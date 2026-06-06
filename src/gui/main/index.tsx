@@ -1,5 +1,5 @@
 import { VM } from "../../vm"
-import i18n from "../../i18n"
+import WorkSpace from "../blocks"
 import './index.css'
 
 export interface GUI_props {
@@ -13,9 +13,11 @@ const GUI = (
 ): React.ReactElement => {
 
     return (
-    <div className="app">
-        {window.t('test')}
-    </div>
+        <div className="app">
+            <WorkSpace
+                vm={vm}
+            />
+        </div>
     )
 }
 

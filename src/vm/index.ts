@@ -1,9 +1,28 @@
 import Runtime from "./runtime/runtime"
+import Settings from "./settings/index"
 
+/**
+ * 虚拟机，基本算是个后端
+ */
 export class VM{
     Runtime: Runtime
+    Settings: Settings
+    editingTargetID: string
 
     constructor(){
-        this.Runtime = Runtime;
+        /**
+         * 运行时
+         */
+        this.Runtime = new Runtime();
+
+        /**
+         * 存储项目设置
+         */
+        this.Settings = new Settings();
+
+        /**
+         * 当前的编辑目标ID
+         */
+        this.editingTargetID = "";
     }
 }
