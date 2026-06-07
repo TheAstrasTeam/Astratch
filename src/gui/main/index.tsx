@@ -2,14 +2,13 @@ import { VM } from "../../vm"
 import WorkSpace from "../blocks"
 import './index.css'
 
-export interface GUI_props {
-    vm: VM
-}
 
 const GUI = (
     {
         vm
-    }: GUI_props
+    }: {
+        vm: VM
+    }
 ): React.ReactElement => {
 
     return (
