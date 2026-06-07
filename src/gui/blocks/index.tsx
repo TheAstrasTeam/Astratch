@@ -1,35 +1,11 @@
-import { useRef, useState, useEffect } from 'react';
+import type { VM } from '../../vm';
 import styles from './index.module.css'
 
 
-const WorkSpace = ({ vm }): React.ReactNode => {
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [dimensions, setDimensions] = useState({
-        width: window.innerWidth,
-        height: window.innerHeight,
-    });
-    useEffect(() => {
-        const handleResize = () => {
-            setDimensions({
-                width: window.innerWidth,
-                height: window.innerHeight,
-            });
-        };
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-
-        canvas.width = dimensions.width;
-        canvas.height = dimensions.height;
-    }, [dimensions]);
+const WorkSpace = ({ vm }: {vm: VM}): React.ReactNode => {
     return (
         <div className={styles.workspace} >
-            <canvas ref={canvasRef}>
-                {window.t("unsupported_webgl")}
-            </canvas>
+            {/* 等待LTY制作renderer然后套用 */}
         </div>
     )
 }
