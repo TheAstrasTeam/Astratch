@@ -1,15 +1,16 @@
 import Runtime from "./runtime/runtime"
 import Settings from "./settings/index"
+import type { IFVM, IFRuntime, IFSettings } from "../typescript/interface"
 
 /**
- * 虚拟机，基本算是个后端
+ * 虚拟机，管理整个AEN
  */
-export class VM{
-    Runtime: Runtime
-    Settings: Settings
-    editingTargetID: string
+export class VM implements IFVM {
+    Runtime: IFRuntime;
+    Settings: IFSettings;
+    editingTargetID: string;
 
-    constructor(){
+    constructor() {
         /**
          * 运行时
          */

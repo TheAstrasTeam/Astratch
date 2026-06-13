@@ -1,4 +1,4 @@
-import { VM } from "../../vm"
+import type { IFVM } from "../../typescript/interface"
 import WorkSpace from "../blocks"
 import './index.css'
 
@@ -7,7 +7,7 @@ const GUI = (
     {
         vm
     }: {
-        vm: VM
+        vm: IFVM
     }
 ): React.ReactElement => {
 
