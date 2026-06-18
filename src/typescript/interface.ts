@@ -13,3 +13,9 @@ export interface IFVM {
     Settings: IFSettings
     editingTargetID: string
 }
+
+// settings
+export interface settings {
+    userName: string,
+    guiTheme: 'dark' | 'light'
+}
