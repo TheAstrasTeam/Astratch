@@ -19,7 +19,7 @@ i18nReady.then(() => {
           />
         ) : (
           <Failed 
-            reason='folder_api_not_supported'
+            reason='file_system_access_api_not_supported'
           />
         )}
       </Suspense>

@@ -1,2 +1,2 @@
 export type IFailedReason = 
-    'folder_api_not_supported'
+    'file_system_access_api_not_supported'

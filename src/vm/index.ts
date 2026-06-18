@@ -2,6 +2,13 @@ import Runtime from "./runtime/runtime"
 import Settings from "./settings/index"
 import type { IVM, IRuntime, IVMSettings, IProjectManager } from "../types/vm"
 import { ProjectManager } from "./projectManager";
+import { t } from "i18next";
+
+export const DEFAULT_PROJECT_JSON = {
+    id: crypto.randomUUID(),
+    name: t('project'),
+    adult: ['you']
+}
 
 /**
  * 虚拟机，管理整个AEN
@@ -36,5 +43,16 @@ export class VM implements IVM {
 
     async selectProject(){
         await this.ProjectManager.selectFolder();
+    }
+
+    async initProject(){
+        if(!this.ProjectManager.folderHandle) 
+            throw new Error('Please load/create a project first!');
+        if(!await this.ProjectManager.isEmpty(this.ProjectManager.folderHandle)) 
+            throw new Error('Please select a empty folder!');
+
+        await this.ProjectManager.createFolder(this.ProjectManager.folderHandle, 'assets');
+        await this.ProjectManager.createFolder(this.ProjectManager.folderHandle, 'sprites');
+        await this.ProjectManager.createFile(this.ProjectManager.folderHandle, 'projectMeta.json', JSON.stringify(DEFAULT_PROJECT_JSON));
     }
 }

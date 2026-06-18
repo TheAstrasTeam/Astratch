@@ -1,4 +1,4 @@
-import type { IProjectManager } from "../../types/vm";
+import type { IProjectManager, folderType } from "../../types/vm";
 
 /**
  * 与文件系统互动
@@ -17,7 +17,24 @@ export class ProjectManager implements IProjectManager{
         this.folderHandle = await window.showDirectoryPicker();
     }
 
-    createFolder(){
+    async isEmpty(path: folderType){
+        try {
+            const entries = await path!.values().next();
+            return !!entries.done;
+        } catch {
+            return true;
+        }
+    }
 
+    async createFolder(path: folderType, name: string){
+        return await path!.getDirectoryHandle(name, { create: true });
+    }
+
+    async createFile(path: folderType, name: string, content: string){
+        const fileHandle = await path!.getFileHandle(name, { create: true });
+        const fileWrite = await fileHandle.createWritable();
+        fileWrite.write(content);
+        fileWrite.close();
+        return fileHandle
     }
 }
