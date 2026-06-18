@@ -1,9 +1,9 @@
-import type { IFRuntime } from "../../typescript/interface"
+import type { IRuntime } from "../../types/vm"
 
 /**
  * 运行时，管理关于项目的执行
  */
-class Runtime implements IFRuntime{
+class Runtime implements IRuntime{
     projectAdult: string[];
     projectID: string;
     constructor(){

@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import GUI from './gui/main/index.tsx';
 import { VM } from './vm/index.ts';
 import i18nReady from './i18n';
+import Failed from './gui/failed/index.tsx';
 
 // 初始化VM
 const vm = new VM();
@@ -12,9 +13,15 @@ i18nReady.then(() => {
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
       <Suspense fallback="loading...">
-        <GUI
-          vm={vm}
-        />
+        {vm.ProjectManager.isAPIAvailable ? (
+          <GUI
+            vm={vm}
+          />
+        ) : (
+          <Failed 
+            reason='folder_api_not_supported'
+          />
+        )}
       </Suspense>
     </StrictMode>,
   )

@@ -163,6 +163,12 @@ const OPCODE = {
     procedures_return: 'procedures_return',
     argument_reporter_string_number: 'argument_reporter_string_number',
     argument_reporter_boolean: 'argument_reporter_boolean'
+} as const
+
+type OpcodeValue = typeof OPCODE[keyof typeof OPCODE]
+
+export interface IBlocksConfig {
+    opcode: OpcodeValue
 }
 
 export {

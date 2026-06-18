@@ -1,14 +1,16 @@
 import Runtime from "./runtime/runtime"
 import Settings from "./settings/index"
-import type { IFVM, IFRuntime, IFSettings } from "../typescript/interface"
+import type { IVM, IRuntime, IVMSettings, IProjectManager } from "../types/vm"
+import { ProjectManager } from "./projectManager";
 
 /**
  * 虚拟机，管理整个AEN
  */
-export class VM implements IFVM {
-    Runtime: IFRuntime;
-    Settings: IFSettings;
+export class VM implements IVM {
+    Runtime: IRuntime;
+    Settings: IVMSettings;
     editingTargetID: string;
+    ProjectManager: IProjectManager;
 
     constructor() {
         /**
@@ -25,5 +27,14 @@ export class VM implements IFVM {
          * 当前的编辑目标ID
          */
         this.editingTargetID = "";
+
+        /**
+         * 管理项目目录
+         */
+        this.ProjectManager = new ProjectManager();
+    }
+
+    async selectProject(){
+        await this.ProjectManager.selectFolder();
     }
 }
