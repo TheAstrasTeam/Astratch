@@ -4,12 +4,6 @@ import type { IVM, IRuntime, IVMSettings, IProjectManager } from "../types/vm"
 import { ProjectManager } from "./projectManager";
 import { t } from "i18next";
 
-export const DEFAULT_PROJECT_JSON = {
-    id: crypto.randomUUID(),
-    name: t('project'),
-    adult: ['you']
-}
-
 /**
  * 虚拟机，管理整个AEN
  */
@@ -53,6 +47,11 @@ export class VM implements IVM {
 
         await this.ProjectManager.createFolder(this.ProjectManager.folderHandle, 'assets');
         await this.ProjectManager.createFolder(this.ProjectManager.folderHandle, 'sprites');
-        await this.ProjectManager.createFile(this.ProjectManager.folderHandle, 'projectMeta.json', JSON.stringify(DEFAULT_PROJECT_JSON));
+        await this.ProjectManager.createFile(this.ProjectManager.folderHandle, 'projectMeta.json', JSON.stringify({
+                id: crypto.randomUUID(),
+                name: t('project'),
+                adult: ['you']
+            }
+        ));
     }
 }

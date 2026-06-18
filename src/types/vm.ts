@@ -24,8 +24,8 @@ export interface IProjectManager {
      */
     createFolder: (path:folderType, name: string) => Promise<FileSystemDirectoryHandle>
     /**
-     * 创建个文件夹
-     * @param path 文件夹的句柄
+     * 创建个文件
+     * @param path 文件的句柄
      * @param name 文件名
      * @param content 文件内容
      * @returns 
