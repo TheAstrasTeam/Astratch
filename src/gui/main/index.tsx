@@ -8,15 +8,22 @@ const GUI = (
 ): React.ReactElement => {
     return (
         <div className="app">
-            <button onClick={async () => {
-                await vm.selectProject();
-            }}>select a folder</button>
-            <button onClick={async() => {
-                await vm.initProject()
-            }}>init project</button>
-            <WorkSpace
-                vm={vm}
-            />
+            <div className="toolbar">
+                {/* 我添加了一个工具栏用来保证布局 */}
+                <button onClick={async () => {
+                    await vm.selectProject();
+                }}>select a folder</button>
+                <button onClick={async() => {
+                    await vm.initProject()
+                }}>init project</button>
+            </div>
+            <div className="workspace-area">
+                {/* 这是一个测试，给工作区包一个容器 */}
+                <WorkSpace
+                    key="workspace"
+                    vm={vm}
+                />
+            </div>
         </div>
     )
 }

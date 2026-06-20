@@ -1,3 +1,19 @@
 .app{
     font-family: 'Courier New', Courier, monospace;
+    /* 别慌，这只是用来测试而已，扣式咯你随时可以删掉或者修改 */
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.toolbar {
+    flex-shrink: 0;
+}
+
+.workspace-area {
+    flex: 1;
+    min-height: 0;
 }
