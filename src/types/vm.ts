@@ -10,6 +10,9 @@ export interface IRuntime {
 export type folderType =  FileSystemDirectoryHandle | undefined;
 
 export interface IProjectManager {
+    /**
+     * 项目文件夹句柄
+     */
     folderHandle?: FileSystemDirectoryHandle
     isAPIAvailable: boolean
     /**

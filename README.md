@@ -64,7 +64,7 @@ t('id')
 
 ### Workspace
 
-`AstraEditor-next` 会用 `WebGPU` 驱动工作区（也就是 `Blockly` ）。这个过程将会持续大约：
+`AstraEditor-next` 暂会用最新的 `Blockly v13.0 `驱动工作区。在**未来**或将**重新**设计一个全新的`WebGPU`驱动的工作区，这个过程将会持续大约：
 > # 很久很久
 
 ### 编译器
