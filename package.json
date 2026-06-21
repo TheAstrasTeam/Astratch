@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "comment": "我也要是模块吗？",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -10,6 +11,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@blockly/continuous-toolbox": "^7.0.0",
+    "@mit-app-inventor/blockly-plugin-workspace-multiselect": "^1.0.2",
     "blockly": "^13.0.0",
     "classnames": "^2.5.1",
     "i18next": "^26.3.1",

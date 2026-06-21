@@ -8,6 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@blockly/continuous-toolbox':
+        specifier: ^7.0.0
+        version: 7.0.9(blockly@13.0.0(jsdom@27.4.0))
+      '@mit-app-inventor/blockly-plugin-workspace-multiselect':
+        specifier: ^1.0.2
+        version: 1.0.2(blockly@13.0.0(jsdom@27.4.0))
       blockly:
         specifier: ^13.0.0
         version: 13.0.0(jsdom@27.4.0)
@@ -32,9 +38,6 @@ importers:
       react-i18next:
         specifier: ^17.0.8
         version: 17.0.8(i18next@26.3.1(typescript@6.0.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@6.0.3)
-      vite-plugin-page-reload:
-        specifier: ^0.2.3
-        version: 0.2.3(vite@8.0.16(@types/node@24.13.1)(sass@1.100.0))
       zustand:
         specifier: ^5.0.14
         version: 5.0.14(@types/react@19.2.17)(react@19.2.7)(use-sync-external-store@1.6.0(react@19.2.7))
@@ -93,6 +96,9 @@ importers:
       vite:
         specifier: ^8.0.12
         version: 8.0.16(@types/node@24.13.1)(sass@1.100.0)
+      vite-plugin-page-reload:
+        specifier: ^0.2.3
+        version: 0.2.3(vite@8.0.16(@types/node@24.13.1)(sass@1.100.0))
 
 packages:
 
@@ -178,6 +184,12 @@ packages:
   '@babel/types@7.29.7':
     resolution: {integrity: sha512-4zBIxpPzowiZpusoFkyGVwakdRJUyuH5PxQ/PrqghfdFWWasvnCdPfQXHrenDai+gyLARulZjZowCOj6fjT4pA==}
     engines: {node: '>=6.9.0'}
+
+  '@blockly/continuous-toolbox@7.0.9':
+    resolution: {integrity: sha512-luFNC9GX4GAEqTrag07jV3DrY2WEeYfyBJnP932/xb27hs6oVaAw1bJPzI/NtyBxdU3LOkQZ826fEVbCVoXzAQ==}
+    engines: {node: '>=8.17.0'}
+    peerDependencies:
+      blockly: ^12.0.0
 
   '@csstools/color-helpers@6.0.2':
     resolution: {integrity: sha512-LMGQLS9EuADloEFkcTBR3BwV/CGHV7zyDxVRtVDTwdI2Ca4it0CCVTT9wCkxSgokjE5Ho41hEPgb8OEUwoXr6Q==}
@@ -307,6 +319,12 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@mit-app-inventor/blockly-plugin-workspace-multiselect@1.0.2':
+    resolution: {integrity: sha512-uC0E9ZqQ+ru8e9BFbLkHylYrXRQ3NFg7zG04W6X8dfMY9+AnMICXY9lnt8xpLd4Tr4osYNsEGHF4W0a82flzaQ==}
+    engines: {node: '>=8.17.0'}
+    peerDependencies:
+      blockly: '>=11 <12'
 
   '@napi-rs/wasm-runtime@1.1.4':
     resolution: {integrity: sha512-3NQNNgA1YSlJb/kMH1ildASP9HW7/7kYnRI2szWJaofaS1hWmbGI4H+d3+22aGzXXN9IJ+n+GiFVcGipJP18ow==}
@@ -727,6 +745,9 @@ packages:
   detect-libc@2.1.2:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
     engines: {node: '>=8'}
+
+  dragselect@2.7.4:
+    resolution: {integrity: sha512-j0qFl4xvsyImlSTn9erDCCT4SSPUMssgKAYuKqhsPr8WPphLghHfjDd4WR2jLjL91fTQQlbbIJ/7T2qwD2hghQ==}
 
   electron-to-chromium@1.5.368:
     resolution: {integrity: sha512-7RckJJK4uESJF9PxvfMWd3TGqIiieUTG4HxnKaKuIpGbcr+r2ZEB3g2gAhCP3Fqm42vJSzLfgab9eva/C4/XVw==}
@@ -1498,6 +1519,10 @@ snapshots:
       '@babel/helper-string-parser': 7.29.7
       '@babel/helper-validator-identifier': 7.29.7
 
+  '@blockly/continuous-toolbox@7.0.9(blockly@13.0.0(jsdom@27.4.0))':
+    dependencies:
+      blockly: 13.0.0(jsdom@27.4.0)
+
   '@csstools/color-helpers@6.0.2': {}
 
   '@csstools/css-calc@3.2.1(@csstools/css-parser-algorithms@4.0.0(@csstools/css-tokenizer@4.0.0))(@csstools/css-tokenizer@4.0.0)':
@@ -1608,6 +1633,11 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@mit-app-inventor/blockly-plugin-workspace-multiselect@1.0.2(blockly@13.0.0(jsdom@27.4.0))':
+    dependencies:
+      blockly: 13.0.0(jsdom@27.4.0)
+      dragselect: 2.7.4
 
   '@napi-rs/wasm-runtime@1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
     dependencies:
@@ -1971,6 +2001,8 @@ snapshots:
   deep-is@0.1.4: {}
 
   detect-libc@2.1.2: {}
+
+  dragselect@2.7.4: {}
 
   electron-to-chromium@1.5.368: {}
 
