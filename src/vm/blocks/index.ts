@@ -26,6 +26,7 @@ class Blocks implements IBlocks {
         this.workspaceSvg = null;
         this.Blockly = BlocklySelf;
         this.supportLanguages = {
+            // Blockly太坏了语言包自己会报语法错误
             // @ts-expect-error
             'en': En,
             // @ts-expect-error
