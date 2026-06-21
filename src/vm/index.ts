@@ -58,7 +58,7 @@ export class VM implements IVM {
         await this.ProjectManager.createFile(this.ProjectManager.folderHandle, 'projectMeta.json', JSON.stringify({
                 id: crypto.randomUUID(),
                 name: t('project'),
-                adult: ['you']
+                author: ['you']
             }
         ));
     }

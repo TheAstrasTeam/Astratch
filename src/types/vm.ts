@@ -6,7 +6,7 @@ export interface IVMSettings {
 
 export interface IRuntime {
     projectID: string
-    projectAdult: string[]
+    projectAuthor: string[]
 }
 
 export type folderType =  FileSystemDirectoryHandle | undefined;
