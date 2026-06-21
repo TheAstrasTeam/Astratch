@@ -14,7 +14,11 @@ export class ProjectManager implements IProjectManager{
     }
 
     async selectFolder(){
-        this.folderHandle = await window.showDirectoryPicker();
+        try{
+            this.folderHandle = await window.showDirectoryPicker();
+        } catch {
+            console.warn('You cancel dir picker!');
+        }
     }
 
     async isEmpty(path: folderType){
@@ -33,7 +37,7 @@ export class ProjectManager implements IProjectManager{
     async createFile(path: folderType, name: string, content: string){
         const fileHandle = await path!.getFileHandle(name, { create: true });
         const fileWrite = await fileHandle.createWritable();
-        fileWrite.write(content);
+        await fileWrite.write(content);
         fileWrite.close();
         return fileHandle
     }
