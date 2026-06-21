@@ -33,6 +33,7 @@ graph LR
         O --> |语言定义| LD[locales/]
 
         B --> |虚拟机|D[vm/]
+        D --> |积木区|BLK[blocks/]
         D --> |运行时|RUNTIME[runtime/]
         D --> |项目文件管理|PM[projectManager/]
         D --> |项目设置|PS[settings/]
