@@ -5,7 +5,7 @@ import './index.css'
 
 const GUI = (
     {vm}: {vm: IVM}
-): React.ReactElement => {
+): React.ReactNode => {
     return (
         <div className="app">
             <div className="toolbar">

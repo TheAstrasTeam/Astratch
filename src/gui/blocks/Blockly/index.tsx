@@ -1,7 +1,7 @@
 import  { useEffect, useRef } from 'react';
 import type { IVM } from '../../../types/vm';
 
-const BlocklyWorkspace = ({vm}:{vm:IVM}) => {
+const BlocklyWorkspace = ({vm}:{vm:IVM}): React.ReactNode => {
     const workspaceDiv = useRef<HTMLDivElement>(null);
     useEffect(() => {
         if (!workspaceDiv.current) return
