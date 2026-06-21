@@ -1,3 +1,5 @@
+// 来自 Cyberexplorer 的积木箱配置
+// Todo: 使用 AEN 的工具箱(骗你的和 Scratch 相兼容所以一样)
 export default {
     kind: 'categoryToolbox',
     contents: [

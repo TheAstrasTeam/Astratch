@@ -6,7 +6,9 @@ import BlocklyWorkspace from './Blockly/index'
 const WorkSpace = ({ vm }: {vm: IVM}): React.ReactNode => {
     return (
         <div className={styles.workspace} >
-            <BlocklyWorkspace />
+            <BlocklyWorkspace 
+                vm={vm}
+            />
         </div>
     )
 }

@@ -1,3 +1,5 @@
+import type { IBlocks } from './blocks'
+
 export interface IVMSettings {
     enableTurboMode: boolean
 }
@@ -46,6 +48,7 @@ export interface IVM {
     Settings: IVMSettings
     editingTargetID: string
     ProjectManager: IProjectManager
+    Blocks: IBlocks
     /**
      * 选择一个文件夹打开作为项目
      */

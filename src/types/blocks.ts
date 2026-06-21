@@ -1,3 +1,5 @@
+import * as Blockly from 'blockly'
+
 const OPCODE = {
     // 运动
     motion_movesteps: 'motion_movesteps',
@@ -173,4 +175,60 @@ export interface IBlocksConfig {
 
 export {
     OPCODE
+}
+
+export type Language = {[key: string]: string};
+
+export interface IBlocks{
+    /**
+     * ## 工作区
+     * > 处理 **所有** 数据&渲染的东西。
+     * 
+     * 至于为什么不拆分？我哪知道，它返回的是这个
+     * 
+     * 它可能还未被创建，所以可能为null
+     */
+    workspaceSvg: Blockly.WorkspaceSvg | null
+    /**
+     * ## Blockly
+     */
+    Blockly: typeof Blockly
+    /**
+     * ## 工具箱
+     * 
+     * 它存储着**所有**积木配置
+     */
+    toolbox: Blockly.utils.toolbox.ToolboxDefinition
+    /**
+     * 支持的所有语言
+     */
+    supportLanguages: {
+        'en': Language, 
+        'zh-Hans': Language
+    }
+    /**
+     * ## 工作区配置
+     */
+    workspaceConfig: Blockly.BlocklyOptions
+    /**
+     * 设置一个语言
+     * @param lang AEN 兼容的 i18n
+     */
+    setLanguage: (lang: 'en' | 'zh-Hans') => void;
+    /**
+     * 销毁工作区
+     * 
+     * @returns 是否销毁成功
+     */
+    dispose: () => boolean
+    /**
+     * 创建一个工作区
+     * 
+     * @returns 是否创建成功
+     */
+    createWorkspace: (DOM: HTMLDivElement) => boolean
+    /**
+     * 重启工作区
+     */
+    restartWorkspace: () => void
 }

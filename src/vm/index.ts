@@ -3,6 +3,8 @@ import Settings from "./settings/index"
 import type { IVM, IRuntime, IVMSettings, IProjectManager } from "../types/vm"
 import { ProjectManager } from "./projectManager";
 import { t } from "i18next";
+import Blocks from "./blocks";
+import * as Blockly from 'blockly';
 
 /**
  * 虚拟机，管理整个AEN
@@ -12,6 +14,7 @@ export class VM implements IVM {
     Settings: IVMSettings;
     editingTargetID: string;
     ProjectManager: IProjectManager;
+    Blocks: Blocks;
 
     constructor() {
         /**
@@ -33,6 +36,11 @@ export class VM implements IVM {
          * 管理项目目录
          */
         this.ProjectManager = new ProjectManager();
+
+        /**
+         * Blockly/WebGPU 工作区管理
+         */
+        this.Blocks = new Blocks(Blockly);
     }
 
     async selectProject(){
