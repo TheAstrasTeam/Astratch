@@ -7,6 +7,9 @@ import Failed from './gui/failed/index.tsx';
 
 // 初始化VM
 const vm = new VM();
+Object.assign(window, {
+  vm,
+});
 
 // 等待国际化初始化
 i18nReady.then(() => {
