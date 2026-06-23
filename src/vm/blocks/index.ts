@@ -2,12 +2,11 @@ import type { IBlocks, Language } from '../../types/blocks'
 import type * as Blockly from 'blockly'
 // 导入两个插件试试
 import * as  ContinuousToolbox from '@blockly/continuous-toolbox'
+// @ts-expect-error 这个插件本来就不支持TS
 import { Multiselect } from '@mit-app-inventor/blockly-plugin-workspace-multiselect'
 import toolbox from './toolbox'
 import * as En from 'blockly/msg/en'
 import * as ZhHans from 'blockly/msg/zh-hans'
-
-// 哪个傻屌给我把Blockly初始化弄这来了，我找你妈半天
 
 /**
  * 用于便捷的管理WebGPU或Blockly工作区
@@ -18,21 +17,12 @@ class Blocks implements IBlocks {
     workspaceSvg: Blockly.WorkspaceSvg | null;
     Blockly: typeof Blockly;
     supportLanguages: { 'en': Language; 'zh-Hans': Language; };
-    workspaceConfig: Blockly.BlocklyOptions;
+    workspaceConfig: Blockly.BlocklyOptions | any;
     toolbox: Blockly.utils.toolbox.ToolboxDefinition;
     /**
      * 缓存的 DOM，用于进行重启操作等
      */
     private _DOM: HTMLDivElement | null;
-
-    // 这是扣式咯叫我添加的初始化函数，它很神秘，没人知道碰了它会发生什么。
-    // 我去，悠悠的户晨风！
-    init(): void {
-        // 注册插件'连续工具箱'，这样工具箱就会像 Scratch 样了
-        ContinuousToolbox.registerContinuousToolbox();
-        // 需要注意的是，某些设置语法看起来不兼容，是因为Blockly新版本弃用了某些方法。
-
-    };
 
     constructor(BlocklySelf: typeof Blockly) {
         this._DOM = null;
@@ -79,8 +69,6 @@ class Blocks implements IBlocks {
                 metricsManager: ContinuousToolbox.ContinuousMetrics,
             },
             // 多选插件的配置选项
-            // 双击积木折叠/展开（MIT App Inventor 的功能）
-            useDoubleClick: true,
             // 拖拽后碰撞邻居积木以避免重叠
             bumpNeighbours: false,
             // 保持多个同类型积木的字段值相同
@@ -101,11 +89,25 @@ class Blocks implements IBlocks {
             multiselectIcon: {
                 hideIcon: false,
                 weight: 3,
+                // todo: 用本地的
                 enabledIcon: 'https://github.com/mit-cml/workspace-multiselect/raw/main/test/media/select.svg',
                 disabledIcon: 'https://github.com/mit-cml/workspace-multiselect/raw/main/test/media/unselect.svg',
             },
         }
     }
+
+    init(): void {
+        // 对于完全不需要现在的工作区的
+        ContinuousToolbox.registerContinuousToolbox();
+        // 对于需要现在的工作区的
+        if (this.workspaceSvg) {
+            // https://github.com/mit-cml/workspace-multiselect
+            // 哪有问题你倒是说一下啊 @cyberexplorer
+            console.log(this.workspaceSvg)
+            const multiselectPlugin = new Multiselect(this.workspaceSvg);
+            multiselectPlugin.init(this.workspaceConfig);
+        }
+    };
 
     /**
      * 重启工作区
@@ -136,12 +138,7 @@ class Blocks implements IBlocks {
 
         this._DOM = DOM;
         this.workspaceSvg = this.Blockly.inject(DOM, this.workspaceConfig);
-
-        // 初始化插件'多选积木'
-        const multiselectPlugin = new Multiselect(this.workspaceSvg);
-        multiselectPlugin.init(this.workspaceConfig);
-        // 抽象，这个插件我搞不太明白，部分配置倒是弄好了，其他的扣式咯自己去研究研究
-        // https://github.com/mit-cml/workspace-multiselect
+        this.init();
         return !!this.workspaceSvg
     }
 

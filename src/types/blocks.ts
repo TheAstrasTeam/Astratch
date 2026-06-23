@@ -208,8 +208,10 @@ export interface IBlocks{
     }
     /**
      * ## 工作区配置
+     * 
+     * > 需要注意的是，部分配置不在`BlocklyOptions`中，所以加了个any
      */
-    workspaceConfig: Blockly.BlocklyOptions
+    workspaceConfig: Blockly.BlocklyOptions | any
     /**
      * 设置一个语言
      * @param lang AEN 兼容的 i18n
@@ -231,4 +233,8 @@ export interface IBlocks{
      * 重启工作区
      */
     restartWorkspace: () => void
+    /**
+     * 初始化 Blockly，载入插件什么的
+     */
+    init: () => void
 }
