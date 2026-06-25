@@ -1,0 +1,41 @@
+name: CI
+
+on:
+    push:
+        # 我认为main因为是需要从 develop
+        # 合并的所以CI有点多余，develop的workflow
+        # 应该是和部署网页端相关的
+        branches: [develop]
+    pull_request:
+        branches: [develop, main]
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '24'
+
+            - uses: pnpm/action-setup@v3
+              with:
+                  version: 9
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Lint
+              run: pnpm lint
+
+            - name: Format check
+              run: pnpm prettier --check .
+
+            - name: Type check
+              run: pnpm tsc -b
+
+            - name: Build
+              run: pnpm build
