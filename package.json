@@ -8,6 +8,7 @@
         "dev": "vite",
         "build": "tsc -b && vite build",
         "lint": "eslint .",
+        "check": "prettier --check .",
         "format": "prettier --write .",
         "preview": "vite preview"
     },

@@ -32,7 +32,7 @@ jobs:
               run: pnpm lint
 
             - name: Format check
-              run: pnpm prettier --check .
+              run: pnpm check
 
             - name: Type check
               run: pnpm tsc -b
