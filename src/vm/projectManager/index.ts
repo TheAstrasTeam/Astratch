@@ -1,27 +1,27 @@
-import type { IProjectManager, folderType } from "../../types/vm";
+import type { IProjectManager, folderType } from '../../types/vm';
 
 /**
  * 与文件系统互动
  */
-export class ProjectManager implements IProjectManager{
+export class ProjectManager implements IProjectManager {
     // 一开始没有
     folderHandle?: FileSystemDirectoryHandle;
     isAPIAvailable: boolean;
 
-    constructor(){
+    constructor() {
         // 在非localhost/https环境下没有这个东西，js还是太安全了
         this.isAPIAvailable = typeof showDirectoryPicker === 'function';
     }
 
-    async selectFolder(){
-        try{
+    async selectFolder() {
+        try {
             this.folderHandle = await window.showDirectoryPicker();
         } catch {
             console.warn('You cancel dir picker!');
         }
     }
 
-    async isEmpty(path: folderType){
+    async isEmpty(path: folderType) {
         try {
             const entries = await path!.values().next();
             return !!entries.done;
@@ -30,15 +30,15 @@ export class ProjectManager implements IProjectManager{
         }
     }
 
-    async createFolder(path: folderType, name: string){
+    async createFolder(path: folderType, name: string) {
         return await path!.getDirectoryHandle(name, { create: true });
     }
 
-    async createFile(path: folderType, name: string, content: string){
+    async createFile(path: folderType, name: string, content: string) {
         const fileHandle = await path!.getFileHandle(name, { create: true });
         const fileWrite = await fileHandle.createWritable();
         await fileWrite.write(content);
         fileWrite.close();
-        return fileHandle
+        return fileHandle;
     }
 }

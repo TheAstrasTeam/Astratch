@@ -432,4 +432,4 @@ export default {
             custom: 'PROCEDURE',
         },
     ],
-}
+};

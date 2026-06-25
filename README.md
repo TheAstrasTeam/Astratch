@@ -1,7 +1,7 @@
 # AstraEditor-Next
 
 > [!WARNING]
-> 此项目仍为计划，具体动工时间未定。 
+> 此项目仍为计划，具体动工时间未定。
 
 ### [AstraEditor](https://github.com/AstraEditor)
 
@@ -46,19 +46,21 @@ graph LR
         H --> |组合| K
         I --> |组合| K
         B --> |公用函数|F[uilts/]
-        B --> |主界面|MAIN[main.ts]     
+        B --> |主界面|MAIN[main.ts]
 ```
 
 ### 国际化
 
 `AstraEditor-next` 使用 `i18next`，您可以这样使用国际化：
-``` ts
-import {t} from 'i18next';
 
-t('id')
+```ts
+import { t } from 'i18next';
+
+t('id');
 ```
 
 之后于`AEN\AstraEditor-Next\src\i18n\locales`配置语言
+
 > 未来会支持线上添加新翻译
 
 ## 大饼
@@ -66,6 +68,7 @@ t('id')
 ### Workspace
 
 `AstraEditor-next` 暂会用最新的 `Blockly v13.0 `驱动工作区。在**未来**或将**重新**设计一个全新的`WebGPU`驱动的工作区，这个过程将会持续大约：
+
 > # 很久很久
 
 ### 编译器
@@ -75,6 +78,7 @@ t('id')
 ### Todo
 
 #### 现在
+
 - [x] 基础项目目录、配置国际化
 - [ ] 敲定项目文件格式
 - [ ] 制作关于项目的 `API`
@@ -84,5 +88,6 @@ t('id')
 - [ ] 完善积木编辑器
 
 #### 未来
+
 - [ ] `Electron` 桌面端
 - [ ] `Tauri` 手机端+适配

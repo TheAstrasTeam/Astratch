@@ -1,23 +1,23 @@
-import type { IBlocks, Language } from '../../types/blocks'
-import type * as Blockly from 'blockly'
+import type { IBlocks, Language } from '../../types/blocks';
+import type * as Blockly from 'blockly';
 // 导入两个插件试试
-import * as  ContinuousToolbox from '@blockly/continuous-toolbox'
+import * as ContinuousToolbox from '@blockly/continuous-toolbox';
 // @ts-expect-error 这个插件本来就不支持TS
-import { Multiselect } from '@mit-app-inventor/blockly-plugin-workspace-multiselect'
-import toolbox from './toolbox'
-import * as En from 'blockly/msg/en'
-import * as ZhHans from 'blockly/msg/zh-hans'
+import { Multiselect } from '@mit-app-inventor/blockly-plugin-workspace-multiselect';
+import toolbox from './toolbox';
+import * as En from 'blockly/msg/en';
+import * as ZhHans from 'blockly/msg/zh-hans';
 
 /**
  * 用于便捷的管理WebGPU或Blockly工作区
- * 
+ *
  * 用一个就好了！
  */
 class Blocks implements IBlocks {
     workspaceSvg: Blockly.WorkspaceSvg | null;
     Blockly: typeof Blockly;
-    supportLanguages: { 'en': Language; 'zh-Hans': Language; };
-    workspaceConfig: Blockly.BlocklyOptions | any;
+    supportLanguages: { en: Language; 'zh-Hans': Language };
+    workspaceConfig: Blockly.BlocklyOptions | Record<string, unknown>;
     toolbox: Blockly.utils.toolbox.ToolboxDefinition;
     /**
      * 缓存的 DOM，用于进行重启操作等
@@ -29,12 +29,11 @@ class Blocks implements IBlocks {
         this.workspaceSvg = null;
         this.Blockly = BlocklySelf;
         this.supportLanguages = {
-            // Blockly太坏了语言包自己会报语法错误
-            // @ts-expect-error
-            'en': En,
-            // @ts-expect-error
-            'zh-Hans': ZhHans
-        }
+            // @ts-expect-error 语言包类型不支持
+            en: En,
+            // @ts-expect-error 语言包类型不支持
+            'zh-Hans': ZhHans,
+        };
         this.toolbox = toolbox;
         this.init(); // 初始化始出
         this.workspaceConfig = {
@@ -57,9 +56,9 @@ class Blocks implements IBlocks {
             },
             /**
              * Todo: 在未来我们打算自己搞一套渲染器，这将会非常*炫酷*
-             * 
+             *
              * 不是吗？
-             * 
+             *
              * - 渲染器指的是积木的样式渲染，你还想咋改
              */
             renderer: 'Zelos',
@@ -90,10 +89,12 @@ class Blocks implements IBlocks {
                 hideIcon: false,
                 weight: 3,
                 // todo: 用本地的
-                enabledIcon: 'https://github.com/mit-cml/workspace-multiselect/raw/main/test/media/select.svg',
-                disabledIcon: 'https://github.com/mit-cml/workspace-multiselect/raw/main/test/media/unselect.svg',
+                enabledIcon:
+                    'https://github.com/mit-cml/workspace-multiselect/raw/main/test/media/select.svg',
+                disabledIcon:
+                    'https://github.com/mit-cml/workspace-multiselect/raw/main/test/media/unselect.svg',
             },
-        }
+        };
     }
 
     init(): void {
@@ -103,11 +104,11 @@ class Blocks implements IBlocks {
         if (this.workspaceSvg) {
             // https://github.com/mit-cml/workspace-multiselect
             // 哪有问题你倒是说一下啊 @cyberexplorer
-            console.log(this.workspaceSvg)
+            console.log(this.workspaceSvg);
             const multiselectPlugin = new Multiselect(this.workspaceSvg);
             multiselectPlugin.init(this.workspaceConfig);
         }
-    };
+    }
 
     /**
      * 重启工作区
@@ -139,7 +140,7 @@ class Blocks implements IBlocks {
         this._DOM = DOM;
         this.workspaceSvg = this.Blockly.inject(DOM, this.workspaceConfig);
         this.init();
-        return !!this.workspaceSvg
+        return !!this.workspaceSvg;
     }
 
     dispose(): boolean {
@@ -152,4 +153,4 @@ class Blocks implements IBlocks {
     }
 }
 
-export default Blocks
+export default Blocks;

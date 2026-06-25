@@ -1,9 +1,9 @@
-import Runtime from "./runtime/runtime"
-import Settings from "./settings/index"
-import type { IVM, IRuntime, IVMSettings, IProjectManager } from "../types/vm"
-import { ProjectManager } from "./projectManager";
-import { t } from "i18next";
-import Blocks from "./blocks";
+import Runtime from './runtime/runtime';
+import Settings from './settings/index';
+import type { IVM, IRuntime, IVMSettings, IProjectManager } from '../types/vm';
+import { ProjectManager } from './projectManager';
+import { t } from 'i18next';
+import Blocks from './blocks';
 import * as Blockly from 'blockly';
 
 /**
@@ -30,7 +30,7 @@ export class VM implements IVM {
         /**
          * 当前的编辑目标ID
          */
-        this.editingTargetID = "";
+        this.editingTargetID = '';
 
         /**
          * 管理项目目录
@@ -43,23 +43,26 @@ export class VM implements IVM {
         this.Blocks = new Blocks(Blockly);
     }
 
-    async selectProject(){
+    async selectProject() {
         await this.ProjectManager.selectFolder();
     }
 
-    async initProject(){
-        if(!this.ProjectManager.folderHandle) 
+    async initProject() {
+        if (!this.ProjectManager.folderHandle)
             throw new Error('Please load/create a project first!');
-        if(!await this.ProjectManager.isEmpty(this.ProjectManager.folderHandle)) 
+        if (!(await this.ProjectManager.isEmpty(this.ProjectManager.folderHandle)))
             throw new Error('Please select a empty folder!');
 
         await this.ProjectManager.createFolder(this.ProjectManager.folderHandle, 'assets');
         await this.ProjectManager.createFolder(this.ProjectManager.folderHandle, 'sprites');
-        await this.ProjectManager.createFile(this.ProjectManager.folderHandle, 'projectMeta.json', JSON.stringify({
+        await this.ProjectManager.createFile(
+            this.ProjectManager.folderHandle,
+            'projectMeta.json',
+            JSON.stringify({
                 id: crypto.randomUUID(),
                 name: t('project'),
-                author: ['you']
-            }
-        ));
+                author: ['you'],
+            }),
+        );
     }
 }

@@ -1,4 +1,4 @@
 export interface IGuiSettings {
-    userName: string
-    guiTheme: 'dark' | 'light'
+    userName: string;
+    guiTheme: 'dark' | 'light';
 }

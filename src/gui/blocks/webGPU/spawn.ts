@@ -1,12 +1,12 @@
 // 生成积木SVG
 
-import type { IBlocksConfig } from "../../../types/blocks";
+import type { IBlocksConfig } from '../../../types/blocks';
 
-function spawnBlock(config: IBlocksConfig): string{
-    let svg: string = '';
-    return svg
+// @ts-expect-error 未完成
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function spawnBlock(config: IBlocksConfig): string {
+    const svg: string = '';
+    return svg;
 }
 
-export {
-    spawnBlock
-}
+export { spawnBlock };

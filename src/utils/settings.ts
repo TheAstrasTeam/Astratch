@@ -1,6 +1,6 @@
 // 用于管理界面、编辑器等除VM之外的设置
-import { create } from 'zustand'
-import { spawnUserName } from './username'
+import { create } from 'zustand';
+import { spawnUserName } from './username';
 import type { IGuiSettings } from '../types/gui';
 
 const DEFAULT_GUITHEME: string = 'dark';
@@ -18,6 +18,6 @@ export function initSettings() {
     }
     create(() => ({
         userName: settings?.userName ?? spawnUserName(),
-        guiTheme: settings?.guiTheme ?? DEFAULT_GUITHEME
-    }))
+        guiTheme: settings?.guiTheme ?? DEFAULT_GUITHEME,
+    }));
 }

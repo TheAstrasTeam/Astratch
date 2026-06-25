@@ -1,19 +1,20 @@
-import  { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import type { IVM } from '../../../types/vm';
 
-const BlocklyWorkspace = ({vm}:{vm:IVM}): React.ReactNode => {
+const BlocklyWorkspace = ({ vm }: { vm: IVM }): React.ReactNode => {
     const workspaceDiv = useRef<HTMLDivElement>(null);
     useEffect(() => {
-        if (!workspaceDiv.current) return
+        if (!workspaceDiv.current) return;
 
-        const workspace = vm.Blocks.createWorkspace(workspaceDiv.current)
+        vm.Blocks.createWorkspace(workspaceDiv.current);
 
         return () => {
             vm.Blocks.dispose();
             // 扣式咯，他是头猪
             //-w-//
         };
-    }, [])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     /*
      * todo:
@@ -24,9 +25,7 @@ const BlocklyWorkspace = ({vm}:{vm:IVM}): React.ReactNode => {
      * - 我拒绝，我自己研究114514年没研究出来，你自己去研究，你个懒棒💥
      */
 
-    return (
-        <div ref={workspaceDiv} style={{ width: '100%', height: '100%' }} />
-    )
-}
+    return <div ref={workspaceDiv} style={{ width: '100%', height: '100%' }} />;
+};
 
-export default BlocklyWorkspace
+export default BlocklyWorkspace;

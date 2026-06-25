@@ -44,6 +44,6 @@ const i18nReady = i18n
             escapeValue: false,
         },
     })
-    .then(() => i18n)
+    .then(() => i18n);
 
 export default i18nReady;

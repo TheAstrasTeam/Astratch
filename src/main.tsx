@@ -8,24 +8,20 @@ import Failed from './gui/failed/index.tsx';
 // 初始化VM
 const vm = new VM();
 Object.assign(window, {
-  vm,
+    vm,
 });
 
 // 等待国际化初始化
 i18nReady.then(() => {
-  createRoot(document.getElementById('root')!).render(
-    <StrictMode>
-      <Suspense fallback="loading...">
-        {vm.ProjectManager.isAPIAvailable ? (
-          <GUI
-            vm={vm}
-          />
-        ) : (
-          <Failed 
-            reason='file_system_access_api_not_supported'
-          />
-        )}
-      </Suspense>
-    </StrictMode>,
-  )
-})
+    createRoot(document.getElementById('root')!).render(
+        <StrictMode>
+            <Suspense fallback='loading...'>
+                {vm.ProjectManager.isAPIAvailable ? (
+                    <GUI vm={vm} />
+                ) : (
+                    <Failed reason='file_system_access_api_not_supported' />
+                )}
+            </Suspense>
+        </StrictMode>,
+    );
+});
