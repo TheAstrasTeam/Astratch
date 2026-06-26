@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@mit-app-inventor/blockly-plugin-workspace-multiselect':
-        specifier: ^1.0.2
-        version: 1.0.2(blockly@13.0.0(jsdom@27.4.0))
       blockly:
         specifier: ^13.0.0
         version: 13.0.0(jsdom@27.4.0)
@@ -316,12 +313,6 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
-
-  '@mit-app-inventor/blockly-plugin-workspace-multiselect@1.0.2':
-    resolution: {integrity: sha512-uC0E9ZqQ+ru8e9BFbLkHylYrXRQ3NFg7zG04W6X8dfMY9+AnMICXY9lnt8xpLd4Tr4osYNsEGHF4W0a82flzaQ==}
-    engines: {node: '>=8.17.0'}
-    peerDependencies:
-      blockly: '>=11 <12'
 
   '@napi-rs/wasm-runtime@1.1.4':
     resolution: {integrity: sha512-3NQNNgA1YSlJb/kMH1ildASP9HW7/7kYnRI2szWJaofaS1hWmbGI4H+d3+22aGzXXN9IJ+n+GiFVcGipJP18ow==}
@@ -742,9 +733,6 @@ packages:
   detect-libc@2.1.2:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
     engines: {node: '>=8'}
-
-  dragselect@2.7.4:
-    resolution: {integrity: sha512-j0qFl4xvsyImlSTn9erDCCT4SSPUMssgKAYuKqhsPr8WPphLghHfjDd4WR2jLjL91fTQQlbbIJ/7T2qwD2hghQ==}
 
   electron-to-chromium@1.5.368:
     resolution: {integrity: sha512-7RckJJK4uESJF9PxvfMWd3TGqIiieUTG4HxnKaKuIpGbcr+r2ZEB3g2gAhCP3Fqm42vJSzLfgab9eva/C4/XVw==}
@@ -1638,11 +1626,6 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@mit-app-inventor/blockly-plugin-workspace-multiselect@1.0.2(blockly@13.0.0(jsdom@27.4.0))':
-    dependencies:
-      blockly: 13.0.0(jsdom@27.4.0)
-      dragselect: 2.7.4
-
   '@napi-rs/wasm-runtime@1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
     dependencies:
       '@emnapi/core': 1.10.0
@@ -2005,8 +1988,6 @@ snapshots:
   deep-is@0.1.4: {}
 
   detect-libc@2.1.2: {}
-
-  dragselect@2.7.4: {}
 
   electron-to-chromium@1.5.368: {}
 

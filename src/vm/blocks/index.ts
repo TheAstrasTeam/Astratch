@@ -2,8 +2,6 @@ import type { IBlocks, Language } from '../../types/blocks';
 import type * as Blockly from 'blockly';
 // 导入两个插件试试
 import * as ContinuousToolbox from './plugins/continuous-toolbox/src';
-// @ts-expect-error 这个插件本来就不支持TS
-import { Multiselect } from '@mit-app-inventor/blockly-plugin-workspace-multiselect';
 import toolbox from './toolbox';
 import * as En from 'blockly/msg/en';
 import * as ZhHans from 'blockly/msg/zh-hans';
@@ -67,33 +65,6 @@ class Blocks implements IBlocks {
                 flyoutsVerticalToolbox: ContinuousToolbox.ContinuousFlyout,
                 metricsManager: ContinuousToolbox.ContinuousMetrics,
             },
-            // 多选插件的配置选项
-            // 拖拽后碰撞邻居积木以避免重叠
-            bumpNeighbours: false,
-            // 保持多个同类型积木的字段值相同
-            multiFieldUpdate: true,
-            // 鼠标进入工作区时自动聚焦
-            // 这玩意怪怪的
-            workspaceAutoFocus: false,
-            // 多选快捷键，默认是 Shift
-            // 值得一提的是，按住 Ctrl 可以拖出单个积木
-            multiSelectKeys: ['Shift'],
-            // 复制粘贴配置
-            multiselectCopyPaste: {
-                // 启用跨标签页复制粘贴功能
-                crossTab: true,
-                // 显示复制粘贴菜单项
-                menu: true,
-            },
-            multiselectIcon: {
-                hideIcon: false,
-                weight: 3,
-                // todo: 用本地的
-                enabledIcon:
-                    'https://github.com/mit-cml/workspace-multiselect/raw/main/test/media/select.svg',
-                disabledIcon:
-                    'https://github.com/mit-cml/workspace-multiselect/raw/main/test/media/unselect.svg',
-            },
         };
     }
 
@@ -102,11 +73,7 @@ class Blocks implements IBlocks {
         ContinuousToolbox.registerContinuousToolbox();
         // 对于需要现在的工作区的
         if (this.workspaceSvg) {
-            // https://github.com/mit-cml/workspace-multiselect
-            // 哪有问题你倒是说一下啊 @cyberexplorer
-            console.log(this.workspaceSvg);
-            const multiselectPlugin = new Multiselect(this.workspaceSvg);
-            multiselectPlugin.init(this.workspaceConfig);
+            // 暂定
         }
     }
 
