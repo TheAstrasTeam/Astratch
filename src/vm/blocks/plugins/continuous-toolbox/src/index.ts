@@ -18,13 +18,12 @@ import { ContinuousToolbox } from './ContinuousToolbox';
 import { RecyclableBlockFlyoutInflater } from './RecyclableBlockFlyoutInflater';
 
 export {
-    ContinuousCategory,
-    ContinuousFlyout,
-    ContinuousMetrics,
-    ContinuousToolbox,
-    LabelFlyoutItem,
-    RecyclableBlockFlyoutInflater,
+  ContinuousCategory,
+  ContinuousFlyout,
+  ContinuousMetrics,
+  ContinuousToolbox, RecyclableBlockFlyoutInflater
 };
+export type { LabelFlyoutItem };
 
 /**
  * Registers the components of the continuous toolbox, replacing Blockly's

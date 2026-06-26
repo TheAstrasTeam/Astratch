@@ -1,7 +1,7 @@
 import type { IBlocks, Language } from '../../types/blocks';
 import type * as Blockly from 'blockly';
 // 导入两个插件试试
-import * as ContinuousToolbox from '@blockly/continuous-toolbox';
+import * as ContinuousToolbox from './plugins/continuous-toolbox/src';
 // @ts-expect-error 这个插件本来就不支持TS
 import { Multiselect } from '@mit-app-inventor/blockly-plugin-workspace-multiselect';
 import toolbox from './toolbox';
