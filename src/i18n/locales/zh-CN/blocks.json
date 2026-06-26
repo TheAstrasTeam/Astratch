@@ -1,1 +1,12 @@
-{}
+{
+    "motion": "运动",
+    "looks": "外观",
+    "sound": "声音",
+    "events": "事件",
+    "control": "控制",
+    "sensing": "侦测",
+    "operators": "运算",
+    "variables": "变量",
+    "my_blocks": "自制积木",
+    "move%1steps": "移动 %1 步"
+}

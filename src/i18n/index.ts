@@ -13,9 +13,10 @@ import enVm from './locales/en/vm.json';
 import enBlocks from './locales/en/blocks.json';
 import enPaint from './locales/en/paint.json';
 import enAudio from './locales/en/audio.json';
+import { localStorageIDs, readLocalStorage } from '../utils/localstorage';
 
-const resources = {
-    zh: {
+export const languageResources = {
+    'zh-CN': {
         gui: zhGui,
         vm: zhVm,
         blocks: zhBlocks,
@@ -35,15 +36,24 @@ const i18nReady = i18n
     .use(LanguageDetector)
     .use(initReactI18next)
     .init({
-        resources,
+        resources: languageResources,
         fallbackLng: 'en',
         debug: import.meta.env.DEV,
         ns: ['gui', 'vm', 'blocks', 'paint', 'audio'],
         defaultNS: 'gui',
+        detection: {
+            caches: [],
+        },
         interpolation: {
             escapeValue: false,
         },
     })
-    .then(() => i18n);
+    .then(() => {
+        // 检测已设定的语言
+        const latestLanguage: string | null = readLocalStorage(localStorageIDs.Language);
+        if (latestLanguage) {
+            i18n.changeLanguage(latestLanguage);
+        }
+    });
 
 export default i18nReady;

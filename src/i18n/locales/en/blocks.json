@@ -1,1 +1,12 @@
-{}
+{
+    "motion": "Motion",
+    "looks": "Looks",
+    "sound": "Sound",
+    "events": "Events",
+    "control": "Control",
+    "sensing": "Sensing",
+    "operators": "Operators",
+    "variables": "Variables",
+    "my_blocks": "My Blocks",
+    "move%1steps": "move %1 steps"
+}

@@ -1,10 +1,11 @@
-import type { IBlocks, Language } from '../../types/blocks';
+import { type IBlocks, type Language } from '../../types/blocks';
 import type * as Blockly from 'blockly';
 // 导入两个插件试试
 import * as ContinuousToolbox from './plugins/continuous-toolbox/src';
-import toolbox from './toolbox';
 import * as En from 'blockly/msg/en';
 import * as ZhHans from 'blockly/msg/zh-hans';
+import getToolbox from './toolbox';
+import { initBlocks } from './blocks';
 
 /**
  * 用于便捷的管理WebGPU或Blockly工作区
@@ -16,7 +17,7 @@ class Blocks implements IBlocks {
     Blockly: typeof Blockly;
     supportLanguages: { en: Language; 'zh-Hans': Language };
     workspaceConfig: Blockly.BlocklyOptions | Record<string, unknown>;
-    toolbox: Blockly.utils.toolbox.ToolboxDefinition;
+    toolbox: Blockly.utils.toolbox.ToolboxDefinition | object;
     /**
      * 缓存的 DOM，用于进行重启操作等
      */
@@ -32,7 +33,7 @@ class Blocks implements IBlocks {
             // @ts-expect-error 语言包类型不支持
             'zh-Hans': ZhHans,
         };
-        this.toolbox = toolbox;
+        this.toolbox = {};
         this.init(); // 初始化始出
         this.workspaceConfig = {
             toolbox: this.toolbox,
@@ -68,9 +69,17 @@ class Blocks implements IBlocks {
         };
     }
 
-    init(): void {
+    async init(): Promise<void> {
+        // 初始化积木区
+        this.toolbox = await getToolbox();
+        this.workspaceConfig.toolbox = this.toolbox;
+
         // 对于完全不需要现在的工作区的
         ContinuousToolbox.registerContinuousToolbox();
+
+        // 定义积木
+        initBlocks(this.Blockly);
+
         // 对于需要现在的工作区的
         if (this.workspaceSvg) {
             // 暂定
@@ -85,28 +94,30 @@ class Blocks implements IBlocks {
             console.warn('No existing workspace');
             return;
         }
-        this.createWorkspace(this._DOM);
-    }
-
-    setLanguage(lang: 'en' | 'zh-Hans'): void {
-        this.Blockly.setLocale(this.supportLanguages[lang]);
         /**
          * 重启工作区
          * 这会丢失所有未保存的数据qwq
          * Todo: 兼容保存
          */
+        // 删除遗留的DOM
+        this._DOM.querySelector('[class*=injectionDiv]')?.remove();
+        this.createWorkspace(this._DOM);
+    }
+
+    setLanguage(lang: 'en' | 'zh-Hans'): void {
+        this.Blockly.setLocale(this.supportLanguages[lang]);
         this.restartWorkspace();
     }
 
-    createWorkspace(DOM: HTMLDivElement): boolean {
+    async createWorkspace(DOM: HTMLDivElement): Promise<boolean> {
         if (this.workspaceSvg) {
             // 若已有存在的工作区，*即刻重启*
             this.dispose();
         }
 
         this._DOM = DOM;
+        await this.init();
         this.workspaceSvg = this.Blockly.inject(DOM, this.workspaceConfig);
-        this.init();
         return !!this.workspaceSvg;
     }
 
