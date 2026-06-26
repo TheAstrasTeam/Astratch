@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@blockly/continuous-toolbox':
-        specifier: ^7.0.0
-        version: 7.0.9(blockly@13.0.0(jsdom@27.4.0))
       '@mit-app-inventor/blockly-plugin-workspace-multiselect':
         specifier: ^1.0.2
         version: 1.0.2(blockly@13.0.0(jsdom@27.4.0))
@@ -190,12 +187,6 @@ packages:
   '@babel/types@7.29.7':
     resolution: {integrity: sha512-4zBIxpPzowiZpusoFkyGVwakdRJUyuH5PxQ/PrqghfdFWWasvnCdPfQXHrenDai+gyLARulZjZowCOj6fjT4pA==}
     engines: {node: '>=6.9.0'}
-
-  '@blockly/continuous-toolbox@7.0.9':
-    resolution: {integrity: sha512-luFNC9GX4GAEqTrag07jV3DrY2WEeYfyBJnP932/xb27hs6oVaAw1bJPzI/NtyBxdU3LOkQZ826fEVbCVoXzAQ==}
-    engines: {node: '>=8.17.0'}
-    peerDependencies:
-      blockly: ^12.0.0
 
   '@csstools/color-helpers@6.0.2':
     resolution: {integrity: sha512-LMGQLS9EuADloEFkcTBR3BwV/CGHV7zyDxVRtVDTwdI2Ca4it0CCVTT9wCkxSgokjE5Ho41hEPgb8OEUwoXr6Q==}
@@ -1535,10 +1526,6 @@ snapshots:
     dependencies:
       '@babel/helper-string-parser': 7.29.7
       '@babel/helper-validator-identifier': 7.29.7
-
-  '@blockly/continuous-toolbox@7.0.9(blockly@13.0.0(jsdom@27.4.0))':
-    dependencies:
-      blockly: 13.0.0(jsdom@27.4.0)
 
   '@csstools/color-helpers@6.0.2': {}
 
