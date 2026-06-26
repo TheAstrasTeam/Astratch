@@ -5,11 +5,23 @@
 
 ### [AstraEditor](https://github.com/AstraEditor)
 
+> 此项目的`我们`均指**AstrasTeam**，除非特有声明。
+
 ## 介绍
 
 `AstraEditor-Next` 是 `AstraEditor` 的 **重制版本**，它不再基于任何 `Scratch` 改版。
 
 值得一提的是，`AstraEditor-Next` 可以兼容 `Scratch 3.0` 项目文件（`.sb3`），这意味着你可以在任何`Scratch`及其修改版平台上**无损运行**。
+
+## 感谢
+
+`AstraEditor-Next` 克隆&修改&使用了 [blockly-example](https://github.com/RaspberryPiFoundation/blockly-samples) 其中的部分插件：
+
+- [Continuous Toolbox](./src/vm/blocks/plugins/continuous-toolbox/)
+
+我们对其中的插件进行了部分修改使其更加适配 `AstraEditor-Next` 的*设想*，我们遵守`Apache License v2.0`，在每个更改的文件开头均有标注。
+
+再次表达我们的非常感谢！
 
 ## 项目架构
 
