@@ -18,10 +18,11 @@ import { ContinuousToolbox } from './ContinuousToolbox';
 import { RecyclableBlockFlyoutInflater } from './RecyclableBlockFlyoutInflater';
 
 export {
-  ContinuousCategory,
-  ContinuousFlyout,
-  ContinuousMetrics,
-  ContinuousToolbox, RecyclableBlockFlyoutInflater
+    ContinuousCategory,
+    ContinuousFlyout,
+    ContinuousMetrics,
+    ContinuousToolbox,
+    RecyclableBlockFlyoutInflater,
 };
 export type { LabelFlyoutItem };
 

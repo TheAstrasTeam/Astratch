@@ -2,7 +2,7 @@
  * @license
  * Copyright 2020 Google LLC
  * SPDX-License-Identifier: Apache-2.0
- * 
+ *
  * 由 AstrasTeam 修改于 2026/6/26:
  * - 修改 getInitialFlyoutContents 函数来保证作用域
  * - 修改 convertToolboxItemToFlyoutItems 对于动态积木栏的处理
@@ -62,9 +62,7 @@ export class ContinuousToolbox extends Blockly.Toolbox {
      * @returns Flyout contents.
      */
     private getInitialFlyoutContents(): Blockly.utils.toolbox.FlyoutItemInfoArray {
-        return this.getToolboxItems().flatMap((item) =>
-            this.convertToolboxItemToFlyoutItems(item),
-        );
+        return this.getToolboxItems().flatMap(item => this.convertToolboxItemToFlyoutItems(item));
     }
 
     /**
@@ -85,9 +83,7 @@ export class ContinuousToolbox extends Blockly.Toolbox {
 
             // Handle custom categories (e.g. variables and functions)
             if (typeof itemContents === 'string') {
-                const callback = this.getWorkspace().getToolboxCategoryCallback(
-                    itemContents,
-                );
+                const callback = this.getWorkspace().getToolboxCategoryCallback(itemContents);
                 itemContents = callback
                     ? Blockly.utils.toolbox.convertFlyoutDefToJsonArray(
                           callback(this.getWorkspace()),
