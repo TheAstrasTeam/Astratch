@@ -351,6 +351,10 @@ export interface IBlocks {
      */
     toolbox: Blockly.utils.toolbox.ToolboxDefinition | object;
     /**
+     * 主题，让界面长得像Scratch
+     */
+    theme: Blockly.Theme;
+    /**
      * 支持的所有语言
      */
     supportLanguages: {

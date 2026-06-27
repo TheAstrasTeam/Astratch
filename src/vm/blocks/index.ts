@@ -18,6 +18,7 @@ class Blocks implements IBlocks {
     supportLanguages: { en: Language; 'zh-Hans': Language };
     workspaceConfig: Blockly.BlocklyOptions | Record<string, unknown>;
     toolbox: Blockly.utils.toolbox.ToolboxDefinition | object;
+    theme: Blockly.Theme;
     /**
      * 缓存的 DOM，用于进行重启操作等
      */
@@ -35,6 +36,11 @@ class Blocks implements IBlocks {
         };
         this.toolbox = {};
         this.init(); // 初始化始出
+        this.theme = this.Blockly.Theme.defineTheme('scratch', {
+            name: 'scratch',
+            base: this.Blockly.Themes.Zelos,
+            startHats: true, // 给Hat一个帽子，就和 Scratch 一样
+        });
         this.workspaceConfig = {
             toolbox: this.toolbox,
             scrollbars: true,
@@ -54,6 +60,7 @@ class Blocks implements IBlocks {
                 wheel: true,
             },
             renderer: 'Zelos',
+            theme: this.theme,
             plugins: {
                 toolbox: ContinuousToolbox.ContinuousToolbox,
                 flyoutsVerticalToolbox: ContinuousToolbox.ContinuousFlyout,

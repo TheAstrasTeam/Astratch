@@ -22,6 +22,7 @@ const connections = {
  */
 const hatConnections = {
     nextStatement: 'Action',
+    hat: 'cap'
 } as const;
 
 /**
