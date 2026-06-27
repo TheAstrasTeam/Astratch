@@ -5,6 +5,7 @@ const OPCODE = {
     motion_movesteps: 'motion_movesteps',
     motion_gotoxy: 'motion_gotoxy',
     motion_goto: 'motion_goto',
+    motion_goto_menu: 'motion_goto_menu',
     motion_turnright: 'motion_turnright',
     motion_turnleft: 'motion_turnleft',
     motion_pointindirection: 'motion_pointindirection',

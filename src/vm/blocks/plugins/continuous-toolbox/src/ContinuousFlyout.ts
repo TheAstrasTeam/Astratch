@@ -2,6 +2,10 @@
  * @license
  * Copyright 2020 Google LLC
  * SPDX-License-Identifier: Apache-2.0
+ * 
+ * 由 AstrasTeam 修改于 2026/6/27:
+ * - 覆盖 getFlyoutScale 为返回固定值
+ * - 增加 FLYOUT_SCALE 常量
  */
 
 /**
@@ -23,6 +27,11 @@ export interface LabelFlyoutItem extends Blockly.FlyoutItem {
  * Class for continuous flyout.
  */
 export class ContinuousFlyout extends Blockly.VerticalFlyout {
+    /**
+     * Flyout的缩放
+     */
+    FLYOUT_SCALE = 1;
+
     /**
      * Target scroll position, used to smoothly scroll to a given category
      * location when selected.
@@ -309,5 +318,15 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
         }
 
         return inflater;
+    }
+
+    /**
+     * 获取Flyout的缩放
+     * 类似 Scratch，Flyout需要固定缩放
+     * 所以覆盖了此方法，返回固定值
+     * @returns 返回的缩放比，1
+     */
+    public override getFlyoutScale(): number {
+        return this.FLYOUT_SCALE;
     }
 }

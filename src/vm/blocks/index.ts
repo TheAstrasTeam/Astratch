@@ -53,13 +53,6 @@ class Blocks implements IBlocks {
                 drag: true,
                 wheel: true,
             },
-            /**
-             * Todo: 在未来我们打算自己搞一套渲染器，这将会非常*炫酷*
-             *
-             * 不是吗？
-             *
-             * - 渲染器指的是积木的样式渲染，你还想咋改
-             */
             renderer: 'Zelos',
             plugins: {
                 toolbox: ContinuousToolbox.ContinuousToolbox,

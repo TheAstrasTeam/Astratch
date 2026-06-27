@@ -11,3 +11,7 @@
 ## 感谢
 
 同 [README](../../../../README.md)
+
+## `fieldDropdown.ts`
+
+这个文件会对 Blockly 增加一个新的输入框，就和Scratch中可填积木的菜单一样！

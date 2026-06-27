@@ -4,6 +4,7 @@ import { BlocksColor, OPCODE } from '../../types/blocks';
 
 import turnLeft from './images/turnLeft.svg';
 import turnRight from './images/turnRight.svg';
+import { dropdownWithInput } from './plugins/fieldDropdown';
 
 /**
  * 对于链接积木的配置项
@@ -14,15 +15,23 @@ const connections = {
 } as const;
 
 const initBlocks = (blockly: typeof Blockly) => {
-    // 删除已定义的积木，重新定义
-    Object.values(OPCODE).forEach(blk => {
-        try {
-            if (Object.keys(blockly.Blocks).indexOf(blk) !== -1)
-                blockly.registry.unregister('Block', blk);
-        } catch {
-            // 不需要管
-        }
-    });
+    try {
+        // 源代码所示，Blockly的注册积木仅会加入到 Map 中，
+        // 因此可以直接删除
+        const blockTypes = Object.keys(blockly.Blocks);
+        blockTypes.forEach(type => {
+            delete blockly.Blocks[type];
+        });
+    } catch {
+        // 不需要管
+    }
+
+    
+    blockly.fieldRegistry.register('field_dropdown_with_block', dropdownWithInput);
+
+    // 事实上对于如下的`message0`在blockly都是无效的
+    // i18next 不支持在消息id中填入空格
+    // 对于实际上的名称需要参考 i18n/locales/*/blocks.json
 
     blockly.common.defineBlocksWithJsonArray([
         {
@@ -38,8 +47,6 @@ const initBlocks = (blockly: typeof Blockly) => {
                 },
             ],
         },
-    ]);
-    blockly.common.defineBlocksWithJsonArray([
         {
             ...connections,
             type: OPCODE.motion_turnright,
@@ -60,13 +67,11 @@ const initBlocks = (blockly: typeof Blockly) => {
                 },
             ],
         },
-    ]);
-    blockly.common.defineBlocksWithJsonArray([
         {
             ...connections,
             type: OPCODE.motion_turnleft,
             colour: BlocksColor.motion.primary,
-            message0: t('blocks:turn %1 %2 degrees'),
+            message0: t('blocks:turn%1%2degrees'),
             args0: [
                 {
                     type: 'field_image',
@@ -79,6 +84,37 @@ const initBlocks = (blockly: typeof Blockly) => {
                     type: 'field_number',
                     name: 'VALUE',
                     value: 15,
+                },
+            ],
+        },
+        {
+            ...connections,
+            type: OPCODE.motion_goto,
+            colour: BlocksColor.motion.primary,
+            message0: t('blocks:goto%1'),
+            args0: [
+                {
+                    type: 'input_value',
+                    name: 'TO',
+                },
+            ],
+        },
+        {
+            type: OPCODE.motion_goto_menu,
+            colour: BlocksColor.motion.secondary,
+            output: 'String',
+            message0: '%1',
+            args0: [
+                {
+                    type: 'field_dropdown_with_block',
+                    name: 'TO',
+                    options: () => {
+                        const options: Array<Array<string>> = [];
+                        options.push([t('blocks:randomPosition'), '_random_']);
+                        options.push([t('blocks:mousePosition'), '_mouse_']);
+                        // todo: 增加targets的name, id
+                        return options;
+                    },
                 },
             ],
         },
