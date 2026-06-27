@@ -24,7 +24,7 @@ const localStorageIDs = {
     /**
      * 当前使用的界面语言
      */
-    Language: 'aen_language',
+    Language: 'ash_language',
 };
 
 export { localStorageIDs, readLocalStorage };

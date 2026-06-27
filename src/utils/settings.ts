@@ -6,7 +6,7 @@ import type { IGuiSettings } from '../types/gui';
 const DEFAULT_GUITHEME: string = 'dark';
 
 export function initSettings() {
-    const settingsOrigin = localStorage.getItem('aen:settings');
+    const settingsOrigin = localStorage.getItem('ash:settings');
     let settings: IGuiSettings | undefined; //万一不存在呢...
 
     if (settingsOrigin) {

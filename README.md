@@ -1,7 +1,4 @@
-# AstraEditor-Next
-
-> [!WARNING]
-> 此项目仍为计划，具体动工时间未定。
+# Astratch
 
 ### [AstraEditor](https://github.com/AstraEditor)
 
@@ -9,32 +6,32 @@
 
 ## 介绍
 
-`AstraEditor-Next` 是 `AstraEditor` 的 **重制版本**，它不再基于任何 `Scratch` 改版。
+`Astratch` 是一个类似 `Scratch` 的开发平台，但它不基于任何 `Scratch` 改版。
 
-值得一提的是，`AstraEditor-Next` 可以兼容 `Scratch 3.0` 项目文件（`.sb3`），这意味着你可以在任何`Scratch`及其修改版平台上**无损运行**。
+值得一提的是，`Astratch` 可以兼容 `Scratch 3.0` 项目文件（`.sb3`），这意味着你可以在任何`Scratch`及其修改版平台上**无损运行**。
 
 ## 感谢
 
-`AstraEditor-Next` 克隆&修改&使用了 [blockly-example](https://github.com/RaspberryPiFoundation/blockly-samples) 其中的部分插件：
+`Astratch` 克隆&修改&使用了 [blockly-example](https://github.com/RaspberryPiFoundation/blockly-samples) 其中的部分插件：
 
 - [Continuous Toolbox](./src/vm/blocks/plugins/continuous-toolbox/)
 
-我们对其中的插件进行了部分修改使其更加适配 `AstraEditor-Next` 的*设想*，我们遵守`Apache License v2.0`，在每个更改的文件开头均有标注。
+我们对其中的插件进行了部分修改使其更加适配 `Astratch` 的*设想*，我们遵守`Apache License v2.0`，在每个更改的文件开头均有标注。
 
 再次表达我们的非常感谢！
 
 ## 项目架构
 
-`AstraEditor-Next` 基于 `React` + `Vite` 技术栈。
+`Astratch` 基于 `React` + `Vite` 技术栈。
 
-`AstraEditor-Next` 的项目结构如下:
+`Astratch` 的项目结构如下:
 
 > [!NOTE]
 > 未来可能仍会变动。
 
 ```mermaid
 graph LR
-        A[AstraEditor-Next]
+        A[Astratch]
 
         A --> |源码|B[src/]
 
@@ -63,7 +60,7 @@ graph LR
 
 ### 国际化
 
-`AstraEditor-next` 使用 `i18next`，您可以这样使用国际化：
+`Astratch` 使用 `i18next`，您可以这样使用国际化：
 
 ```ts
 import { t } from 'i18next';
@@ -71,7 +68,7 @@ import { t } from 'i18next';
 t('id');
 ```
 
-之后于`AEN\AstraEditor-Next\src\i18n\locales`配置语言
+之后于`ASH\Astratch\src\i18n\locales`配置语言
 
 > 未来会支持线上添加新翻译
 
@@ -79,13 +76,13 @@ t('id');
 
 ### Workspace
 
-`AstraEditor-next` 暂会用最新的 `Blockly v13.0 `驱动工作区。在**未来**或将**重新**设计一个全新的`WebGPU`驱动的工作区，这个过程将会持续大约：
+`Astratch` 暂会用最新的 `Blockly v13.0 `驱动工作区。在**未来**或将**重新**设计一个全新的`WebGPU`驱动的工作区，这个过程将会持续大约：
 
 > # 很久很久
 
 ### 编译器
 
-`AstraEditor-next` 会将积木编译为`WASM`或`JavaScript`，相比`TurboWarp`会有更加激进的优化和*更低的稳定性*。
+`Astratch` 会将积木编译为`WASM`或`JavaScript`，相比`TurboWarp`会有更加激进的优化和*更低的稳定性*。
 
 ### Todo
 
@@ -96,7 +93,7 @@ t('id');
 - [ ] 制作关于项目的 `API`
 - [ ] 制作基础积木编辑器
 - [ ] 完善 `GUI`
-- [ ] 制作 `VM` 、编译器（`aen` -> `JavaScript`/`WASM`）
+- [ ] 制作 `VM` 、编译器（`ash` -> `JavaScript`/`WASM`）
 - [ ] 完善积木编辑器
 
 #### 未来

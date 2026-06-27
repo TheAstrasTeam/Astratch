@@ -7,7 +7,7 @@ import Blocks from './blocks';
 import * as Blockly from 'blockly';
 
 /**
- * 虚拟机，管理整个AEN
+ * 虚拟机，管理整个ASH
  */
 export class VM implements IVM {
     Runtime: IRuntime;

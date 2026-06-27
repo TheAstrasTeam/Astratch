@@ -369,7 +369,7 @@ export interface IBlocks {
     workspaceConfig: Blockly.BlocklyOptions | Record<string, unknown>;
     /**
      * 设置一个语言
-     * @param lang AEN 兼容的 i18n
+     * @param lang ASH 兼容的 i18n
      */
     setLanguage: (lang: 'en' | 'zh-Hans') => void;
     /**
