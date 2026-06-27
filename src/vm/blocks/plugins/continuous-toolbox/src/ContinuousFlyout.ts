@@ -2,7 +2,7 @@
  * @license
  * Copyright 2020 Google LLC
  * SPDX-License-Identifier: Apache-2.0
- * 
+ *
  * 由 AstrasTeam 修改于 2026/6/27:
  * - 覆盖 getFlyoutScale 为返回固定值
  * - 增加 FLYOUT_SCALE 常量

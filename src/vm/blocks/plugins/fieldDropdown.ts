@@ -277,9 +277,8 @@ export class dropdownWithInput extends Blockly.Field<string> {
         if (this.getConstants()!.FIELD_DROPDOWN_COLOURED_DIV) {
             const sourceBlock = this.sourceBlock_ as Blockly.BlockSvg;
             const parent = sourceBlock.getParent();
-            const primaryColour = sourceBlock.isShadow() && parent
-                ? parent.getColour()
-                : sourceBlock.getColour();
+            const primaryColour =
+                sourceBlock.isShadow() && parent ? parent.getColour() : sourceBlock.getColour();
             const borderColour = sourceBlock.getColourTertiary();
             Blockly.DropDownDiv.setColour(primaryColour, borderColour);
         }

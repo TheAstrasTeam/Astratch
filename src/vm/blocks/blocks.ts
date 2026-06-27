@@ -8,9 +8,6 @@ import greenFlag from './images/green-flag.svg';
 import repeatIcon from './images/repeat.svg';
 import { dropdownWithInput } from './plugins/fieldDropdown';
 
-import { registerFieldAngle, FieldAngle, Mode } from '@blockly/field-angle';
-import { registerFieldColour } from '@blockly/field-colour';
-
 /**
  * 对于链接积木的配置项
  */
