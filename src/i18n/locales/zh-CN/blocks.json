@@ -1,4 +1,13 @@
 ﻿{
+    "motion": "运动",
+    "looks": "外观",
+    "sound": "声音",
+    "events": "事件",
+    "control": "控制",
+    "sensing": "侦测",
+    "operators": "运算",
+    "variables": "变量",
+    "my_blocks": "自制积木",
     "CONTROL_INCRCOUNTER": "计数器加一",
     "LOOKS_CHANGESTRETCHBY": "将伸缩增加 %1",
     "SENSING_MOUSEDOWN": "按下鼠标？",

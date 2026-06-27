@@ -1,4 +1,13 @@
 ﻿{
+    "motion": "Motion",
+    "looks": "Looks",
+    "sound": "Sound",
+    "events": "Events",
+    "control": "Control",
+    "sensing": "Sensing",
+    "operators": "Operators",
+    "variables": "Variables",
+    "my_blocks": "My Blocks",
     "CONTROL_INCRCOUNTER": "increment counter",
     "LOOKS_CHANGESTRETCHBY": "change stretch by %1",
     "SENSING_MOUSEDOWN": "mouse down?",
