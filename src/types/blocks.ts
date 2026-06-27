@@ -10,8 +10,11 @@ const OPCODE = {
     motion_turnleft: 'motion_turnleft',
     motion_pointindirection: 'motion_pointindirection',
     motion_pointtowards: 'motion_pointtowards',
+    motion_pointtowards_menu: 'motion_pointtowards_menu',
+    motion_direction_menu: 'motion_direction_menu',
     motion_glidesecstoxy: 'motion_glidesecstoxy',
     motion_glideto: 'motion_glideto',
+    motion_glideto_menu: 'motion_glideto_menu',
     motion_ifonedgebounce: 'motion_ifonedgebounce',
     motion_setrotationstyle: 'motion_setrotationstyle',
     motion_changexby: 'motion_changexby',
@@ -52,6 +55,8 @@ const OPCODE = {
     looks_size: 'looks_size',
     looks_costumenumbername: 'looks_costumenumbername',
     looks_backdropnumbername: 'looks_backdropnumbername',
+    looks_costume: 'looks_costume',
+    looks_backdrops: 'looks_backdrops',
 
     // 声音
     sound_play: 'sound_play',
@@ -78,6 +83,8 @@ const OPCODE = {
     event_whenstageclicked: 'event_whenstageclicked',
     event_whenbackdropswitchesto: 'event_whenbackdropswitchesto',
     event_whenbroadcastreceived: 'event_whenbroadcastreceived',
+    event_broadcast_menu: 'event_broadcast_menu',
+    event_touchingobjectmenu: 'event_touchingobjectmenu',
 
     // 控制
     control_repeat: 'control_repeat',
@@ -97,20 +104,25 @@ const OPCODE = {
     control_clear_counter: 'control_clear_counter',
     control_all_at_once: 'control_all_at_once',
     control_start_as_clone: 'control_start_as_clone',
+    control_create_clone_of_menu: 'control_create_clone_of_menu',
 
     // 侦测
     sensing_touchingobject: 'sensing_touchingobject',
+    sensing_touchingobjectmenu: 'sensing_touchingobjectmenu',
     sensing_touchingcolor: 'sensing_touchingcolor',
     sensing_coloristouchingcolor: 'sensing_coloristouchingcolor',
     sensing_distanceto: 'sensing_distanceto',
+    sensing_distancetomenu: 'sensing_distancetomenu',
     sensing_timer: 'sensing_timer',
     sensing_resettimer: 'sensing_resettimer',
     sensing_of: 'sensing_of',
+    sensing_of_object_menu: 'sensing_of_object_menu',
     sensing_mousex: 'sensing_mousex',
     sensing_mousey: 'sensing_mousey',
     sensing_setdragmode: 'sensing_setdragmode',
     sensing_mousedown: 'sensing_mousedown',
     sensing_keypressed: 'sensing_keypressed',
+    sensing_keyoptions: 'sensing_keyoptions',
     sensing_current: 'sensing_current',
     sensing_dayssince2000: 'sensing_dayssince2000',
     sensing_loudness: 'sensing_loudness',
@@ -159,6 +171,17 @@ const OPCODE = {
     data_listcontainsitem: 'data_listcontainsitem',
     data_hidelist: 'data_hidelist',
     data_showlist: 'data_showlist',
+    data_listindexall: 'data_listindexall',
+    data_listindexrandom: 'data_listindexrandom',
+
+    // 通用积木 (shadow blocks)
+    math_number: 'math_number',
+    math_integer: 'math_integer',
+    math_whole_number: 'math_whole_number',
+    math_positive_number: 'math_positive_number',
+    math_angle: 'math_angle',
+    text: 'text',
+    colour_picker: 'colour_picker',
 
     // 自定义积木
     procedures_definition: 'procedures_definition',
