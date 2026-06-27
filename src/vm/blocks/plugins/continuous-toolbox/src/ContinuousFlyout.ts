@@ -30,7 +30,7 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
     /**
      * Flyout的缩放
      */
-    FLYOUT_SCALE = 1;
+    FLYOUT_SCALE = 0.8;
 
     /**
      * Target scroll position, used to smoothly scroll to a given category
