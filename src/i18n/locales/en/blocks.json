@@ -226,5 +226,7 @@
     "CATEGORY_SENSING": "Sensing",
     "OPERATORS_LT": "%1 < %2",
     "SOUND_SETEFFECTO": "set %1 effect to %2",
-    "SENSING_SETDRAGMODE": "set drag mode %1"
+    "SENSING_SETDRAGMODE": "set drag mode %1",
+    "hello": "Hello!",
+    "hmm": "Hmm..."
 }

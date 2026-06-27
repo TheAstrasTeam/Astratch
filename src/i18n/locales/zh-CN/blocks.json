@@ -226,5 +226,7 @@
     "CATEGORY_SENSING": "侦测",
     "OPERATORS_LT": "%1 < %2",
     "SOUND_SETEFFECTO": "将 %1 音效设为 %2",
-    "SENSING_SETDRAGMODE": "将拖动模式设为 %1"
+    "SENSING_SETDRAGMODE": "将拖动模式设为 %1",
+    "hello": "你好！",
+    "hmm": "嗯......"
 }

@@ -119,9 +119,6 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     { kind: 'block', type: OPCODE.motion_direction },
                 ],
             },
-            // ================================================================
-            // 外观 (Looks)
-            // ================================================================
             {
                 kind: 'category',
                 name: LOOKS,
@@ -130,15 +127,23 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     {
                         kind: 'block',
                         type: OPCODE.looks_sayforsecs,
-                        inputs: { MESSAGE: txt('Hello!'), SECS: num(2) },
+                        inputs: { MESSAGE: txt(t('blocks:hello')), SECS: num(2) },
                     },
-                    { kind: 'block', type: OPCODE.looks_say, inputs: { MESSAGE: txt('Hello!') } },
+                    {
+                        kind: 'block',
+                        type: OPCODE.looks_say,
+                        inputs: { MESSAGE: txt(t('blocks:hello')) },
+                    },
                     {
                         kind: 'block',
                         type: OPCODE.looks_thinkforsecs,
-                        inputs: { MESSAGE: txt('Hmm...'), SECS: num(2) },
+                        inputs: { MESSAGE: txt(t('blocks:hmm')), SECS: num(2) },
                     },
-                    { kind: 'block', type: OPCODE.looks_think, inputs: { MESSAGE: txt('Hmm...') } },
+                    {
+                        kind: 'block',
+                        type: OPCODE.looks_think,
+                        inputs: { MESSAGE: txt(t('blocks:hmm')) },
+                    },
                     {
                         kind: 'block',
                         type: OPCODE.looks_switchcostumeto,
@@ -178,9 +183,6 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     { kind: 'block', type: OPCODE.looks_hide },
                 ],
             },
-            // ================================================================
-            // 声音 (Sound)
-            // ================================================================
             {
                 kind: 'category',
                 name: SOUND,
@@ -213,9 +215,6 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     { kind: 'block', type: OPCODE.sound_volume },
                 ],
             },
-            // ================================================================
-            // 事件 (Events)
-            // ================================================================
             {
                 kind: 'category',
                 name: EVENTS,
@@ -244,9 +243,6 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     },
                 ],
             },
-            // ================================================================
-            // 控制 (Control)
-            // ================================================================
             {
                 kind: 'category',
                 name: CONTROL,
@@ -269,9 +265,6 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     { kind: 'block', type: OPCODE.control_delete_this_clone },
                 ],
             },
-            // ================================================================
-            // 侦测 (Sensing)
-            // ================================================================
             {
                 kind: 'category',
                 name: SENSING,
@@ -325,9 +318,6 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     { kind: 'block', type: OPCODE.sensing_username },
                 ],
             },
-            // ================================================================
-            // 运算 (Operators)
-            // ================================================================
             {
                 kind: 'category',
                 name: OPERATORS,
@@ -405,18 +395,12 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     { kind: 'block', type: OPCODE.operator_mathop, inputs: { NUM: num('') } },
                 ],
             },
-            // ================================================================
-            // 变量 (Variables) — 使用 Blockly 内置 custom handler
-            // ================================================================
             {
                 kind: 'category',
                 name: VARIABLES,
                 colour: BlocksColor.data.primary,
                 custom: 'VARIABLE',
             },
-            // ================================================================
-            // 自制积木 (My Blocks) — 使用 Blockly 内置 custom handler
-            // ================================================================
             {
                 kind: 'category',
                 name: MY_BLOCKS,
