@@ -228,5 +228,9 @@
     "SOUND_SETEFFECTO": "set %1 effect to %2",
     "SENSING_SETDRAGMODE": "set drag mode %1",
     "hello": "Hello!",
-    "hmm": "Hmm..."
+    "hmm": "Hmm...",
+    "apple_": "apple ",
+    "apple": "apple",
+    "banana": "banana",
+    "whatsyourname": "What's your name?"
 }

@@ -298,7 +298,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     {
                         kind: 'block',
                         type: OPCODE.sensing_askandwait,
-                        inputs: { QUESTION: txt("What's your name?") },
+                        inputs: { QUESTION: txt(t("blocks:whatsyourname")) },
                     },
                     { kind: 'block', type: OPCODE.sensing_answer },
                     { kind: 'block', type: OPCODE.sensing_mousedown },
@@ -369,22 +369,25 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     {
                         kind: 'block',
                         type: OPCODE.operator_join,
-                        inputs: { STRING1: txt('apple '), STRING2: txt('banana') },
+                        inputs: {
+                            STRING1: txt(t('blocks:apple_')),
+                            STRING2: txt(t('blocks:banana')),
+                        },
                     },
                     {
                         kind: 'block',
                         type: OPCODE.operator_letter_of,
-                        inputs: { LETTER: numWhole(1), STRING: txt('apple') },
+                        inputs: { LETTER: numWhole(1), STRING: txt(t('blocks:apple')) },
                     },
                     {
                         kind: 'block',
                         type: OPCODE.operator_length,
-                        inputs: { STRING: txt('apple') },
+                        inputs: { STRING: txt(t('blocks:apple')) },
                     },
                     {
                         kind: 'block',
                         type: OPCODE.operator_contains,
-                        inputs: { STRING1: txt('apple'), STRING2: txt('a') },
+                        inputs: { STRING1: txt(t('blocks:apple')), STRING2: txt('a') },
                     },
                     {
                         kind: 'block',

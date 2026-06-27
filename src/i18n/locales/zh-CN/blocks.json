@@ -228,5 +228,9 @@
     "SOUND_SETEFFECTO": "将 %1 音效设为 %2",
     "SENSING_SETDRAGMODE": "将拖动模式设为 %1",
     "hello": "你好！",
-    "hmm": "嗯......"
+    "hmm": "嗯......",
+    "apple_": "苹果 ",
+    "apple": "苹果",
+    "banana": "香蕉",
+    "whatsyourname": "你叫什么名字？"
 }
