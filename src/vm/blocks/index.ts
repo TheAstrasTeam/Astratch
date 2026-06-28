@@ -23,6 +23,10 @@ class Blocks implements IBlocks {
      * 缓存的 DOM，用于进行重启操作等
      */
     private _DOM: HTMLDivElement | null;
+    /**
+     * 标记此时是否正在创建工作区，来防止时序问题
+     */
+    private _isCreating: boolean = false; 
 
     constructor(BlocklySelf: typeof Blockly) {
         this._DOM = null;
@@ -35,7 +39,6 @@ class Blocks implements IBlocks {
             'zh-Hans': ZhHans,
         };
         this.toolbox = {};
-        this.init(); // 初始化始出
         this.theme = this.Blockly.Theme.defineTheme('scratch', {
             name: 'scratch',
             base: this.Blockly.Themes.Zelos,
@@ -110,6 +113,12 @@ class Blocks implements IBlocks {
     }
 
     async createWorkspace(DOM: HTMLDivElement): Promise<boolean> {
+        // 如果创建工作区过于频繁
+        // 会出现init没进行完成就再次运行以此
+        // 从而创建了多次工作区
+        if(this._isCreating) return false;
+
+        this._isCreating = true;
         if (this.workspaceSvg) {
             // 若已有存在的工作区，*即刻重启*
             this.dispose();
@@ -118,6 +127,7 @@ class Blocks implements IBlocks {
         this._DOM = DOM;
         await this.init();
         this.workspaceSvg = this.Blockly.inject(DOM, this.workspaceConfig);
+        this._isCreating = false;
         return !!this.workspaceSvg;
     }
 

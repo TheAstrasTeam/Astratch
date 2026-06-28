@@ -5,6 +5,7 @@ const BlocklyWorkspace = ({ vm }: { vm: IVM }): React.ReactNode => {
     const workspaceDiv = useRef<HTMLDivElement>(null);
     useEffect(() => {
         if (!workspaceDiv.current) return;
+        if(vm.Blocks.workspaceSvg) vm.Blocks.dispose();
 
         vm.Blocks.createWorkspace(workspaceDiv.current);
 
@@ -15,16 +16,6 @@ const BlocklyWorkspace = ({ vm }: { vm: IVM }): React.ReactNode => {
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    /*
-     * todo:
-     * 我们需要解决工作区的某些BUG，并且接入 Continuous-Toolbox 插件
-     * 我知道赛博猫猫看见这个注释的时候已经放学了
-     * 所以这个东西留给赛博猫猫做
-     * （拜托我做了很多工作的好不好）
-     * - 我拒绝，我自己研究114514年没研究出来，你自己去研究，你个懒棒💥
-     */
-
     return <div ref={workspaceDiv} style={{ width: '100%', height: '100%' }} />;
 };
 
