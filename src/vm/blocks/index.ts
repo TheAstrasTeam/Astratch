@@ -26,7 +26,7 @@ class Blocks implements IBlocks {
     /**
      * 标记此时是否正在创建工作区，来防止时序问题
      */
-    private _isCreating: boolean = false; 
+    private _isCreating: boolean = false;
 
     constructor(BlocklySelf: typeof Blockly) {
         this._DOM = null;
@@ -116,18 +116,22 @@ class Blocks implements IBlocks {
         // 如果创建工作区过于频繁
         // 会出现init没进行完成就再次运行以此
         // 从而创建了多次工作区
-        if(this._isCreating) return false;
+        if (this._isCreating) return false;
 
         this._isCreating = true;
-        if (this.workspaceSvg) {
-            // 若已有存在的工作区，*即刻重启*
-            this.dispose();
+        try {
+            if (this.workspaceSvg) {
+                // 若已有存在的工作区，*即刻重启*
+                this.dispose();
+            }
+
+            this._DOM = DOM;
+            await this.init();
+            this.workspaceSvg = this.Blockly.inject(DOM, this.workspaceConfig);
+        } finally {
+            this._isCreating = false;
         }
 
-        this._DOM = DOM;
-        await this.init();
-        this.workspaceSvg = this.Blockly.inject(DOM, this.workspaceConfig);
-        this._isCreating = false;
         return !!this.workspaceSvg;
     }
 
