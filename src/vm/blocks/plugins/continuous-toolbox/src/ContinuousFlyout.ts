@@ -220,7 +220,7 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
      *
      * @param e The mouse wheel event to handle.
      */
-    // eslint-disable-next-line @typescript-eslint/naming-convention
+
     protected override wheel_(e: WheelEvent) {
         // Don't scroll in response to mouse wheel events if we're currently
         // animating scrolling to a category.

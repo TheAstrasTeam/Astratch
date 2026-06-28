@@ -6,7 +6,9 @@ import turnLeft from './images/turnLeft.svg';
 import turnRight from './images/turnRight.svg';
 import greenFlag from './images/green-flag.svg';
 import repeatIcon from './images/repeat.svg';
+
 import { dropdownWithInput } from './plugins/fieldDropdown';
+import { FieldAngle } from './plugins/field-angle/src';
 
 /**
  * 对于链接积木的配置项
@@ -62,6 +64,7 @@ const initBlocks = (blockly: typeof Blockly) => {
         // 不需要管
     }
     blockly.fieldRegistry.register('field_dropdown_with_block', dropdownWithInput);
+    blockly.fieldRegistry.register('field_angle', FieldAngle);
 
     // 事实上对于如下的`message0`在blockly都是无效的
     // i18next 不支持在消息id中填入空格

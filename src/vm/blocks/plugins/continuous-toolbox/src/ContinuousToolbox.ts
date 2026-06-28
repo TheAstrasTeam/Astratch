@@ -115,7 +115,7 @@ export class ContinuousToolbox extends Blockly.Toolbox {
      * @param oldItem The previously selected toolbox category.
      * @param newItem The newly selected toolbox category.
      */
-    // eslint-disable-next-line @typescript-eslint/naming-convention
+
     override updateFlyout_(
         _oldItem: Blockly.ISelectableToolboxItem | null,
         newItem: Blockly.ISelectableToolboxItem | null,
@@ -136,7 +136,7 @@ export class ContinuousToolbox extends Blockly.Toolbox {
      * @param oldItem The previously selected toolbox category.
      * @param newItem The newly selected toolbox category.
      */
-    // eslint-disable-next-line @typescript-eslint/naming-convention
+
     override shouldDeselectItem_(
         oldItem: Blockly.ISelectableToolboxItem | null,
         newItem: Blockly.ISelectableToolboxItem | null,

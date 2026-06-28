@@ -1,0 +1,58 @@
+{
+    "name": "@blockly/field-angle",
+    "version": "6.0.9",
+    "description": "A Blockly angle field.",
+    "scripts": {
+        "audit:fix": "blockly-scripts auditFix",
+        "build": "blockly-scripts build",
+        "clean": "blockly-scripts clean",
+        "lint": "eslint .",
+        "predeploy": "blockly-scripts predeploy",
+        "prepublishOnly": "npm run clean && npm run build",
+        "start": "blockly-scripts start",
+        "test": "blockly-scripts test"
+    },
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "unpkg": "./dist/index.js",
+    "author": "Blockly Team",
+    "keywords": [
+        "blockly",
+        "field",
+        "angle"
+    ],
+    "homepage": "https://github.com/RaspberryPiFoundation/blockly-samples/tree/master/plugins/field-angle#readme",
+    "bugs": {
+        "url": "https://github.com/RaspberryPiFoundation/blockly-samples/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/RaspberryPiFoundation/blockly-samples.git",
+        "directory": "plugins/field-angle"
+    },
+    "license": "Apache-2.0",
+    "directories": {
+        "dist": "dist",
+        "src": "src"
+    },
+    "files": [
+        "dist",
+        "src"
+    ],
+    "devDependencies": {
+        "@blockly/dev-scripts": "^4.0.12",
+        "@blockly/dev-tools": "^9.0.9",
+        "chai": "^4.2.0",
+        "sinon": "^9.0.1",
+        "typescript": "^5.4.5"
+    },
+    "peerDependencies": {
+        "blockly": "^12.0.0"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "engines": {
+        "node": ">=8.0.0"
+    }
+}
