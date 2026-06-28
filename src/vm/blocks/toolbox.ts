@@ -298,7 +298,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     {
                         kind: 'block',
                         type: OPCODE.sensing_askandwait,
-                        inputs: { QUESTION: txt(t("blocks:whatsyourname")) },
+                        inputs: { QUESTION: txt(t('blocks:whatsyourname')) },
                     },
                     { kind: 'block', type: OPCODE.sensing_answer },
                     { kind: 'block', type: OPCODE.sensing_mousedown },

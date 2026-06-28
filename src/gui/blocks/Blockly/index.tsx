@@ -5,7 +5,7 @@ const BlocklyWorkspace = ({ vm }: { vm: IVM }): React.ReactNode => {
     const workspaceDiv = useRef<HTMLDivElement>(null);
     useEffect(() => {
         if (!workspaceDiv.current) return;
-        if(vm.Blocks.workspaceSvg) vm.Blocks.dispose();
+        if (vm.Blocks.workspaceSvg) vm.Blocks.dispose();
 
         vm.Blocks.createWorkspace(workspaceDiv.current);
 
