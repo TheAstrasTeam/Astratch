@@ -1,10 +1,14 @@
 import i18next from 'i18next';
 import type { IVM } from '../../types/vm';
 import WorkSpace from '../blocks';
-import './index.css';
 import { useState } from 'react';
 import { localStorageIDs } from '../../utils/localstorage';
 import { languageResources } from '../../i18n';
+
+import styles from './index.module.css';
+import './public.css';
+import './css/constants.css';
+import './css/zIndex.css';
 
 const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
     const [language, setLanguage] = useState(i18next.language);
@@ -17,8 +21,8 @@ const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
         vm.Blocks.restartWorkspace();
     };
     return (
-        <div className='app'>
-            <div className='toolbar'>
+        <div className={styles.app}>
+            <div className={styles.toolbar}>
                 {/* 我添加了一个工具栏用来保证布局 */}
                 <button
                     onClick={async () => {
@@ -42,7 +46,7 @@ const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
                     ))}
                 </select>
             </div>
-            <div className='workspace-area'>
+            <div className={styles.workspaceArea}>
                 {/* 这是一个测试，给工作区包一个容器 */}
                 <WorkSpace key='workspace' vm={vm} />
             </div>

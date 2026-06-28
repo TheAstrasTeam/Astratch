@@ -1,0 +1,28 @@
+/* 关于控件的默认CSS */
+
+body{
+    display: flex;
+    margin: 0;
+}
+
+button{
+    border: 0;
+    padding: var(--button-padding);
+    background-color: var(--default-color);
+    border-radius: 5px;
+    margin: 5px;
+}
+
+button:hover,select:hover{
+    filter: brightness(var(--hover-bright));
+}
+
+select{
+    border: 0;
+    padding: var(--select-padding);
+    background-color: var(--default-color);
+    border-radius: 5px;
+    margin: 5px;
+}
+
+

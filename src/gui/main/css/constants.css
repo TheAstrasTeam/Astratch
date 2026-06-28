@@ -1,2 +1,9 @@
 :root {
+    --button-padding: 6px;
+    --select-padding: 5px;
+
+    --default-color: #eee;
+    
+    /* filter(...) */
+    --hover-bright: 1.05;
 }
