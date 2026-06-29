@@ -752,7 +752,7 @@ Blockly.Css.register(`
 }
 .fieldColourSlider {
   -webkit-appearance: none;
-  width: 150px;
+  width: 180px;
   height: 24px;
   margin: 4px 8px 24px 8px;
   padding: 0;
@@ -766,8 +766,8 @@ Blockly.Css.register(`
 /* Webkit */
 .fieldColourSlider::-webkit-slider-runnable-track {
   background: var(--slider-track-background);
-  border-radius: 8px;
-  height: 16px;
+  border-radius: 16px;
+  height: 24px;
 }
 .fieldColourSlider::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -777,13 +777,12 @@ Blockly.Css.register(`
   cursor: pointer;
   width: ${FieldColourHsvSliders.THUMB_RADIUS * 2}px;
   height: ${FieldColourHsvSliders.THUMB_RADIUS * 2}px;
-  margin-top: -4px;
 }
 /* Firefox */
 .fieldColourSlider::-moz-range-track {
   background: var(--slider-track-background);
   border-radius: 8px;
-  height: 16px;
+  height: 24px;
 }
 .fieldColourSlider::-moz-range-thumb {
   background: #fff;
