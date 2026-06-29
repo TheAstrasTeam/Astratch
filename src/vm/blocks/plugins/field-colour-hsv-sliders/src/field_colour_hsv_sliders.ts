@@ -2,6 +2,10 @@
  * @license
  * Copyright 2022 Google LLC
  * SPDX-License-Identifier: Apache-2.0
+ * 
+ * 由 AstrasTeam 修改于 2026/6/29:
+ * - 重写 getScaledBBox 方法
+ * - 新增 颜色预览、HEX输入框
  */
 
 /**
@@ -237,8 +241,46 @@ export class FieldColourHsvSliders extends FieldColour {
     /** HTML range input element for editing brightness. */
     private brightnessSlider: HTMLInputElement | null = null;
 
+    /** 显示HEX输入框 */
+    private hexInput: HTMLInputElement | null = null;
+
+    /** 显示颜色预览 */
+    private colourPreview: HTMLDivElement | null = null;
+
     /** HTML div element containing all the labels and sliders. */
     private dropdownContainer: HTMLDivElement | null = null;
+
+    /**
+     * Zelos 渲染器会错误的将 borderRect_ 改为不显示，这破坏了坐标的检测
+     * 因此需要重写这个方法
+     *
+     * @override
+     */
+    override getScaledBBox(): Blockly.utils.Rect {
+        if (this.isFullBlockField()) {
+            const block = this.getSourceBlock();
+            if (!block) throw new Blockly.UnattachedFieldError();
+            const bBox = (block as Blockly.BlockSvg).getHeightWidth();
+            const scale = (block.workspace as Blockly.WorkspaceSvg).scale;
+            const xy = this.getAbsoluteXY_();
+            const scaledWidth = (bBox.width + 1) * scale;
+            const scaledHeight = (bBox.height + 1) * scale;
+            if (Blockly.utils.userAgent.GECKO) {
+                xy.x += 1.5 * scale;
+                xy.y += 1.5 * scale;
+            } else {
+                xy.x -= 0.5 * scale;
+                xy.y -= 0.5 * scale;
+            }
+            return new Blockly.utils.Rect(
+                xy.y,
+                xy.y + scaledHeight,
+                xy.x,
+                xy.x + scaledWidth,
+            );
+        }
+        return super.getScaledBBox();
+    }
 
     /**
      * Create and show the colour field's editor.
@@ -358,6 +400,27 @@ export class FieldColourHsvSliders extends FieldColour {
             ),
         );
 
+        const hexRow: HTMLDivElement = document.createElement('div');
+        hexRow.classList.add('fieldColourHexRow');
+        this.colourPreview = document.createElement('div');
+        this.colourPreview.classList.add('fieldColourHexPreview');
+        this.hexInput = document.createElement('input');
+        this.hexInput.classList.add('fieldColourHexInput');
+        this.hexInput.type = 'text';
+        this.hexInput.maxLength = 7;
+        this.hexInput.placeholder = '#RRGGBB';
+        hexRow.appendChild(this.colourPreview);
+        hexRow.appendChild(this.hexInput);
+        container.appendChild(hexRow);
+        this.hsvBoundEvents.push(
+            Blockly.browserEvents.conditionalBind(
+                this.hexInput,
+                'input',
+                this,
+                this.onHexInputChange,
+            ),
+        );
+
         if (window.EyeDropper) {
             // If the browser supports the eyedropper API, create a button for it.
             const button: HTMLButtonElement = document.createElement('button');
@@ -391,6 +454,8 @@ export class FieldColourHsvSliders extends FieldColour {
         this.saturationSlider = null;
         this.brightnessReadout = null;
         this.brightnessSlider = null;
+        this.hexInput = null;
+        this.colourPreview = null;
         this.dropdownContainer = null;
 
         if (
@@ -464,6 +529,17 @@ export class FieldColourHsvSliders extends FieldColour {
                 this.updateSliderValues();
             });
         }
+    }
+
+    private onHexInputChange(): void {
+        if (!this.hexInput) return;
+        let hex = this.hexInput.value.trim();
+        if (!hex.startsWith('#')) {
+            hex = '#' + hex;
+        }
+        if (!/^#[0-9a-fA-F]{6}$/.test(hex)) return;
+        this.setIntermediateValue(hex.toLowerCase());
+        this.updateSliderValues();
     }
 
     private setIntermediateValue(value: string): void {
@@ -546,6 +622,13 @@ export class FieldColourHsvSliders extends FieldColour {
             FieldColourHsvSliders.hsvToHex(h, s, 1) +
             ` calc(100% - ${FieldColourHsvSliders.THUMB_RADIUS}px))`;
         this.brightnessSlider.style.setProperty('--slider-track-background', brightnessGradient);
+
+        if (this.hexInput) {
+            this.hexInput.value = (this.getValue() as string) || '';
+        }
+        if (this.colourPreview) {
+            this.colourPreview.style.backgroundColor = (this.getValue() as string) || '';
+        }
     }
 
     /** Updates slider values based on the current value of the field. */
@@ -582,6 +665,36 @@ Blockly.Css.register(`
 .fieldColourSliderLabel {
   display: flex;
   justify-content: space-between;
+}
+.fieldColourHexRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 8px;
+}
+.fieldColourHexPreview {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid #bbb;
+  flex-shrink: 0;
+}
+.fieldColourHexInput {
+  flex: 1;
+  width: 100%;
+  height: 24px;
+  padding: 0 6px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 12px;
+  color: #5c5c5c;
+  background: #fff;
+  box-sizing: border-box;
+  outline: none;
+}
+.fieldColourHexInput:focus {
+  border-color: #4a4a4a;
 }
 .fieldColourEyedropper {
   appearance: none;
