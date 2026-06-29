@@ -1,0 +1,47 @@
+.start{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1 1;
+    background-color: var(--ui-white);
+    padding-left: 10rem;
+}
+
+.logo{
+    height: 5rem;
+    width: auto;
+    margin-top: 25vh;
+}
+
+.welcome{
+    font-size: 64px;
+}
+
+.button{
+    position: relative;
+    background-color: transparent;
+    font-size:large;
+    padding: 1rem 2rem;
+    width: 40%;
+    text-align: left;
+    overflow: hidden;
+    background-image: linear-gradient(
+        90deg,
+        var(--text-primary) 0%,
+        var(--text-primary) 40%,
+        #6bb5ff 60%,
+        var(--text-primary) 65%,
+        var(--text-primary) 100%
+    );
+    background-size: 300% 100%;
+    background-position: 100% 50%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.button:hover{
+    background-position: 0% 50%;
+    transition: background-position 1s ease-in-out;
+    filter: none;
+}

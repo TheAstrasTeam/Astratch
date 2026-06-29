@@ -4,6 +4,7 @@ import GUI from './gui/main/index.tsx';
 import { VM } from './vm/index.ts';
 import i18nReady from './i18n';
 import Failed from './gui/failed/index.tsx';
+import { applyGuiTheme } from './lib/Theme/guiThemeManager.ts';
 
 // 初始化VM
 const vm = new VM();
@@ -13,6 +14,7 @@ Object.assign(window, {
 
 // 等待国际化初始化
 i18nReady.then(() => {
+    applyGuiTheme(); //初始化主题
     createRoot(document.getElementById('root')!).render(
         <StrictMode>
             <Suspense fallback='loading...'>

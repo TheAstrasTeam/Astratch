@@ -1,11 +1,9 @@
 // 用于管理界面、编辑器等除VM之外的设置
 import { create } from 'zustand';
 import { spawnUserName } from './username';
-import type { IGuiSettings } from '../types/gui';
+import { DEFAULT_GUITHEME, type guiTheme, type IGuiSettings } from '../types/gui';
 
-const DEFAULT_GUITHEME: string = 'dark';
-
-export function initSettings() {
+export function initSettings(): IGuiSettings  {
     const settingsOrigin = localStorage.getItem('ash:settings');
     let settings: IGuiSettings | undefined; //万一不存在呢...
 
@@ -16,8 +14,16 @@ export function initSettings() {
             // ignore
         }
     }
-    create(() => ({
+    return {
         userName: settings?.userName ?? spawnUserName(),
         guiTheme: settings?.guiTheme ?? DEFAULT_GUITHEME,
-    }));
+    };
 }
+
+const useSettingsStore = create<IGuiSettings>((set) => ({
+    ...initSettings(),
+    setUserName: (userName: string) => set({userName}),
+    setGuiTheme: (guiTheme: guiTheme) => set({ guiTheme: guiTheme }),
+    
+}));
+export default useSettingsStore

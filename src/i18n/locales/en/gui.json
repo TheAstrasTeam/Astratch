@@ -1,3 +1,12 @@
 {
-    "test": "A test text to show i18n is working!"
+    "welcomeText0": "Hey there, {{name}}!",
+    "welcomeText1": "What's next?",
+    "welcomeText2": "Welcome back, {{name}}!",
+    "welcomeText3": "Ready to create?",
+    "welcomeText4": "Good to see you, {{name}}!",
+    "welcomeText5": "Let's make something!",
+    "welcomeText6": "Hi, {{name}}!",
+    "welcomeText7": "What shall we build?",
+    "welcomeText8": "Hello, {{name}}!",
+    "welcomeText9": "Time to create!"
 }
