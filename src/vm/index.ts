@@ -3,29 +3,27 @@ import Settings from './settings/index';
 import type { IVM, IRuntime, IVMSettings, IProjectManager } from '../types/vm';
 import { ProjectManager } from './projectManager';
 import { t } from 'i18next';
-import Blocks from './blocks';
-import * as Blockly from 'blockly';
+
 
 /**
  * 虚拟机，管理整个ASH
  */
 export class VM implements IVM {
-    Runtime: IRuntime;
-    Settings: IVMSettings;
+    runtime: IRuntime;
+    settings: IVMSettings;
     editingTargetID: string;
-    ProjectManager: IProjectManager;
-    Blocks: Blocks;
+    projectManager: IProjectManager;
 
     constructor() {
         /**
          * 运行时
          */
-        this.Runtime = new Runtime();
+        this.runtime = new Runtime();
 
         /**
          * 存储项目设置
          */
-        this.Settings = new Settings();
+        this.settings = new Settings();
 
         /**
          * 当前的编辑目标ID
@@ -35,28 +33,23 @@ export class VM implements IVM {
         /**
          * 管理项目目录
          */
-        this.ProjectManager = new ProjectManager();
-
-        /**
-         * Blockly/WebGPU 工作区管理
-         */
-        this.Blocks = new Blocks(Blockly);
+        this.projectManager = new ProjectManager();
     }
 
     async selectProject() {
-        await this.ProjectManager.selectFolder();
+        await this.projectManager.selectFolder();
     }
 
     async initProject() {
-        if (!this.ProjectManager.folderHandle)
+        if (!this.projectManager.folderHandle)
             throw new Error('Please load/create a project first!');
-        if (!(await this.ProjectManager.isEmpty(this.ProjectManager.folderHandle)))
+        if (!(await this.projectManager.isEmpty(this.projectManager.folderHandle)))
             throw new Error('Please select a empty folder!');
 
-        await this.ProjectManager.createFolder(this.ProjectManager.folderHandle, 'assets');
-        await this.ProjectManager.createFolder(this.ProjectManager.folderHandle, 'sprites');
-        await this.ProjectManager.createFile(
-            this.ProjectManager.folderHandle,
+        await this.projectManager.createFolder(this.projectManager.folderHandle, 'assets');
+        await this.projectManager.createFolder(this.projectManager.folderHandle, 'sprites');
+        await this.projectManager.createFile(
+            this.projectManager.folderHandle,
             'projectMeta.json',
             JSON.stringify({
                 id: crypto.randomUUID(),

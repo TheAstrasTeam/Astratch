@@ -17,8 +17,8 @@ const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
         setLanguage(e.target.value);
         localStorage.setItem(localStorageIDs.Language, e.target.value);
         await i18next.changeLanguage(e.target.value);
-        await vm.Blocks.init();
-        vm.Blocks.restartWorkspace();
+        await vm.runtime.blocks.init();
+        vm.runtime.blocks.restartWorkspace();
     };
     return (
         <div className={styles.app}>

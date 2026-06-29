@@ -5,12 +5,12 @@ const BlocklyWorkspace = ({ vm }: { vm: IVM }): React.ReactNode => {
     const workspaceDiv = useRef<HTMLDivElement>(null);
     useEffect(() => {
         if (!workspaceDiv.current) return;
-        if (vm.Blocks.workspaceSvg) vm.Blocks.dispose();
+        if (vm.runtime.blocks.workspaceSvg) vm.runtime.blocks.dispose();
 
-        vm.Blocks.createWorkspace(workspaceDiv.current);
+        vm.runtime.blocks.createWorkspace(workspaceDiv.current);
 
         return () => {
-            vm.Blocks.dispose();
+            vm.runtime.blocks.dispose();
             // 扣式咯，他是头猪
             //-w-//
         };

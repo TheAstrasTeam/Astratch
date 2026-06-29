@@ -16,7 +16,7 @@ i18nReady.then(() => {
     createRoot(document.getElementById('root')!).render(
         <StrictMode>
             <Suspense fallback='loading...'>
-                {vm.ProjectManager.isAPIAvailable ? (
+                {vm.projectManager.isAPIAvailable ? (
                     <GUI vm={vm} />
                 ) : (
                     <Failed reason='file_system_access_api_not_supported' />

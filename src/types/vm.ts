@@ -7,6 +7,7 @@ export interface IVMSettings {
 export interface IRuntime {
     projectID: string;
     projectAuthor: string[];
+    blocks: IBlocks;
 }
 
 export type folderType = FileSystemDirectoryHandle | undefined;
@@ -44,11 +45,10 @@ export interface IProjectManager {
 }
 
 export interface IVM {
-    Runtime: IRuntime;
-    Settings: IVMSettings;
+    runtime: IRuntime;
+    settings: IVMSettings;
     editingTargetID: string;
-    ProjectManager: IProjectManager;
-    Blocks: IBlocks;
+    projectManager: IProjectManager;
     /**
      * 选择一个文件夹打开作为项目
      */
