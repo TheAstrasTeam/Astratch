@@ -1,8 +1,8 @@
 export const guiThemes = {
     dark: 'dark',
-    light: 'light'
+    light: 'light',
 } as const;
-export type guiTheme = keyof typeof guiThemes
+export type guiTheme = keyof typeof guiThemes;
 export const DEFAULT_GUITHEME = 'dark' as const;
 export interface IGuiSettings {
     userName: string;
@@ -31,8 +31,8 @@ export const guiInterface = {
     /**
      * 加载界面
      */
-    LOADING: 'loading'
-} as const
+    LOADING: 'loading',
+} as const;
 
-export type IGuiInterface = typeof guiInterface[keyof typeof guiInterface]
-export const defaultGuiInterface = guiInterface.START
+export type IGuiInterface = (typeof guiInterface)[keyof typeof guiInterface];
+export const defaultGuiInterface = guiInterface.START;

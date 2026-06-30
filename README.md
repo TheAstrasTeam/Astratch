@@ -12,6 +12,8 @@
 
 ## 感谢
 
+### Blockly
+
 `Astratch` 克隆&修改&使用了 [blockly-example](https://github.com/RaspberryPiFoundation/blockly-samples) 其中的部分插件：
 
 - [Continuous Toolbox](./src/vm/blocks/plugins/continuous-toolbox/)
@@ -21,6 +23,10 @@
 - [field-grid-dropdown](./src/vm/blocks/plugins/field-grid-dropdown/)
 
 我们对其中的插件进行了部分修改使其更加适配 `Astratch` 的*设想*，我们遵守`Apache License v2.0`，在每个更改的文件开头均有标注。
+
+### ICONS
+
+`Astratch` 使用 **Google** 的 [Material Symbols](https://github.com/google/material-design-icons) 的开源图标
 
 再次表达我们的非常感谢！
 

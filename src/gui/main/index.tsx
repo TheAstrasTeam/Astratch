@@ -5,10 +5,10 @@ import { useState } from 'react';
 import { localStorageIDs } from '../../utils/localstorage';
 import { languageResources } from '../../i18n';
 
-import styles from './index.module.css';
-import './public.css';
-import '../css/constants.css';
-import '../css/zIndex.css';
+import styles from './index.module.scss';
+import './public.scss';
+import '../css/constants.scss';
+import '../css/zIndex.scss';
 import useGUIStore from '../../utils/gui/interface';
 import { guiInterface } from '../../types/gui';
 import Start from '../start';

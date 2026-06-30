@@ -17,9 +17,15 @@ const guiTheme = {
 
     'text-primary': '#eeeeee',
 
-    "input-background": "#1e1e1e",
-} as const
+    'input-background': '#1e1e1e',
 
-export default{
-    guiTheme
-}
+    'svg-filter': 'brightness(0)',
+    'active-button': 'brightness(0.5)',
+
+    'time-hover': '0.2s',
+    'time-active': '0.1s'
+} as const;
+
+export default {
+    guiTheme,
+};

@@ -29,12 +29,12 @@ const jsonDefinition = {
 /**
  * Javascript block generator function.
  *
- * @param block The Block instance to generate code for.
+ * @param _block The Block instance to generate code for.
  * @param generator The JavascriptGenerator calling the function.
  * @returns A tuple containing the code string and precedence.
  */
 export function toJavascript(
-    block: Block,
+    _block: Block,
     generator: JavascriptGenerator,
 ): [string, JavascriptOrder] {
     // Generate a random colour.
@@ -54,11 +54,11 @@ function ${generator.FUNCTION_NAME_PLACEHOLDER_}() {
 /**
  * Dart block generator function.
  *
- * @param block The Block instance to generate code for.
+ * @param _block The Block instance to generate code for.
  * @param generator The DartGenerator calling the function.
  * @returns A tuple containing the code string and precedence.
  */
-export function toDart(block: Block, generator: DartGenerator): [string, DartOrder] {
+export function toDart(_block: Block, generator: DartGenerator): [string, DartOrder] {
     // Generate a random colour.
     // TODO(#7600): find better approach than casting to any to override
     // CodeGenerator declaring .definitions protected.
@@ -83,11 +83,11 @@ String ${generator.FUNCTION_NAME_PLACEHOLDER_}() {
 /**
  * Lua block generator function.
  *
- * @param block The Block instance to generate code for.
- * @param generator The LuaGenerator calling the function.
+ * @param _block The Block instance to generate code for.
+ * @param _generator The LuaGenerator calling the function.
  * @returns A tuple containing the code string and precedence.
  */
-export function toLua(block: Block, generator: LuaGenerator): [string, LuaOrder] {
+export function toLua(_block: Block, _generator: LuaGenerator): [string, LuaOrder] {
     // Generate a random colour.
     const code = 'string.format("#%06x", math.random(0, 2^24 - 1))';
     return [code, LuaOrder.HIGH];
@@ -96,11 +96,11 @@ export function toLua(block: Block, generator: LuaGenerator): [string, LuaOrder]
 /**
  * PHP block generator function.
  *
- * @param block The Block instance to generate code for.
+ * @param _block The Block instance to generate code for.
  * @param generator The PhpGenerator calling the function.
  * @returns A tuple containing the code string and precedence.
  */
-export function toPhp(block: Block, generator: PhpGenerator): [string, PhpOrder] {
+export function toPhp(_block: Block, generator: PhpGenerator): [string, PhpOrder] {
     // Generate a random colour.
     const functionName = generator.provideFunction_(
         'colour_random',
@@ -117,11 +117,11 @@ function ${generator.FUNCTION_NAME_PLACEHOLDER_}() {
 /**
  * Python block generator function.
  *
- * @param block The Block instance to generate code for.
+ * @param _block The Block instance to generate code for.
  * @param generator The PythonGenerator calling the function.
  * @returns A tuple containing the code string and precedence.
  */
-export function toPython(block: Block, generator: PythonGenerator): [string, PythonOrder] {
+export function toPython(_block: Block, generator: PythonGenerator): [string, PythonOrder] {
     // Generate a random colour.
     // TODO(#7600): find better approach than casting to any to override
     // CodeGenerator declaring .definitions protected.

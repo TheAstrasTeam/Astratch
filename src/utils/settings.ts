@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { spawnUserName } from './username';
 import { DEFAULT_GUITHEME, type guiTheme, type IGuiSettings } from '../types/gui';
 
-export function initSettings(): IGuiSettings  {
+export function initSettings(): IGuiSettings {
     const settingsOrigin = localStorage.getItem('ash:settings');
     let settings: IGuiSettings | undefined; //万一不存在呢...
 
@@ -20,10 +20,9 @@ export function initSettings(): IGuiSettings  {
     };
 }
 
-const useSettingsStore = create<IGuiSettings>((set) => ({
+const useSettingsStore = create<IGuiSettings>(set => ({
     ...initSettings(),
-    setUserName: (userName: string) => set({userName}),
+    setUserName: (userName: string) => set({ userName }),
     setGuiTheme: (guiTheme: guiTheme) => set({ guiTheme: guiTheme }),
-    
 }));
-export default useSettingsStore
+export default useSettingsStore;

@@ -1,0 +1,49 @@
+@use '../css/color' as *;
+
+.start {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1 1;
+    background-color: $ui-white;
+    padding-left: 10vw;
+    justify-content: center;
+}
+
+.logo {
+    height: 5rem;
+    width: auto;
+}
+
+.welcome {
+    font-size: 64px;
+}
+
+.button {
+    display: flex;
+    gap: 5px;
+    align-content: center;
+    position: relative;
+    background-color: transparent;
+    font-size: large;
+    padding: 1rem 2rem;
+    width: 40%;
+    text-align: left;
+    overflow: hidden;
+    color: $text-primary;
+    transition: background-color $time-hover ease, filter $time-active ease;
+
+    &:hover {
+        background-color: $ui-black-transparent;
+        filter: none;
+    }
+    &:active{
+        filter: brightness(0.5);
+    }
+
+    svg {
+        width: 20px;
+        height: auto;
+        color: $text-primary;
+    }
+}

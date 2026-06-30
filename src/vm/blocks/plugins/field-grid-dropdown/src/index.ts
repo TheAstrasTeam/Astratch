@@ -127,10 +127,10 @@ export class FieldGridDropdown extends Blockly.FieldDropdown {
     /**
      * Create a dropdown menu under the text.
      *
-     * @param e Optional mouse event that triggered the field to open, or
+     * @param _e Optional mouse event that triggered the field to open, or
      *  undefined if triggered programmatically.
      */
-    protected showEditor_(e?: MouseEvent) {
+    protected showEditor_(_e?: MouseEvent) {
         Blockly.DropDownDiv.clearContent();
         const rtl = !!this.getSourceBlock()?.workspace.RTL;
         this.grid = new Grid(

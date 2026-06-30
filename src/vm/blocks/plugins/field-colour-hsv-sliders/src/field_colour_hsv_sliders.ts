@@ -2,7 +2,7 @@
  * @license
  * Copyright 2022 Google LLC
  * SPDX-License-Identifier: Apache-2.0
- * 
+ *
  * 由 AstrasTeam 修改于 2026/6/29:
  * - 重写 getScaledBBox 方法
  * - 新增 颜色预览、HEX输入框
@@ -272,12 +272,7 @@ export class FieldColourHsvSliders extends FieldColour {
                 xy.x -= 0.5 * scale;
                 xy.y -= 0.5 * scale;
             }
-            return new Blockly.utils.Rect(
-                xy.y,
-                xy.y + scaledHeight,
-                xy.x,
-                xy.x + scaledWidth,
-            );
+            return new Blockly.utils.Rect(xy.y, xy.y + scaledHeight, xy.x, xy.x + scaledWidth);
         }
         return super.getScaledBBox();
     }
@@ -501,9 +496,9 @@ export class FieldColourHsvSliders extends FieldColour {
     /**
      * Updates the value of this field based on the editor sliders.
      *
-     * @param event Unused.
+     * @param _event Unused.
      */
-    private onSliderChange(event?: Event): void {
+    private onSliderChange(_event?: Event): void {
         if (!this.hueSlider || !this.saturationSlider || !this.brightnessSlider) {
             throw new Error('The HSV sliders are missing.');
         }
@@ -519,9 +514,9 @@ export class FieldColourHsvSliders extends FieldColour {
     /**
      * Updates the value of this field and editor sliders using an eyedropper.
      *
-     * @param event Unused.
+     * @param _event Unused.
      */
-    private onEyedropperEvent(event?: Event): void {
+    private onEyedropperEvent(_event?: Event): void {
         if (window.EyeDropper) {
             const eyeDropper: EyeDropper = new window.EyeDropper();
             eyeDropper.open().then(result => {

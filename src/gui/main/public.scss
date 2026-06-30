@@ -1,0 +1,32 @@
+@use '../css/color' as *;
+
+// 关于控件的默认CSS
+
+@mixin control-base {
+    border: 0;
+    background-color: var(--default-color);
+    border-radius: 5px;
+    margin: 5px;
+
+    &:hover {
+        filter: brightness(var(--hover-bright));
+    }
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    margin: 0;
+    color: $text-primary;
+    user-select: none;
+}
+
+button {
+    @include control-base;
+    padding: var(--button-padding);
+}
+
+select {
+    @include control-base;
+    padding: var(--select-padding);
+}

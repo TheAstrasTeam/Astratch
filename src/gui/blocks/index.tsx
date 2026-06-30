@@ -1,5 +1,5 @@
 import type { IVM } from '../../types/vm';
-import styles from './index.module.css';
+import styles from './index.module.scss';
 import BlocklyWorkspace from './Blockly/index';
 
 const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {

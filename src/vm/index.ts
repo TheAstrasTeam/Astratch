@@ -4,7 +4,6 @@ import type { IVM, IRuntime, IVMSettings, IProjectManager } from '../types/vm';
 import { ProjectManager } from './projectManager';
 import { t } from 'i18next';
 
-
 /**
  * 虚拟机，管理整个ASH
  */
