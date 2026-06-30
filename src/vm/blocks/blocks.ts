@@ -48,6 +48,7 @@ const initBlocks = (blockly: typeof Blockly) => {
         // 因此可以直接删除
         const blockTypes = Object.keys(blockly.Blocks);
         blockTypes.forEach(type => {
+            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
             delete blockly.Blocks[type];
         });
     } catch {

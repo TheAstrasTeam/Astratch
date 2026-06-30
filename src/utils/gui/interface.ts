@@ -11,6 +11,8 @@ const useGUIStore: UseBoundStore<
     }>
 > = create(set => ({
     guiInterface: defaultGuiInterface,
-    setInterface: (guiInterface: IGuiInterface) => set({ guiInterface }),
+    setInterface: (guiInterface: IGuiInterface) => {
+        set({ guiInterface });
+    },
 }));
 export default useGUIStore;

@@ -48,11 +48,11 @@ const i18nReady = i18n
             escapeValue: false,
         },
     })
-    .then(() => {
+    .then(async () => {
         // 检测已设定的语言
-        const latestLanguage: string | null = readLocalStorage(localStorageIDs.Language);
+        const latestLanguage = readLocalStorage(localStorageIDs.Language) as string | null;
         if (latestLanguage) {
-            i18n.changeLanguage(latestLanguage);
+            await i18n.changeLanguage(latestLanguage);
         }
     });
 

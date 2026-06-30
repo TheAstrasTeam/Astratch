@@ -1,7 +1,7 @@
 import i18next from 'i18next';
 import type { IVM } from '../../types/vm';
 import WorkSpace from '../blocks';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { localStorageIDs } from '../../utils/localstorage';
 import { languageResources } from '../../i18n';
 
@@ -17,35 +17,29 @@ const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
     const [language, setLanguage] = useState(i18next.language);
     // 控制显示界面
     const nowGuiInterface = useGUIStore(state => state.guiInterface);
-    const handleLanguageChanged = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setLanguage(e.target.value);
-        localStorage.setItem(localStorageIDs.Language, e.target.value);
-        await i18next.changeLanguage(e.target.value);
-        await vm.runtime.blocks.init();
-        vm.runtime.blocks.restartWorkspace();
-    };
+    const handleLanguageChanged = useCallback(
+        async (e: React.ChangeEvent<HTMLSelectElement>) => {
+            const value = e.target.value;
+            setLanguage(value);
+            localStorage.setItem(localStorageIDs.Language, value);
+
+            try {
+                await i18next.changeLanguage(value);
+                await vm.runtime.blocks.init();
+                await vm.runtime.blocks.restartWorkspace();
+            } catch {
+                // 待定
+            }
+        },
+        [vm],
+    );
     return (
         <div className={styles.app}>
             {nowGuiInterface === guiInterface.START && <Start />}
             {nowGuiInterface === guiInterface.EDITOR && (
                 <>
                     <div className={styles.toolbar}>
-                        {/* 我添加了一个工具栏用来保证布局 */}
-                        <button
-                            onClick={async () => {
-                                await vm.selectProject();
-                            }}
-                        >
-                            select a folder
-                        </button>
-                        <button
-                            onClick={async () => {
-                                await vm.initProject();
-                            }}
-                        >
-                            init project
-                        </button>
-                        <select onChange={handleLanguageChanged} value={language}>
+                        <select onChange={void handleLanguageChanged} value={language}>
                             {Object.keys(languageResources).map(lan => (
                                 <option value={lan} key={lan}>
                                     {lan}

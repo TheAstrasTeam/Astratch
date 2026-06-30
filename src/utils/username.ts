@@ -5,5 +5,5 @@
  * `Player_?????`
  */
 export function spawnUserName() {
-    return `Player_${~~(Math.random() * 90000) + 10000}`;
+    return `Player_${Math.floor(Math.random() * 90000 + 10000).toString()}`;
 }

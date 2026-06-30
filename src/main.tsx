@@ -13,8 +13,9 @@ Object.assign(window, {
 });
 
 // 等待国际化初始化
-i18nReady.then(() => {
+await i18nReady.then(() => {
     applyGuiTheme(); //初始化主题
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     createRoot(document.getElementById('root')!).render(
         <StrictMode>
             <Suspense fallback='loading...'>

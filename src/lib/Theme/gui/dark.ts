@@ -23,7 +23,7 @@ const guiTheme = {
     'active-button': 'brightness(0.5)',
 
     'time-hover': '0.2s',
-    'time-active': '0.1s'
+    'time-active': '0.1s',
 } as const;
 
 export default {

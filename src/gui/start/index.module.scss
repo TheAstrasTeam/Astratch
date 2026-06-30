@@ -31,13 +31,15 @@
     text-align: left;
     overflow: hidden;
     color: $text-primary;
-    transition: background-color $time-hover ease, filter $time-active ease;
+    transition:
+        background-color $time-hover ease,
+        filter $time-active ease;
 
     &:hover {
         background-color: $ui-black-transparent;
         filter: none;
     }
-    &:active{
+    &:active {
         filter: brightness(0.5);
     }
 

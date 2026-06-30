@@ -5,15 +5,15 @@
  * @param key 存储键名
  * @returns 解析后的数据，不存在时返回 null
  */
-const readLocalStorage = <T = unknown>(key: string): T | null => {
+const readLocalStorage = (key: string): unknown => {
     try {
         const data = localStorage.getItem(key);
         if (!data) return null;
 
         try {
-            return JSON.parse(data) as T;
+            return JSON.parse(data);
         } catch {
-            return data as T;
+            return data;
         }
     } catch {
         return null;

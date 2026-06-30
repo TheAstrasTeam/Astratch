@@ -26,7 +26,7 @@ class Blocks implements IBlocks {
     /**
      * 标记此时是否正在创建工作区，来防止时序问题
      */
-    private _isCreating: boolean = false;
+    private _isCreating = false;
 
     constructor(BlocklySelf: typeof Blockly) {
         this._DOM = null;
@@ -92,7 +92,7 @@ class Blocks implements IBlocks {
     /**
      * 重启工作区
      */
-    restartWorkspace(): void {
+    async restartWorkspace(): Promise<void> {
         if (!this._DOM) {
             console.warn('No existing workspace');
             return;
@@ -104,16 +104,16 @@ class Blocks implements IBlocks {
          */
         // 删除遗留的DOM
         this._DOM.querySelector('[class*=injectionDiv]')?.remove();
-        this.createWorkspace(this._DOM);
+        await this.createWorkspace(this._DOM);
     }
 
-    setLanguage(lang: 'en' | 'zh-Hans'): void {
+    async setLanguage(lang: 'en' | 'zh-Hans'): Promise<void> {
         this.Blockly.setLocale(this.supportLanguages[lang]);
-        this.restartWorkspace();
+        await this.restartWorkspace();
     }
 
     async createWorkspace(DOM: HTMLDivElement): Promise<boolean> {
-        // 如果创建工作区过于频繁
+        // 如果创建工作区过于频繁·
         // 会出现init没进行完成就再次运行以此
         // 从而创建了多次工作区
         if (this._isCreating) return false;

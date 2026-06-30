@@ -13,7 +13,7 @@ const Start = (): React.ReactNode => {
     const userName = useSettingsStore(state => state.userName);
     const spawnWelcomeText = () => {
         // eslint-disable-next-line react-hooks/purity
-        return t(`gui:welcomeText${Math.floor(Math.random() * 10)}`, { name: userName });
+        return t(`gui:welcomeText${Math.floor(Math.random() * 10).toString()}`, { name: userName });
     };
     return (
         <div className={styles.start}>
@@ -24,7 +24,10 @@ const Start = (): React.ReactNode => {
                 <AddIcon />
                 Create a project
             </button>
-            <button className={styles.button}><LoadIcon/>Load a project</button>
+            <button className={styles.button}>
+                <LoadIcon />
+                Load a project
+            </button>
         </div>
     );
 };

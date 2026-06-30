@@ -22,8 +22,9 @@ export class ProjectManager implements IProjectManager {
     }
 
     async isEmpty(path: folderType) {
+        if (!path) return false;
         try {
-            const entries = await path!.values().next();
+            const entries = await path.values().next();
             return !!entries.done;
         } catch {
             return true;
@@ -31,14 +32,16 @@ export class ProjectManager implements IProjectManager {
     }
 
     async createFolder(path: folderType, name: string) {
-        return await path!.getDirectoryHandle(name, { create: true });
+        if (!path) return false;
+        return await path.getDirectoryHandle(name, { create: true });
     }
 
     async createFile(path: folderType, name: string, content: string) {
-        const fileHandle = await path!.getFileHandle(name, { create: true });
+        if (!path) return false;
+        const fileHandle = await path.getFileHandle(name, { create: true });
         const fileWrite = await fileHandle.createWritable();
         await fileWrite.write(content);
-        fileWrite.close();
+        await fileWrite.close();
         return fileHandle;
     }
 }

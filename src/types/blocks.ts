@@ -328,7 +328,7 @@ export interface IBlocksConfig {
 
 export { OPCODE, BlocksColor };
 
-export type Language = { [key: string]: string };
+export type Language = Record<string, string>;
 
 export interface IBlocks {
     /**
@@ -371,7 +371,7 @@ export interface IBlocks {
      * 设置一个语言
      * @param lang ASH 兼容的 i18n
      */
-    setLanguage: (lang: 'en' | 'zh-Hans') => void;
+    setLanguage: (lang: 'en' | 'zh-Hans') => Promise<void>;
     /**
      * 销毁工作区
      *
@@ -387,7 +387,7 @@ export interface IBlocks {
     /**
      * 重启工作区
      */
-    restartWorkspace: () => void;
+    restartWorkspace: () => Promise<void>;
     /**
      * 初始化 Blockly，载入插件什么的
      */
