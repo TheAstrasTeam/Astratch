@@ -1,8 +1,8 @@
 <div style="display: flex; flex-direction: column; gap: 20px; align-items: center; justify-content: center; width: 100%;">
   <div style="width: 250px; height: auto;">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./src/assets/darkLogo.svg">
-      <img alt="Astratch Light Logo" src="./src/assets/lightLogo.svg" style="width: 100%; height: auto; display: block;">
+      <source media="(prefers-color-scheme: dark)" srcset="./src/assets/lightLogo.svg" alt="Astratch Light Logo">
+      <img alt="Astratch Dark Logo" src="./src/assets/darkLogo.svg" style="width: 100%; height: auto; display: block;">
     </picture>
   </div>
 </div>
