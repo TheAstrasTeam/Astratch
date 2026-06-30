@@ -1,5 +1,5 @@
 import { DEFAULT_GUITHEME, type guiTheme } from '../../types/gui';
-import useSettingsStore from '../../utils/settings';
+import useSettingsStore from '../../stores/useSettingsStore';
 import dark from './gui/dark';
 import light from './gui/light';
 

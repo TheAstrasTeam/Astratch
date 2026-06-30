@@ -1,5 +1,5 @@
 import styles from './index.module.scss';
-import useSettingsStore from '../../utils/settings';
+import useSettingsStore from '../../stores/useSettingsStore';
 import { guiThemes } from '../../types/gui';
 import { t } from 'i18next';
 

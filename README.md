@@ -1,10 +1,17 @@
-# Astratch
+<div style="display: flex; flex-direction: column; gap: 20px; align-items: center; justify-content: center; width: 100%;">
+  <div style="width: 250px; height: auto;">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="./src/assets/darkLogo.svg">
+      <img alt="Astratch Light Logo" src="./src/assets/lightLogo.svg" style="width: 100%; height: auto; display: block;">
+    </picture>
+  </div>
+</div>
 
-### [AstraEditor](https://github.com/AstraEditor)
-
-> 此项目的`我们`均指**AstrasTeam**，除非特有声明。
+> ### 也试试 [AstraEditor](https://github.com/AstraEditor) !
 
 ## 介绍
+
+> 此项目的`我们`均指**AstrasTeam**，除非特有声明。
 
 `Astratch` 是一个类似 `Scratch` 的开发平台，但它不基于任何 `Scratch` 改版。
 
@@ -16,11 +23,11 @@
 
 `Astratch` 克隆&修改&使用了 [blockly-example](https://github.com/RaspberryPiFoundation/blockly-samples) 其中的部分插件：
 
-- [Continuous Toolbox](./src/vm/blocks/plugins/continuous-toolbox/)
-- [field-angle](./src/vm/blocks/plugins/field-angle/)
-- [field-colour-hsv-sliders](./src/vm/blocks/plugins/field-colour-hsv-sliders/)
-- [field-colour](./src/vm/blocks/plugins/field-colour/)
-- [field-grid-dropdown](./src/vm/blocks/plugins/field-grid-dropdown/)
+- [Continuous Toolbox](./plugins/continuous-toolbox/)
+- [field-angle](./plugins/field-angle/)
+- [field-colour-hsv-sliders](./plugins/field-colour-hsv-sliders/)
+- [field-colour](./plugins/field-colour/)
+- [field-grid-dropdown](./plugins/field-grid-dropdown/)
 
 我们对其中的插件进行了部分修改使其更加适配 `Astratch` 的*设想*，我们遵守`Apache License v2.0`，在每个更改的文件开头均有标注。
 
@@ -48,24 +55,26 @@ graph LR
         B --> |渲染器|C[renderer/]
         B --> |国际化|O[i18n/]
         B --> |类型定义|TP[types/]
+        B --> |状态管理|ST[stores/]
 
         O --> |语言定义| LD[locales/]
 
         B --> |虚拟机|D[vm/]
         D --> |积木区|BLK[blocks/]
         D --> |运行时|RUNTIME[runtime/]
-        D --> |项目文件管理|PM[projectManager/]
+        D --> |项目管理|PM[project/]
         D --> |项目设置|PS[settings/]
         B --> |用户界面|E[gui/]
         E --> |主界面|K[main/]
         E --> |编辑器|G[blocks/]
-        E --> |画板|H[paint/]
-        E --> |音频|I[audio/]
+        E --> |启动页|START[start/]
+        E --> |错误页|ERR[error/]
+        E --> |全局样式|STY[styles/]
         G --> |组合| K
-        H --> |组合| K
-        I --> |组合| K
-        B --> |公用函数|F[uilts/]
-        B --> |主界面|MAIN[main.ts]
+        B --> |入口|MAIN[main.tsx]
+        B --> |工具函数|F[utils/]
+
+        A --> |第三方插件|PL[plugins/]
 ```
 
 ### 国际化
@@ -78,7 +87,7 @@ import { t } from 'i18next';
 t('id');
 ```
 
-之后于`ASH\Astratch\src\i18n\locales`配置语言
+之后于`ASH\src\i18n\locales`配置语言
 
 > 未来会支持线上添加新翻译
 
@@ -101,7 +110,7 @@ t('id');
 - [x] 基础项目目录、配置国际化
 - [ ] 敲定项目文件格式
 - [ ] 制作关于项目的 `API`
-- [ ] 制作基础积木编辑器
+- [x] 制作基础积木编辑器
 - [ ] 完善 `GUI`
 - [ ] 制作 `VM` 、编译器（`ash` -> `JavaScript`/`WASM`）
 - [ ] 完善积木编辑器

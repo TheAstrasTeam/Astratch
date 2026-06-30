@@ -7,9 +7,7 @@ import { languageResources } from '../../i18n';
 
 import styles from './index.module.scss';
 import './public.scss';
-import '../css/constants.scss';
-import '../css/zIndex.scss';
-import useGUIStore from '../../utils/gui/interface';
+import useGUIStore from '../../stores/useGUIStore';
 import { guiInterface } from '../../types/gui';
 import Start from '../start';
 

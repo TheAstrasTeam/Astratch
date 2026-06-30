@@ -7,9 +7,9 @@ import turnRight from './images/turnRight.svg';
 import greenFlag from './images/green-flag.svg';
 import repeatIcon from './images/repeat.svg';
 
-import { dropdownWithInput } from './plugins/fieldDropdown';
-import { FieldAngle } from './plugins/field-angle/src';
-import { FieldColourHsvSliders } from './plugins/field-colour-hsv-sliders/src';
+import { dropdownWithInput } from './fieldDropdown';
+import { FieldAngle } from '../../../plugins/field-angle/src';
+import { FieldColourHsvSliders } from '../../../plugins/field-colour-hsv-sliders/src';
 
 /**
  * 对于链接积木的配置项

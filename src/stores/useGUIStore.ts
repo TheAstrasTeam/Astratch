@@ -1,8 +1,8 @@
-// 这里定义着关于界面定义的东西
-// 实际上就和useState差不多
+// GUI 界面状态管理
+// 控制当前显示哪个界面（start / editor / extension / loading）
 
 import { create, type UseBoundStore, type StoreApi } from 'zustand';
-import { defaultGuiInterface, type IGuiInterface } from '../../types/gui';
+import { defaultGuiInterface, type IGuiInterface } from '../types/gui';
 
 const useGUIStore: UseBoundStore<
     StoreApi<{

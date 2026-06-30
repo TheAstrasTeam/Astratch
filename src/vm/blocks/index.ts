@@ -1,11 +1,11 @@
 import { type IBlocks, type Language } from '../../types/blocks';
 import type * as Blockly from 'blockly';
 // 导入两个插件试试
-import * as ContinuousToolbox from './plugins/continuous-toolbox/src';
+import * as ContinuousToolbox from '../../../plugins/continuous-toolbox/src';
 import * as En from 'blockly/msg/en';
 import * as ZhHans from 'blockly/msg/zh-hans';
 import getToolbox from './toolbox';
-import { initBlocks } from './blocks';
+import { initBlocks } from './definitions';
 
 /**
  * 用于便捷的管理WebGPU或Blockly工作区

@@ -1,7 +1,7 @@
 import Runtime from './runtime/runtime';
 import Settings from './settings/index';
 import type { IVM, IRuntime, IVMSettings, IProjectManager } from '../types/vm';
-import { ProjectManager } from './projectManager';
+import { ProjectManager } from './project';
 import { t } from 'i18next';
 
 /**

@@ -3,8 +3,10 @@ import { createRoot } from 'react-dom/client';
 import GUI from './gui/main/index.tsx';
 import { VM } from './vm/index.ts';
 import i18nReady from './i18n';
-import Failed from './gui/failed/index.tsx';
+import ErrorPage from './gui/error/index.tsx';
 import { applyGuiTheme } from './lib/Theme/guiThemeManager.ts';
+import './gui/styles/constants.scss';
+import './gui/styles/zIndex.scss';
 
 // 初始化VM
 const vm = new VM();
@@ -22,7 +24,7 @@ await i18nReady.then(() => {
                 {vm.projectManager.isAPIAvailable ? (
                     <GUI vm={vm} />
                 ) : (
-                    <Failed reason='file_system_access_api_not_supported' />
+                    <ErrorPage reason='file_system_access_api_not_supported' />
                 )}
             </Suspense>
         </StrictMode>,
