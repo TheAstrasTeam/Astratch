@@ -1,3 +1,4 @@
+<!-- Encoding: UTF-8 -->
 <div style="display: flex; flex-direction: column; gap: 20px; align-items: center; justify-content: center; width: 100%;">
   <div style="width: 250px; height: auto;">
     <picture>
@@ -53,31 +54,38 @@
 graph LR
         A[Astratch]
 
-        A --> |源码|B[src/]
+        A --> |源代码| ROOT_SRC[src/]
+        A --> |静态资源| ROOT_PUBLIC[public/]
+        A --> |第三方插件| ROOT_PLUGINS[plugins/]
+        A --> |构建产物| ROOT_DIST[dist/]
 
-        B --> |渲染器|C[renderer/]
-        B --> |国际化|O[i18n/]
-        B --> |类型定义|TP[types/]
-        B --> |状态管理|ST[stores/]
+        ROOT_SRC --> |资源文件| ASSETS[assets/]
+        ROOT_SRC --> |通用组件| COMPONENTS[components/]
+        ROOT_SRC --> |图形界面| GUI[gui/]
+        ROOT_SRC --> |国际化| I18N[i18n/]
+        ROOT_SRC --> |基础库| LIB[lib/]
+        ROOT_SRC --> |渲染器| RENDERER[renderer/]
+        ROOT_SRC --> |状态管理| STORES[stores/]
+        ROOT_SRC --> |类型定义| TYPES[types/]
+        ROOT_SRC --> |工具函数| UTILS[utils/]
+        ROOT_SRC --> |虚拟机| VM[vm/]
 
-        O --> |语言定义| LD[locales/]
+        GUI --> |积木编辑区| GUI_BLOCKS[blocks/]
+        GUI --> |错误页| GUI_ERROR[error/]
+        GUI --> |主界面| GUI_MAIN[main/]
+        GUI --> |启动页| GUI_START[start/]
+        GUI --> |全局样式| GUI_STYLES[styles/]
 
-        B --> |虚拟机|D[vm/]
-        D --> |积木区|BLK[blocks/]
-        D --> |运行时|RUNTIME[runtime/]
-        D --> |项目管理|PM[project/]
-        D --> |项目设置|PS[settings/]
-        B --> |用户界面|E[gui/]
-        E --> |主界面|K[main/]
-        E --> |编辑器|G[blocks/]
-        E --> |启动页|START[start/]
-        E --> |错误页|ERR[error/]
-        E --> |全局样式|STY[styles/]
-        G --> |组合| K
-        B --> |入口|MAIN[main.tsx]
-        B --> |工具函数|F[utils/]
+        I18N --> |语言包| LOCALES[locales/]
 
-        A --> |第三方插件|PL[plugins/]
+        LIB --> |主题系统| THEME[Theme/]
+
+        VM --> |积木定义| VM_BLOCKS[blocks/]
+        VM --> |项目管理| VM_PROJECT[project/]
+        VM --> |运行时| VM_RUNTIME[runtime/]
+        VM --> |项目设置| VM_SETTINGS[settings/]
+
+
 ```
 
 ### 国际化
