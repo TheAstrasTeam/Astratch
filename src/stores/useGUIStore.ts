@@ -15,4 +15,15 @@ const useGUIStore: UseBoundStore<
         set({ guiInterface });
     },
 }));
-export default useGUIStore;
+const useLoadingStore: UseBoundStore<
+    StoreApi<{
+        loading: boolean;
+        setLoading: (loading: boolean) => void;
+    }>
+> = create(set => ({
+    loading: false,
+    setLoading: (loading: boolean) => {
+        set({ loading });
+    },
+}));
+export { useGUIStore, useLoadingStore };

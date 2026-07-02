@@ -94,6 +94,7 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
 
     const [projectName, setProjectName] = useState<string>('');
     const [projectIdAuto, setProjectIdAuto] = useState<string>('');
+    const [projectIdInputed, setProjectIdInputed] = useState<boolean>(false)
     const [projectId, setProjectId] = useState<string>('');
 
     const [projectFolderName, setProjectFolderName] = useState<string>('');
@@ -277,6 +278,7 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
                         <input
                             className={styles.inputInput}
                             placeholder={t('gui:config.name.input.tip')}
+                            value={projectName}
                             onChange={e => {
                                 setProjectName(e.target.value);
                                 setProjectIdAuto(toID(e.target.value));
@@ -291,8 +293,9 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
                         <input
                             className={styles.inputInput}
                             placeholder={t('gui:config.id.input.tip')}
-                            value={projectId || projectIdAuto}
+                            value={projectIdInputed ? projectId : projectIdAuto}
                             onChange={e => {
+                                setProjectIdInputed(true);
                                 setProjectId(e.target.value);
                             }}
                         />

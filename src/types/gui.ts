@@ -2,11 +2,24 @@ export const guiThemes = {
     dark: 'dark',
     light: 'light',
 } as const;
-export type guiTheme = keyof typeof guiThemes;
+export type TGuiTheme = keyof typeof guiThemes;
 export const DEFAULT_GUITHEME = 'dark' as const;
+
+export const guiAccents = {
+    blue: 'blue'
+} as const;
+export type TGuiAccent = keyof typeof guiAccents;
+export const DEFAULT_GUIACCENT = 'blue' as const;
+
+export const DEFAULT_GUITHEME_MAP = {
+    gui: 'dark',
+    accent: 'blue'
+} as const
+export type TGuiThemeMap = typeof DEFAULT_GUITHEME_MAP;
+
 export interface IGuiSettings {
     userName: string;
-    guiTheme: guiTheme;
+    guiTheme: TGuiThemeMap;
 }
 
 export const guiInterface = {
@@ -28,10 +41,6 @@ export const guiInterface = {
      * 而不是一个单纯的界面
      */
     EXTENSION: 'extension',
-    /**
-     * 加载界面
-     */
-    LOADING: 'loading',
     /**
      * 创建项目
      */

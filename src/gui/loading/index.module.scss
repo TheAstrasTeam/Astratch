@@ -1,0 +1,27 @@
+@use '../styles/color.scss' as *;
+@use '../styles/animation.scss' as *;
+@use '../styles/constants.scss' as *;
+@use '../styles/zIndex.scss' as *;
+
+.loading {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    background-color: $ui-secondary;
+    z-index: $loading;
+    justify-content: space-between;
+    align-items: center;
+    background-color: $ui-white;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    text-align: center;
+}
+
+.loader-text {
+    padding-right: 100px;
+}
+
+.loader{
+    display: flex;
+    transform: scale(4) translate(35px, 35px)
+}

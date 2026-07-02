@@ -7,7 +7,7 @@ import lightLogo from '../../assets/lightLogo.svg';
 import darkLogo from '../../assets/darkLogo.svg';
 import AddIcon from '../../assets/add.svg?react';
 import LoadIcon from '../../assets/load.svg?react';
-import useGUIStore from '../../stores/useGUIStore';
+import { useGUIStore } from '../../stores/useGUIStore';
 
 const Start = (): React.ReactNode => {
     const settings = useSettingsStore(state => state.guiTheme);
