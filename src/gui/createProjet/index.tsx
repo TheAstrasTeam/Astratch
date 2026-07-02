@@ -183,7 +183,8 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
                                     tags={['recommended']}
                                     select={selectedTarget === targets.ASH}
                                 />
-                                <Target
+                                {/* todo: 制作兼容 */}
+                                {/* <Target
                                     onClick={() => {
                                         setSelectTarget(targets.SCRATCH);
                                     }}
@@ -198,7 +199,7 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
                                     id={targets.TURBOWARP}
                                     icon={turboWarpIcon}
                                     select={selectedTarget === targets.TURBOWARP}
-                                />
+                                /> */}
                             </div>
                         </div>
                         <div className={styles.compare}>
