@@ -3,7 +3,7 @@
 /**
  * 生成一个符合`abc.def`之类的id字符串
  * @param string 字符串
- * @returns 
+ * @returns
  */
 export const toID = (string: string) => {
     return string

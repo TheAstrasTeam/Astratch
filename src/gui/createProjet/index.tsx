@@ -3,8 +3,8 @@ import type { IVM } from '../../types/vm';
 import styles from './index.module.scss';
 
 import ashIcon from '../../assets/projectScheme/ASH.svg';
-import scratchIcon from '../../assets/projectScheme/ScratchSb3.svg';
-import turboWarpIcon from '../../assets/projectScheme/TurboWarpSb3.svg';
+import _scratchIcon from '../../assets/projectScheme/ScratchSb3.svg';
+import _turboWarpIcon from '../../assets/projectScheme/TurboWarpSb3.svg';
 import folderIcon from '../../assets/folder.svg';
 import flashIcon from '../../assets/flash.svg';
 import moreBlockIcon from '../../assets/moreBlocks.svg';
@@ -94,7 +94,7 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
 
     const [projectName, setProjectName] = useState<string>('');
     const [projectIdAuto, setProjectIdAuto] = useState<string>('');
-    const [projectIdInputed, setProjectIdInputed] = useState<boolean>(false)
+    const [projectIdInputed, setProjectIdInputed] = useState<boolean>(false);
     const [projectId, setProjectId] = useState<string>('');
 
     const [projectFolderName, setProjectFolderName] = useState<string>('');

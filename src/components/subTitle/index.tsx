@@ -19,16 +19,18 @@ const SubTitle = ({
     return (
         <div
             className={styles.subTitleContent}
-            style={row ? { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' } : {}}
+            style={
+                row
+                    ? {
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                      }
+                    : {}
+            }
         >
-            <span className={styles.subTitle}>
-                {titleContent}
-            </span>
-            {introduce && (
-                <span className={styles.introduce}>
-                    {introduce}
-                </span>
-            )}
+            <span className={styles.subTitle}>{titleContent}</span>
+            {introduce && <span className={styles.introduce}>{introduce}</span>}
         </div>
     );
 };

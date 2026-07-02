@@ -4,7 +4,7 @@ import styles from './index.module.scss';
  * 大标题
  * @param titleContent 标题
  * @param introduce 介绍
- * @returns 
+ * @returns
  */
 const Title = ({ titleContent, introduce = '' }: { titleContent: string; introduce?: string }) => {
     return (

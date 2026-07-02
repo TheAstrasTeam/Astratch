@@ -13,15 +13,15 @@ const guiColors = {
     'extensions-transparent': '#0099ff55',
     'extensions-light': '#66ccff',
 
-    'drop-highlight': '#8cd3ffff'
+    'drop-highlight': '#8cd3ffff',
 };
 
 const blockColors = {
     checkboxActiveBackground: '#0099ff',
-    checkboxActiveBorder: '#0066ff'
+    checkboxActiveBorder: '#0066ff',
 };
 
 export default {
     guiColors,
-    blockColors
+    blockColors,
 };

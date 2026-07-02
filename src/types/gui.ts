@@ -6,15 +6,15 @@ export type TGuiTheme = keyof typeof guiThemes;
 export const DEFAULT_GUITHEME = 'dark' as const;
 
 export const guiAccents = {
-    blue: 'blue'
+    blue: 'blue',
 } as const;
 export type TGuiAccent = keyof typeof guiAccents;
 export const DEFAULT_GUIACCENT = 'blue' as const;
 
 export const DEFAULT_GUITHEME_MAP = {
     gui: 'dark',
-    accent: 'blue'
-} as const
+    accent: 'blue',
+} as const;
 export type TGuiThemeMap = typeof DEFAULT_GUITHEME_MAP;
 
 export interface IGuiSettings {

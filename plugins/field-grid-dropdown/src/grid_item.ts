@@ -16,6 +16,9 @@ export class GridItem {
     /** Identifier for a click handler to unregister during dispose(). */
     private clickHandler: browserEvents.Data | null;
 
+    /** The programmatic value of this grid item. */
+    private readonly value: string;
+
     /** Callback to invoke when this item is selected. */
     private selectionCallback: ((selectedItem: GridItem) => void) | null;
 
@@ -33,9 +36,10 @@ export class GridItem {
     constructor(
         container: HTMLElement,
         content: string | HTMLElement,
-        private readonly value: string,
+        value: string,
         selectionCallback: (selectedItem: GridItem) => void,
     ) {
+        this.value = value;
         this.selectionCallback = selectionCallback;
 
         this.element = document.createElement('button');

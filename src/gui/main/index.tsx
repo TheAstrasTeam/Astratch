@@ -17,7 +17,7 @@ const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
     const [language, setLanguage] = useState(i18next.language);
     // 控制显示界面
     const nowGuiInterface = useGUIStore(state => state.guiInterface);
-    const isLoading = useLoadingStore(state => state.loading)
+    const isLoading = useLoadingStore(state => state.loading);
     const handleLanguageChanged = useCallback(
         async (e: React.ChangeEvent<HTMLSelectElement>) => {
             const value = e.target.value;

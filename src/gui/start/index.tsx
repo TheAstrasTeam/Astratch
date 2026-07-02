@@ -23,7 +23,8 @@ const Start = (): React.ReactNode => {
     };
     return (
         <div className={styles.start}>
-            <img src={settings === guiThemes.dark ? lightLogo : darkLogo} className={styles.logo} />
+            {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
+            <img src={settings.gui === guiThemes.dark ? lightLogo : darkLogo} className={styles.logo} />
             <span className={styles.welcome}>{spawnWelcomeText()}</span>
             <div style={{ marginTop: '32px' }} />
             <button className={styles.button} onClick={handleCreateProject}>

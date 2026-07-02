@@ -28,7 +28,7 @@
     flex: 1;
     animation: $content-in $time-animation cubic-bezier(0, 1, 0.5, 1);
 }
-.schemes-content{
+.schemes-content {
     display: flex;
     flex-direction: row;
 }
@@ -134,24 +134,24 @@
     opacity: 0.5;
 }
 
-.next-bar{
+.next-bar {
     display: flex;
     flex-direction: row-reverse;
 }
 
 .next-button,
-.back-button{
+.back-button {
     width: 65px;
 }
 
-.input-box{
+.input-box {
     display: flex;
     justify-content: space-between;
     width: 40%;
     align-items: center;
 }
 
-.input-input{
+.input-input {
     outline: none;
     background-color: $ui-tertiary;
     border: $ui-secondary $border-width solid;
@@ -161,12 +161,12 @@
     height: 15px;
 }
 
-.input-input-box{
+.input-input-box {
     display: flex;
     flex-direction: column;
 }
 
-.input-text-tip{
+.input-text-tip {
     opacity: 0.5;
     font-size: small;
 }

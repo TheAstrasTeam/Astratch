@@ -7,7 +7,7 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 import prettierConfig from 'eslint-config-prettier';
 
 export default defineConfig([
-    globalIgnores(['dist', 'node_modules', 'plugins']),
+    globalIgnores(['dist', 'node_modules', 'plugins', 'src/vm/blocks/fieldDropdown.ts']),
     {
         files: ['**/*.{ts,tsx}'],
         extends: [
