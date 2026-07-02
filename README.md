@@ -33,7 +33,10 @@
 
 ### ICONS
 
-`Astratch` 使用 **Google** 的 [Material Symbols](https://github.com/google/material-design-icons) 的开源图标
+`Astratch` 使用了一下开源仓库的图标：
+
+- [Material Symbols](https://github.com/google/material-design-icons) 
+- [Typicons](https://github.com/stephenhutchings/typicons.font)
 
 再次表达我们的非常感谢！
 

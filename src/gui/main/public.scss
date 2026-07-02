@@ -1,10 +1,33 @@
 @use '../styles/color' as *;
 
+// 全局滚动条样式
+* {
+    scrollbar-width: thin;
+    scrollbar-color: $ui-tertiary transparent;
+
+    &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: $ui-tertiary;
+        border-radius: 4px;
+
+        &:hover {
+            background-color: $text-primary;
+        }
+    }
+}
+
 // 关于控件的默认CSS
 
 @mixin control-base {
     border: 0;
-    background-color: var(--default-color);
+    background-color: $ui-tertiary;
+    color: $text-primary;
     border-radius: 5px;
     margin: 5px;
 
@@ -24,9 +47,25 @@ body {
 button {
     @include control-base;
     padding: var(--button-padding);
+    border: transparent 1px solid;
+}
+button:hover {
+    border: $ui-black-transparent 1px solid;
+}
+button:active {
+    filter: $active-button;
 }
 
 select {
     @include control-base;
     padding: var(--select-padding);
+}
+
+code {
+    font-family:
+        ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+        monospace;
+    background-color: $ui-secondary;
+    padding: 5px;
+    border-radius: 5px;
 }

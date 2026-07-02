@@ -1,0 +1,19 @@
+@use '../../gui/styles/color.scss' as *;
+
+.sub-title-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.sub-title {
+    font-size: 32px;
+    flex: 1;
+}
+
+.introduce {
+    font-size: small;
+    font-weight: light;
+    opacity: 0.7;
+    flex: 0.5;
+}

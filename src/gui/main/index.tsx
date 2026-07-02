@@ -10,6 +10,7 @@ import './public.scss';
 import useGUIStore from '../../stores/useGUIStore';
 import { guiInterface } from '../../types/gui';
 import Start from '../start';
+import CreateProject from '../createProjet';
 
 const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
     const [language, setLanguage] = useState(i18next.language);
@@ -33,6 +34,7 @@ const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
     );
     return (
         <div className={styles.app}>
+            {nowGuiInterface === guiInterface.CREATE_PROJECT && <CreateProject vm={vm} />}
             {nowGuiInterface === guiInterface.START && <Start />}
             {nowGuiInterface === guiInterface.EDITOR && (
                 <>

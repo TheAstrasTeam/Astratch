@@ -1,0 +1,16 @@
+@use '../../gui/styles/color.scss' as *;
+
+.title-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.title {
+    font-size: 56px;
+}
+
+.introduce {
+    font-size: medium;
+    font-weight: light;
+    opacity: 0.7;
+}

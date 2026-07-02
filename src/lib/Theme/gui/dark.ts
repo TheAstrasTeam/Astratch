@@ -19,11 +19,8 @@ const guiTheme = {
 
     'input-background': '#1e1e1e',
 
-    'svg-filter': 'brightness(0)',
+    'svg-filter': 'invert(1)',
     'active-button': 'brightness(0.5)',
-
-    'time-hover': '0.2s',
-    'time-active': '0.1s',
 } as const;
 
 export default {

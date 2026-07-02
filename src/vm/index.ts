@@ -12,6 +12,7 @@ export class VM implements IVM {
     settings: IVMSettings;
     editingTargetID: string;
     projectManager: IProjectManager;
+    isEditingProject: boolean;
 
     constructor() {
         /**
@@ -33,6 +34,13 @@ export class VM implements IVM {
          * 管理项目目录
          */
         this.projectManager = new ProjectManager();
+
+        /**
+         * 正在编辑项目
+         * 如果已经打开了一个项目，则返回true
+         * 额，这个不是正在拖放积木的编辑！
+         */
+        this.isEditingProject = false;
     }
 
     async selectProject() {

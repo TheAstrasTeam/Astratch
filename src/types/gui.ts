@@ -32,6 +32,10 @@ export const guiInterface = {
      * 加载界面
      */
     LOADING: 'loading',
+    /**
+     * 创建项目
+     */
+    CREATE_PROJECT: 'create_project',
 } as const;
 
 export type IGuiInterface = (typeof guiInterface)[keyof typeof guiInterface];

@@ -6,4 +6,19 @@
 
     /* filter(...) */
     --hover-bright: 1.05;
+
+    --border-width: 1px;
+
+    --time-hover: 0.2s;
+    --time-active: 0.1s;
+    --time-animation: 0.5s
 }
+
+$button-padding: var(--button-padding);
+$select-padding: var(--button-padding);
+$default-color: var(--button-padding);
+$hover-bright: var(--button-padding);
+$time-hover: var(--time-hover);
+$time-active: var(--time-active);
+$time-animation: var(--time-animation);
+$border-width: var(--border-width);
