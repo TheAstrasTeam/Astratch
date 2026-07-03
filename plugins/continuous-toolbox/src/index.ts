@@ -2,6 +2,9 @@
  * @license
  * Copyright 2020 Google LLC
  * SPDX-License-Identifier: Apache-2.0
+ * 
+ * 由 AstrasTeam 修改于 2026/7/3:
+ * - 加宽`categoryBubble`的边框宽度
  */
 
 /**
@@ -70,7 +73,7 @@ export function registerContinuousToolbox() {
   .categoryBubble {
     margin: 0 auto 0.125rem;
     border-radius: 100%;
-    border: 1px solid;
+    border: 2px solid;
     width: 1.25rem;
     height: 1.25rem;
   }
