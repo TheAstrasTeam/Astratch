@@ -1,4 +1,4 @@
-import { targets, type IProjectMeta, type IVMSettings } from '../../types/vm';
+import { targets, type IProjectMeta, type IVMSettings, type IVM } from '../../types/vm';
 
 /**
  * 设置，管理关于项目的一些设置
@@ -6,10 +6,12 @@ import { targets, type IProjectMeta, type IVMSettings } from '../../types/vm';
  * **注意，这和位于`utils/`的设置不同，它用来关于`ASH`本身**
  */
 class Settings implements IVMSettings {
+    vm: IVM;
     enableTurboMode: boolean;
     projectMeta: IProjectMeta;
 
-    constructor() {
+    constructor(vm: IVM) {
+        this.vm = vm;
         this.enableTurboMode = false;
         this.projectMeta = {
             author: [],

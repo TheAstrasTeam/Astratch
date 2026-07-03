@@ -22,7 +22,10 @@ export interface IVMSettings {
 }
 
 export interface ITargetBlocks {
-    _blocks: (typeof Blockly.serialization.blocks)[];
+    _blocks: {
+        languageVersion: number;
+        blocks: Blockly.serialization.blocks.State[];
+    };
     _script: string[];
 }
 
@@ -37,6 +40,7 @@ export interface ITargetEffects {
 }
 
 export interface ITarget {
+    name: string;
     size: number;
     id: string;
     blocks: ITargetBlocks;
@@ -47,6 +51,16 @@ export interface ITarget {
     volume: number;
     x: number;
     y: number;
+}
+
+export interface ITargetMeta {
+    name?: string;
+    id?: string;
+    /**
+     * 数据，如果是导入的target的话
+     * todo: 确认类型注解
+     */
+    data?: ArrayBuffer;
 }
 
 export interface IRuntime {
@@ -64,10 +78,18 @@ export interface IRuntime {
     blocks: IBlocks;
     /**
      * 关于*角色*的
-     * 
+     *
      * ps: 角色是 Scratch 的`sprite`的中文叫法，target 在 ASH 指代是“实体”
      */
     targets: ITarget[];
+    /**
+     * 默认target的信息
+     */
+    DEFAULT_TARGETINFO: ITarget;
+    /**
+     * 创建一个新的target
+     */
+    createTarget: (meta: ITargetMeta) => void;
 }
 
 export type folderType = FileSystemDirectoryHandle | undefined;
@@ -118,7 +140,44 @@ export interface IVM {
      */
     selectProject: () => Promise<void>;
     /**
+     * 保存项目
+     */
+    saveProject: () => Promise<void>;
+    /**
      * 初始化项目
      */
     initProject: () => Promise<void>;
+    /**
+     * 订阅事件
+     * @param id 订阅的事件
+     * @param callback 回调
+     * @param once 是否只探测一次
+     */
+    on: (id: TEvents, callback: (data: object) => void, once?: boolean) => void;
+    /**
+     * 取消订阅事件
+     * @param id 取消订阅的事件
+     * @param callback 回调
+     */
+    off: (id: TEvents, callback: (data: object) => void) => void;
+    /**
+     * 发送事件
+     * @param id 发送的事件
+     * @param data 数据
+     * @returns 
+     */
+    emit: (id: TEvents, data?: object) => void;
 }
+
+export interface IEvent {
+    callback?: (data: object) => void;
+    once?: boolean;
+}
+
+export const events = {
+    SWITCH_TARGET: 'switch_target',
+    UPDATE_PROJECT: 'update_project',
+    
+} as const
+
+export type TEvents = typeof events[keyof typeof events]

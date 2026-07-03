@@ -1,6 +1,6 @@
 import Runtime from './runtime/runtime';
 import Settings from './settings/index';
-import type { IVM, IRuntime, IVMSettings, IProjectManager } from '../types/vm';
+import type { IVM, IRuntime, IVMSettings, IProjectManager, IEvent, TEvents } from '../types/vm';
 import { ProjectManager } from './project';
 import { t } from 'i18next';
 
@@ -14,16 +14,21 @@ export class VM implements IVM {
     projectManager: IProjectManager;
     isEditingProject: boolean;
 
+    /**
+     * 事件
+     */
+    private events = new Map<string, IEvent[]>();
+
     constructor() {
         /**
          * 运行时
          */
-        this.runtime = new Runtime();
+        this.runtime = new Runtime(this);
 
         /**
          * 存储项目设置
          */
-        this.settings = new Settings();
+        this.settings = new Settings(this);
 
         /**
          * 当前的编辑目标ID
@@ -33,7 +38,7 @@ export class VM implements IVM {
         /**
          * 管理项目目录
          */
-        this.projectManager = new ProjectManager();
+        this.projectManager = new ProjectManager(this);
 
         /**
          * 正在编辑项目
@@ -43,11 +48,38 @@ export class VM implements IVM {
         this.isEditingProject = false;
     }
 
+    on(id: TEvents, callback: (data: object) => void, once = false) {
+        if (!this.events.has(id)) this.events.set(id, []);
+        const listeners = this.events.get(id);
+        if (!listeners) return;
+        if (listeners.some(e => e.callback === callback)) return;
+        listeners.push({
+            callback,
+            once,
+        });
+    }
+
+    off(id: TEvents, callback: (data: object) => void) {
+        const listeners = this.events.get(id);
+        if (!listeners) return;
+        const index = listeners.findIndex(e => e.callback === callback);
+        if (index !== -1) listeners.splice(index, 1);
+    }
+
+    emit(id: TEvents, data: object = {}) {
+        this.events.get(id)?.forEach((event, index) => {
+            event.callback?.(data);
+            if (event.once) {
+                this.events.get(id)?.splice(index, 1);
+            }
+        });
+    }
+
     async selectProject() {
         await this.projectManager.selectFolder();
     }
 
-    async initProject() {
+    async saveProject() {
         if (!this.projectManager.folderHandle)
             throw new Error('Please load/create a project first!');
         if (!(await this.projectManager.isEmpty(this.projectManager.folderHandle)))
@@ -64,5 +96,13 @@ export class VM implements IVM {
                 author: ['you'],
             }),
         );
+    }
+
+    async initProject() {
+        // todo: 改进进入机制
+        this.runtime.createTarget({
+            name: 'Astratch',
+        });
+        await this.saveProject();
     }
 }

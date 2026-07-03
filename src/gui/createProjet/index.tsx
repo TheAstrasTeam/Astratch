@@ -141,7 +141,7 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
         }, 2000);
     };
 
-    const handleNextClick = () => {
+    const handleNextClick = async () => {
         if (nowTab === tabs.SCHEME) {
             setTab(tabs.CONFIG);
         } else {
@@ -154,6 +154,7 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
                 projectID: projectId || projectIdAuto,
                 author: [settingsStore],
             });
+            await vm.initProject()
             setGuiStore(guiInterface.EDITOR);
         }
     };
@@ -166,7 +167,7 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
         <div className={styles.main}>
             <div className={styles.nextBar}>
                 {/* 这里的顺序是倒的 */}
-                <button className={styles.nextButton} onClick={handleNextClick}>
+                <button className={styles.nextButton} onClick={() => void handleNextClick()}>
                     {t('gui:next')}
                 </button>
                 {nowTab === tabs.CONFIG && (
