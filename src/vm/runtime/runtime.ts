@@ -1,4 +1,4 @@
-import type { IRuntime } from '../../types/vm';
+import type { IRuntime, ITarget } from '../../types/vm';
 import Blocks from '../blocks';
 import * as Blockly from 'blockly';
 
@@ -9,6 +9,8 @@ class Runtime implements IRuntime {
     projectAuthor: string[];
     projectID: string;
     blocks: Blocks;
+    targets: ITarget[];
+
     constructor() {
         this.projectAuthor = [];
         this.projectID = '';
@@ -17,6 +19,11 @@ class Runtime implements IRuntime {
          * Blockly/WebGPU 工作区管理
          */
         this.blocks = new Blocks(Blockly);
+
+        /**
+         * Targets
+         */
+        this.targets = []
     }
 }
 

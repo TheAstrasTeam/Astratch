@@ -161,6 +161,10 @@
     height: 15px;
 }
 
+.input-text {
+    transition: color 0.3s ease;
+}
+
 .input-input-box {
     display: flex;
     flex-direction: column;

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import type { IVM } from '../../types/vm';
+import { useRef, useState } from 'react';
+import { type IVM, type TallTarget, targets } from '../../types/vm';
 import styles from './index.module.scss';
 
 import ashIcon from '../../assets/projectScheme/ASH.svg';
@@ -15,18 +15,15 @@ import { t } from 'i18next';
 import Title from '../../components/title';
 import SubTitle from '../../components/subTitle';
 import { toID } from '../../utils/ashString';
+import useSettingsStore from '../../stores/useSettingsStore';
+import { useGUIStore } from '../../stores/useGUIStore';
+import { guiInterface } from '../../types/gui';
 
 const tabs = {
     SCHEME: 'scheme',
     CONFIG: 'config',
 } as const;
 type TcreateProjectTabs = (typeof tabs)[keyof typeof tabs];
-const targets = {
-    ASH: 'ash',
-    SCRATCH: 'scratch',
-    TURBOWARP: 'turbowarp',
-};
-type TallTarget = (typeof targets)[keyof typeof targets];
 
 const Target = ({
     onClick,
@@ -99,16 +96,65 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
 
     const [projectFolderName, setProjectFolderName] = useState<string>('');
 
+    const settingsStore = useSettingsStore(state => state.userName);
+    const setGuiStore = useGUIStore(state => state.setInterface);
+
+    const nameInput = useRef<HTMLSpanElement>(null);
+    const idInput = useRef<HTMLSpanElement>(null);
+    const folderInput = useRef<HTMLSpanElement>(null);
+
     const handleSelectFolder = async () => {
         await vm.projectManager.selectFolder();
         setProjectFolderName(vm.projectManager.folderHandle?.name ?? '');
+    };
+    
+    /**
+     * 检测是否 Meta 有问题
+     *
+     * @returns 是否有问题，若有问题则返回具体的定位，否则返回false
+     */
+    const checkMeta = () => {
+        const wrongPlaces: string[] = [];
+        if (!projectName.trim()) wrongPlaces.push('name');
+        if (!projectId.trim() && !projectIdAuto.trim()) wrongPlaces.push('id');
+        if (!vm.projectManager.folderHandle) wrongPlaces.push('folder');
+        return wrongPlaces.length ? wrongPlaces : false;
+    };
+
+    /**
+     * 在创建失败后对错误的数据进行提示
+     */
+    const setCreateFailed = (checkMetaResult: string[]) => {
+        if (checkMetaResult.includes('name') && nameInput.current) {
+            nameInput.current.style.color = 'red';
+        }
+        if (checkMetaResult.includes('id') && idInput.current) {
+            idInput.current.style.color = 'red';
+        }
+        if (checkMetaResult.includes('folder') && folderInput.current) {
+            folderInput.current.style.color = 'red';
+        }
+        setTimeout(() => {
+            if (nameInput.current) nameInput.current.style.color = '';
+            if (idInput.current) idInput.current.style.color = '';
+            if (folderInput.current) folderInput.current.style.color = '';
+        }, 2000);
     };
 
     const handleNextClick = () => {
         if (nowTab === tabs.SCHEME) {
             setTab(tabs.CONFIG);
         } else {
-            // todo 完成配置
+            const checkMetaResult = checkMeta();
+            if (checkMetaResult) {
+                setCreateFailed(checkMetaResult);
+                return;
+            }
+            vm.settings.setProjectMeta({
+                projectID: projectId || projectIdAuto,
+                author: [settingsStore],
+            });
+            setGuiStore(guiInterface.EDITOR);
         }
     };
     const handleBackClick = () => {
@@ -273,7 +319,9 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
                     {/* 这里的配置有点复杂所以就不提取重复了 */}
                     <div className={styles.inputBox}>
                         <div className={styles.inputInputBox}>
-                            <span className={styles.inputText}>{t('gui:config.name')}</span>
+                            <span ref={nameInput} className={styles.inputText}>
+                                {t('gui:config.name')}
+                            </span>
                             <span className={styles.inputTextTip}>{t('gui:config.name.tip')}</span>
                         </div>
                         <input
@@ -288,7 +336,9 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
                     </div>
                     <div className={styles.inputBox}>
                         <div className={styles.inputInputBox}>
-                            <span className={styles.inputText}>{t('gui:config.id')}</span>
+                            <span ref={idInput} className={styles.inputText}>
+                                {t('gui:config.id')}
+                            </span>
                             <span className={styles.inputTextTip}>{t('gui:config.id.tip')}</span>
                         </div>
                         <input
@@ -304,7 +354,9 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
                     {/* todo: 支持设备不支持FAS的情况 */}
                     <div className={styles.inputBox}>
                         <div className={styles.inputInputBox}>
-                            <span className={styles.inputText}>{t('gui:config.path')}</span>
+                            <span ref={folderInput} className={styles.inputText}>
+                                {t('gui:config.path')}
+                            </span>
                             <span className={styles.inputTextTip}>{t('gui:config.path.tip')}</span>
                         </div>
                         <div>

@@ -1,13 +1,73 @@
 import type { IBlocks } from './blocks';
+import * as Blockly from 'blockly/core';
+
+export const targets = {
+    ASH: 'ash',
+    SCRATCH: 'scratch',
+    TURBOWARP: 'turbowarp',
+};
+export type TallTarget = (typeof targets)[keyof typeof targets];
+
+export interface IProjectMeta {
+    author: string[];
+    projectName: string;
+    projectID: string;
+    projectMode: TallTarget;
+}
 
 export interface IVMSettings {
     enableTurboMode: boolean;
+    projectMeta: IProjectMeta;
+    setProjectMeta: (meta: Partial<IProjectMeta>) => void;
+}
+
+export interface ITargetBlocks {
+    _blocks: (typeof Blockly.serialization.blocks)[];
+    _script: string[];
+}
+
+export interface ITargetEffects {
+    brightness: number;
+    color: number;
+    fisheye: number;
+    ghost: number;
+    mosaic: number;
+    pixelate: number;
+    whirl: number;
+}
+
+export interface ITarget {
+    size: number;
+    id: string;
+    blocks: ITargetBlocks;
+    comments: Record<string, Blockly.serialization.workspaceComments.State>;
+    direction: number;
+    currentCostume: number;
+    effects: ITargetEffects;
+    volume: number;
+    x: number;
+    y: number;
 }
 
 export interface IRuntime {
+    /**
+     * 项目ID
+     */
     projectID: string;
+    /**
+     * 项目作者（们）
+     */
     projectAuthor: string[];
+    /**
+     * 关于积木的
+     */
     blocks: IBlocks;
+    /**
+     * 关于*角色*的
+     * 
+     * ps: 角色是 Scratch 的`sprite`的中文叫法，target 在 ASH 指代是“实体”
+     */
+    targets: ITarget[];
 }
 
 export type folderType = FileSystemDirectoryHandle | undefined;

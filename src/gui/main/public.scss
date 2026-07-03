@@ -69,3 +69,22 @@ code {
     padding: 5px;
     border-radius: 5px;
 }
+
+
+// 关于Blockly高亮
+
+[id*=blocklySelectedGlowFilter] feFlood {
+    flood-color: var(--ui-blockly-border);
+    flood-opacity: 0.5
+}
+
+.blocklyHighlightedConnectionPath {
+    stroke: var(--ui-blockly-border) solid !important;
+    stroke-width: none
+}
+
+.injectionDiv {
+    --blockly-active-node-color: var(--ui-blockly-border);
+    --blockly-active-tree-color: var(--ui-blockly-border);
+    --blockly-selection-width: 1px;
+}

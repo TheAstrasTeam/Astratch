@@ -7,7 +7,11 @@ import lightLogo from '../../assets/lightLogo.svg';
 import darkLogo from '../../assets/darkLogo.svg';
 import AddIcon from '../../assets/add.svg?react';
 import LoadIcon from '../../assets/load.svg?react';
+
+import DebugIcon from '../../assets/bug.svg?react'
+
 import { useGUIStore } from '../../stores/useGUIStore';
+import { debug } from '../../utils/debug';
 
 const Start = (): React.ReactNode => {
     const settings = useSettingsStore(state => state.guiTheme);
@@ -23,8 +27,8 @@ const Start = (): React.ReactNode => {
     };
     return (
         <div className={styles.start}>
-            {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
             <img
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
                 src={settings.gui === guiThemes.dark ? lightLogo : darkLogo}
                 className={styles.logo}
             />
@@ -38,6 +42,19 @@ const Start = (): React.ReactNode => {
                 <LoadIcon />
                 {t('gui:start.loadProject')}
             </button>
+            
+            {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
+            {debug && (
+                <>
+                    <h4>DEBUG TOOLS</h4>
+                    <button className={styles.button} onClick={() => {
+                        setInterface(guiInterface.EDITOR)
+                    }}>
+                        <DebugIcon />
+                        DEBUG: 跳转到编辑器
+                    </button>
+                </>
+            )}
         </div>
     );
 };

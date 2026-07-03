@@ -4,6 +4,7 @@ import {
     type TGuiAccent,
     type TGuiTheme,
 } from '../../types/gui';
+import type * as Blockly from 'blockly';
 import useSettingsStore from '../../stores/useSettingsStore';
 
 import dark from './gui/dark';
@@ -14,6 +15,10 @@ import blue from './accent/blue';
 const guiThemeMap: Record<TGuiTheme, Record<string, string>> = {
     dark: dark.guiTheme,
     light: light.guiTheme,
+};
+const blocklyThemeMap: Record<TGuiTheme, Blockly.Theme.ComponentStyle> = {
+    dark: dark.blocklyTheme,
+    light: light.blocklyTheme,
 };
 const guiAccentMap: Record<TGuiAccent, Record<'gui' | 'block', Record<string, string>>> = {
     blue: {
@@ -41,4 +46,10 @@ const applyGuiTheme = (): void => {
     });
 };
 
-export { guiThemeMap, applyGuiTheme };
+const getBlocklyComponentStyles = (): Blockly.Theme.ComponentStyle => {
+    const { guiTheme: themeKey } = useSettingsStore.getState();
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    return blocklyThemeMap[themeKey.gui] ?? blocklyThemeMap[DEFAULT_GUITHEME];
+};
+
+export { guiThemeMap, blocklyThemeMap, applyGuiTheme, getBlocklyComponentStyles };

@@ -41,7 +41,7 @@ const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
             {nowGuiInterface === guiInterface.START && <Start />}
             {nowGuiInterface === guiInterface.EDITOR && (
                 <>
-                    <div className={styles.toolbar}>
+                    {/* <div className={styles.toolbar}>
                         <select onChange={void handleLanguageChanged} value={language}>
                             {Object.keys(languageResources).map(lan => (
                                 <option value={lan} key={lan}>
@@ -49,7 +49,7 @@ const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
                                 </option>
                             ))}
                         </select>
-                    </div>
+                    </div> */}
                     <div className={styles.workspaceArea}>
                         {/* 这是一个测试，给工作区包一个容器 */}
                         <WorkSpace key='workspace' vm={vm} />

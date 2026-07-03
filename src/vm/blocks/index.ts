@@ -1,11 +1,12 @@
 import { type IBlocks, type Language } from '../../types/blocks';
-import type * as Blockly from 'blockly';
+import * as Blockly from 'blockly';
 // 导入两个插件试试
 import * as ContinuousToolbox from '../../../plugins/continuous-toolbox/src';
 import * as En from 'blockly/msg/en';
 import * as ZhHans from 'blockly/msg/zh-hans';
 import getToolbox from './toolbox';
 import { initBlocks } from './definitions';
+import { getBlocklyComponentStyles } from '../../lib/Theme/guiThemeManager';
 
 /**
  * 用于便捷的管理WebGPU或Blockly工作区
@@ -39,10 +40,14 @@ class Blocks implements IBlocks {
             'zh-Hans': ZhHans,
         };
         this.toolbox = {};
-        this.theme = this.Blockly.Theme.defineTheme('scratch', {
+        this.theme = this.Blockly.Theme.defineTheme('astratch', {
             name: 'scratch',
             base: this.Blockly.Themes.Zelos,
             startHats: true, // 给Hat一个帽子，就和 Scratch 一样
+            componentStyles: {
+                ...getBlocklyComponentStyles(),
+                flyoutOpacity: 0.5,
+            },
         });
         this.workspaceConfig = {
             toolbox: this.toolbox,

@@ -1,4 +1,4 @@
-import type { IVMSettings } from '../../types/vm';
+import { targets, type IProjectMeta, type IVMSettings } from '../../types/vm';
 
 /**
  * 设置，管理关于项目的一些设置
@@ -7,9 +7,20 @@ import type { IVMSettings } from '../../types/vm';
  */
 class Settings implements IVMSettings {
     enableTurboMode: boolean;
+    projectMeta: IProjectMeta;
 
     constructor() {
         this.enableTurboMode = false;
+        this.projectMeta = {
+            author: [],
+            projectName: '',
+            projectID: '',
+            projectMode: targets.ASH,
+        };
+    }
+
+    setProjectMeta(meta: Partial<IProjectMeta>) {
+        this.projectMeta = { ...this.projectMeta, ...meta };
     }
 }
 
