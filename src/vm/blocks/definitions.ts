@@ -1548,6 +1548,7 @@ const initBlocks = (blockly: typeof Blockly) => {
             ],
         },
         {
+            ...returnConnections,
             type: OPCODE.operator_letter_of,
             colour: BlocksColor.operators.primary,
             output: 'String',
