@@ -1,4 +1,5 @@
 import { events, type IRuntime, type ITarget, type ITargetMeta, type IVM } from '../../types/vm';
+import type { IWorkspaceState } from '../../types/blocks';
 import Blocks from '../blocks';
 import * as Blockly from 'blockly';
 
@@ -7,21 +8,17 @@ import * as Blockly from 'blockly';
  */
 class Runtime implements IRuntime {
     vm: IVM;
-    projectAuthor: string[];
-    projectID: string;
     blocks: Blocks;
     targets: ITarget[];
     DEFAULT_TARGETINFO: ITarget;
+    editingTargetID: string;
 
     constructor(vm: IVM) {
         this.vm = vm;
-        this.projectAuthor = [];
-        this.projectID = '';
-
         /**
          * Blockly/WebGPU 工作区管理
          */
-        this.blocks = new Blocks(Blockly);
+        this.blocks = new Blocks(Blockly, vm);
 
         /**
          * Targets
@@ -58,16 +55,36 @@ class Runtime implements IRuntime {
             x: 0,
             y: 0,
         };
+
+        /**
+         * 当前的编辑目标ID
+         */
+        this.editingTargetID = '';
     }
 
-    createTarget(Meta: ITargetMeta) {
+    createTarget(Meta: ITargetMeta, switchTo = true) {
         // todo: 处理Data
+        const id = Meta.id ?? crypto.randomUUID();
         this.targets.push({
             ...this.DEFAULT_TARGETINFO,
             name: Meta.name ?? this.DEFAULT_TARGETINFO.name,
-            id: Meta.id ?? crypto.randomUUID(),
+            id,
         });
 
+        this.vm.emit(events.UPDATE_PROJECT);
+        if (switchTo) this.switchTarget(id);
+    }
+
+    switchTarget(id: string) {
+        this.editingTargetID = id;
+        this.vm.emit(events.SWITCH_TARGET);
+    }
+
+    setTargetBlock(targetID: string, blocks: IWorkspaceState) {
+        const target = this.targets.find(target => target.id === targetID);
+        if (!target) throw new Error(`Not found ${targetID} in project.`);
+
+        target.blocks._blocks = blocks.blocks;
         this.vm.emit(events.UPDATE_PROJECT);
     }
 }

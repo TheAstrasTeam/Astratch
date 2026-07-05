@@ -18,7 +18,6 @@ import { ProjectManager } from './project';
 export class VM implements IVM {
     runtime: IRuntime;
     settings: IVMSettings;
-    editingTargetID: string;
     projectManager: IProjectManager;
     isEditingProject: boolean;
 
@@ -37,11 +36,6 @@ export class VM implements IVM {
          * 存储项目设置
          */
         this.settings = new Settings(this);
-
-        /**
-         * 当前的编辑目标ID
-         */
-        this.editingTargetID = '';
 
         /**
          * 管理项目目录
@@ -88,10 +82,8 @@ export class VM implements IVM {
     }
 
     async saveProject() {
-        if (!this.projectManager.folderHandle)
-            throw new Error('Please load/create a project first!');
-        if (!(await this.projectManager.isEmpty(this.projectManager.folderHandle)))
-            throw new Error('Please select a empty folder!');
+        const checkResult = await this.projectManager.checkProjectCanSave();
+        if (!checkResult.pass) throw new Error(checkResult.result);
 
         await this.projectManager.createFolder(this.projectManager.folderHandle, 'assets');
         await this.projectManager.createFolder(this.projectManager.folderHandle, 'sprites');
@@ -104,6 +96,9 @@ export class VM implements IVM {
 
     async initProject() {
         // todo: 改进进入机制
+        const checkResult = await this.projectManager.checkProjectCanSave();
+        if (!checkResult.pass) throw new Error(checkResult.result);
+        
         this.runtime.createTarget({
             name: 'Astratch',
         });

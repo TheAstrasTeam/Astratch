@@ -1,4 +1,5 @@
 import * as Blockly from 'blockly';
+import type { IVM } from './vm';
 
 const OPCODE = {
     // 运动
@@ -330,6 +331,23 @@ export { OPCODE, BlocksColor };
 
 export type Language = Record<string, string>;
 
+/**
+ * 下面导出后的blocks
+ */
+export interface IBlocksState {
+    languageVersion: number;
+    blocks: Blockly.serialization.blocks.State[];
+}
+
+/**
+ * `Blockly.serialization.workspaces.save()` 的类型
+ * Blockly 自身的类型声明把它写成 `{[key: string]: any}`，导致类型系统爆炸了
+ */
+export interface IWorkspaceState {
+    blocks: IBlocksState;
+    workspaceComments?: Blockly.serialization.workspaceComments.State[];
+}
+
 export interface IBlocks {
     /**
      * ## 工作区
@@ -368,6 +386,11 @@ export interface IBlocks {
      */
     workspaceConfig: Blockly.BlocklyOptions | Record<string, unknown>;
     /**
+     * VM自身
+     * 额，我们需要在Block中使用VM的其它功能
+     */
+    vm: IVM
+    /**
      * 设置一个语言
      * @param lang ASH 兼容的 i18n
      */
@@ -392,4 +415,8 @@ export interface IBlocks {
      * 初始化 Blockly，载入插件什么的
      */
     init: () => Promise<void>;
+    /**
+     * 检测到工作区变化的处理
+     */
+    handleWorkspaceChange: (event: Blockly.Events.Abstract) => void
 }

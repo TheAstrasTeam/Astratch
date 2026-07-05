@@ -28,11 +28,14 @@
     align-items: center;
     gap: 5px;
     margin-bottom: 5px;
-}
-.target svg {
-    color: $text-primary;
-    width: 20px;
-    height: auto;
+    &.selected {
+        background-color: $ui-black-transparent;
+    }
+    & svg {
+        color: $text-primary;
+        width: 20px;
+        height: auto;
+    }
 }
 
 /* 改大点好测试 */

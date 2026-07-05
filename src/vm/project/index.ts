@@ -15,6 +15,15 @@ export class ProjectManager implements IProjectManager {
         this.isAPIAvailable = typeof showDirectoryPicker === 'function';
     }
 
+    async checkProjectCanSave() {
+        if (!this.isAPIAvailable) return { pass: false, result: 'API is unavailable' };
+        if (!this.folderHandle)
+            return { pass: false, result: 'Please load/create a project first!' };
+        if (!(await this.isEmpty(this.folderHandle)))
+            return { pass: false, result: 'Please select a empty folder!' };
+        return { pass: true };
+    }
+
     async selectFolder() {
         try {
             this.folderHandle = await window.showDirectoryPicker();

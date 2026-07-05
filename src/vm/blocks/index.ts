@@ -1,4 +1,4 @@
-import { type IBlocks, type Language } from '../../types/blocks';
+import { type IBlocks, type IWorkspaceState, type Language } from '../../types/blocks';
 import * as Blockly from 'blockly';
 // 导入两个插件试试
 import * as ContinuousToolbox from '../../../plugins/continuous-toolbox/src';
@@ -7,6 +7,7 @@ import * as ZhHans from 'blockly/msg/zh-hans';
 import getToolbox from './toolbox';
 import { initBlocks } from './definitions';
 import { getBlocklyComponentStyles } from '../../lib/Theme/guiThemeManager';
+import type { IVM } from '../../types/vm';
 
 /**
  * 用于便捷的管理WebGPU或Blockly工作区
@@ -20,6 +21,8 @@ class Blocks implements IBlocks {
     workspaceConfig: Blockly.BlocklyOptions | Record<string, unknown>;
     toolbox: Blockly.utils.toolbox.ToolboxDefinition | object;
     theme: Blockly.Theme;
+    vm: IVM;
+
     /**
      * 缓存的 DOM，用于进行重启操作等
      */
@@ -28,8 +31,24 @@ class Blocks implements IBlocks {
      * 标记此时是否正在创建工作区，来防止时序问题
      */
     private _isCreating = false;
+    /**
+     * 在工作区出现事件时需要同步积木，
+     * 但是不是所有事件都会修改工作区，
+     * 所以需要过滤掉一些防止更改过于频繁
+     */
+    private _disableUpdateType = [
+        // 选择一个积木
+        // `Class for a selected event. Notifies listeners that a new element has been selected.`
+        'selected',
+        // 拖动一个积木
+        // 事实上，它常和`move`一起触发
+        // 但drag是“拖动”，而拖动会造成移动
+        // 所以只需要检测`move`即可
+        'drag',
+    ];
 
-    constructor(BlocklySelf: typeof Blockly) {
+    constructor(BlocklySelf: typeof Blockly, vm: IVM) {
+        this.vm = vm;
         this._DOM = null;
         this.workspaceSvg = null;
         this.Blockly = BlocklySelf;
@@ -77,6 +96,17 @@ class Blocks implements IBlocks {
         };
     }
 
+    handleWorkspaceChange(event: Blockly.Events.Abstract) {
+        // 检测更新，并检查这个事件是否需要忽略
+        if (!this.workspaceSvg) return;
+        if (!this._disableUpdateType.includes(event.type)) {
+            this.vm.runtime.setTargetBlock(
+                this.vm.runtime.editingTargetID,
+                this.Blockly.serialization.workspaces.save(this.workspaceSvg) as IWorkspaceState,
+            );
+        }
+    }
+
     async init(): Promise<void> {
         // 初始化积木区
         this.toolbox = await getToolbox();
@@ -87,11 +117,6 @@ class Blocks implements IBlocks {
 
         // 定义积木
         initBlocks(this.Blockly);
-
-        // 对于需要现在的工作区的
-        if (this.workspaceSvg) {
-            // 暂定
-        }
     }
 
     /**
@@ -133,6 +158,9 @@ class Blocks implements IBlocks {
             this._DOM = DOM;
             await this.init();
             this.workspaceSvg = this.Blockly.inject(DOM, this.workspaceConfig);
+
+            console.log('created new workspace!');
+            this.workspaceSvg.addChangeListener(this.handleWorkspaceChange.bind(this));
         } finally {
             this._isCreating = false;
         }

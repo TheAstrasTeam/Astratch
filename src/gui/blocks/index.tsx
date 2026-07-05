@@ -2,6 +2,7 @@ import { events, type ITarget, type IVM } from '../../types/vm';
 import styles from './index.module.scss';
 import BlocklyWorkspace from './Blockly/index';
 import { useEffect, useState } from 'react';
+import classNames from 'classnames'
 
 import SpriteIcon from '../../assets/sprite.svg?react';
 import { t } from 'i18next';
@@ -27,7 +28,9 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
                 <span className={styles.targetsBarTitle}>{t('gui:entries')}</span>
                 <ul className={styles.targets}>
                     {targets.map(target => (
-                        <li key={target.id} className={styles.target}>
+                        <li key={target.id} className={classNames(styles.target,{
+                            [styles.selected]: target.id === vm.runtime.editingTargetID
+                        })}>
                             <SpriteIcon />
                             {target.name}
                         </li>

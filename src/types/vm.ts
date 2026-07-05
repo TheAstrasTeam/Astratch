@@ -1,4 +1,4 @@
-import type { IBlocks } from './blocks';
+import type { IBlocks, IBlocksState, IWorkspaceState } from './blocks';
 import * as Blockly from 'blockly/core';
 
 export const targets = {
@@ -9,8 +9,14 @@ export const targets = {
 export type TallTarget = (typeof targets)[keyof typeof targets];
 
 export interface IProjectMeta {
+    /**
+     * 项目作者（们）
+     */
     author: string[];
     projectName: string;
+    /**
+     * 项目ID
+     */
     projectID: string;
     projectMode: TallTarget;
 }
@@ -22,10 +28,7 @@ export interface IVMSettings {
 }
 
 export interface ITargetBlocks {
-    _blocks: {
-        languageVersion: number;
-        blocks: Blockly.serialization.blocks.State[];
-    };
+    _blocks: IBlocksState;
     _script: string[];
 }
 
@@ -65,14 +68,6 @@ export interface ITargetMeta {
 
 export interface IRuntime {
     /**
-     * 项目ID
-     */
-    projectID: string;
-    /**
-     * 项目作者（们）
-     */
-    projectAuthor: string[];
-    /**
      * 关于积木的
      */
     blocks: IBlocks;
@@ -90,6 +85,21 @@ export interface IRuntime {
      * 创建一个新的target
      */
     createTarget: (meta: ITargetMeta) => void;
+    /**
+     * 切换target
+     */
+    switchTarget: (id: string) => void;
+    /**
+     * 当前的编辑目标ID
+     */
+    editingTargetID: string;
+    /**
+     * 设置一个target的所有块
+     * @param targetID 目标的ID
+     * @param blocks 块的AST
+     * @returns
+     */
+    setTargetBlock: (targetID: string, blocks: IWorkspaceState) => void;
 }
 
 export type folderType = FileSystemDirectoryHandle | undefined;
@@ -135,6 +145,13 @@ export interface IProjectManager {
      * @returns
      */
     getFile: (path: folderType, name: string) => Promise<FileSystemFileHandle | false>;
+    /**
+     * 检查项目是否是可以保存的
+     */
+    checkProjectCanSave: () => Promise<{
+        pass: boolean,
+        result?: string
+    }>
 }
 
 export const projectFileNames = {
@@ -144,7 +161,6 @@ export const projectFileNames = {
 export interface IVM {
     runtime: IRuntime;
     settings: IVMSettings;
-    editingTargetID: string;
     projectManager: IProjectManager;
     /**
      * 选择一个文件夹打开作为项目
