@@ -12,7 +12,6 @@ import {
 } from '../types/vm';
 import { ProjectManager } from './project';
 
-
 /**
  * 虚拟机，管理整个ASH
  */
@@ -119,7 +118,7 @@ export class VM implements IVM {
             projectFileNames.meta,
         );
         // todo: 读取其它数据
-    
+
         // 元数据
         if (!metaFileHandle) return false;
         const metaFile = await metaFileHandle.getFile();
@@ -128,7 +127,7 @@ export class VM implements IVM {
         if (!metaFileContent) return false;
         try {
             const projectMeta = JSON.parse(metaFileContent) as Partial<IProjectMeta>;
-            this.settings.setProjectMeta(projectMeta)
+            this.settings.setProjectMeta(projectMeta);
         } catch {
             return false;
         }

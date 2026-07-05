@@ -48,9 +48,8 @@ export class ProjectManager implements IProjectManager {
     }
 
     async getFile(path: folderType, name: string) {
-        if(!path) return false;
+        if (!path) return false;
         const fileHandle = await path.getFileHandle(name);
-        console.log(fileHandle)
-        return fileHandle
+        return fileHandle;
     }
 }

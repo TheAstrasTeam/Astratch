@@ -107,7 +107,7 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
         await vm.projectManager.selectFolder();
         setProjectFolderName(vm.projectManager.folderHandle?.name ?? '');
     };
-    
+
     /**
      * 检测是否 Meta 有问题
      *
@@ -154,7 +154,7 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
                 projectID: projectId || projectIdAuto,
                 author: [settingsStore],
             });
-            await vm.initProject()
+            await vm.initProject();
             setGuiStore(guiInterface.EDITOR);
         }
     };

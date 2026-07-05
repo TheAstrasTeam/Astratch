@@ -70,17 +70,16 @@ code {
     border-radius: 5px;
 }
 
-
 // 关于Blockly高亮
 
-[id*=blocklySelectedGlowFilter] feFlood {
+[id*='blocklySelectedGlowFilter'] feFlood {
     flood-color: var(--ui-blockly-border);
-    flood-opacity: 0.5
+    flood-opacity: 0.5;
 }
 
 .blocklyHighlightedConnectionPath {
     stroke: var(--ui-blockly-border) solid !important;
-    stroke-width: none
+    stroke-width: none;
 }
 
 .injectionDiv {

@@ -2,7 +2,7 @@
  * @license
  * Copyright 2020 Google LLC
  * SPDX-License-Identifier: Apache-2.0
- * 
+ *
  * 由 AstrasTeam 修改于 2026/7/3:
  * - 加宽`categoryBubble`的边框宽度
  */

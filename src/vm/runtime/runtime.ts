@@ -56,7 +56,7 @@ class Runtime implements IRuntime {
             },
             volume: 100,
             x: 0,
-            y: 0
+            y: 0,
         };
     }
 
@@ -67,8 +67,8 @@ class Runtime implements IRuntime {
             name: Meta.name ?? this.DEFAULT_TARGETINFO.name,
             id: Meta.id ?? crypto.randomUUID(),
         });
-        
-        this.vm.emit(events.UPDATE_PROJECT)
+
+        this.vm.emit(events.UPDATE_PROJECT);
     }
 }
 
