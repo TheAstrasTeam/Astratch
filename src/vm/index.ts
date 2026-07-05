@@ -1,8 +1,17 @@
 import Runtime from './runtime/runtime';
 import Settings from './settings/index';
-import type { IVM, IRuntime, IVMSettings, IProjectManager, IEvent, TEvents } from '../types/vm';
+import {
+    type IVM,
+    type IRuntime,
+    type IVMSettings,
+    type IProjectManager,
+    type IEvent,
+    type TEvents,
+    projectFileNames,
+    type IProjectMeta,
+} from '../types/vm';
 import { ProjectManager } from './project';
-import { t } from 'i18next';
+
 
 /**
  * 虚拟机，管理整个ASH
@@ -89,12 +98,8 @@ export class VM implements IVM {
         await this.projectManager.createFolder(this.projectManager.folderHandle, 'sprites');
         await this.projectManager.createFile(
             this.projectManager.folderHandle,
-            'projectMeta.json',
-            JSON.stringify({
-                id: crypto.randomUUID(),
-                name: t('project'),
-                author: ['you'],
-            }),
+            projectFileNames.meta,
+            JSON.stringify(this.settings.projectMeta),
         );
     }
 
@@ -104,5 +109,30 @@ export class VM implements IVM {
             name: 'Astratch',
         });
         await this.saveProject();
+    }
+
+    async loadProject() {
+        await this.selectProject();
+        // 获取元文件句柄
+        const metaFileHandle = await this.projectManager.getFile(
+            this.projectManager.folderHandle,
+            projectFileNames.meta,
+        );
+        // todo: 读取其它数据
+    
+        // 元数据
+        if (!metaFileHandle) return false;
+        const metaFile = await metaFileHandle.getFile();
+        // {...}
+        const metaFileContent = await metaFile.text();
+        if (!metaFileContent) return false;
+        try {
+            const projectMeta = JSON.parse(metaFileContent) as Partial<IProjectMeta>;
+            this.settings.setProjectMeta(projectMeta)
+        } catch {
+            return false;
+        }
+
+        return true;
     }
 }

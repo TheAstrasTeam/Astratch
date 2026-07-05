@@ -7,8 +7,32 @@
     display: flex;
     background-color: $ui-white;
 }
-.targets{
+.targets-bar {
     width: 300px;
+    display: flex;
+    flex-direction: column;
+}
+.targets-bar-title {
+    margin: 0.5rem 1rem;
+    font-size: x-large;
+}
+.targets {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    list-style-type: none;
+    padding: 0 0.5rem;
+}
+.target {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 5px;
+}
+.target svg {
+    color: $text-primary;
+    width: 20px;
+    height: auto;
 }
 
 /* 改大点好测试 */

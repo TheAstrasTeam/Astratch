@@ -128,7 +128,18 @@ export interface IProjectManager {
      * @returns 是否有文件
      */
     isEmpty: (path: folderType) => Promise<boolean>;
+    /**
+     * 获取一个文件
+     * @param path 文件夹句柄
+     * @param name 文件名称
+     * @returns
+     */
+    getFile: (path: folderType, name: string) => Promise<FileSystemFileHandle | false>;
 }
+
+export const projectFileNames = {
+    meta: 'projectMeta.json',
+} as const;
 
 export interface IVM {
     runtime: IRuntime;
@@ -164,9 +175,14 @@ export interface IVM {
      * 发送事件
      * @param id 发送的事件
      * @param data 数据
-     * @returns 
+     * @returns
      */
     emit: (id: TEvents, data?: object) => void;
+    /**
+     * 加载项目
+     * @returns 是否加载成功
+     */
+    loadProject: () => Promise<boolean>;
 }
 
 export interface IEvent {
@@ -177,7 +193,6 @@ export interface IEvent {
 export const events = {
     SWITCH_TARGET: 'switch_target',
     UPDATE_PROJECT: 'update_project',
-    
-} as const
+} as const;
 
-export type TEvents = typeof events[keyof typeof events]
+export type TEvents = (typeof events)[keyof typeof events];

@@ -8,12 +8,13 @@ import darkLogo from '../../assets/darkLogo.svg';
 import AddIcon from '../../assets/add.svg?react';
 import LoadIcon from '../../assets/load.svg?react';
 
-import DebugIcon from '../../assets/bug.svg?react'
+import DebugIcon from '../../assets/bug.svg?react';
 
 import { useGUIStore } from '../../stores/useGUIStore';
 import { debug } from '../../utils/debug';
+import { type IVM } from '../../types/vm';
 
-const Start = (): React.ReactNode => {
+const Start = ({ vm }: { vm: IVM }): React.ReactNode => {
     const settings = useSettingsStore(state => state.guiTheme);
     const userName = useSettingsStore(state => state.userName);
     const setInterface = useGUIStore(state => state.setInterface);
@@ -24,6 +25,10 @@ const Start = (): React.ReactNode => {
     const handleCreateProject = () => {
         // 开始创建项目
         setInterface(guiInterface.CREATE_PROJECT);
+    };
+    const handleLoadProject = async () => {
+        const loadedProject = await vm.loadProject();
+        if (loadedProject) setInterface(guiInterface.EDITOR);
     };
     return (
         <div className={styles.start}>
@@ -38,18 +43,21 @@ const Start = (): React.ReactNode => {
                 <AddIcon />
                 {t('gui:start.createProject')}
             </button>
-            <button className={styles.button}>
+            <button className={styles.button} onClick={() => void handleLoadProject()}>
                 <LoadIcon />
                 {t('gui:start.loadProject')}
             </button>
-            
+
             {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
             {debug && (
                 <>
                     <h4>DEBUG TOOLS</h4>
-                    <button className={styles.button} onClick={() => {
-                        setInterface(guiInterface.EDITOR)
-                    }}>
+                    <button
+                        className={styles.button}
+                        onClick={() => {
+                            setInterface(guiInterface.EDITOR);
+                        }}
+                    >
                         <DebugIcon />
                         DEBUG: 跳转到编辑器
                     </button>

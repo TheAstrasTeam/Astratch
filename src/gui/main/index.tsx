@@ -38,7 +38,7 @@ const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
         <div className={styles.app}>
             {isLoading && <Loading />}
             {nowGuiInterface === guiInterface.CREATE_PROJECT && <CreateProject vm={vm} />}
-            {nowGuiInterface === guiInterface.START && <Start />}
+            {nowGuiInterface === guiInterface.START && <Start vm={vm} />}
             {nowGuiInterface === guiInterface.EDITOR && (
                 <>
                     {/* <div className={styles.toolbar}>
