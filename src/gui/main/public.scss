@@ -78,8 +78,7 @@ code {
 }
 
 .blocklyHighlightedConnectionPath {
-    stroke: var(--ui-blockly-border) solid !important;
-    stroke-width: none;
+    stroke: var(--ui-blockly-border) !important;
 }
 
 .injectionDiv {

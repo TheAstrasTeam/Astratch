@@ -382,13 +382,13 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                         gap: 12,
                         kind: 'block',
                         type: OPCODE.sensing_touchingcolor,
-                        inputs: { COLOR: colour() },
+                        inputs: { COLOR: colour('#0099ff') },
                     },
                     {
                         gap: 12,
                         kind: 'block',
                         type: OPCODE.sensing_coloristouchingcolor,
-                        inputs: { COLOR: colour(), COLOR2: colour() },
+                        inputs: { COLOR: colour('#66ccff'), COLOR2: colour('#ff9b86') },
                     },
                     {
                         gap: 12,
