@@ -160,6 +160,11 @@ class Blocks implements IBlocks {
             this.workspaceSvg = this.Blockly.inject(DOM, this.workspaceConfig);
 
             console.log('created new workspace!');
+            const nowTarget = this.vm.runtime.getTargetByID(this.vm.runtime.editingTargetID)
+            if(nowTarget?.blocks) this.Blockly.serialization.workspaces.load(
+                nowTarget.blocks._workspace,
+                this.workspaceSvg,
+            );
             this.workspaceSvg.addChangeListener(this.handleWorkspaceChange.bind(this));
         } finally {
             this._isCreating = false;
@@ -170,6 +175,7 @@ class Blocks implements IBlocks {
 
     dispose(): boolean {
         if (this.workspaceSvg) {
+            this.workspaceSvg.removeChangeListener(this.handleWorkspaceChange.bind(this));
             this.workspaceSvg.dispose();
             this.workspaceSvg = null;
             return true;

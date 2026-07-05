@@ -33,9 +33,11 @@ class Runtime implements IRuntime {
             size: 100,
             id: crypto.randomUUID(),
             blocks: {
-                _blocks: {
-                    languageVersion: 0,
-                    blocks: [],
+                _workspace: {
+                    blocks: {
+                        languageVersion: 0,
+                        blocks: [],
+                    },
                 },
                 _script: [],
             },
@@ -80,11 +82,15 @@ class Runtime implements IRuntime {
         this.vm.emit(events.SWITCH_TARGET);
     }
 
-    setTargetBlock(targetID: string, blocks: IWorkspaceState) {
-        const target = this.targets.find(target => target.id === targetID);
-        if (!target) throw new Error(`Not found ${targetID} in project.`);
+    getTargetByID(id: string) {
+        return this.targets.find(target => target.id === id)
+    }
 
-        target.blocks._blocks = blocks.blocks;
+    setTargetBlock(targetID: string, state: IWorkspaceState) {
+        const target = this.targets.find(target => target.id === targetID)
+        if(!target) throw new Error(`Not found ${targetID} in project.`);
+
+        target.blocks._workspace = state;
         this.vm.emit(events.UPDATE_PROJECT);
     }
 }

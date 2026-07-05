@@ -1,4 +1,4 @@
-import type { IBlocks, IBlocksState, IWorkspaceState } from './blocks';
+import type { IBlocks, IWorkspaceState } from './blocks';
 import * as Blockly from 'blockly/core';
 
 export const targets = {
@@ -28,7 +28,10 @@ export interface IVMSettings {
 }
 
 export interface ITargetBlocks {
-    _blocks: IBlocksState;
+    /**
+     * 序列化的工作区
+     */
+    _workspace: IWorkspaceState;
     _script: string[];
 }
 
@@ -100,6 +103,10 @@ export interface IRuntime {
      * @returns
      */
     setTargetBlock: (targetID: string, blocks: IWorkspaceState) => void;
+    /**
+     * 通过ID获取这个target的index
+     */
+    getTargetByID: (id: string) => ITarget | undefined
 }
 
 export type folderType = FileSystemDirectoryHandle | undefined;
