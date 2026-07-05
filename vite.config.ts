@@ -19,7 +19,7 @@ export default defineConfig({
     css: {
         modules: {
             scopeBehaviour: 'local',
-            generateScopedName: '[name]_[local]_[hash:base64:5]',
+            generateScopedName: '[folder]_[local]_[hash:base64:5]',
             localsConvention: 'camelCaseOnly',
         },
     },
