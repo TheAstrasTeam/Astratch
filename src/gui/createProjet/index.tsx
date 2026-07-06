@@ -161,6 +161,9 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
     const handleBackClick = () => {
         if (nowTab === tabs.CONFIG) {
             setTab(tabs.SCHEME);
+        } else {
+            // 回到主页
+            setGuiStore(guiInterface.START);
         }
     };
     return (
@@ -170,11 +173,9 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
                 <button className={styles.nextButton} onClick={() => void handleNextClick()}>
                     {t('gui:next')}
                 </button>
-                {nowTab === tabs.CONFIG && (
-                    <button className={styles.backButton} onClick={handleBackClick}>
-                        {t('gui:back')}
-                    </button>
-                )}
+                <button className={styles.backButton} onClick={handleBackClick}>
+                    {t('gui:back')}
+                </button>
             </div>
             {nowTab === tabs.SCHEME && (
                 <div className={styles.schemes}>
