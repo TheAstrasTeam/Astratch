@@ -31,7 +31,8 @@ class Runtime implements IRuntime {
         this.DEFAULT_TARGETINFO = {
             name: '',
             size: 100,
-            id: crypto.randomUUID(),
+            // id 会在创建项目时自动创建
+            id: '',
             blocks: {
                 _workspace: {
                     blocks: {

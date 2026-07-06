@@ -1,4 +1,4 @@
-import { type IBlocks, type IWorkspaceState, type Language } from '../../types/blocks';
+import { SNAP_RADIUS, type IBlocks, type IWorkspaceState, type Language } from '../../types/blocks';
 import * as Blockly from 'blockly';
 // 导入两个插件试试
 import * as ContinuousToolbox from '../../../plugins/continuous-toolbox/src';
@@ -45,6 +45,8 @@ class Blocks implements IBlocks {
         // 但drag是“拖动”，而拖动会造成移动
         // 所以只需要检测`move`即可
         'drag',
+        // 视口更改，其实就是移动工作区镜头
+        'viewport_change'
     ];
 
     constructor(BlocklySelf: typeof Blockly, vm: IVM) {
@@ -93,6 +95,10 @@ class Blocks implements IBlocks {
                 flyoutsVerticalToolbox: ContinuousToolbox.ContinuousFlyout,
                 metricsManager: ContinuousToolbox.ContinuousMetrics,
             },
+            // 网格，暂定48
+            grid: {
+                spacing: 48
+            }
         };
     }
 
@@ -100,6 +106,7 @@ class Blocks implements IBlocks {
         // 检测更新，并检查这个事件是否需要忽略
         if (!this.workspaceSvg) return;
         if (!this._disableUpdateType.includes(event.type)) {
+            console.log(event.type)
             this.vm.runtime.setTargetBlock(
                 this.vm.runtime.editingTargetID,
                 this.Blockly.serialization.workspaces.save(this.workspaceSvg) as IWorkspaceState,
@@ -111,6 +118,9 @@ class Blocks implements IBlocks {
         // 初始化积木区
         this.toolbox = await getToolbox();
         this.workspaceConfig.toolbox = this.toolbox;
+
+        this.Blockly.config.snapRadius = SNAP_RADIUS;
+        this.Blockly.config.connectingSnapRadius = SNAP_RADIUS;
 
         // 对于完全不需要现在的工作区的
         ContinuousToolbox.registerContinuousToolbox();
