@@ -158,8 +158,6 @@ class Blocks implements IBlocks {
             this._DOM = DOM;
             await this.init();
             this.workspaceSvg = this.Blockly.inject(DOM, this.workspaceConfig);
-
-            console.log('created new workspace!');
             const nowTarget = this.vm.runtime.getTargetByID(this.vm.runtime.editingTargetID)
             if(nowTarget?.blocks) this.Blockly.serialization.workspaces.load(
                 nowTarget.blocks._workspace,

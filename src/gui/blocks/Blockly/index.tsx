@@ -1,14 +1,21 @@
 import { useEffect, useRef } from 'react';
-import type { IVM } from '../../../types/vm';
+import { events, type IVM } from '../../../types/vm';
 
 const BlocklyWorkspace = ({ vm }: { vm: IVM }): React.ReactNode => {
     const workspaceDiv = useRef<HTMLDivElement>(null);
     useEffect(() => {
-        if (!workspaceDiv.current) return;
-        if (vm.runtime.blocks.workspaceSvg) vm.runtime.blocks.dispose();
+        const handleTargetChanged = () => {
+            restartWorkspace();
+        };
+        const restartWorkspace = () => {
+            if (!workspaceDiv.current) return;
+            if (vm.runtime.blocks.workspaceSvg) vm.runtime.blocks.dispose();
 
-        void vm.runtime.blocks.createWorkspace(workspaceDiv.current);
-
+            void vm.runtime.blocks.createWorkspace(workspaceDiv.current);
+        };
+        vm.off(events.SWITCH_TARGET, handleTargetChanged);
+        vm.on(events.SWITCH_TARGET, handleTargetChanged);
+        restartWorkspace();
         return () => {
             vm.runtime.blocks.dispose();
             // 扣式咯，他是头猪

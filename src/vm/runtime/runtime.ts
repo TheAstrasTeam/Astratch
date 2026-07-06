@@ -68,7 +68,8 @@ class Runtime implements IRuntime {
         // todo: 处理Data
         const id = Meta.id ?? crypto.randomUUID();
         this.targets.push({
-            ...this.DEFAULT_TARGETINFO,
+            // 直接 this.DEFAULT_TARGETINFO 会造成浅拷贝
+            ...structuredClone(this.DEFAULT_TARGETINFO),
             name: Meta.name ?? this.DEFAULT_TARGETINFO.name,
             id,
         });
