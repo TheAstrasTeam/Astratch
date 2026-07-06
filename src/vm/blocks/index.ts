@@ -46,7 +46,7 @@ class Blocks implements IBlocks {
         // 所以只需要检测`move`即可
         'drag',
         // 视口更改，其实就是移动工作区镜头
-        'viewport_change'
+        'viewport_change',
     ];
 
     constructor(BlocklySelf: typeof Blockly, vm: IVM) {
@@ -97,8 +97,8 @@ class Blocks implements IBlocks {
             },
             // 网格，暂定48
             grid: {
-                spacing: 48
-            }
+                spacing: 48,
+            },
         };
     }
 
@@ -106,7 +106,6 @@ class Blocks implements IBlocks {
         // 检测更新，并检查这个事件是否需要忽略
         if (!this.workspaceSvg) return;
         if (!this._disableUpdateType.includes(event.type)) {
-            console.log(event.type)
             this.vm.runtime.setTargetBlock(
                 this.vm.runtime.editingTargetID,
                 this.Blockly.serialization.workspaces.save(this.workspaceSvg) as IWorkspaceState,
@@ -168,11 +167,12 @@ class Blocks implements IBlocks {
             this._DOM = DOM;
             await this.init();
             this.workspaceSvg = this.Blockly.inject(DOM, this.workspaceConfig);
-            const nowTarget = this.vm.runtime.getTargetByID(this.vm.runtime.editingTargetID)
-            if(nowTarget?.blocks) this.Blockly.serialization.workspaces.load(
-                nowTarget.blocks._workspace,
-                this.workspaceSvg,
-            );
+            const nowTarget = this.vm.runtime.getTargetByID(this.vm.runtime.editingTargetID);
+            if (nowTarget?.blocks)
+                this.Blockly.serialization.workspaces.load(
+                    nowTarget.blocks._workspace,
+                    this.workspaceSvg,
+                );
             this.workspaceSvg.addChangeListener(this.handleWorkspaceChange.bind(this));
         } finally {
             this._isCreating = false;

@@ -1,9 +1,9 @@
-import i18next from 'i18next';
+// import i18next from 'i18next';
 import type { IVM } from '../../types/vm';
 import WorkSpace from '../blocks';
-import { useState, useCallback } from 'react';
-import { localStorageIDs } from '../../utils/localstorage';
-import { languageResources } from '../../i18n';
+// import { useState, useCallback } from 'react';
+// import { localStorageIDs } from '../../utils/localstorage';
+// import { languageResources } from '../../i18n';
 
 import styles from './index.module.scss';
 import './public.scss';
@@ -14,26 +14,26 @@ import CreateProject from '../createProjet';
 import Loading from '../loading';
 
 const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
-    const [language, setLanguage] = useState(i18next.language);
+    // const [_language, setLanguage] = useState(i18next.language);
     // 控制显示界面
     const nowGuiInterface = useGUIStore(state => state.guiInterface);
     const isLoading = useLoadingStore(state => state.loading);
-    const handleLanguageChanged = useCallback(
-        async (e: React.ChangeEvent<HTMLSelectElement>) => {
-            const value = e.target.value;
-            setLanguage(value);
-            localStorage.setItem(localStorageIDs.Language, value);
+    // const handleLanguageChanged = useCallback(
+    //     async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    //         const value = e.target.value;
+    //         setLanguage(value);
+    //         localStorage.setItem(localStorageIDs.Language, value);
 
-            try {
-                await i18next.changeLanguage(value);
-                await vm.runtime.blocks.init();
-                await vm.runtime.blocks.restartWorkspace();
-            } catch {
-                // 待定
-            }
-        },
-        [vm],
-    );
+    //         try {
+    //             await i18next.changeLanguage(value);
+    //             await vm.runtime.blocks.init();
+    //             await vm.runtime.blocks.restartWorkspace();
+    //         } catch {
+    //             // 待定
+    //         }
+    //     },
+    //     [vm],
+    // );
     return (
         <div className={styles.app}>
             {isLoading && <Loading />}

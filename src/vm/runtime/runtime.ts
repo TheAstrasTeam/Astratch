@@ -85,12 +85,12 @@ class Runtime implements IRuntime {
     }
 
     getTargetByID(id: string) {
-        return this.targets.find(target => target.id === id)
+        return this.targets.find(target => target.id === id);
     }
 
     setTargetBlock(targetID: string, state: IWorkspaceState) {
-        const target = this.targets.find(target => target.id === targetID)
-        if(!target) throw new Error(`Not found ${targetID} in project.`);
+        const target = this.targets.find(target => target.id === targetID);
+        if (!target) throw new Error(`Not found ${targetID} in project.`);
 
         target.blocks._workspace = state;
         this.vm.emit(events.UPDATE_PROJECT);

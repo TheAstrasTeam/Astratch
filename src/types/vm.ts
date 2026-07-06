@@ -106,7 +106,7 @@ export interface IRuntime {
     /**
      * 通过ID获取这个target的index
      */
-    getTargetByID: (id: string) => ITarget | undefined
+    getTargetByID: (id: string) => ITarget | undefined;
 }
 
 export type folderType = FileSystemDirectoryHandle | undefined;
@@ -156,9 +156,9 @@ export interface IProjectManager {
      * 检查项目是否是可以保存的
      */
     checkProjectCanSave: () => Promise<{
-        pass: boolean,
-        result?: string
-    }>
+        pass: boolean;
+        result?: string;
+    }>;
 }
 
 export const projectFileNames = {

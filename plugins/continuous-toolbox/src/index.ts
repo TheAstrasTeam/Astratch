@@ -5,7 +5,7 @@
  *
  * 由 AstrasTeam 修改于 2026/7/3:
  * - 加宽`categoryBubble`的边框宽度
- * 
+ *
  * 由 AstrasTeam 修改于 2026/7/6:
  * - 减小`blocklyToolboxCategoryLabel`的字体大小
  * - 增加`blocklyToolboxCategory`的宽度设置（60px）

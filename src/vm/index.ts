@@ -98,7 +98,7 @@ export class VM implements IVM {
         // todo: 改进进入机制
         const checkResult = await this.projectManager.checkProjectCanSave();
         if (!checkResult.pass) throw new Error(checkResult.result);
-        
+
         this.runtime.createTarget({
             name: 'Astratch',
         });

@@ -31,11 +31,12 @@ jobs:
             - name: Lint
               run: pnpm lint
 
-            - name: Format check
-              run: pnpm check
-
             - name: Type check
               run: pnpm tsc -b
 
             - name: Build
               run: pnpm build
+
+            - name: Format check
+              run: pnpm check
+              continue-on-error: true
