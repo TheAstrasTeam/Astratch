@@ -27,10 +27,15 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
         vm.runtime.switchTarget(id);
     };
 
+    const handleCreateObject = () => {
+        const name = prompt(t('gui:objectNameAsk'));
+        if (name) vm.runtime.createTarget({ name: name });
+    };
+
     return (
         <div className={styles.workspace}>
             <div className={styles.targetsBar}>
-                <span className={styles.targetsBarTitle}>{t('gui:entries')}</span>
+                <span className={styles.targetsBarTitle}>{t('gui:object')}</span>
                 <ul className={styles.targets}>
                     {targets.map(target => (
                         <li
@@ -47,6 +52,7 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
                         </li>
                     ))}
                 </ul>
+                <button onClick={handleCreateObject}>{t('gui:createObject')}</button>
             </div>
             <BlocklyWorkspace vm={vm} />
         </div>

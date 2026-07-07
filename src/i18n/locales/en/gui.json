@@ -42,5 +42,6 @@
     "config.path.tip": "Location of storage project",
     "config.path.button": "Select a Folder",
     "next": "Next",
-    "back": "Back"
+    "back": "Back",
+    "object": "Objects"
 }
