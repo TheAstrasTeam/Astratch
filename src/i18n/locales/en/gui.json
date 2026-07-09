@@ -43,5 +43,6 @@
     "config.path.button": "Select a Folder",
     "next": "Next",
     "back": "Back",
-    "object": "Objects"
+    "object": "Objects",
+    "createObject": "Create Object"
 }

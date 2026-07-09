@@ -13,7 +13,9 @@ import enVm from './locales/en/vm.json';
 import enBlocks from './locales/en/blocks.json';
 import enPaint from './locales/en/paint.json';
 import enAudio from './locales/en/audio.json';
-import { localStorageIDs, readLocalStorage } from '../utils/localstorage';
+import { readLocalStorage } from '../utils/localstorage';
+import i18next from 'i18next';
+import { localStorageIDs } from '../types/storage';
 
 export const languageResources = {
     'zh-CN': {
@@ -53,6 +55,8 @@ const i18nReady = i18n
         const latestLanguage = readLocalStorage(localStorageIDs.Language) as string | null;
         if (latestLanguage) {
             await i18n.changeLanguage(latestLanguage);
+        } else {
+            localStorage.setItem(localStorageIDs.Language, i18next.language)
         }
     });
 

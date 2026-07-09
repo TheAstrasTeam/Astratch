@@ -1,3 +1,5 @@
+import { spawnUserName } from "../utils/username";
+
 export const guiThemes = {
     dark: 'dark',
     light: 'light',
@@ -49,3 +51,11 @@ export const guiInterface = {
 
 export type IGuiInterface = (typeof guiInterface)[keyof typeof guiInterface];
 export const defaultGuiInterface = guiInterface.START;
+
+export const DEFAULT_SETTINGS: IGuiSettings = {
+    // 生成于 src\stores\useSettingsStore.ts
+    userName: spawnUserName(),
+    guiTheme: {
+        ...DEFAULT_GUITHEME_MAP
+    }
+};
