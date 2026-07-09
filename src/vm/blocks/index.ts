@@ -69,6 +69,10 @@ class Blocks implements IBlocks {
                 ...getBlocklyComponentStyles(),
                 flyoutOpacity: 0.5,
             },
+            fontStyle: {
+                weight: 'normal',
+                size: 12,
+            },
         });
         this.workspaceConfig = {
             toolbox: this.toolbox,

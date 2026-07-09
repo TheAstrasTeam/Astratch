@@ -12,6 +12,7 @@ import { guiInterface } from '../../types/gui';
 import Start from '../start';
 import CreateProject from '../createProjet';
 import Loading from '../loading';
+import MenuBar from '../menubar';
 
 const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
     // const [_language, setLanguage] = useState(i18next.language);
@@ -36,6 +37,8 @@ const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
     // );
     return (
         <div className={styles.app}>
+            {/* menubar 菜单栏 */}
+            <MenuBar vm={vm} />
             {isLoading && <Loading />}
             {nowGuiInterface === guiInterface.CREATE_PROJECT && <CreateProject vm={vm} />}
             {nowGuiInterface === guiInterface.START && <Start vm={vm} />}

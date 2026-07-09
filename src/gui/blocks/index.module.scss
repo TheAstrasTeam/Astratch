@@ -1,20 +1,36 @@
 @use '../styles/color' as *;
 @use '../styles/constants.scss' as *;
 
-.workspace {
+.main {
     width: 100%;
     height: 100%;
     display: flex;
     background-color: $ui-white;
 }
-.targets-bar {
-    width: 300px;
+.page-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    background-color: $ui-secondary;
+}
+.main-contents {
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
 }
-.targets-bar-title {
-    margin: 0.5rem 1rem;
-    font-size: x-large;
+.switch-tabs {
+    width: 3rem;
+    display: flex;
+    & svg {
+        color: $text-primary;
+        width: 1rem;
+        height: auto;
+    }
+}
+.switch-tab {
+    width: 2rem;
+    height: 2rem;
 }
 .targets {
     flex: 1;
@@ -28,6 +44,8 @@
     align-items: center;
     gap: 5px;
     margin-bottom: 5px;
+    padding: 5px;
+    border-radius: 4px;
     &.selected {
         background-color: $ui-black-transparent;
     }
@@ -38,4 +56,18 @@
     }
 }
 
-/* 改大点好测试 */
+.tool-bar {
+    height: 2rem;
+    width: 100%;
+    display: flex;
+}
+
+.tool-bar-left,
+.tool-bar-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+.tool-bar-right {
+    flex-direction: row-reverse;
+}

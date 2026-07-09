@@ -544,17 +544,16 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     },
                 ],
             },
+            // 制作变量、自制积木
             {
                 kind: 'category',
                 name: VARIABLES,
                 colour: BlocksColor.data.primary,
-                custom: 'VARIABLE',
             },
             {
                 kind: 'category',
                 name: MY_BLOCKS,
                 colour: BlocksColor.more.primary,
-                custom: 'PROCEDURE',
             },
         ],
     };

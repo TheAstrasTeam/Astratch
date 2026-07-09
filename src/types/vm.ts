@@ -47,26 +47,43 @@ export interface ITargetEffects {
 
 export interface ITarget {
     name: string;
-    size: number;
     id: string;
     blocks: ITargetBlocks;
     comments: Record<string, Blockly.serialization.workspaceComments.State>;
-    direction: number;
-    currentCostume: number;
-    effects: ITargetEffects;
-    volume: number;
-    x: number;
-    y: number;
+    size?: number;
+    direction?: number;
+    currentCostume?: number;
+    effects?: ITargetEffects;
+    volume?: number;
+    x?: number;
+    y?: number;
 }
+
+export const TargetModes = {
+    OBJECT: 'object',
+    MODULE: 'module'
+} as const;
+export type TTargetMode = typeof TargetModes[keyof typeof TargetModes]
 
 export interface ITargetMeta {
     name?: string;
+    mode?: TTargetMode;
     id?: string;
     /**
      * 数据，如果是导入的target的话
      * todo: 确认类型注解
      */
     data?: ArrayBuffer;
+}
+
+export interface IObjectInfo {
+    size: number;
+    direction: number;
+    currentCostume: number;
+    effects: ITargetEffects;
+    volume: number;
+    x: number;
+    y: number;
 }
 
 export interface IRuntime {
@@ -80,6 +97,10 @@ export interface IRuntime {
      * ps: 角色是 Scratch 的`sprite`的中文叫法，target 在 ASH 指代是“实体”
      */
     targets: ITarget[];
+    /**
+     * 对于实体额外的info
+     */
+    DEFAULT_OBJECTINFO: IObjectInfo;
     /**
      * 默认target的信息
      */

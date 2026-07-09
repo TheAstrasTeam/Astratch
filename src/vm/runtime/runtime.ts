@@ -1,4 +1,12 @@
-import { events, type IRuntime, type ITarget, type ITargetMeta, type IVM } from '../../types/vm';
+import {
+    events,
+    TargetModes,
+    type IObjectInfo,
+    type IRuntime,
+    type ITarget,
+    type ITargetMeta,
+    type IVM,
+} from '../../types/vm';
 import type { IWorkspaceState } from '../../types/blocks';
 import Blocks from '../blocks';
 import * as Blockly from 'blockly';
@@ -12,6 +20,7 @@ class Runtime implements IRuntime {
     targets: ITarget[];
     DEFAULT_TARGETINFO: ITarget;
     editingTargetID: string;
+    DEFAULT_OBJECTINFO: IObjectInfo;
 
     constructor(vm: IVM) {
         this.vm = vm;
@@ -26,23 +35,10 @@ class Runtime implements IRuntime {
         this.targets = [];
 
         /**
-         * 默认的Target
+         * 对于实体额外的info
          */
-        this.DEFAULT_TARGETINFO = {
-            name: '',
+        this.DEFAULT_OBJECTINFO = {
             size: 100,
-            // id 会在创建项目时自动创建
-            id: '',
-            blocks: {
-                _workspace: {
-                    blocks: {
-                        languageVersion: 0,
-                        blocks: [],
-                    },
-                },
-                _script: [],
-            },
-            comments: {},
             direction: 90,
             currentCostume: 0,
             effects: {
@@ -60,6 +56,25 @@ class Runtime implements IRuntime {
         };
 
         /**
+         * 默认的Target
+         */
+        this.DEFAULT_TARGETINFO = {
+            name: '',
+            // id 会在创建项目时自动创建
+            id: '',
+            blocks: {
+                _workspace: {
+                    blocks: {
+                        languageVersion: 0,
+                        blocks: [],
+                    },
+                },
+                _script: [],
+            },
+            comments: {},
+        };
+
+        /**
          * 当前的编辑目标ID
          */
         this.editingTargetID = '';
@@ -71,9 +86,10 @@ class Runtime implements IRuntime {
         this.targets.push({
             // 直接 this.DEFAULT_TARGETINFO 会造成浅拷贝
             ...structuredClone(this.DEFAULT_TARGETINFO),
+            mode: Meta.mode ?? TargetModes.OBJECT,
             name: Meta.name ?? this.DEFAULT_TARGETINFO.name,
             id,
-        });
+        } as ITarget);
 
         this.vm.emit(events.UPDATE_PROJECT);
         if (switchTo) this.switchTarget(id);

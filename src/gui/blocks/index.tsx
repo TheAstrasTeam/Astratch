@@ -6,6 +6,7 @@ import classNames from 'classnames';
 
 import SpriteIcon from '../../assets/sprite.svg?react';
 import { t } from 'i18next';
+import SelectBar from '../../components/workspace/selectBar';
 
 const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
     const [targets, setTargets] = useState<ITarget[]>(vm.runtime.targets);
@@ -33,28 +34,42 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
     };
 
     return (
-        <div className={styles.workspace}>
-            <div className={styles.targetsBar}>
-                <span className={styles.targetsBarTitle}>{t('gui:object')}</span>
-                <ul className={styles.targets}>
-                    {targets.map(target => (
-                        <li
-                            key={target.id}
-                            className={classNames(styles.target, {
-                                [styles.selected]: target.id === vm.runtime.editingTargetID,
-                            })}
-                            onClick={() => {
-                                handleTargetChange(target.id);
-                            }}
-                        >
-                            <SpriteIcon />
-                            {target.name}
-                        </li>
-                    ))}
-                </ul>
-                <button onClick={handleCreateObject}>{t('gui:createObject')}</button>
+        <div className={styles.main}>
+            <div className={styles.switchTabs}>
+                <button className={styles.switchTab}>
+                    <SpriteIcon />
+                </button>
             </div>
-            <BlocklyWorkspace vm={vm} />
+            <div className={styles.mainContents}>
+                <div className={styles.toolBar}>
+                    <div className={styles.toolBarLeft}></div>
+                    <div className={styles.toolBarRight}>
+                        <button>{"|>"}</button>
+                    </div>
+                </div>
+                <div className={styles.pageContent}>
+                    <SelectBar title={t('gui:object')}>
+                        <ul className={styles.targets}>
+                            {targets.map(target => (
+                                <li
+                                    key={target.id}
+                                    className={classNames(styles.target, {
+                                        [styles.selected]: target.id === vm.runtime.editingTargetID,
+                                    })}
+                                    onClick={() => {
+                                        handleTargetChange(target.id);
+                                    }}
+                                >
+                                    <SpriteIcon />
+                                    {target.name}
+                                </li>
+                            ))}
+                        </ul>
+                        <button onClick={handleCreateObject}>{t('gui:createObject')}</button>
+                    </SelectBar>
+                    <BlocklyWorkspace vm={vm} />
+                </div>
+            </div>
         </div>
     );
 };

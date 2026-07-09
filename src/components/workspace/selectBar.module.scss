@@ -1,0 +1,21 @@
+@use '../../gui/styles/color' as *;
+@use '../../gui/styles/constants.scss' as *;
+
+.select-bar {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    border: $border-width $ui-black-transparent solid;
+}
+.select-bar-title {
+    font-size: small;
+}
+.select-bar-title-div {
+    padding: 5px;
+    border-bottom:  $border-width $ui-black-transparent solid;
+}
+.select-bar-contents {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
