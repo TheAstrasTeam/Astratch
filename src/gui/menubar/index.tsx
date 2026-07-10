@@ -1,6 +1,7 @@
 import type { IVM } from '../../types/vm';
 import styles from './index.module.scss';
 import logo from '../../assets/ashIconLight.svg';
+import { t } from 'i18next';
 
 const MenuBar = ({ vm }: { vm: IVM }): React.ReactNode => {
     return (
@@ -8,8 +9,10 @@ const MenuBar = ({ vm }: { vm: IVM }): React.ReactNode => {
             <div className={styles.menubarContentsLeft}>
                 <img className={styles.menubarContentLogo} src={logo} />
             </div>
-            <div className={styles.menubarContentsCenter}></div>
-            <div className={styles.menubarContentsRight}></div>
+            <div className={styles.menubarContentsCenter}>
+                <input placeholder={t('gui:searchTip')}></input>
+            </div>
+            <div className={styles.menubarContentsRight}>Right</div>
         </div>
     );
 };

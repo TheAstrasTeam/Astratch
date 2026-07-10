@@ -20,7 +20,11 @@
 .menubar-contents-left {
     padding-left: 5px;
 }
+.menubar-contents-center {
+    justify-content: center
+}
 .menubar-contents-right {
+    flex-direction: row-reverse;
     padding-right: 5px;
 }
 

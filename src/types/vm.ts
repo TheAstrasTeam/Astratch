@@ -5,8 +5,18 @@ export const targets = {
     ASH: 'ash',
     SCRATCH: 'scratch',
     TURBOWARP: 'turbowarp',
-};
+} as const;
 export type TallTarget = (typeof targets)[keyof typeof targets];
+
+/**
+ * 内置Tab
+ */
+export const allBuiltInTabs = {
+    TARGETS: 'targets',
+    ADDONS: 'addons',
+    DEBUG: 'debug'
+} as const;
+export type TallBuiltInTabs = (typeof allBuiltInTabs)[keyof typeof allBuiltInTabs];
 
 export interface IProjectMeta {
     /**
