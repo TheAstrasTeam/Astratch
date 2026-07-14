@@ -8,6 +8,20 @@ import { applyGuiTheme } from './lib/Theme/guiThemeManager.ts';
 import './gui/styles/constants.scss';
 import './gui/styles/zIndex.scss';
 
+// 一个很有趣的动画效果，渐隐加载
+const Loading: HTMLElement | null = document.querySelector('.loading');
+if (Loading) {
+    // 热加载没必要播放动画
+    if (import.meta.hot) {
+        Loading.remove();
+    } else {
+        Loading.style.animation = 'loadingOut 0.3s forwards';
+        setTimeout(() => {
+            Loading.remove();
+        }, 300);
+    }
+}
+
 // 初始化VM
 const vm = new VM();
 Object.assign(window, {

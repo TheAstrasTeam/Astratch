@@ -3,7 +3,7 @@ import styles from './index.module.scss';
 import logo from '../../assets/ashIconLight.svg';
 import { t } from 'i18next';
 
-const MenuBar = ({ vm }: { vm: IVM }): React.ReactNode => {
+const MenuBar = ({ }: { vm: IVM }): React.ReactNode => {
     return (
         <div className={styles.menubarContents}>
             <div className={styles.menubarContentsLeft}>

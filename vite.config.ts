@@ -37,6 +37,7 @@ Give we a star⭐ in\x1b[34m https://github.com/TheAstrasTeam/Astratch\x1b[0m , 
 
 // https://vite.dev/config/
 export default defineConfig({
+    root: 'src',
     plugins: [
         react(),
         svgr(),
