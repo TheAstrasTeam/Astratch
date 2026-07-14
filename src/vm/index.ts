@@ -9,6 +9,7 @@ import {
     type TEvents,
     projectFileNames,
     type IProjectMeta,
+    events,
 } from '../types/vm';
 import { ProjectManager } from './project';
 
@@ -103,6 +104,9 @@ export class VM implements IVM {
             name: 'Astratch',
         });
         await this.saveProject();
+        // 进入编辑器
+        this.isEditingProject = true;
+        this.emit(events.CREATE_PROJECT);
     }
 
     async loadProject() {

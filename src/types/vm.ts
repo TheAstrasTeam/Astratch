@@ -14,7 +14,7 @@ export type TallTarget = (typeof targets)[keyof typeof targets];
 export const allBuiltInTabs = {
     TARGETS: 'targets',
     ADDONS: 'addons',
-    DEBUG: 'debug'
+    DEBUG: 'debug',
 } as const;
 export type TallBuiltInTabs = (typeof allBuiltInTabs)[keyof typeof allBuiltInTabs];
 
@@ -71,9 +71,9 @@ export interface ITarget {
 
 export const TargetModes = {
     OBJECT: 'object',
-    MODULE: 'module'
+    MODULE: 'module',
 } as const;
-export type TTargetMode = typeof TargetModes[keyof typeof TargetModes]
+export type TTargetMode = (typeof TargetModes)[keyof typeof TargetModes];
 
 export interface ITargetMeta {
     name?: string;
@@ -253,6 +253,7 @@ export interface IEvent {
 export const events = {
     SWITCH_TARGET: 'switch_target',
     UPDATE_PROJECT: 'update_project',
+    CREATE_PROJECT: 'create_project',
 } as const;
 
 export type TEvents = (typeof events)[keyof typeof events];
