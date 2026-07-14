@@ -1,0 +1,36 @@
+@use '../styles/color' as *;
+@use '../styles/constants.scss' as *;
+
+
+.targets {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    list-style-type: none;
+    padding: 0 0.5rem;
+}
+.target {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 5px;
+    padding: 5px;
+    border-radius: 4px;
+    &.selected {
+        background-color: $ui-black-transparent;
+    }
+    & svg {
+        color: $text-primary;
+        width: 20px;
+        height: auto;
+    }
+}
+
+
+.not-in-project-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

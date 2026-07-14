@@ -5,12 +5,7 @@
     width: 100%;
     height: 100%;
     display: flex;
-    background-color: $ui-white;
-}
-.page-content {
-    width: 100%;
-    height: 100%;
-    display: flex;
+    flex-direction: column;
     background-color: $ui-secondary;
 }
 .main-contents {
@@ -22,7 +17,14 @@
 .switch-tabs {
     width: 2rem;
     height: 2rem;
+    flex: 0.5;
     display: flex;
+    overflow: auto hidden;
+    // 让滚动条出现在上面
+    transform: rotateX(180deg);
+    > * {
+        transform: rotateX(180deg);
+    }
     & svg {
         color: $text-primary;
         width: 1rem;
@@ -46,6 +48,7 @@
             box-shadow: inset 0 -1px 0px $looks-secondary;
         }
     }
+    
 }
 .switch-tab {
     width: 2rem;
@@ -107,4 +110,9 @@
     display: flex;
     flex: 1;
     flex-direction: column;
+}
+.workspace {
+    display: flex;
+    flex: 1;
+    min-height: 0;
 }

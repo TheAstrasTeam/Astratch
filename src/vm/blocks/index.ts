@@ -198,6 +198,10 @@ class Blocks implements IBlocks {
         }
         return false;
     }
+
+    refreshBlocklySize(): void {
+        if (this.workspaceSvg) this.Blockly.common.svgResize(this.workspaceSvg);
+    }
 }
 
 export default Blocks;

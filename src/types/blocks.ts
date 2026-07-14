@@ -419,6 +419,10 @@ export interface IBlocks {
      * 检测到工作区变化的处理
      */
     handleWorkspaceChange: (event: Blockly.Events.Abstract) => void;
+    /**
+     * 刷新工作区的大小
+     */
+    refreshBlocklySize: () => void;
 }
 
 // 设置吸附半径，48来自源码

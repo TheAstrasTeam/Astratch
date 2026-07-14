@@ -78,6 +78,10 @@ input {
     border-radius: 3px;
 }
 
+span {
+    font-size: small;
+}
+
 // 关于Blockly高亮
 
 [id*='blocklySelectedGlowFilter'] feFlood {

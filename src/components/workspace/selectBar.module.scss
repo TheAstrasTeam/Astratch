@@ -2,7 +2,7 @@
 @use '../../gui/styles/constants.scss' as *;
 
 .select-bar {
-    width: 300px;
+    width: 100%;
     display: flex;
     flex-direction: column;
     border: $border-width $ui-black-transparent solid;

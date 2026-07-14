@@ -14,7 +14,7 @@ import compatibleExtension from '../../assets/compatibleExtension.svg';
 import { t } from 'i18next';
 import Title from '../../components/title';
 import SubTitle from '../../components/subTitle';
-import { toID } from '../../utils/ashString';
+import { toID } from '../../utils/ash-string';
 import useSettingsStore from '../../stores/useSettingsStore';
 import { useGUIStore } from '../../stores/useGUIStore';
 import { guiInterface } from '../../types/gui';
@@ -219,7 +219,7 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
                                     const next = options[nextIndex];
                                     next.focus();
                                     const targetId = next.getAttribute('data-target');
-                                    if (targetId) setSelectTarget(targetId);
+                                    if (targetId) setSelectTarget(targetId as TallTarget);
                                 }}
                             >
                                 <Target

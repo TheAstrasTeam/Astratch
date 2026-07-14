@@ -7,17 +7,12 @@ import WorkSpace from './workspace';
 
 import styles from './index.module.scss';
 import './public.scss';
-import { useGUIStore, useLoadingStore } from '../stores/useGUIStore';
-import { guiInterface, type IGuiInterface } from '../types/gui';
-import Start from './start';
-import CreateProject from './createProjet';
+import { useLoadingStore } from '../stores/useGUIStore';
 import Loading from './loading';
 import MenuBar from './menubar';
 
 const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
     // const [_language, setLanguage] = useState(i18next.language);
-    // 控制显示界面
-    const nowGuiInterface: IGuiInterface = useGUIStore(state => state.guiInterface);
     const isLoading: boolean = useLoadingStore(state => state.loading);
     // const handleLanguageChanged = useCallback(
     //     async (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -40,25 +35,9 @@ const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
             {/* menubar 菜单栏 */}
             <MenuBar vm={vm} />
             {isLoading && <Loading />}
-            {nowGuiInterface === guiInterface.CREATE_PROJECT && <CreateProject vm={vm} />}
-            {nowGuiInterface === guiInterface.START && <Start vm={vm} />}
-            {nowGuiInterface === guiInterface.EDITOR && (
-                <>
-                    {/* <div className={styles.toolbar}>
-                        <select onChange={void handleLanguageChanged} value={language}>
-                            {Object.keys(languageResources).map(lan => (
-                                <option value={lan} key={lan}>
-                                    {lan}
-                                </option>
-                            ))}
-                        </select>
-                    </div> */}
-                    <div className={styles.workspaceArea}>
-                        {/* 这是一个测试，给工作区包一个容器 */}
-                        <WorkSpace key='workspace' vm={vm} />
-                    </div>
-                </>
-            )}
+            <div className={styles.workspaceArea}>
+                <WorkSpace vm={vm} />
+            </div>
         </div>
     );
 };

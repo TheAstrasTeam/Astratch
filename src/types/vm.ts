@@ -237,6 +237,12 @@ export interface IVM {
      * @returns 是否加载成功
      */
     loadProject: () => Promise<boolean>;
+    /**
+     * 正在编辑项目
+     * 如果已经打开了一个项目，则返回true
+     * 额，这个不是正在拖放积木的编辑！
+     */
+    isEditingProject: boolean;
 }
 
 export interface IEvent {
