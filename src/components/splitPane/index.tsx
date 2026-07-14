@@ -57,7 +57,7 @@ const SplitPane = ({
 
         const handleMouseUp = () => {
             setIsDragging(false);
-            onOver?.()
+            onOver?.();
         };
 
         document.addEventListener('mousemove', handleMouseMove);

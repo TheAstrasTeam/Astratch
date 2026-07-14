@@ -1,4 +1,9 @@
-import type { IProjectManager, folderType, IVM } from '../../types/vm';
+import {
+    type IProjectManager,
+    type folderType,
+    type IVM,
+    allProjectCheckError,
+} from '../../types/vm';
 
 /**
  * 与文件系统互动
@@ -16,11 +21,24 @@ export class ProjectManager implements IProjectManager {
     }
 
     async checkProjectCanSave() {
-        if (!this.isAPIAvailable) return { pass: false, result: 'API is unavailable' };
+        if (!this.isAPIAvailable)
+            return {
+                pass: false,
+                result: 'API is unavailable',
+                error: allProjectCheckError.API_UNDEFINED,
+            };
         if (!this.folderHandle)
-            return { pass: false, result: 'Please load/create a project first!' };
+            return {
+                pass: false,
+                result: 'Please load/create a project first!',
+                error: allProjectCheckError.NOTHING_SELECTED,
+            };
         if (!(await this.isEmpty(this.folderHandle)))
-            return { pass: false, result: 'Please select a empty folder!' };
+            return {
+                pass: false,
+                result: 'Please select a empty folder!',
+                error: allProjectCheckError.FOLDER_NOT_EMPTY,
+            };
         return { pass: true };
     }
 
@@ -60,5 +78,20 @@ export class ProjectManager implements IProjectManager {
         if (!path) return false;
         const fileHandle = await path.getFileHandle(name);
         return fileHandle;
+    }
+
+    async removeFile(path: folderType, name: string) {
+        if (!path) return false;
+        await path.removeEntry(name, { recursive: true });
+        return true;
+    }
+
+    async listAllFileName(path: folderType) {
+        if (!path) return false;
+        const result = [];
+        for await (const entry of path.values()) {
+            result.push(entry.name);
+        }
+        return result;
     }
 }

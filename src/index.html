@@ -1,171 +1,163 @@
 <!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Astratch</title>
-    <style>
-        .circle {
-            width: 64px;
-            height: 64px;
-            border-radius: 200%;
-            display: block;
-            background-color: #fff;
-            opacity: 0.5;
-        }
-
-        .logo {
-            transform: scale(1.5, 1.5) translateY(40px);
-        }
-
-        @keyframes circleA_1 {
-
-            50%,
-            0% {
-                transform: translate(0px, 22px) scale(0.75, 0.75);
-                opacity: 0;
-            }
-
-            75% {
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Astratch</title>
+        <style>
+            .circle {
+                width: 64px;
+                height: 64px;
+                border-radius: 200%;
+                display: block;
+                background-color: #fff;
                 opacity: 0.5;
             }
 
-            100% {
-                transform: scale(1.95, 1.95);
-            }
-        }
-
-        @keyframes circleA_2 {
-
-            20%,
-            0% {
-                transform: translate(0px, -52px) scale(0.5, 0.5);
-                opacity: 0;
+            .logo {
+                transform: scale(1.5, 1.5) translateY(40px);
             }
 
-            75% {
-                opacity: 0.5;
-            }
-
-            100% {
-                transform: translate(-25px, -12px) scale(0.96, 0.96);
-            }
-        }
-
-        @keyframes circleA_3 {
-
-            30%,
-            0% {
-                transform: translate(0px, -112px) scale(0.26, 0.26);
-                opacity: 0;
-            }
-
-            75% {
-                opacity: 0.5;
-            }
-
-            100% {
-                transform: translate(40px, -108px) scale(1.46, 1.46);
-            }
-        }
-
-        @keyframes loadingOut {
-            from {
-                opacity: 1;
-            }
-            to {
-                opacity: 0;
-            }
-        }
-
-        #circle_1,
-        #circle_2,
-        #circle_3 {
-            animation-duration: 1s;
-            animation-iteration-count: infinite;
-            animation-direction: alternate;
-        }
-
-        #circle_1 {
-            animation-name: circleA_1;
-        }
-
-        #circle_2 {
-            animation-name: circleA_2;
-        }
-
-        #circle_3 {
-            animation-name: circleA_3;
-        }
-
-        .loading {
-            padding: 0;
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            z-index: 999999;
-            user-select: none;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            margin: 0;
-            user-select: none;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="loading">
-        <div class="logo">
-            <div class="circle" id="circle_1"></div>
-            <div class="circle" id="circle_2"></div>
-            <div class="circle" id="circle_3"></div>
-        </div>
-    </div>
-    <div id="root">
-
-    </div>
-    </div>
-    <noscript>
-        <h1>Hold on!</h1>
-        <span>
-            You need javascript to run
-            <div style="color: #0099ff">Astratch</div>
-        </span>
-    </noscript>
-    <script type="module" src="./main.tsx"></script>
-    <script>
-        // 例子：
-        // "{\"userName\":\"Player_76136\",\"guiTheme\":{\"gui\":\"dark\",\"accent\":\"blue\"}}"
-        const ashSettings = localStorage.getItem('ash_settings');
-        const Loading = document.querySelector('.loading');
-        if (ashSettings && ashSettings) {
-            try {
-                const ashTheme = JSON.parse(ashSettings).guiTheme;
-                if (ashTheme.gui === 'dark') {
-                    Loading.style.backgroundColor = '#1e1e1e';
-                    Loading.style.color = '#eee';
-                } else {
-                    Loading.style.color = '#111';
-                    switch(ashTheme.accent) {
-                        case 'blue':
-                            Loading.style.backgroundColor = '#09f';
-                            break
-                        default:
-                            Loading.style.backgroundColor = '#09f';
-                            break
-                    }
+            @keyframes circleA_1 {
+                50%,
+                0% {
+                    transform: translate(0px, 22px) scale(0.75, 0.75);
+                    opacity: 0;
                 }
-            } catch { }
-        }
-    </script>
-</body>
 
+                75% {
+                    opacity: 0.5;
+                }
+
+                100% {
+                    transform: scale(1.95, 1.95);
+                }
+            }
+
+            @keyframes circleA_2 {
+                20%,
+                0% {
+                    transform: translate(0px, -52px) scale(0.5, 0.5);
+                    opacity: 0;
+                }
+
+                75% {
+                    opacity: 0.5;
+                }
+
+                100% {
+                    transform: translate(-25px, -12px) scale(0.96, 0.96);
+                }
+            }
+
+            @keyframes circleA_3 {
+                30%,
+                0% {
+                    transform: translate(0px, -112px) scale(0.26, 0.26);
+                    opacity: 0;
+                }
+
+                75% {
+                    opacity: 0.5;
+                }
+
+                100% {
+                    transform: translate(40px, -108px) scale(1.46, 1.46);
+                }
+            }
+
+            @keyframes loadingOut {
+                from {
+                    opacity: 1;
+                }
+                to {
+                    opacity: 0;
+                }
+            }
+
+            #circle_1,
+            #circle_2,
+            #circle_3 {
+                animation-duration: 1s;
+                animation-iteration-count: infinite;
+                animation-direction: alternate;
+            }
+
+            #circle_1 {
+                animation-name: circleA_1;
+            }
+
+            #circle_2 {
+                animation-name: circleA_2;
+            }
+
+            #circle_3 {
+                animation-name: circleA_3;
+            }
+
+            .loading {
+                padding: 0;
+                width: 100vw;
+                height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: absolute;
+                z-index: 999999;
+                user-select: none;
+            }
+
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                display: flex;
+                margin: 0;
+                user-select: none;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="loading">
+            <div class="logo">
+                <div class="circle" id="circle_1"></div>
+                <div class="circle" id="circle_2"></div>
+                <div class="circle" id="circle_3"></div>
+            </div>
+        </div>
+        <div id="root"></div>
+        <noscript>
+            <h1>Hold on!</h1>
+            <span>
+                You need javascript to run
+                <div style="color: #0099ff">Astratch</div>
+            </span>
+        </noscript>
+        <script type="module" src="./main.tsx"></script>
+        <script>
+            // 例子：
+            // "{\"userName\":\"Player_76136\",\"guiTheme\":{\"gui\":\"dark\",\"accent\":\"blue\"}}"
+            const ashSettings = localStorage.getItem('ash_settings');
+            const Loading = document.querySelector('.loading');
+            if (ashSettings && ashSettings) {
+                try {
+                    const ashTheme = JSON.parse(ashSettings).guiTheme;
+                    if (ashTheme.gui === 'dark') {
+                        Loading.style.backgroundColor = '#1e1e1e';
+                        Loading.style.color = '#eee';
+                    } else {
+                        Loading.style.color = '#111';
+                        switch (ashTheme.accent) {
+                            case 'blue':
+                                Loading.style.backgroundColor = '#09f';
+                                break;
+                            default:
+                                Loading.style.backgroundColor = '#09f';
+                                break;
+                        }
+                    }
+                } catch {}
+            }
+        </script>
+    </body>
 </html>

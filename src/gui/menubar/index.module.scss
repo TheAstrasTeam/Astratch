@@ -6,7 +6,7 @@
     height: 2rem;
     display: flex;
     background-color: $ui-white;
-    border-bottom:  $border-width $ui-black-transparent solid;
+    border-bottom: $border-width $ui-black-transparent solid;
     align-items: center;
 }
 .menubar-contents-left,
@@ -21,7 +21,7 @@
     padding-left: 5px;
 }
 .menubar-contents-center {
-    justify-content: center
+    justify-content: center;
 }
 .menubar-contents-right {
     flex-direction: row-reverse;
@@ -33,6 +33,6 @@
     width: auto;
 }
 
-.search{
+.search {
     flex: 1;
 }

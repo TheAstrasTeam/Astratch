@@ -4,6 +4,7 @@ import pageReload from 'vite-plugin-page-reload';
 import babel from '@rolldown/plugin-babel';
 import svgr from 'vite-plugin-svgr';
 
+// eslint-disable-next-line no-console
 console.log(`\x1b[34m
                ░░░░░░░░░                                
           ░░░░░░░░░░░░░░░░░░░                           

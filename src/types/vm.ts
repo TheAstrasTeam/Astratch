@@ -189,8 +189,30 @@ export interface IProjectManager {
     checkProjectCanSave: () => Promise<{
         pass: boolean;
         result?: string;
+        error?: TAllProjectCheckError;
     }>;
+    /**
+     * 删除一个文件
+     * @param path 路径句柄
+     * @param name 文件名称
+     * @returns
+     */
+    removeFile: (path: folderType, name: string) => Promise<boolean>;
+    /**
+     * 列出所有文件/文件夹
+     * @param path 路径句柄
+     * @returns
+     */
+    listAllFileName: (path: folderType) => Promise<string[] | false>;
 }
+
+export const allProjectCheckError = {
+    API_UNDEFINED: 'api_undefined',
+    NOTHING_SELECTED: 'nothing_selected',
+    FOLDER_NOT_EMPTY: 'folder_not_empty',
+} as const;
+export type TAllProjectCheckError =
+    (typeof allProjectCheckError)[keyof typeof allProjectCheckError];
 
 export const projectFileNames = {
     meta: 'projectMeta.json',

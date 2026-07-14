@@ -1,10 +1,6 @@
 // GUI 设置 store（用户名、主题等）
 import { create } from 'zustand';
-import {
-    DEFAULT_SETTINGS,
-    type IGuiSettings,
-    type TGuiThemeMap,
-} from '../types/gui';
+import { DEFAULT_SETTINGS, type IGuiSettings, type TGuiThemeMap } from '../types/gui';
 import { readLocalStorage, setItemToLocalStorage } from '../utils/localstorage';
 import { localStorageIDs } from '../types/storage';
 

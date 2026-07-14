@@ -56,7 +56,7 @@ const i18nReady = i18n
         if (latestLanguage) {
             await i18n.changeLanguage(latestLanguage);
         } else {
-            localStorage.setItem(localStorageIDs.Language, i18next.language)
+            localStorage.setItem(localStorageIDs.Language, i18next.language);
         }
     });
 

@@ -10,8 +10,10 @@ import {
     projectFileNames,
     type IProjectMeta,
     events,
+    allProjectCheckError,
 } from '../types/vm';
 import { ProjectManager } from './project';
+import { t } from 'i18next';
 
 /**
  * 虚拟机，管理整个ASH
@@ -98,7 +100,22 @@ export class VM implements IVM {
     async initProject() {
         // todo: 改进进入机制
         const checkResult = await this.projectManager.checkProjectCanSave();
-        if (!checkResult.pass) throw new Error(checkResult.result);
+        if (!checkResult.pass) {
+            if (checkResult.error === allProjectCheckError.FOLDER_NOT_EMPTY) {
+                const userWantRemoveAllFile = confirm(t('vm:project.removeAllFileAsk'));
+                if (!userWantRemoveAllFile) throw new Error(checkResult.result);
+                const fileNames = await this.projectManager.listAllFileName(
+                    this.projectManager.folderHandle,
+                );
+                if (fileNames)
+                    for (const name of fileNames) {
+                        await this.projectManager.removeFile(
+                            this.projectManager.folderHandle,
+                            name,
+                        );
+                    }
+            } else throw new Error(checkResult.result);
+        }
 
         this.runtime.createTarget({
             name: 'Astratch',

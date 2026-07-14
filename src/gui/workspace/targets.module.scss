@@ -1,7 +1,6 @@
 @use '../styles/color' as *;
 @use '../styles/constants.scss' as *;
 
-
 .targets {
     flex: 1;
     min-height: 0;
@@ -25,7 +24,6 @@
         height: auto;
     }
 }
-
 
 .not-in-project-content {
     width: 100%;

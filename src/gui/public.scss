@@ -52,7 +52,7 @@ button:active:not(:disabled) {
     filter: $active-button;
 }
 button:disabled {
-    filter: brightness(0.5)
+    filter: brightness(0.5);
 }
 
 select {
@@ -70,7 +70,7 @@ code {
 }
 
 // blocklyHtmlInput 是 blockly 输入框的选中时名
-input:not([class*="blocklyHtmlInput"]) {
+input:not([class*='blocklyHtmlInput']) {
     background-color: $ui-tertiary;
     outline: none;
     color: $text-primary;
