@@ -70,7 +70,8 @@ code {
     border-radius: 5px;
 }
 
-input {
+// blocklyHtmlInput 是 blockly 输入框的选中时名
+input:not([class*="blocklyHtmlInput"]) {
     background-color: $ui-tertiary;
     outline: none;
     color: $text-primary;
@@ -89,9 +90,10 @@ span {
     flood-opacity: 0.5;
 }
 
-.blocklyHighlightedConnectionPath {
-    stroke: var(--ui-blockly-border) !important;
-}
+// 在 v13.1.0 后使用它会导致积木插槽出现奇妙的高亮
+// .blocklyHighlightedConnectionPath {
+//     stroke: var(--ui-blockly-border) !important;
+// }
 
 .injectionDiv {
     --blockly-active-node-color: var(--ui-blockly-border);
