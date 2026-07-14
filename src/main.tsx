@@ -1,6 +1,6 @@
 import { StrictMode, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
-import GUI from './gui/main/index.tsx';
+import GUI from './gui/index.tsx';
 import { VM } from './vm/index.ts';
 import i18nReady from './i18n';
 import ErrorPage from './gui/error/index.tsx';

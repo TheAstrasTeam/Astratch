@@ -1,18 +1,18 @@
 // import i18next from 'i18next';
-import type { IVM } from '../../types/vm';
-import WorkSpace from '../blocks';
+import type { IVM } from '../types/vm';
+import WorkSpace from './workspace';
 // import { useState, useCallback } from 'react';
 // import { localStorageIDs } from '../../utils/localstorage';
 // import { languageResources } from '../../i18n';
 
 import styles from './index.module.scss';
 import './public.scss';
-import { useGUIStore, useLoadingStore } from '../../stores/useGUIStore';
-import { guiInterface, type IGuiInterface } from '../../types/gui';
-import Start from '../start';
-import CreateProject from '../createProjet';
-import Loading from '../loading';
-import MenuBar from '../menubar';
+import { useGUIStore, useLoadingStore } from '../stores/useGUIStore';
+import { guiInterface, type IGuiInterface } from '../types/gui';
+import Start from './start';
+import CreateProject from './createProjet';
+import Loading from './loading';
+import MenuBar from './menubar';
 
 const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
     // const [_language, setLanguage] = useState(i18next.language);

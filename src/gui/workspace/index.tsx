@@ -1,7 +1,6 @@
 import {
     allBuiltInTabs,
     events,
-    type TallBuiltInTabs,
     type ITarget,
     type IVM,
 } from '../../types/vm';
