@@ -117,7 +117,9 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
                                 <button>{'Testing'}</button>
                             </div>
                         </div>
-                        <BlocklyWorkspace vm={vm} />
+                        <div className={styles.blocklyWorkspace}>
+                            <BlocklyWorkspace vm={vm} />
+                        </div>
                     </div>
                 </div>
             </div>

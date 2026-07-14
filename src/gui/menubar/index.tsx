@@ -10,7 +10,10 @@ const MenuBar = ({ vm }: { vm: IVM }): React.ReactNode => {
                 <img className={styles.menubarContentLogo} src={logo} />
             </div>
             <div className={styles.menubarContentsCenter}>
-                <input placeholder={t('gui:searchTip')}></input>
+                <input
+                    className={styles.search}
+                    placeholder={t('gui:searchTip')}
+                ></input>
             </div>
             <div className={styles.menubarContentsRight}>Right</div>
         </div>

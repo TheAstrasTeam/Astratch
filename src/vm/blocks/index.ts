@@ -35,19 +35,34 @@ class Blocks implements IBlocks {
      * 在工作区出现事件时需要同步积木，
      * 但是不是所有事件都会修改工作区，
      * 所以需要过滤掉一些防止更改过于频繁
+     *
+     * : string[] 用于防止TS把类型改了
+     * 如果没它会导致 `includes` 报类型错误
      */
-    private _disableUpdateType = [
+    private _disableUpdateType: string[] = [
         // 选择一个积木
         // `Class for a selected event. Notifies listeners that a new element has been selected.`
-        'selected',
+        Blockly.Events.SELECTED,
         // 拖动一个积木
         // 事实上，它常和`move`一起触发
         // 但drag是“拖动”，而拖动会造成移动
         // 所以只需要检测`move`即可
-        'drag',
+        Blockly.Events.COMMENT_DRAG,
+        Blockly.Events.BLOCK_DRAG,
         // 视口更改，其实就是移动工作区镜头
-        'viewport_change',
+        Blockly.Events.VIEWPORT_CHANGE,
     ];
+
+    handleWorkspaceChange = (event: Blockly.Events.Abstract) => {
+        // 检测更新，并检查这个事件是否需要忽略
+        if (!this.workspaceSvg) return;
+        if (!this._disableUpdateType.includes(event.type)) {
+            this.vm.runtime.setTargetBlock(
+                this.vm.runtime.editingTargetID,
+                this.Blockly.serialization.workspaces.save(this.workspaceSvg) as IWorkspaceState,
+            );
+        }
+    };
 
     constructor(BlocklySelf: typeof Blockly, vm: IVM) {
         this.vm = vm;
@@ -104,17 +119,6 @@ class Blocks implements IBlocks {
                 spacing: 48,
             },
         };
-    }
-
-    handleWorkspaceChange(event: Blockly.Events.Abstract) {
-        // 检测更新，并检查这个事件是否需要忽略
-        if (!this.workspaceSvg) return;
-        if (!this._disableUpdateType.includes(event.type)) {
-            this.vm.runtime.setTargetBlock(
-                this.vm.runtime.editingTargetID,
-                this.Blockly.serialization.workspaces.save(this.workspaceSvg) as IWorkspaceState,
-            );
-        }
     }
 
     async init(): Promise<void> {
@@ -177,7 +181,7 @@ class Blocks implements IBlocks {
                     nowTarget.blocks._workspace,
                     this.workspaceSvg,
                 );
-            this.workspaceSvg.addChangeListener(this.handleWorkspaceChange.bind(this));
+            this.workspaceSvg.addChangeListener(this.handleWorkspaceChange);
         } finally {
             this._isCreating = false;
         }
@@ -187,7 +191,7 @@ class Blocks implements IBlocks {
 
     dispose(): boolean {
         if (this.workspaceSvg) {
-            this.workspaceSvg.removeChangeListener(this.handleWorkspaceChange.bind(this));
+            this.workspaceSvg.removeChangeListener(this.handleWorkspaceChange);
             this.workspaceSvg.dispose();
             this.workspaceSvg = null;
             return true;

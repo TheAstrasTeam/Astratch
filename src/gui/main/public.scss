@@ -70,6 +70,14 @@ code {
     border-radius: 5px;
 }
 
+input {
+    background-color: $ui-tertiary;
+    outline: none;
+    color: $text-primary;
+    border: 1px $ui-secondary solid;
+    border-radius: 3px;
+}
+
 // 关于Blockly高亮
 
 [id*='blocklySelectedGlowFilter'] feFlood {
