@@ -4,8 +4,12 @@ import styles from './targets.module.scss';
 
 import SpriteIcon from '../../assets/sprite.svg?react';
 import { t } from 'i18next';
+import { guiInterface } from '../../types/gui';
+import { useGUIStore } from '../../stores/useGUIStore';
 
 const TargetsPanel = ({ targets, vm }: { targets: ITarget[]; vm: IVM }) => {
+    const setInterface = useGUIStore(state => state.setInterface);
+
     const handleTargetChange = (id: string) => {
         vm.runtime.switchTarget(id);
     };
@@ -13,6 +17,10 @@ const TargetsPanel = ({ targets, vm }: { targets: ITarget[]; vm: IVM }) => {
     const handleCreateObject = () => {
         const name = prompt(t('gui:objectNameAsk'));
         if (name) vm.runtime.createTarget({ name: name });
+    };
+
+    const handleCreateProject = () => {
+        setInterface(guiInterface.CREATE_PROJECT);
     };
 
     if (vm.isEditingProject)
@@ -37,11 +45,16 @@ const TargetsPanel = ({ targets, vm }: { targets: ITarget[]; vm: IVM }) => {
                 <button onClick={handleCreateObject}>{t('gui:createObject')}</button>
             </>
         );
-    else return (
-        <div className={styles.notInProjectContent}>
-            <span className={styles.notInProjectSpan}>尚未打开任何一个项目</span>
-        </div>
-    );
+    else
+        return (
+            <div className={styles.notInProjectContent}>
+                <span className={styles.notInProjectSpan}>{t('gui:panel.notInProject')}</span>
+                <button onClick={handleCreateProject}>
+                    {/* 至于为什么这里用start，你懂什么，这叫复用 */}
+                    {t('gui:start.createProject')}
+                </button>
+            </div>
+        );
 };
 
 export default TargetsPanel;

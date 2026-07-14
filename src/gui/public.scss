@@ -45,11 +45,14 @@ button {
     padding: var(--button-padding);
     border: transparent 1px solid;
 }
-button:hover {
+button:hover:not(:disabled) {
     border: $ui-black-transparent 1px solid;
 }
-button:active {
+button:active:not(:disabled) {
     filter: $active-button;
+}
+button:disabled {
+    filter: brightness(0.5)
 }
 
 select {

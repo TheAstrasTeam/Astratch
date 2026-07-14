@@ -44,5 +44,6 @@
     "next": "Next",
     "back": "Back",
     "object": "Objects",
-    "createObject": "Create Object"
+    "createObject": "Create Object",
+    "panel.notInProject": "You aren't in a project yet! Why not"
 }
