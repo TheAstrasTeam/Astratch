@@ -13,7 +13,7 @@
         "preview": "vite preview"
     },
     "dependencies": {
-        "blockly": "^13.0.0",
+        "blockly": "^13.1.1",
         "classnames": "^2.5.1",
         "i18next": "^26.3.1",
         "i18next-browser-languagedetector": "^8.2.1",
@@ -25,11 +25,11 @@
         "zustand": "^5.0.14"
     },
     "devDependencies": {
-        "@babel/core": "^7.29.0",
+        "@babel/core": "^8.0.1",
         "@eslint/js": "^10.0.1",
         "@rolldown/plugin-babel": "^0.2.3",
         "@types/babel__core": "^7.20.5",
-        "@types/node": "^24.12.3",
+        "@types/node": "^26.1.1",
         "@types/react": "^19.2.14",
         "@types/react-dom": "^19.2.3",
         "@types/wicg-file-system-access": "^2023.10.7",
@@ -42,7 +42,7 @@
         "globals": "^17.6.0",
         "prettier": "^3.8.4",
         "sass": "^1.100.0",
-        "typescript": "~6.0.2",
+        "typescript": "~7.0.2",
         "typescript-eslint": "^8.59.2",
         "vite": "^8.0.12",
         "vite-plugin-page-reload": "^0.2.3"
