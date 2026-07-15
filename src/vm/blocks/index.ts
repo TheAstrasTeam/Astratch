@@ -54,6 +54,8 @@ class Blocks implements IBlocks {
         Blockly.Events.BLOCK_DRAG,
         // 视口更改，其实就是移动工作区镜头
         Blockly.Events.VIEWPORT_CHANGE,
+        // 选择工具箱
+        Blockly.Events.TOOLBOX_ITEM_SELECT
     ];
 
     handleWorkspaceChange = (event: Blockly.Events.Abstract | null, byHand = false) => {
