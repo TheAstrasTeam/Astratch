@@ -8,6 +8,9 @@ import getToolbox from './toolbox';
 import { initBlocks } from './definitions';
 import { getBlocklyComponentStyles } from '../../lib/Theme/guiThemeManager';
 import type { IVM } from '../../types/vm';
+import { getBlocklyI18nByI18next } from '../../utils/ash-i18n';
+import i18next from 'i18next';
+import { replaceChineseI18n } from './i18n';
 
 /**
  * 用于便捷的管理WebGPU或Blockly工作区
@@ -53,15 +56,18 @@ class Blocks implements IBlocks {
         Blockly.Events.VIEWPORT_CHANGE,
     ];
 
-    handleWorkspaceChange = (event: Blockly.Events.Abstract) => {
+    handleWorkspaceChange = (event: Blockly.Events.Abstract | null, byHand = false) => {
         // 检测更新，并检查这个事件是否需要忽略
-        if (!this.workspaceSvg) return;
-        if (!this._disableUpdateType.includes(event.type)) {
+        const update = () => {
+            if (!this.workspaceSvg) return;
             this.vm.runtime.setTargetBlock(
                 this.vm.runtime.editingTargetID,
                 this.Blockly.serialization.workspaces.save(this.workspaceSvg) as IWorkspaceState,
             );
-        }
+        };
+        if (event) {
+            if (!this._disableUpdateType.includes(event.type)) update();
+        } else if (byHand) update();
     };
 
     constructor(BlocklySelf: typeof Blockly, vm: IVM) {
@@ -144,19 +150,18 @@ class Blocks implements IBlocks {
             console.warn('No existing workspace');
             return;
         }
-        /**
-         * 重启工作区
-         * 这会丢失所有未保存的数据qwq
-         * Todo: 兼容保存
-         */
+        this.handleWorkspaceChange(null, true);
         // 删除遗留的DOM
         this._DOM.querySelector('[class*=injectionDiv]')?.remove();
         await this.createWorkspace(this._DOM);
     }
 
-    async setLanguage(lang: 'en' | 'zh-Hans'): Promise<void> {
+    setLanguage(lang: 'en' | 'zh-Hans'): void {
         this.Blockly.setLocale(this.supportLanguages[lang]);
-        await this.restartWorkspace();
+        if (lang === 'zh-Hans') {
+            replaceChineseI18n(this.Blockly);
+        }
+        // await this.restartWorkspace();
     }
 
     async createWorkspace(DOM: HTMLDivElement): Promise<boolean> {
@@ -173,6 +178,7 @@ class Blocks implements IBlocks {
             }
 
             this._DOM = DOM;
+            if (i18next.language) this.setLanguage(getBlocklyI18nByI18next(i18next.language));
             await this.init();
             this.workspaceSvg = this.Blockly.inject(DOM, this.workspaceConfig);
             const nowTarget = this.vm.runtime.getTargetByID(this.vm.runtime.editingTargetID);
