@@ -6,6 +6,7 @@ import * as En from 'blockly/msg/en';
 import * as ZhHans from 'blockly/msg/zh-hans';
 import getToolbox from './toolbox';
 import { initBlocks } from './definitions';
+import { AshConnectionChecker } from './cBlockWrap';
 import { getBlocklyComponentStyles } from '../../lib/Theme/guiThemeManager';
 import type { IVM } from '../../types/vm';
 import { getBlocklyI18nByI18next } from '../../utils/ash-i18n';
@@ -121,6 +122,7 @@ class Blocks implements IBlocks {
                 toolbox: ContinuousToolbox.ContinuousToolbox,
                 flyoutsVerticalToolbox: ContinuousToolbox.ContinuousFlyout,
                 metricsManager: ContinuousToolbox.ContinuousMetrics,
+                connectionChecker: AshConnectionChecker,
             },
             // 网格，暂定48
             grid: {

@@ -10,6 +10,7 @@ import repeatIcon from './images/repeat.svg';
 import { dropdownWithInput } from './fieldDropdown';
 import { FieldAngle } from '../../../plugins/field-angle/src';
 import { FieldColourHsvSliders } from '../../../plugins/field-colour-hsv-sliders/src';
+import { installCBlockWrap } from './cBlockWrap';
 
 /**
  * 对于链接积木的配置项
@@ -65,6 +66,11 @@ const initBlocks = (blockly: typeof Blockly) => {
     } catch {
         // 不需要管
     }
+    blockly.fieldRegistry.unregister('field_dropdown_with_block');
+    blockly.fieldRegistry.unregister('field_angle');
+    blockly.fieldRegistry.unregister('field_colour');
+
+    installCBlockWrap(blockly);
     blockly.fieldRegistry.register('field_dropdown_with_block', dropdownWithInput);
     blockly.fieldRegistry.register('field_angle', FieldAngle);
     blockly.fieldRegistry.register('field_colour', FieldColourHsvSliders);
