@@ -22,12 +22,14 @@
         "react-dom": "^19.2.6",
         "react-i18next": "^17.0.8",
         "vite-plugin-svgr": "^5.2.0",
-        "zustand": "^5.0.14"
+        "zustand": "^5.0.14",
+        "@szhsin/react-menu": "^4.5.2"
     },
     "devDependencies": {
         "@babel/core": "^8.0.1",
         "@eslint/js": "^10.0.1",
         "@rolldown/plugin-babel": "^0.2.3",
+
         "@types/babel__core": "^7.20.5",
         "@types/node": "^26.1.1",
         "@types/react": "^19.2.14",

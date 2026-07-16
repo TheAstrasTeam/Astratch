@@ -59,3 +59,23 @@ export const DEFAULT_SETTINGS: IGuiSettings = {
         ...DEFAULT_GUITHEME_MAP,
     },
 };
+
+export const AllContextMenu = {
+    MENUBAR_FILE: 'menubar_file',
+    MENUBAR_FILE_NEW: 'menubar_file_new',
+    MENUBAR_FILE_OPEN: 'menubar_file_open',
+    MENUBAR_FILE_SAVE: 'menubar_file_save',
+    MENUBAR_FILE_SAVE_AS: 'menubar_file_save_as',
+    MENUBAR_FILE_EXIT: 'menubar_file_exit',
+    MENUBAR_EDIT: 'menubar_edit',
+    MENUBAR_EDIT_UNDO: 'menubar_edit_undo',
+    MENUBAR_EDIT_REDO: 'menubar_edit_redo',
+    MENUBAR_EDIT_RESTORE: 'menubar_edit_restore',
+    MENUBAR_RUN: 'menubar_run',
+    MENUBAR_RUN_RUN: 'menubar_run_run',
+    MENUBAR_RUN_STOP: 'menubar_run_stop',
+    MENUBAR_HELP: 'menubar_help',
+    MENUBAR_HELP_ABOUT: 'menubar_help_about',
+    MENUBAR_HELP_DOCS: 'menubar_help_docs',
+}
+export type TAllContextMenu = (typeof AllContextMenu)[keyof typeof AllContextMenu];

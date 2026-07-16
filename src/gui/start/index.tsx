@@ -13,6 +13,7 @@ import DebugIcon from '../../assets/bug.svg?react';
 import { useGUIStore } from '../../stores/useGUIStore';
 import { debug } from '../../utils/debug';
 import { type IVM } from '../../types/vm';
+import { selectProjectThenJump } from '../../utils/ash-gui';
 
 const Start = ({ vm }: { vm: IVM }): React.ReactNode => {
     const settings = useSettingsStore(state => state.guiTheme);
@@ -25,10 +26,6 @@ const Start = ({ vm }: { vm: IVM }): React.ReactNode => {
     const handleCreateProject = () => {
         // 开始创建项目
         setInterface(guiInterface.CREATE_PROJECT);
-    };
-    const handleLoadProject = async () => {
-        const loadedProject = await vm.loadProject();
-        if (loadedProject) setInterface(guiInterface.EDITOR);
     };
     return (
         <div className={styles.start}>
@@ -43,7 +40,7 @@ const Start = ({ vm }: { vm: IVM }): React.ReactNode => {
                 <AddIcon />
                 {t('gui:start.createProject')}
             </button>
-            <button className={styles.button} onClick={() => void handleLoadProject()}>
+            <button className={styles.button} onClick={() => void selectProjectThenJump(vm, setInterface)}>
                 <LoadIcon />
                 {t('gui:start.loadProject')}
             </button>

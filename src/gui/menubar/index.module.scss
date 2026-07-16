@@ -29,10 +29,32 @@
 }
 
 .menubar-content-logo {
-    height: 1.5rem;
+    height: 1rem;
     width: auto;
+    margin: 0 5px;
 }
 
 .search {
     flex: 1;
+}
+
+.left-ul {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    height: 100%;
+    margin-left: 15px;
+    padding: 0;
+    list-style-type: none;
+    & li {
+        font-size: small;
+        color: $text-primary;
+        padding: 0 10px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        &:hover {
+            background-color: $ui-tertiary;
+        }
+    }
 }

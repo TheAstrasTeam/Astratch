@@ -10,34 +10,18 @@ import './public.scss';
 import { useLoadingStore } from '../stores/useGUIStore';
 import Loading from './loading';
 import MenuBar from './menubar';
+import { ContextMenuLayer } from './contextMenu';
 
 const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
-    // const [_language, setLanguage] = useState(i18next.language);
     const isLoading: boolean = useLoadingStore(state => state.loading);
-    // const handleLanguageChanged = useCallback(
-    //     async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    //         const value = e.target.value;
-    //         setLanguage(value);
-    //         localStorage.setItem(localStorageIDs.Language, value);
-
-    //         try {
-    //             await i18next.changeLanguage(value);
-    //             await vm.runtime.blocks.init();
-    //             await vm.runtime.blocks.restartWorkspace();
-    //         } catch {
-    //             // 待定
-    //         }
-    //     },
-    //     [vm],
-    // );
     return (
         <div className={styles.app}>
-            {/* menubar 菜单栏 */}
             <MenuBar vm={vm} />
             {isLoading && <Loading />}
             <div className={styles.workspaceArea}>
                 <WorkSpace vm={vm} />
             </div>
+            <ContextMenuLayer />
         </div>
     );
 };
