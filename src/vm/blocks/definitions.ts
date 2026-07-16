@@ -7,10 +7,11 @@ import turnRight from './images/turnRight.svg';
 import greenFlag from './images/green-flag.svg';
 import repeatIcon from './images/repeat.svg';
 
-import { dropdownWithInput } from './fieldDropdown';
+import { dropdownWithInput } from '../../../plugins/fieldDropdown';
 import { FieldAngle } from '../../../plugins/field-angle/src';
 import { FieldColourHsvSliders } from '../../../plugins/field-colour-hsv-sliders/src';
-import { installCBlockWrap } from './cBlockWrap';
+import { registerScratchComment } from '../../../plugins/scratch-comment';
+import { installCBlockWrap } from '../../../plugins/cBlockWrap';
 
 /**
  * 对于链接积木的配置项
@@ -58,17 +59,20 @@ const initBlocks = (blockly: typeof Blockly) => {
 
     // 关于注释
     try {
-        // 注册注释选项，在空白工作区也可用
+        // 注册注释选项（添加/删除注释右键菜单），在空白工作区也可用
         blockly.ContextMenuItems.registerCommentOptions();
-        // 去除blockly自己的注释
-        // todo: 实现和Scratch相同的注释
-        blockly.icons.registry.unregister('comment');
+        // 注册 Scratch 风格注释图标，替换 Blockly 原生 CommentIcon
+        registerScratchComment(blockly);
     } catch {
         // 不需要管
     }
     blockly.fieldRegistry.unregister('field_dropdown_with_block');
     blockly.fieldRegistry.unregister('field_angle');
     blockly.fieldRegistry.unregister('field_colour');
+    // 内联切换，这个不该让用户手动修改
+    // todo: 确认是否需要禁用
+    blockly.ContextMenuRegistry.registry.unregister('blockInline');
+
 
     installCBlockWrap(blockly);
     blockly.fieldRegistry.register('field_dropdown_with_block', dropdownWithInput);

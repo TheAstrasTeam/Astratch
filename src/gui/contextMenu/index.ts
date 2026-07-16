@@ -1,4 +1,5 @@
 export { ContextMenuLayer } from './contextMenuLayer';
 export { useContextMenu } from './useContextMenu';
-export { menuContentRegistry } from './menuRegistry';
+export { menuContentRegistry, registerContextMenu, unregisterContextMenu } from './menuRegistry';
 export type { MenuContentRenderer } from './menuRegistry';
+export { openContextMenu, closeContextMenu } from '../../stores/useContextMenuStore';

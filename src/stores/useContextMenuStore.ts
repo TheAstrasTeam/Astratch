@@ -25,3 +25,11 @@ const useContextMenuStore: UseBoundStore<StoreApi<ContextMenuState>> = create(se
 }));
 
 export default useContextMenuStore;
+
+export const openContextMenu = (id: TAllContextMenu, point: ContextMenuAnchorPoint) => {
+    useContextMenuStore.getState().openMenu(id, point);
+};
+
+export const closeContextMenu = () => {
+    useContextMenuStore.getState().closeMenu();
+};

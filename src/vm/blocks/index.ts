@@ -6,12 +6,25 @@ import * as En from 'blockly/msg/en';
 import * as ZhHans from 'blockly/msg/zh-hans';
 import getToolbox from './toolbox';
 import { initBlocks } from './definitions';
-import { AshConnectionChecker } from './cBlockWrap';
+import { AshConnectionChecker } from '../../../plugins/cBlockWrap';
 import { getBlocklyComponentStyles } from '../../lib/Theme/guiThemeManager';
 import type { IVM } from '../../types/vm';
 import { getBlocklyI18nByI18next } from '../../utils/ash-i18n';
 import i18next from 'i18next';
 import { replaceChineseI18n } from './i18n';
+import { openContextMenu } from '../../gui/contextMenu';
+import { AllContextMenu } from '../../types/gui';
+
+let _blocklyMenuOptions: Blockly.ContextMenuRegistry.ContextMenuOption[] | null = null;
+let _blocklyMenuEvent: PointerEvent | null = null;
+
+export function getBlocklyMenuOptions(): Blockly.ContextMenuRegistry.ContextMenuOption[] | null {
+    return _blocklyMenuOptions;
+}
+
+export function getBlocklyMenuEvent(): PointerEvent | null {
+    return _blocklyMenuEvent;
+}
 
 /**
  * 用于便捷的管理WebGPU或Blockly工作区
@@ -56,7 +69,7 @@ class Blocks implements IBlocks {
         // 视口更改，其实就是移动工作区镜头
         Blockly.Events.VIEWPORT_CHANGE,
         // 选择工具箱
-        Blockly.Events.TOOLBOX_ITEM_SELECT
+        Blockly.Events.TOOLBOX_ITEM_SELECT,
     ];
 
     handleWorkspaceChange = (event: Blockly.Events.Abstract | null, byHand = false) => {
@@ -72,6 +85,54 @@ class Blocks implements IBlocks {
             if (!this._disableUpdateType.includes(event.type)) update();
         } else if (byHand) update();
     };
+
+    /**
+     * 替换Blockly的右键菜单
+     */
+    private _patchBlocklyContextMenu(): void {
+        const workspaceSvg = this.workspaceSvg;
+        const BlocklyRef = this.Blockly;
+        if (!workspaceSvg) return;
+
+        this.Blockly.Gesture.prototype.handleRightClick = function (e: PointerEvent) {
+            const g = this as unknown as Record<string, unknown>;
+            const ws = g.startWorkspace_ as Blockly.WorkspaceSvg | undefined;
+            const block = g.startBlock as Blockly.BlockSvg | undefined;
+            const comment = g.startComment as Blockly.BlockSvg | undefined;
+
+            let options: Blockly.ContextMenuRegistry.ContextMenuOption[];
+
+            if (block) {
+                options = BlocklyRef.ContextMenuRegistry.registry.getContextMenuOptions(
+                    { block, focusedNode: block },
+                    e,
+                );
+            } else if (comment) {
+                options = BlocklyRef.ContextMenuRegistry.registry.getContextMenuOptions(
+                    {
+                        comment: comment as unknown as Parameters<
+                            typeof BlocklyRef.ContextMenuRegistry.registry.getContextMenuOptions
+                        >[0]['comment'],
+                        focusedNode: comment,
+                    },
+                    e,
+                );
+            } else {
+                options = BlocklyRef.ContextMenuRegistry.registry.getContextMenuOptions(
+                    { workspace: workspaceSvg, focusedNode: ws ?? undefined },
+                    e,
+                );
+            }
+
+            _blocklyMenuOptions = options;
+            _blocklyMenuEvent = e;
+            e.preventDefault();
+            e.stopPropagation();
+            if (_blocklyMenuOptions.length)
+                openContextMenu(AllContextMenu.BLOCKLY, { x: e.clientX, y: e.clientY });
+            (g.dispose as () => void)();
+        };
+    }
 
     constructor(BlocklySelf: typeof Blockly, vm: IVM) {
         this.vm = vm;
@@ -101,6 +162,12 @@ class Blocks implements IBlocks {
         this.workspaceConfig = {
             toolbox: this.toolbox,
             scrollbars: true,
+            // 折叠积木
+            // 这玩意会导致注释无法正常工作
+            collapse: false,
+            // 禁用积木
+            // 这玩意在ASH没用
+            disable: false,
             zoom: {
                 controls: true,
                 wheel: true,
@@ -185,6 +252,9 @@ class Blocks implements IBlocks {
             if (i18next.language) this.setLanguage(getBlocklyI18nByI18next(i18next.language));
             await this.init();
             this.workspaceSvg = this.Blockly.inject(DOM, this.workspaceConfig);
+
+            this._patchBlocklyContextMenu();
+
             const nowTarget = this.vm.runtime.getTargetByID(this.vm.runtime.editingTargetID);
             if (nowTarget?.blocks)
                 this.Blockly.serialization.workspaces.load(

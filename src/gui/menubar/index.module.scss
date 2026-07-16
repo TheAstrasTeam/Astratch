@@ -45,15 +45,19 @@
     height: 100%;
     margin-left: 15px;
     padding: 0;
-    list-style-type: none;
-    & li {
+    & button {
         font-size: small;
+        background-color: transparent;
+        border: none;
+        border-radius: 0;
         color: $text-primary;
         padding: 0 10px;
+        margin: 0;
         height: 100%;
         display: flex;
         align-items: center;
         &:hover {
+            border: none;
             background-color: $ui-tertiary;
         }
     }
