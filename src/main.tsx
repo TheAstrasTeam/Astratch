@@ -7,6 +7,8 @@ import ErrorPage from './gui/error/index.tsx';
 import { applyGuiTheme } from './lib/Theme/guiThemeManager.ts';
 import './gui/styles/constants.scss';
 import './gui/styles/zIndex.scss';
+import { shortcutManager } from './lib/ShortcutManager/index.ts';
+import { ALL_SHORTCUTS_IDS } from './types/lib.ts';
 
 // 一个很有趣的动画效果，渐隐加载
 const Loading: HTMLElement | null = document.querySelector('.loading');
@@ -26,6 +28,11 @@ if (Loading) {
 const vm = new VM();
 Object.assign(window, {
     vm,
+});
+
+shortcutManager.register({
+    id: ALL_SHORTCUTS_IDS.SAVE_PROJECT,
+    command: () => vm.saveProject(),
 });
 
 // 等待国际化初始化

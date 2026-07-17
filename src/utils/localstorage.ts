@@ -1,13 +1,13 @@
 // 存储关于本地存储的实用函数
 
-import type { TlocalStorageIDs } from '../types/storage';
+import type { TLocalStorageIDs } from '../types/storage';
 
 /**
  * 从本地存储读取一个值
  * @param key 存储键名
  * @returns 解析后的数据，不存在时返回 null
  */
-const readLocalStorage = (key: TlocalStorageIDs): unknown => {
+const readLocalStorage = (key: TLocalStorageIDs): unknown => {
     try {
         const data = localStorage.getItem(key);
         if (!data) return null;
@@ -27,7 +27,7 @@ const readLocalStorage = (key: TlocalStorageIDs): unknown => {
  * @param key 存储键名
  * @param data 存储的数据
  */
-const setItemToLocalStorage = (key: TlocalStorageIDs, data: string | object) => {
+const setItemToLocalStorage = (key: TLocalStorageIDs, data: string | object) => {
     if (!data) return;
     const storageData = typeof data === 'object' ? JSON.stringify(data) : data;
     localStorage.setItem(key, storageData);

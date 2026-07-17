@@ -7,6 +7,15 @@ import { useContextMenu } from '../contextMenu';
 import { AllContextMenu, guiInterface } from '../../types/gui';
 import { useGUIStore } from '../../stores/useGUIStore';
 import { selectProjectThenJump } from '../../utils/ash-gui';
+import { shortcutManager } from '../../lib/ShortcutManager';
+import { ALL_SHORTCUTS_IDS } from '../../types/lib';
+
+export const MenuTextWithShortCut = ({ text, shortcut }: { text: string; shortcut: string }) => (
+    <span style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+        <span>{text}</span>
+        <span style={{ opacity: 0.6, marginLeft: '2rem' }}>{shortcut}</span>
+    </span>
+);
 
 const MenuBar = ({ vm }: { vm: IVM }): React.ReactNode => {
     const setInterface = useGUIStore(state => state.setInterface);
@@ -17,10 +26,20 @@ const MenuBar = ({ vm }: { vm: IVM }): React.ReactNode => {
                     setInterface(guiInterface.CREATE_PROJECT);
                 }}
             >
-                {t('gui:menu.new')}
+                <MenuTextWithShortCut
+                    text={t('gui:menu.new')}
+                    shortcut={shortcutManager.formatHotKey(
+                        shortcutManager.getHotKey(ALL_SHORTCUTS_IDS.NEW_PROJECT),
+                    )}
+                />
             </MenuItem>
             <MenuItem onClick={() => void selectProjectThenJump(vm, setInterface)}>
-                {t('gui:menu.open')}
+                <MenuTextWithShortCut
+                    text={t('gui:menu.open')}
+                    shortcut={shortcutManager.formatHotKey(
+                        shortcutManager.getHotKey(ALL_SHORTCUTS_IDS.OPEN_PROJECT),
+                    )}
+                />
             </MenuItem>
             <MenuDivider />
             <MenuItem onClick={close}>{t('gui:menu.save')}</MenuItem>
