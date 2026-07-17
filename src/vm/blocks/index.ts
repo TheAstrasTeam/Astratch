@@ -12,8 +12,9 @@ import type { IVM } from '../../types/vm';
 import { getBlocklyI18nByI18next } from '../../utils/ash-i18n';
 import i18next from 'i18next';
 import { replaceChineseI18n } from './i18n';
-import { openContextMenu } from '../../gui/contextMenu';
+import { closeContextMenu, openContextMenu } from '../../gui/contextMenu';
 import { AllContextMenu } from '../../types/gui';
+import { ScratchCommentBubble } from '../../../plugins/scratch-comment';
 
 let _blocklyMenuOptions: Blockly.ContextMenuRegistry.ContextMenuOption[] | null = null;
 let _blocklyMenuEvent: PointerEvent | null = null;
@@ -90,36 +91,38 @@ class Blocks implements IBlocks {
      * 替换Blockly的右键菜单
      */
     private _patchBlocklyContextMenu(): void {
-        const workspaceSvg = this.workspaceSvg;
         const BlocklyRef = this.Blockly;
-        if (!workspaceSvg) return;
+        const gesturePrototype = this.Blockly.Gesture.prototype as Blockly.Gesture & {
+            __ashContextMenuPatched?: boolean;
+        };
+        if (gesturePrototype.__ashContextMenuPatched) return;
+        gesturePrototype.__ashContextMenuPatched = true;
 
-        this.Blockly.Gesture.prototype.handleRightClick = function (e: PointerEvent) {
-            const g = this as unknown as Record<string, unknown>;
-            const ws = g.startWorkspace_ as Blockly.WorkspaceSvg | undefined;
-            const block = g.startBlock as Blockly.BlockSvg | undefined;
-            const comment = g.startComment as Blockly.BlockSvg | undefined;
+        gesturePrototype.handleRightClick = function (e: PointerEvent) {
+            const focusedNode = BlocklyRef.getFocusManager().getFocusedNode();
+            let options: Blockly.ContextMenuRegistry.ContextMenuOption[] = [];
 
-            let options: Blockly.ContextMenuRegistry.ContextMenuOption[];
-
-            if (block) {
+            if (focusedNode instanceof ScratchCommentBubble) {
+                options = focusedNode.getContextMenuOptions();
+            } else if (focusedNode instanceof BlocklyRef.BlockSvg) {
+                options = BlocklyRef.ContextMenuRegistry.registry.getContextMenuOptions(
+                    { block: focusedNode, focusedNode },
+                    e,
+                );
+            } else if (focusedNode instanceof BlocklyRef.icons.Icon) {
+                const block = focusedNode.getSourceBlock() as Blockly.BlockSvg;
                 options = BlocklyRef.ContextMenuRegistry.registry.getContextMenuOptions(
                     { block, focusedNode: block },
                     e,
                 );
-            } else if (comment) {
+            } else if (focusedNode instanceof BlocklyRef.comments.RenderedWorkspaceComment) {
                 options = BlocklyRef.ContextMenuRegistry.registry.getContextMenuOptions(
-                    {
-                        comment: comment as unknown as Parameters<
-                            typeof BlocklyRef.ContextMenuRegistry.registry.getContextMenuOptions
-                        >[0]['comment'],
-                        focusedNode: comment,
-                    },
+                    { comment: focusedNode, focusedNode },
                     e,
                 );
-            } else {
+            } else if (focusedNode instanceof BlocklyRef.WorkspaceSvg) {
                 options = BlocklyRef.ContextMenuRegistry.registry.getContextMenuOptions(
-                    { workspace: workspaceSvg, focusedNode: ws ?? undefined },
+                    { workspace: focusedNode, focusedNode },
                     e,
                 );
             }
@@ -128,9 +131,13 @@ class Blocks implements IBlocks {
             _blocklyMenuEvent = e;
             e.preventDefault();
             e.stopPropagation();
-            if (_blocklyMenuOptions.length)
+            if (_blocklyMenuOptions.length) {
                 openContextMenu(AllContextMenu.BLOCKLY, { x: e.clientX, y: e.clientY });
-            (g.dispose as () => void)();
+            } else {
+                closeContextMenu();
+            }
+            BlocklyRef.keyboardNavigationController.setIsActive(false);
+            this.dispose();
         };
     }
 

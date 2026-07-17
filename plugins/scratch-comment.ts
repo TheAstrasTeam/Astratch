@@ -60,7 +60,7 @@ export class ScratchCommentBubble implements Blockly.IBubble {
     readonly workspace: Blockly.WorkspaceSvg;
 
     /** 拥有此 bubble 的 icon（用于删除时回写 block.setCommentText(null)）。 */
-    private readonly owner?: Blockly.IHasBubble & Blockly.IFocusableNode;
+    private readonly owner?: Blockly.icons.Icon & Blockly.IHasBubble;
 
     /** 是否已 dispose。 */
     private disposed = false;
@@ -68,7 +68,7 @@ export class ScratchCommentBubble implements Blockly.IBubble {
     constructor(
         workspace: Blockly.WorkspaceSvg,
         anchor: Blockly.utils.Coordinate,
-        owner?: Blockly.IHasBubble & Blockly.IFocusableNode,
+        owner?: Blockly.icons.Icon & Blockly.IHasBubble,
     ) {
         this.id = Blockly.utils.idGenerator.getNextUniqueId();
         this.workspace = workspace;
@@ -119,18 +119,6 @@ export class ScratchCommentBubble implements Blockly.IBubble {
             this,
             this.onPointerDown,
         );
-        // 3.2 绑定 contextmenu 到 commentView 的 svgRoot，触发 showContextMenu
-        Blockly.browserEvents.conditionalBind(
-            this.commentView.getSvgRoot(),
-            'contextmenu',
-            this,
-            (e: Event) => {
-                e.preventDefault();
-                e.stopPropagation();
-                this.showContextMenu(e);
-            },
-        );
-
         // 4. 监听 commentView 的文本/尺寸变化，转发给 CommentIcon 的监听器
         this.commentView.addTextChangeListener((_oldText, newText) => {
             for (const l of this.textChangeListeners) l();
@@ -304,24 +292,30 @@ export class ScratchCommentBubble implements Blockly.IBubble {
      * 故不走 ContextMenuRegistry（scope.comment 需为 RenderedWorkspaceComment），
      * 直接构造一个删除选项。
      */
-    showContextMenu(e: Event): void {
-        const block = (this.owner as any)?.sourceBlock as Blockly.Block | undefined;
-        if (!block) return;
-        const rtl = this.workspace.RTL;
-        // 用 LegacyContextMenuOption（只需 text/enabled/callback，无需 id），
-        // ContextMenu.show 接受 ContextMenuOption | LegacyContextMenuOption。
-        const menuOptions: Blockly.ContextMenuRegistry.LegacyContextMenuOption[] = [
+    getContextMenuOptions(): Blockly.ContextMenuRegistry.ContextMenuOption[] {
+        const block = this.owner?.getSourceBlock() as Blockly.BlockSvg | undefined;
+        if (!block) return [];
+        return [
             {
+                id: 'scratchCommentDelete',
                 text: Blockly.Msg['REMOVE_COMMENT'] ?? 'Delete Comment',
                 enabled: true,
+                scope: { block, focusedNode: this },
+                weight: 0,
                 callback: () => {
                     Blockly.Events.setGroup(true);
                     block.setCommentText(null);
                     Blockly.Events.setGroup(false);
-                    this.workspace.getAudioManager().play('delete');
+                    void this.workspace.getAudioManager().play('delete');
                 },
             },
         ];
+    }
+
+    showContextMenu(e: Event): void {
+        const menuOptions = this.getContextMenuOptions();
+        if (!menuOptions.length) return;
+        const rtl = this.workspace.RTL;
         let location: Blockly.utils.Coordinate;
         if (e instanceof PointerEvent) {
             location = new Blockly.utils.Coordinate(e.clientX, e.clientY);
@@ -340,8 +334,7 @@ export class ScratchCommentBubble implements Blockly.IBubble {
      */
     private handleViewDisposed(): void {
         if (this.disposed) return;
-        const block = (this.owner as any)?.sourceBlock as Blockly.Block | undefined;
-        block?.setCommentText(null);
+        this.owner?.getSourceBlock().setCommentText(null);
     }
 
     dispose(): void {
