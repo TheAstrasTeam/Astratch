@@ -15,7 +15,7 @@ import { t } from 'i18next';
 import Title from '../../components/title';
 import SubTitle from '../../components/subTitle';
 import { toID } from '../../utils/ash-string';
-import useSettingsStore from '../../stores/useSettingsStore';
+import { useSettings } from '../../settings/SettingsRegistry';
 import { useGUIStore } from '../../stores/useGUIStore';
 import { guiInterface } from '../../types/gui';
 
@@ -96,7 +96,7 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
 
     const [projectFolderName, setProjectFolderName] = useState<string>('');
 
-    const settingsStore = useSettingsStore(state => state.userName);
+    const settingsStore = useSettings(state => state.userName);
     const setGuiStore = useGUIStore(state => state.setInterface);
 
     const nameInput = useRef<HTMLSpanElement>(null);

@@ -28,6 +28,7 @@
     "devDependencies": {
         "@babel/core": "^8.0.1",
         "@eslint/js": "^10.0.1",
+        "@reactleaf/modal": "^2.0.0",
         "@rolldown/plugin-babel": "^0.2.3",
         "@types/babel__core": "^7.20.5",
         "@types/mousetrap": "^1.6.15",

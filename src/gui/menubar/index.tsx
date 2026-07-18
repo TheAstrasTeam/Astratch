@@ -9,6 +9,8 @@ import { useGUIStore } from '../../stores/useGUIStore';
 import { selectProjectThenJump } from '../../utils/ash-gui';
 import { shortcutManager } from '../../lib/ShortcutManager';
 import { ALL_SHORTCUTS_IDS } from '../../types/lib';
+import { modal } from '../../components/Modal/modal';
+import { SettingsModal } from '../../components/modal_settings';
 
 export const MenuTextWithShortCut = ({ text, shortcut }: { text: string; shortcut: string }) => (
     <span style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
@@ -45,9 +47,14 @@ const MenuBar = ({ vm }: { vm: IVM }): React.ReactNode => {
             <MenuItem onClick={close}>{t('gui:menu.save')}</MenuItem>
             <MenuItem onClick={close}>{t('gui:menu.saveAs')}</MenuItem>
             <MenuDivider />
+            <MenuItem onClick={handleOpenSettings}>{t('gui:menu.settings')}</MenuItem>
             <MenuItem onClick={close}>{t('gui:menu.exit')}</MenuItem>
         </>
     ));
+
+    const handleOpenSettings = () => {
+        void modal.open(SettingsModal);
+    };
 
     const handleMenuClick = (openFn: (point: { x: number; y: number }) => void) => {
         return (e: React.MouseEvent<HTMLElement>) => {

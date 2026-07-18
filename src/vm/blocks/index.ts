@@ -8,7 +8,7 @@ import getToolbox from './toolbox';
 import { initBlocks } from './definitions';
 import { AshConnectionChecker } from '../../../plugins/cBlockWrap';
 import { getBlocklyComponentStyles } from '../../lib/Theme/guiThemeManager';
-import type { IVM } from '../../types/vm';
+import { events, type IVM } from '../../types/vm';
 import { getBlocklyI18nByI18next } from '../../utils/ash-i18n';
 import i18next from 'i18next';
 import { replaceChineseI18n } from './i18n';
@@ -17,13 +17,13 @@ import { AllContextMenu } from '../../types/gui';
 import { ScratchCommentBubble } from '../../../plugins/scratch-comment';
 
 let _blocklyMenuOptions: Blockly.ContextMenuRegistry.ContextMenuOption[] | null = null;
-let _blocklyMenuEvent: PointerEvent | null = null;
+let _blocklyMenuEvent: Event | null = null;
 
 export function getBlocklyMenuOptions(): Blockly.ContextMenuRegistry.ContextMenuOption[] | null {
     return _blocklyMenuOptions;
 }
 
-export function getBlocklyMenuEvent(): PointerEvent | null {
+export function getBlocklyMenuEvent(): Event | null {
     return _blocklyMenuEvent;
 }
 
@@ -77,14 +77,24 @@ class Blocks implements IBlocks {
         // 检测更新，并检查这个事件是否需要忽略
         const update = () => {
             if (!this.workspaceSvg) return;
-            this.vm.runtime.setTargetBlock(
-                this.vm.runtime.editingTargetID,
-                this.Blockly.serialization.workspaces.save(this.workspaceSvg) as IWorkspaceState,
-            );
+            try {
+                this.vm.runtime.setTargetBlock(
+                    this.vm.runtime.editingTargetID,
+                    this.Blockly.serialization.workspaces.save(
+                        this.workspaceSvg,
+                    ) as IWorkspaceState,
+                );
+            } catch (e) {
+                console.warn(e);
+            }
         };
         if (event) {
             if (!this._disableUpdateType.includes(event.type)) update();
         } else if (byHand) update();
+    };
+
+    handleThemeUpdate = () => {
+        void this.restartWorkspace();
     };
 
     /**
@@ -98,12 +108,15 @@ class Blocks implements IBlocks {
         if (gesturePrototype.__ashContextMenuPatched) return;
         gesturePrototype.__ashContextMenuPatched = true;
 
-        gesturePrototype.handleRightClick = function (e: PointerEvent) {
-            const focusedNode = BlocklyRef.getFocusManager().getFocusedNode();
+        const collectOptions = (focusedNode: Blockly.IFocusableNode | null, e: Event) => {
             let options: Blockly.ContextMenuRegistry.ContextMenuOption[] = [];
 
             if (focusedNode instanceof ScratchCommentBubble) {
-                options = focusedNode.getContextMenuOptions();
+                options = (
+                    focusedNode as unknown as {
+                        getContextMenuOptions(): Blockly.ContextMenuRegistry.ContextMenuOption[];
+                    }
+                ).getContextMenuOptions();
             } else if (focusedNode instanceof BlocklyRef.BlockSvg) {
                 options = BlocklyRef.ContextMenuRegistry.registry.getContextMenuOptions(
                     { block: focusedNode, focusedNode },
@@ -127,12 +140,22 @@ class Blocks implements IBlocks {
                 );
             }
 
+            return options;
+        };
+
+        gesturePrototype.handleRightClick = function (e: Event) {
+            const focusedNode = BlocklyRef.getFocusManager().getFocusedNode();
+
+            const options = collectOptions(focusedNode, e);
             _blocklyMenuOptions = options;
             _blocklyMenuEvent = e;
             e.preventDefault();
             e.stopPropagation();
             if (_blocklyMenuOptions.length) {
-                openContextMenu(AllContextMenu.BLOCKLY, { x: e.clientX, y: e.clientY });
+                openContextMenu(AllContextMenu.BLOCKLY, {
+                    x: (e as MouseEvent).clientX,
+                    y: (e as MouseEvent).clientY,
+                });
             } else {
                 closeContextMenu();
             }
@@ -213,6 +236,11 @@ class Blocks implements IBlocks {
         this.Blockly.config.snapRadius = SNAP_RADIUS;
         this.Blockly.config.connectingSnapRadius = SNAP_RADIUS;
 
+        this.theme.componentStyles = {
+            ...getBlocklyComponentStyles(),
+            flyoutOpacity: 0.5,
+        };
+
         // 对于完全不需要现在的工作区的
         ContinuousToolbox.registerContinuousToolbox();
 
@@ -255,6 +283,7 @@ class Blocks implements IBlocks {
                 this.dispose();
             }
 
+            this.vm.on(events.UPDATE_THEME, this.handleThemeUpdate);
             this._DOM = DOM;
             if (i18next.language) this.setLanguage(getBlocklyI18nByI18next(i18next.language));
             await this.init();
@@ -278,6 +307,7 @@ class Blocks implements IBlocks {
 
     dispose(): boolean {
         if (this.workspaceSvg) {
+            this.vm.off(events.UPDATE_THEME, this.handleThemeUpdate);
             this.workspaceSvg.removeChangeListener(this.handleWorkspaceChange);
             this.workspaceSvg.dispose();
             this.workspaceSvg = null;

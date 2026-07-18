@@ -44,6 +44,7 @@ const returnConnections = {
     inputsInline: true,
 } as const;
 
+
 const initBlocks = (blockly: typeof Blockly) => {
     try {
         // 源代码所示，Blockly的注册积木仅会加入到 Map 中，
@@ -63,21 +64,23 @@ const initBlocks = (blockly: typeof Blockly) => {
         blockly.ContextMenuItems.registerCommentOptions();
         // 注册 Scratch 风格注释图标，替换 Blockly 原生 CommentIcon
         registerScratchComment(blockly);
+        // 内联切换，这个不该让用户手动修改
+        // todo: 确认是否需要禁用
+        blockly.ContextMenuRegistry.registry.unregister('blockInline');
     } catch {
         // 不需要管
     }
     blockly.fieldRegistry.unregister('field_dropdown_with_block');
     blockly.fieldRegistry.unregister('field_angle');
     blockly.fieldRegistry.unregister('field_colour');
-    // 内联切换，这个不该让用户手动修改
-    // todo: 确认是否需要禁用
-    blockly.ContextMenuRegistry.registry.unregister('blockInline');
-
 
     installCBlockWrap(blockly);
     blockly.fieldRegistry.register('field_dropdown_with_block', dropdownWithInput);
     blockly.fieldRegistry.register('field_angle', FieldAngle);
     blockly.fieldRegistry.register('field_colour', FieldColourHsvSliders);
+
+    blockly.ShortcutRegistry.registry.unregister(blockly.ShortcutItems.names.MENU);
+    registryMenuOfShortcut(blockly);
 
     // 事实上对于如下的`message0`在blockly都是无效的
     // i18next 不支持在消息id中填入空格

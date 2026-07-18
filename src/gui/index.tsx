@@ -44,6 +44,7 @@ const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
             unregisterOpen();
         };
     }, [vm, setInterface]);
+
     return (
         <div className={styles.app}>
             <MenuBar vm={vm} />

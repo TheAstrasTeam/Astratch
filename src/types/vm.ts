@@ -276,6 +276,7 @@ export const events = {
     SWITCH_TARGET: 'switch_target',
     UPDATE_PROJECT: 'update_project',
     CREATE_PROJECT: 'create_project',
+    UPDATE_THEME: 'update_theme'
 } as const;
 
 export type TEvents = (typeof events)[keyof typeof events];
