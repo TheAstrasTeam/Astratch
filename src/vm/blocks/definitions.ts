@@ -1,5 +1,5 @@
 import { t } from 'i18next';
-import type * as Blockly from 'blockly/core';
+import * as Blockly from 'blockly/core';
 import { BlocksColor, OPCODE } from '../../types/blocks';
 
 import turnLeft from './images/turnLeft.svg';
@@ -10,7 +10,7 @@ import repeatIcon from './images/repeat.svg';
 import { dropdownWithInput } from '../../../plugins/fieldDropdown';
 import { FieldAngle } from '../../../plugins/field-angle/src';
 import { FieldColourHsvSliders } from '../../../plugins/field-colour-hsv-sliders/src';
-import { registerScratchComment } from '../../../plugins/scratch-comment';
+import { registerScratchComment, ScratchCommentBubble } from '../../../plugins/scratch-comment';
 import { installCBlockWrap } from '../../../plugins/cBlockWrap';
 
 /**
@@ -44,6 +44,41 @@ const returnConnections = {
     inputsInline: true,
 } as const;
 
+export const collectOptions = (focusedNode: Blockly.IFocusableNode | null, e: Event) => {
+    // 此函数由 Ai 生成
+    let options: Blockly.ContextMenuRegistry.ContextMenuOption[] = [];
+
+    if (focusedNode instanceof ScratchCommentBubble) {
+        options = (
+            focusedNode as unknown as {
+                getContextMenuOptions(): Blockly.ContextMenuRegistry.ContextMenuOption[];
+            }
+        ).getContextMenuOptions();
+    } else if (focusedNode instanceof Blockly.BlockSvg) {
+        options = Blockly.ContextMenuRegistry.registry.getContextMenuOptions(
+            { block: focusedNode, focusedNode },
+            e,
+        );
+    } else if (focusedNode instanceof Blockly.icons.Icon) {
+        const block = focusedNode.getSourceBlock() as Blockly.BlockSvg;
+        options = Blockly.ContextMenuRegistry.registry.getContextMenuOptions(
+            { block, focusedNode: block },
+            e,
+        );
+    } else if (focusedNode instanceof Blockly.comments.RenderedWorkspaceComment) {
+        options = Blockly.ContextMenuRegistry.registry.getContextMenuOptions(
+            { comment: focusedNode, focusedNode },
+            e,
+        );
+    } else if (focusedNode instanceof Blockly.WorkspaceSvg) {
+        options = Blockly.ContextMenuRegistry.registry.getContextMenuOptions(
+            { workspace: focusedNode, focusedNode },
+            e,
+        );
+    }
+
+    return options;
+};
 
 const initBlocks = (blockly: typeof Blockly) => {
     try {
@@ -79,8 +114,8 @@ const initBlocks = (blockly: typeof Blockly) => {
     blockly.fieldRegistry.register('field_angle', FieldAngle);
     blockly.fieldRegistry.register('field_colour', FieldColourHsvSliders);
 
-    blockly.ShortcutRegistry.registry.unregister(blockly.ShortcutItems.names.MENU);
-    registryMenuOfShortcut(blockly);
+    // blockly.ShortcutRegistry.registry.unregister(blockly.ShortcutItems.names.MENU);
+    // registryMenuOfShortcut(blockly);
 
     // 事实上对于如下的`message0`在blockly都是无效的
     // i18next 不支持在消息id中填入空格

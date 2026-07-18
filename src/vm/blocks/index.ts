@@ -5,7 +5,7 @@ import * as ContinuousToolbox from '../../../plugins/continuous-toolbox/src';
 import * as En from 'blockly/msg/en';
 import * as ZhHans from 'blockly/msg/zh-hans';
 import getToolbox from './toolbox';
-import { initBlocks } from './definitions';
+import { collectOptions, initBlocks } from './definitions';
 import { AshConnectionChecker } from '../../../plugins/cBlockWrap';
 import { getBlocklyComponentStyles } from '../../lib/Theme/guiThemeManager';
 import { events, type IVM } from '../../types/vm';
@@ -14,6 +14,10 @@ import i18next from 'i18next';
 import { replaceChineseI18n } from './i18n';
 import { closeContextMenu, openContextMenu } from '../../gui/contextMenu';
 import { AllContextMenu } from '../../types/gui';
+import {
+    installContextMenuPatch,
+    setContextMenuHandler,
+} from '../../../plugins/context-menu-patch';
 import { ScratchCommentBubble } from '../../../plugins/scratch-comment';
 
 let _blocklyMenuOptions: Blockly.ContextMenuRegistry.ContextMenuOption[] | null = null;
@@ -97,71 +101,23 @@ class Blocks implements IBlocks {
         void this.restartWorkspace();
     };
 
-    /**
-     * 替换Blockly的右键菜单
-     */
     private _patchBlocklyContextMenu(): void {
-        const BlocklyRef = this.Blockly;
-        const gesturePrototype = this.Blockly.Gesture.prototype as Blockly.Gesture & {
-            __ashContextMenuPatched?: boolean;
-        };
-        if (gesturePrototype.__ashContextMenuPatched) return;
-        gesturePrototype.__ashContextMenuPatched = true;
-
-        const collectOptions = (focusedNode: Blockly.IFocusableNode | null, e: Event) => {
-            let options: Blockly.ContextMenuRegistry.ContextMenuOption[] = [];
-
+        // 此函数由 Ai 生成
+        installContextMenuPatch(this.Blockly);
+        setContextMenuHandler((options, event, location) => {
+            // ScratchCommentBubble 是 ASH 自定义的，不在插件覆盖范围内，单独处理
+            const focusedNode = this.Blockly.getFocusManager().getFocusedNode();
             if (focusedNode instanceof ScratchCommentBubble) {
-                options = (
-                    focusedNode as unknown as {
-                        getContextMenuOptions(): Blockly.ContextMenuRegistry.ContextMenuOption[];
-                    }
-                ).getContextMenuOptions();
-            } else if (focusedNode instanceof BlocklyRef.BlockSvg) {
-                options = BlocklyRef.ContextMenuRegistry.registry.getContextMenuOptions(
-                    { block: focusedNode, focusedNode },
-                    e,
-                );
-            } else if (focusedNode instanceof BlocklyRef.icons.Icon) {
-                const block = focusedNode.getSourceBlock() as Blockly.BlockSvg;
-                options = BlocklyRef.ContextMenuRegistry.registry.getContextMenuOptions(
-                    { block, focusedNode: block },
-                    e,
-                );
-            } else if (focusedNode instanceof BlocklyRef.comments.RenderedWorkspaceComment) {
-                options = BlocklyRef.ContextMenuRegistry.registry.getContextMenuOptions(
-                    { comment: focusedNode, focusedNode },
-                    e,
-                );
-            } else if (focusedNode instanceof BlocklyRef.WorkspaceSvg) {
-                options = BlocklyRef.ContextMenuRegistry.registry.getContextMenuOptions(
-                    { workspace: focusedNode, focusedNode },
-                    e,
-                );
+                options = collectOptions(focusedNode, event);
             }
-
-            return options;
-        };
-
-        gesturePrototype.handleRightClick = function (e: Event) {
-            const focusedNode = BlocklyRef.getFocusManager().getFocusedNode();
-
-            const options = collectOptions(focusedNode, e);
             _blocklyMenuOptions = options;
-            _blocklyMenuEvent = e;
-            e.preventDefault();
-            e.stopPropagation();
-            if (_blocklyMenuOptions.length) {
-                openContextMenu(AllContextMenu.BLOCKLY, {
-                    x: (e as MouseEvent).clientX,
-                    y: (e as MouseEvent).clientY,
-                });
+            _blocklyMenuEvent = event;
+            if (options.length) {
+                openContextMenu(AllContextMenu.BLOCKLY, location);
             } else {
                 closeContextMenu();
             }
-            BlocklyRef.keyboardNavigationController.setIsActive(false);
-            this.dispose();
-        };
+        });
     }
 
     constructor(BlocklySelf: typeof Blockly, vm: IVM) {
