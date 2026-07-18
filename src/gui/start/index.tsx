@@ -39,7 +39,10 @@ const Start = ({ vm }: { vm: IVM }): React.ReactNode => {
                 <AddIcon />
                 {t('gui:start.createProject')}
             </button>
-            <button className={styles.button} onClick={() => void selectProjectThenJump(vm, setInterface)}>
+            <button
+                className={styles.button}
+                onClick={() => void selectProjectThenJump(vm, setInterface)}
+            >
                 <LoadIcon />
                 {t('gui:start.loadProject')}
             </button>

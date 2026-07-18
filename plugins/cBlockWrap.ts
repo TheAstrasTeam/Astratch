@@ -1,4 +1,12 @@
 /**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+// 此文件由 Ai 生成
+
+/**
  * C 型积木在blockly中会直接插入最上面，而不能根据鼠标位置动态推断
  */
 
@@ -53,7 +61,7 @@ const getFirstStatementInput = (block: Blockly.BlockSvg): Blockly.Connection | n
         }
     }
     return null;
-}
+};
 
 export const installCBlockWrap = (BlocklyNS: typeof Blockly): void => {
     if (installed) return;
@@ -108,4 +116,4 @@ export const installCBlockWrap = (BlocklyNS: typeof Blockly): void => {
         // 非包围情形：走默认实现
         originalHide(markerConn);
     };
-}
+};

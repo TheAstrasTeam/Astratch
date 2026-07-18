@@ -1,3 +1,5 @@
+// 此文件由 Ai 生成
+
 import mousetrap from 'mousetrap';
 import {
     ALL_SHORTCUTS_IDS,
@@ -44,14 +46,14 @@ class ShortcutManager implements IShortcut {
     }
 
     formatHotKey(key: string): string {
-        switch(getPlatfrom()) {
+        switch (getPlatfrom()) {
             case ALL_PLATFORMS.WIN:
             case ALL_PLATFORMS.LINUX:
-                return key.replaceAll('mod', 'ctrl')
+                return key.replaceAll('mod', 'ctrl');
             case ALL_PLATFORMS.MAC:
                 return key.replaceAll('mod', '⌘');
             default:
-                return key
+                return key;
         }
     }
 

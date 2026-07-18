@@ -21,17 +21,12 @@ export function ContextMenuLayer() {
         }
     }, [openMenuId, toggleMenu]);
 
-    const renderContent =
-        openMenuId ? menuContentRegistry.get(openMenuId) : undefined;
+    const renderContent = openMenuId ? menuContentRegistry.get(openMenuId) : undefined;
 
     return (
-        <div id={CONTEXT_MENU_LAYER_ID} className="contextMenuLayer">
+        <div id={CONTEXT_MENU_LAYER_ID} className='contextMenuLayer'>
             {openMenuId && anchorPoint && renderContent && (
-                <ControlledMenu
-                    {...menuState}
-                    anchorPoint={anchorPoint}
-                    onClose={closeMenu}
-                >
+                <ControlledMenu {...menuState} anchorPoint={anchorPoint} onClose={closeMenu}>
                     {renderContent(closeMenu)}
                 </ControlledMenu>
             )}

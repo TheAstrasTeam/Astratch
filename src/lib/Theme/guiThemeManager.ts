@@ -51,5 +51,4 @@ const getBlocklyComponentStyles = (): Blockly.Theme.ComponentStyle => {
     return blocklyThemeMap[themeMode];
 };
 
-
 export { guiThemeMap, blocklyThemeMap, applyGuiTheme, getBlocklyComponentStyles };

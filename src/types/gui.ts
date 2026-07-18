@@ -50,7 +50,6 @@ export const guiInterface = {
 export type IGuiInterface = (typeof guiInterface)[keyof typeof guiInterface];
 export const defaultGuiInterface = guiInterface.START;
 
-
 export const AllContextMenu = {
     MENUBAR_FILE: 'menubar_file',
     MENUBAR_FILE_NEW: 'menubar_file_new',
@@ -68,6 +67,6 @@ export const AllContextMenu = {
     MENUBAR_HELP: 'menubar_help',
     MENUBAR_HELP_ABOUT: 'menubar_help_about',
     MENUBAR_HELP_DOCS: 'menubar_help_docs',
-    BLOCKLY: 'blockly'
-}
+    BLOCKLY: 'blockly',
+};
 export type TAllContextMenu = (typeof AllContextMenu)[keyof typeof AllContextMenu];

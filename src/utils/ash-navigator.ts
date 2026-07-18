@@ -35,8 +35,4 @@ const getPlatfrom = (): TAll_Platforms => {
     }
 };
 
-export {
-    getPlatfrom,
-    ALL_PLATFORMS,
-    type TAll_Platforms
-}
+export { getPlatfrom, ALL_PLATFORMS, type TAll_Platforms };

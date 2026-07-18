@@ -1,3 +1,5 @@
+// 此文件由 Ai 生成
+
 import { create, type StoreApi, type UseBoundStore } from 'zustand';
 import { readLocalStorage, setItemToLocalStorage } from '../utils/localstorage';
 import { localStorageIDs } from '../types/storage';

@@ -19,9 +19,10 @@ const BlocklyWorkspace = ({ vm }: { vm: IVM }): React.ReactNode => {
                     disabled={!opt.enabled}
                     onClick={selectEvent => {
                         const menuOpenEvent = getBlocklyMenuEvent();
-                        const location = menuOpenEvent
-                            ? { x: menuOpenEvent.clientX, y: menuOpenEvent.clientY }
-                            : { x: 0, y: 0 };
+                        const location =
+                            menuOpenEvent instanceof PointerEvent
+                                ? { x: menuOpenEvent.clientX, y: menuOpenEvent.clientY }
+                                : { x: 0, y: 0 };
                         (opt.callback as (...args: unknown[]) => void)(
                             opt.scope,
                             menuOpenEvent,

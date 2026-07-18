@@ -1,7 +1,7 @@
 // 关于部分常用 GUI 互动的实用工具
 
-import { guiInterface, type IGuiInterface } from "../types/gui";
-import type { IVM } from "../types/vm"
+import { guiInterface, type IGuiInterface } from '../types/gui';
+import type { IVM } from '../types/vm';
 
 /**
  * 选择项目并跳转到编辑器
@@ -13,6 +13,4 @@ const selectProjectThenJump = async (vm: IVM, setInterface: (state: IGuiInterfac
     if (loadedProject) setInterface(guiInterface.EDITOR);
 };
 
-export {
-    selectProjectThenJump
-}
+export { selectProjectThenJump };

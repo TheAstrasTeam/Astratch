@@ -627,10 +627,10 @@ export class ScratchCommentIcon extends CommentIcon {
      */
     override saveState(): Blockly.icons.CommentState | null {
         const state: Blockly.icons.CommentState = {
-            'text': this.getText(),
-            'pinned': this.bubbleIsVisible(),
-            'height': this.getBubbleSize().height,
-            'width': this.getBubbleSize().width,
+            text: this.getText(),
+            pinned: this.bubbleIsVisible(),
+            height: this.getBubbleSize().height,
+            width: this.getBubbleSize().width,
         };
         const location = this.getBubbleLocation();
         if (location) {
@@ -696,7 +696,6 @@ export function registerScratchComment(blockly: typeof Blockly): void {
   `);
 
     patchZerosWidthIconPadding(blockly);
-
 
     patchLookUpFocusableNode(blockly);
 }

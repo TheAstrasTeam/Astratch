@@ -15,7 +15,7 @@ const SpawnSetting = ({ settings }: { settings: ISettingDefinition }) => {
     const handleSelectChanged = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setNowValue(e.target.value);
         Settings.set(settings.key, e.target.value);
-    }
+    };
 
     return (
         <div className={styles.settingContent}>

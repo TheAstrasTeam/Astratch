@@ -96,7 +96,7 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
 
     const [projectFolderName, setProjectFolderName] = useState<string>('');
 
-    const settingsStore = useSettings(state => state.userName);
+    const settingsStore = useSettings(state => state.userName) as string;
     const setGuiStore = useGUIStore(state => state.setInterface);
 
     const nameInput = useRef<HTMLSpanElement>(null);

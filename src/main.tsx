@@ -46,7 +46,7 @@ await i18nReady.then(() => {
             state.guiThemeAccent !== prevState.guiThemeAccent
         ) {
             applyGuiTheme();
-            vm.emit(events.UPDATE_THEME)
+            vm.emit(events.UPDATE_THEME);
         }
     });
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
