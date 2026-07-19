@@ -78,6 +78,11 @@ input:not([class*='blocklyHtmlInput']):not([class*='fieldColourSlider']) {
     border-radius: 3px;
 }
 
+// 在暗色模式下积木输入框会变黑
+input[class*='blocklyHtmlInput'] {
+    color-scheme: light;
+}
+
 span {
     font-size: small;
 }
