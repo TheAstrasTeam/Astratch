@@ -70,7 +70,7 @@ code {
 }
 
 // blocklyHtmlInput 是 blockly 输入框的选中时名
-input:not([class*='blocklyHtmlInput']) {
+input:not([class*='blocklyHtmlInput']):not([class*='fieldColourSlider']) {
     background-color: $ui-tertiary;
     outline: none;
     color: $text-primary;
@@ -98,4 +98,39 @@ span {
     --blockly-active-node-color: var(--ui-blockly-border);
     --blockly-active-tree-color: var(--ui-blockly-border);
     --blockly-selection-width: 1px;
+}
+
+// 关于Blockly下拉框，提示框地方
+
+.blocklyDropDownDiv {
+    background-color: $ui-secondary;
+    border-color: $ui-tertiary;
+    & span {
+        color: $text-primary;
+    }
+    & hr {
+        border-top: 1px solid $ui-tertiary;
+    }
+}
+
+.fieldColourEyedropper {
+    color: $text-primary;
+}
+
+.fieldColourSlider {
+    background-color: $ui-secondary;
+}
+
+.blocklyToast {
+    background-color: $ui-secondary;
+    border-color: $ui-tertiary;
+    & .blocklyToastMessage {
+        color: $text-primary;
+    }
+    & .blocklyToastCloseButton svg {
+        & rect {
+            // X 的图标
+            fill: $text-primary !important;
+        }
+    }
 }

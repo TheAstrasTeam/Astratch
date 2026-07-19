@@ -7,37 +7,52 @@ import WorkSpace from './workspace';
 
 import styles from './index.module.scss';
 import './public.scss';
-import { useLoadingStore } from '../stores/useGUIStore';
+import { useGUIStore, useLoadingStore } from '../stores/useGUIStore';
 import Loading from './loading';
 import MenuBar from './menubar';
+import { ContextMenuLayer } from './contextMenu';
+import { shortcutManager } from '../lib/ShortcutManager';
+import { ALL_SHORTCUTS_IDS } from '../types/lib';
+import { useEffect } from 'react';
+import { guiInterface } from '../types/gui';
+import { selectProjectThenJump } from '../utils/ash-gui';
 
 const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
-    // const [_language, setLanguage] = useState(i18next.language);
     const isLoading: boolean = useLoadingStore(state => state.loading);
-    // const handleLanguageChanged = useCallback(
-    //     async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    //         const value = e.target.value;
-    //         setLanguage(value);
-    //         localStorage.setItem(localStorageIDs.Language, value);
+    const setInterface = useGUIStore(state => state.setInterface);
+    useEffect(() => {
+        const unregisterSave = shortcutManager.register({
+            id: ALL_SHORTCUTS_IDS.SAVE_PROJECT,
+            command: () => vm.saveProject(),
+        });
 
-    //         try {
-    //             await i18next.changeLanguage(value);
-    //             await vm.runtime.blocks.init();
-    //             await vm.runtime.blocks.restartWorkspace();
-    //         } catch {
-    //             // 待定
-    //         }
-    //     },
-    //     [vm],
-    // );
+        const unregisterNew = shortcutManager.register({
+            id: ALL_SHORTCUTS_IDS.NEW_PROJECT,
+            command: () => {
+                setInterface(guiInterface.CREATE_PROJECT);
+            },
+        });
+
+        const unregisterOpen = shortcutManager.register({
+            id: ALL_SHORTCUTS_IDS.OPEN_PROJECT,
+            command: () => selectProjectThenJump(vm, setInterface),
+        });
+
+        return () => {
+            unregisterSave();
+            unregisterNew();
+            unregisterOpen();
+        };
+    }, [vm, setInterface]);
+
     return (
         <div className={styles.app}>
-            {/* menubar 菜单栏 */}
             <MenuBar vm={vm} />
             {isLoading && <Loading />}
             <div className={styles.workspaceArea}>
                 <WorkSpace vm={vm} />
             </div>
+            <ContextMenuLayer />
         </div>
     );
 };

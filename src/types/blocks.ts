@@ -394,7 +394,7 @@ export interface IBlocks {
      * 设置一个语言
      * @param lang ASH 兼容的 i18n
      */
-    setLanguage: (lang: 'en' | 'zh-Hans') => Promise<void>;
+    setLanguage: (lang: 'en' | 'zh-Hans') => void;
     /**
      * 销毁工作区
      *

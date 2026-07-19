@@ -10,6 +10,7 @@ const debounce = <T extends (...args: unknown[]) => void>(
     delay: number,
     immediate: boolean,
 ) => {
+    // 此函数由 Ai 生成
     let timer: ReturnType<typeof setTimeout> | null = null;
     return function (this: unknown, ...args: Parameters<T>) {
         const callNow = immediate && !timer;

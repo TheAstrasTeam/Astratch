@@ -5,9 +5,31 @@ import * as ContinuousToolbox from '../../../plugins/continuous-toolbox/src';
 import * as En from 'blockly/msg/en';
 import * as ZhHans from 'blockly/msg/zh-hans';
 import getToolbox from './toolbox';
-import { initBlocks } from './definitions';
+import { collectOptions, initBlocks } from './definitions';
+import { AshConnectionChecker } from '../../../plugins/cBlockWrap';
 import { getBlocklyComponentStyles } from '../../lib/Theme/guiThemeManager';
-import type { IVM } from '../../types/vm';
+import { events, type IVM } from '../../types/vm';
+import { getBlocklyI18nByI18next } from '../../utils/ash-i18n';
+import i18next from 'i18next';
+import { replaceChineseI18n } from './i18n';
+import { closeContextMenu, openContextMenu } from '../../gui/contextMenu';
+import { AllContextMenu } from '../../types/gui';
+import {
+    installContextMenuPatch,
+    setContextMenuHandler,
+} from '../../../plugins/context-menu-patch';
+import { ScratchCommentBubble } from '../../../plugins/scratch-comment';
+
+let _blocklyMenuOptions: Blockly.ContextMenuRegistry.ContextMenuOption[] | null = null;
+let _blocklyMenuEvent: Event | null = null;
+
+export function getBlocklyMenuOptions(): Blockly.ContextMenuRegistry.ContextMenuOption[] | null {
+    return _blocklyMenuOptions;
+}
+
+export function getBlocklyMenuEvent(): Event | null {
+    return _blocklyMenuEvent;
+}
 
 /**
  * 用于便捷的管理WebGPU或Blockly工作区
@@ -51,18 +73,52 @@ class Blocks implements IBlocks {
         Blockly.Events.BLOCK_DRAG,
         // 视口更改，其实就是移动工作区镜头
         Blockly.Events.VIEWPORT_CHANGE,
+        // 选择工具箱
+        Blockly.Events.TOOLBOX_ITEM_SELECT,
     ];
 
-    handleWorkspaceChange = (event: Blockly.Events.Abstract) => {
+    handleWorkspaceChange = (event: Blockly.Events.Abstract | null, byHand = false) => {
         // 检测更新，并检查这个事件是否需要忽略
-        if (!this.workspaceSvg) return;
-        if (!this._disableUpdateType.includes(event.type)) {
-            this.vm.runtime.setTargetBlock(
-                this.vm.runtime.editingTargetID,
-                this.Blockly.serialization.workspaces.save(this.workspaceSvg) as IWorkspaceState,
-            );
-        }
+        const update = () => {
+            if (!this.workspaceSvg) return;
+            try {
+                this.vm.runtime.setTargetBlock(
+                    this.vm.runtime.editingTargetID,
+                    this.Blockly.serialization.workspaces.save(
+                        this.workspaceSvg,
+                    ) as IWorkspaceState,
+                );
+            } catch (e) {
+                console.warn(e);
+            }
+        };
+        if (event) {
+            if (!this._disableUpdateType.includes(event.type)) update();
+        } else if (byHand) update();
     };
+
+    handleThemeUpdate = () => {
+        void this.restartWorkspace();
+    };
+
+    private _patchBlocklyContextMenu(): void {
+        // 此函数由 Ai 生成
+        installContextMenuPatch(this.Blockly);
+        setContextMenuHandler((options, event, location) => {
+            // ScratchCommentBubble 是 ASH 自定义的，不在插件覆盖范围内，单独处理
+            const focusedNode = this.Blockly.getFocusManager().getFocusedNode();
+            if (focusedNode instanceof ScratchCommentBubble) {
+                options = collectOptions(focusedNode, event);
+            }
+            _blocklyMenuOptions = options;
+            _blocklyMenuEvent = event;
+            if (options.length) {
+                openContextMenu(AllContextMenu.BLOCKLY, location);
+            } else {
+                closeContextMenu();
+            }
+        });
+    }
 
     constructor(BlocklySelf: typeof Blockly, vm: IVM) {
         this.vm = vm;
@@ -92,6 +148,12 @@ class Blocks implements IBlocks {
         this.workspaceConfig = {
             toolbox: this.toolbox,
             scrollbars: true,
+            // 折叠积木
+            // 这玩意会导致注释无法正常工作
+            collapse: false,
+            // 禁用积木
+            // 这玩意在ASH没用
+            disable: false,
             zoom: {
                 controls: true,
                 wheel: true,
@@ -113,6 +175,7 @@ class Blocks implements IBlocks {
                 toolbox: ContinuousToolbox.ContinuousToolbox,
                 flyoutsVerticalToolbox: ContinuousToolbox.ContinuousFlyout,
                 metricsManager: ContinuousToolbox.ContinuousMetrics,
+                connectionChecker: AshConnectionChecker,
             },
             // 网格，暂定48
             grid: {
@@ -129,6 +192,11 @@ class Blocks implements IBlocks {
         this.Blockly.config.snapRadius = SNAP_RADIUS;
         this.Blockly.config.connectingSnapRadius = SNAP_RADIUS;
 
+        this.theme.componentStyles = {
+            ...getBlocklyComponentStyles(),
+            flyoutOpacity: 0.5,
+        };
+
         // 对于完全不需要现在的工作区的
         ContinuousToolbox.registerContinuousToolbox();
 
@@ -144,19 +212,18 @@ class Blocks implements IBlocks {
             console.warn('No existing workspace');
             return;
         }
-        /**
-         * 重启工作区
-         * 这会丢失所有未保存的数据qwq
-         * Todo: 兼容保存
-         */
+        this.handleWorkspaceChange(null, true);
         // 删除遗留的DOM
         this._DOM.querySelector('[class*=injectionDiv]')?.remove();
         await this.createWorkspace(this._DOM);
     }
 
-    async setLanguage(lang: 'en' | 'zh-Hans'): Promise<void> {
+    setLanguage(lang: 'en' | 'zh-Hans'): void {
         this.Blockly.setLocale(this.supportLanguages[lang]);
-        await this.restartWorkspace();
+        if (lang === 'zh-Hans') {
+            replaceChineseI18n(this.Blockly);
+        }
+        // await this.restartWorkspace();
     }
 
     async createWorkspace(DOM: HTMLDivElement): Promise<boolean> {
@@ -172,9 +239,14 @@ class Blocks implements IBlocks {
                 this.dispose();
             }
 
+            this.vm.on(events.UPDATE_THEME, this.handleThemeUpdate);
             this._DOM = DOM;
+            if (i18next.language) this.setLanguage(getBlocklyI18nByI18next(i18next.language));
             await this.init();
             this.workspaceSvg = this.Blockly.inject(DOM, this.workspaceConfig);
+
+            this._patchBlocklyContextMenu();
+
             const nowTarget = this.vm.runtime.getTargetByID(this.vm.runtime.editingTargetID);
             if (nowTarget?.blocks)
                 this.Blockly.serialization.workspaces.load(
@@ -191,6 +263,7 @@ class Blocks implements IBlocks {
 
     dispose(): boolean {
         if (this.workspaceSvg) {
+            this.vm.off(events.UPDATE_THEME, this.handleThemeUpdate);
             this.workspaceSvg.removeChangeListener(this.handleWorkspaceChange);
             this.workspaceSvg.dispose();
             this.workspaceSvg = null;

@@ -1,6 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+
 import { events, type IVM } from '../../../types/vm';
 import styles from './index.module.scss';
+import { useEffect, useRef ,useState} from 'react';
+import { MenuItem, MenuDivider } from '@szhsin/react-menu';
+
+import { useContextMenu } from '../../contextMenu';
+import { AllContextMenu } from '../../../types/gui';
+import { getBlocklyMenuOptions, getBlocklyMenuEvent } from '../../../vm/blocks';
 
 const BlocklyWorkspace = ({ vm }: { vm: IVM }): React.ReactNode => {
     const workspaceDiv = useRef<HTMLDivElement>(null);
@@ -13,6 +19,44 @@ const BlocklyWorkspace = ({ vm }: { vm: IVM }): React.ReactNode => {
     const [overlayText, setOverlayText] = useState('');
     const [overlayVisible, setOverlayVisible] = useState(false);
     const [transition, setTransition] = useState('opacity 0.5s ease');
+    useContextMenu(AllContextMenu.BLOCKLY, closeMenu => {
+        const options = getBlocklyMenuOptions();
+        if (!options?.length) return null;
+        return options.map((opt, i) => {
+            if ('separator' in opt) return <MenuDivider key={i} />;
+            return (
+                <MenuItem
+                    key={i}
+                    disabled={!opt.enabled}
+                    onClick={selectEvent => {
+                        const menuOpenEvent = getBlocklyMenuEvent();
+                        const location =
+                            menuOpenEvent instanceof PointerEvent
+                                ? { x: menuOpenEvent.clientX, y: menuOpenEvent.clientY }
+                                : { x: 0, y: 0 };
+                        (opt.callback as (...args: unknown[]) => void)(
+                            opt.scope,
+                            menuOpenEvent,
+                            (selectEvent as unknown as React.MouseEvent).nativeEvent,
+                            location,
+                        );
+                        closeMenu();
+                    }}
+                >
+                    {typeof opt.text === 'string' ? (
+                        opt.text
+                    ) : (
+                        <span
+                            dangerouslySetInnerHTML={{
+                                __html: opt.text.outerHTML,
+                            }}
+                        />
+                    )}
+                </MenuItem>
+            );
+        });
+    });
+
     useEffect(() => {
         const showOverlay = (text: string) => {
             setOverlayText(text);

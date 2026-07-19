@@ -45,5 +45,20 @@
     "back": "Back",
     "object": "Objects",
     "createObject": "Create Object",
-    "panel.notInProject": "You aren't in a project yet! Why not"
+    "panel.notInProject": "You aren't in a project yet! Why not",
+    "searchTip": "Search",
+    "menu.file": "File",
+    "menu.edit": "Edit",
+    "menu.run": "Run",
+    "menu.help": "Help",
+    "menu.new": "New Project",
+    "menu.open": "Open Project",
+    "menu.save": "Save",
+    "menu.saveAs": "Save As",
+    "menu.exit": "Exit",
+    "menu.undo": "Undo",
+    "menu.redo": "Redo",
+    "menu.restore": "Restore Defaults",
+    "menu.about": "About Astratch",
+    "menu.docs": "Documentation"
 }

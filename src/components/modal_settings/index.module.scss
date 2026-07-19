@@ -1,0 +1,57 @@
+@use '../../gui/styles/color.scss' as *;
+@use '../../gui/styles/constants.scss' as *;
+
+.content {
+    min-width: 75vw;
+    min-height: 75vh;
+    display: flex;
+    flex: 1;
+}
+
+.tabs {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 20%;
+    background-color: $ui-tertiary;
+    & button {
+        margin: 0;
+        text-align: left;
+        padding-left: 20%;
+        border-radius: 0;
+    }
+}
+
+.tabs-title {
+    padding-left: 10%;
+    border-radius: 0;
+    font-weight: bolder;
+    margin: 10px 0;
+}
+
+.settings {
+    margin: 0;
+    padding: 25px;
+    width: 100%;
+}
+.settings-title {
+    font-size: xx-large;
+}
+
+.setting-content {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.setting-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.setting-text-title {
+    font-size: large;
+}
+.setting-text-desc {
+    opacity: 0.5;
+}

@@ -1,4 +1,12 @@
 /**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+// 此文件由 Ai 生成
+
+/**
  * 修改 FieldDropdown，修改的和 Scratch 一致
  */
 

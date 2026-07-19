@@ -7,6 +7,10 @@ export const localStorageIDs = {
      * 当前的设置
      */
     Settings: 'ash_settings',
+    /**
+     * 快捷键配置
+     */
+    Shortcuts: 'ash_shortcuts',
 } as const;
 
-export type TlocalStorageIDs = (typeof localStorageIDs)[keyof typeof localStorageIDs];
+export type TLocalStorageIDs = (typeof localStorageIDs)[keyof typeof localStorageIDs];

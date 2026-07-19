@@ -29,10 +29,36 @@
 }
 
 .menubar-content-logo {
-    height: 1.5rem;
+    height: 1rem;
     width: auto;
+    margin: 0 5px;
 }
 
 .search {
     flex: 1;
+}
+
+.left-ul {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    height: 100%;
+    margin-left: 15px;
+    padding: 0;
+    & button {
+        font-size: small;
+        background-color: transparent;
+        border: none;
+        border-radius: 0;
+        color: $text-primary;
+        padding: 0 10px;
+        margin: 0;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        &:hover {
+            border: none;
+            background-color: $ui-tertiary;
+        }
+    }
 }

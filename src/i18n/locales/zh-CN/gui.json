@@ -45,5 +45,20 @@
     "back": "返回",
     "object": "实体",
     "createObject": "创建一个实体",
-    "panel.notInProject": "你还不在一个项目内！为什么不"
+    "panel.notInProject": "你还不在一个项目内！为什么不",
+    "searchTip": "搜索",
+    "menu.file": "文件",
+    "menu.edit": "编辑",
+    "menu.run": "运行",
+    "menu.help": "帮助",
+    "menu.new": "新建项目",
+    "menu.open": "打开项目",
+    "menu.save": "保存",
+    "menu.saveAs": "另存为",
+    "menu.exit": "退出",
+    "menu.undo": "撤销",
+    "menu.redo": "重做",
+    "menu.restore": "恢复默认设置",
+    "menu.about": "关于 Astratch",
+    "menu.docs": "文档"
 }
