@@ -8,7 +8,7 @@ import getToolbox from './toolbox';
 import { collectOptions, initBlocks } from './definitions';
 import { AshConnectionChecker } from '../../../plugins/cBlockWrap';
 import { getBlocklyComponentStyles } from '../../lib/Theme/guiThemeManager';
-import { events, type IVM } from '../../types/vm';
+import { events, type IVM, type viewportUpdateEvent } from '../../types/vm';
 import { getBlocklyI18nByI18next } from '../../utils/ash-i18n';
 import i18next from 'i18next';
 import { replaceChineseI18n } from './i18n';
@@ -92,8 +92,30 @@ class Blocks implements IBlocks {
                 console.warn(e);
             }
         };
+        const getInfoOfViewportUpdate = (event: Blockly.Events.ViewportChange): viewportUpdateEvent => {
+            // 常理来说是不会出现位置大小
+            // 都更改的事件，所以暂不处理
+            if (event.oldScale !== event.scale)
+                return {
+                    changed: 'scale',
+                    oldScale: event.oldScale ?? 1,
+                    scale: event.scale ?? 1,
+                };
+            else
+                return {
+                    changed: 'position',
+                    x: event.viewLeft ?? 0,
+                    y: event.viewTop ?? 0,
+                };
+        };
         if (event) {
             if (!this._disableUpdateType.includes(event.type)) update();
+            // 对于视口更改的额外事件
+            else if (event.type === (Blockly.Events.VIEWPORT_CHANGE as string))
+                this.vm.emit(
+                    events.VIEWPORT_VIEW,
+                    getInfoOfViewportUpdate(event as Blockly.Events.ViewportChange),
+                );
         } else if (byHand) update();
     };
 
@@ -147,6 +169,7 @@ class Blocks implements IBlocks {
         });
         this.workspaceConfig = {
             toolbox: this.toolbox,
+            media: '/vm/blocks/images',
             scrollbars: true,
             // 折叠积木
             // 这玩意会导致注释无法正常工作
