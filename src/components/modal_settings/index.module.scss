@@ -13,12 +13,13 @@
     flex-direction: column;
     height: 100%;
     width: 20%;
-    background-color: $ui-tertiary;
+    background-color: $ui-modal-header-background;
     & button {
         margin: 0;
         text-align: left;
         padding-left: 20%;
         border-radius: 0;
+        background-color: $ui-modal-header-background;
     }
 }
 
