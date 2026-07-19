@@ -11,6 +11,8 @@ import light from './gui/light';
 
 import blue from './accent/blue';
 
+const DEFAULT_BLOCKLY_SPRITES_STYLE_ID = 'blockly_sprites_style';
+
 const guiThemeMap: Record<TGuiTheme, Record<string, string>> = {
     dark: dark.guiTheme,
     light: light.guiTheme,
@@ -36,8 +38,26 @@ const applyGuiTheme = (): void => {
     const accents = guiAccentMap[themeAccent] ?? guiAccentMap[DEFAULT_GUIACCENT];
 
     Object.entries(theme).forEach(css => {
-        if (css[0] === 'color-scheme') document.documentElement.style.colorScheme = css[1];
-        else document.documentElement.style.setProperty(`--${css[0]}`, css[1]);
+        if (css[0] === 'color-scheme') {
+            document.documentElement.style.colorScheme = css[1];
+
+            // 在亮色模式下将 blockly 右下角
+            // 的图标为反色
+            if (css[1] === 'light') {
+                const blocklySpritesStyle = document.createElement('style');
+                blocklySpritesStyle.id = DEFAULT_BLOCKLY_SPRITES_STYLE_ID;
+                blocklySpritesStyle.textContent = `
+                    .blocklyTrash image,
+                    .blocklyZoom.blocklyZoomOut,
+                    .blocklyZoom.blocklyZoomIn,
+                    .blocklyZoom.blocklyZoomReset {
+                        filter: invert(1);
+                    }
+                `;
+                document.head.appendChild(blocklySpritesStyle);
+            } else document.getElementById(DEFAULT_BLOCKLY_SPRITES_STYLE_ID)?.remove();
+            
+        } else document.documentElement.style.setProperty(`--${css[0]}`, css[1]);
     });
     Object.entries(accents).forEach(color => {
         Object.entries(color[1]).forEach(css => {
