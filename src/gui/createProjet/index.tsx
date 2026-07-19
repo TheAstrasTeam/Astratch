@@ -86,7 +86,8 @@ const CompareContentSelectTip = ({
 );
 
 const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
-    const [nowTab, setTab] = useState<TcreateProjectTabs>(tabs.SCHEME);
+    // todo: 制作兼容后再使用scheme这个tab
+    const [nowTab, setTab] = useState<TcreateProjectTabs>(tabs.CONFIG);
     const [selectedTarget, setSelectTarget] = useState<TallTarget>(targets.ASH);
 
     const [projectName, setProjectName] = useState<string>('');
@@ -160,7 +161,9 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
     };
     const handleBackClick = () => {
         if (nowTab === tabs.CONFIG) {
-            setTab(tabs.SCHEME);
+            // todo: 制作兼容后再使用scheme这个tab
+            setGuiStore(guiInterface.START);
+            // setTab(tabs.SCHEME);
         } else {
             // 回到主页
             setGuiStore(guiInterface.START);
