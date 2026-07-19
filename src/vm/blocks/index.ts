@@ -92,7 +92,9 @@ class Blocks implements IBlocks {
                 console.warn(e);
             }
         };
-        const getInfoOfViewportUpdate = (event: Blockly.Events.ViewportChange): viewportUpdateEvent => {
+        const getInfoOfViewportUpdate = (
+            event: Blockly.Events.ViewportChange,
+        ): viewportUpdateEvent => {
             // 常理来说是不会出现位置大小
             // 都更改的事件，所以暂不处理
             if (event.oldScale !== event.scale)

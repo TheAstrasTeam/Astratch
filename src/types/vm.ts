@@ -277,6 +277,19 @@ export const events = {
     UPDATE_PROJECT: 'update_project',
     CREATE_PROJECT: 'create_project',
     UPDATE_THEME: 'update_theme',
+    VIEWPORT_VIEW: 'viewport_view',
 } as const;
 
 export type TEvents = (typeof events)[keyof typeof events];
+
+export type viewportUpdateEvent =
+    | {
+          changed: 'scale';
+          oldScale: number;
+          scale: number;
+      }
+    | {
+          changed: 'position';
+          x: number;
+          y: number;
+      };
