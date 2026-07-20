@@ -74,12 +74,16 @@ export class VM implements IVM {
     }
 
     emit(id: TEvents, data: object = {}) {
-        this.events.get(id)?.forEach((event, index) => {
+        const callbacks = this.events.get(id);
+        if (!callbacks) return;
+
+        for (let i = callbacks.length - 1; i >= 0; i--) {
+            const event = callbacks[i];
             event.callback?.(data);
             if (event.once) {
-                this.events.get(id)?.splice(index, 1);
+                callbacks.splice(i, 1);
             }
-        });
+        }
     }
 
     async selectProject() {
@@ -104,7 +108,6 @@ export class VM implements IVM {
         const checkResult = await this.projectManager.checkProjectCanSave();
         if (!checkResult.pass) {
             if (checkResult.error === allProjectCheckError.FOLDER_NOT_EMPTY) {
-                
                 const userWantRemoveAllFile = await new Promise(resolve => {
                     void modal.open(ConfirmModal, {
                         message: t('vm:project.removeAllFileAsk'),
