@@ -20,6 +20,7 @@ import CreateProject from '../createProjet';
 import TargetsPanel from './targets';
 import SplitPane from '../../components/splitPane';
 import { debounce } from '../../utils/ash-debounce';
+import { BottomBar } from '../bottomBar';
 
 const TabButton = ({
     id,
@@ -137,6 +138,7 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
                     }}
                 />
             </div>
+            <BottomBar vm={vm} />
         </div>
     );
 };

@@ -69,5 +69,7 @@
     "prompt_description": "输入Modal的标题（请不要输入“赛博猫猫高瞻远瞩！”）",
     "ok": "好的",
     "no": "不要",
-    "done": "完成"
+    "done": "完成",
+    "scale": "缩放",
+    "bottomBar_positionText": "工作区 x: {{x}}, y: {{y}} 缩放: {{scale}}"
 }

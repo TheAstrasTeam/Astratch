@@ -1,0 +1,30 @@
+@use '../styles/color.scss' as *;
+@use '../styles/animation.scss' as *;
+@use '../styles/constants.scss' as *;
+
+.main {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 0;
+    padding: 0 5px;
+    background-color: $ui-secondary;
+    height: 25px;
+    border-top: $ui-black-transparent $border-width solid;
+
+    & button {
+        margin: 0;
+        height: 100%;
+        border-radius: 0;
+        background-color: $ui-secondary;
+        border: none;
+        padding: 0;
+        color: color-mix(in srgb, $text-primary 50%, transparent 50%);
+        &:hover {
+            border: none !important;
+            color: $text-primary;
+            filter: brightness(1.5);
+        }
+        
+    }
+}

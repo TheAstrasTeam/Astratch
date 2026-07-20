@@ -1,18 +1,15 @@
-import { events, type IVM, type viewportUpdateEvent } from '../../../types/vm';
+import { events, type IVM } from '../../../types/vm';
 import styles from './index.module.scss';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { MenuItem, MenuDivider } from '@szhsin/react-menu';
 
 import { useContextMenu } from '../../contextMenu';
 import { AllContextMenu } from '../../../types/gui';
 import { getBlocklyMenuOptions, getBlocklyMenuEvent } from '../../../vm/blocks';
 
-import { t } from 'i18next';
 
 const BlocklyWorkspace = ({ vm }: { vm: IVM }): React.ReactNode => {
     const workspaceDiv = useRef<HTMLDivElement>(null);
-
-    const [overlayText, setOverlayText] = useState('');
 
     useContextMenu(AllContextMenu.BLOCKLY, closeMenu => {
         const options = getBlocklyMenuOptions();
@@ -53,11 +50,6 @@ const BlocklyWorkspace = ({ vm }: { vm: IVM }): React.ReactNode => {
     });
 
     useEffect(() => {
-        const handleViewportUpdate = (data: viewportUpdateEvent) => {
-            if (data.changed === 'scale')
-                setOverlayText(`${t('gui:scale')}: ${data.scale.toFixed(2)}`);
-            else setOverlayText(`x: ${data.x.toFixed(2)}, y: ${data.y.toFixed(2)}`);
-        };
         const handleTargetChanged = () => {
             restartWorkspace();
         };
@@ -69,9 +61,7 @@ const BlocklyWorkspace = ({ vm }: { vm: IVM }): React.ReactNode => {
         };
 
         vm.off(events.SWITCH_TARGET, handleTargetChanged);
-        vm.off(events.VIEWPORT_VIEW, handleViewportUpdate as (data: object) => void);
         vm.on(events.SWITCH_TARGET, handleTargetChanged);
-        vm.on(events.VIEWPORT_VIEW, handleViewportUpdate as (data: object) => void);
         restartWorkspace();
         return () => {
             vm.off(events.SWITCH_TARGET, handleTargetChanged);
@@ -83,9 +73,6 @@ const BlocklyWorkspace = ({ vm }: { vm: IVM }): React.ReactNode => {
     return (
         <div className={styles.root}>
             <div ref={workspaceDiv} className={styles.workspace} />
-            <div className={styles.overlay} key={overlayText}>
-                {overlayText}
-            </div>
         </div>
     );
 };

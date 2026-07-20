@@ -69,5 +69,6 @@
     "prompt_description": "Prompt modal title (Please do NOT type \"Never gonna give you up\")",
     "ok": "OK",
     "no": "No",
-    "done": "Done"
+    "done": "Done",
+    "scale": "Scale"
 }
