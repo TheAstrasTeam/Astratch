@@ -60,5 +60,14 @@
     "menu.redo": "Redo",
     "menu.restore": "Restore Defaults",
     "menu.about": "About Astratch",
-    "menu.docs": "Documentation"
+    "menu.docs": "Documentation",
+    "alert": "Alert",
+    "alert_description": "Alert modal title (why do you want to see my... what hint could a title possibly give?)",
+    "confirm": "Confirm",
+    "confirm_description": "Confirm modal title (Good Morning, and in case I don't see you, good afternoon, good evening, and good night!)",
+    "prompt": "Prompt",
+    "prompt_description": "Prompt modal title (Please do NOT type \"Never gonna give you up\")",
+    "ok": "OK",
+    "no": "No",
+    "done": "Done"
 }

@@ -1,0 +1,27 @@
+@use '../../gui/styles/color.scss' as *;
+@use '../../gui/styles/constants.scss' as *;
+
+.content {
+    min-width: 25vw;
+    min-height: 25vh;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.state {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 1rem;
+    & input {
+        margin-top: 15px;
+    }
+}
+
+.buttons{ 
+    display: flex;
+    & button {
+        flex: 1;
+    }
+}

@@ -1,1 +1,3 @@
-{}
+{
+    "project.removeAllFileAsk": "这个文件夹有东西了！请问要全部删掉嘛？"
+}

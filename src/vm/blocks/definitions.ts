@@ -12,6 +12,10 @@ import { FieldAngle } from '../../../plugins/field-angle/src';
 import { FieldColourHsvSliders } from '../../../plugins/field-colour-hsv-sliders/src';
 import { registerScratchComment, ScratchCommentBubble } from '../../../plugins/scratch-comment';
 import { installCBlockWrap } from '../../../plugins/cBlockWrap';
+import { modal } from '../../components/Modal/modal';
+import { AlertModal } from '../../components/modal_alert';
+import { ConfirmModal } from '../../components/modal_confirm';
+import { PromptModal } from '../../components/modal_prompt';
 
 /**
  * 对于链接积木的配置项
@@ -114,8 +118,26 @@ const initBlocks = (blockly: typeof Blockly) => {
     blockly.fieldRegistry.register('field_angle', FieldAngle);
     blockly.fieldRegistry.register('field_colour', FieldColourHsvSliders);
 
-    // blockly.ShortcutRegistry.registry.unregister(blockly.ShortcutItems.names.MENU);
-    // registryMenuOfShortcut(blockly);
+    // 替换 blockly 自己的modal
+    blockly.dialog.setAlert((message, callback) => {
+        void modal.open(AlertModal, {
+            message,
+            callback,
+        });
+    });
+    blockly.dialog.setConfirm((message, callback) => {
+        void modal.open(ConfirmModal, {
+            message,
+            callback,
+        });
+    });
+    blockly.dialog.setPrompt((message, defaultValue, callback) => {
+        void modal.open(PromptModal, {
+            message,
+            defaultValue,
+            callback
+        })
+    });
 
     // 事实上对于如下的`message0`在blockly都是无效的
     // i18next 不支持在消息id中填入空格

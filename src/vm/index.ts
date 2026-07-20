@@ -14,6 +14,8 @@ import {
 } from '../types/vm';
 import { ProjectManager } from './project';
 import { t } from 'i18next';
+import { modal } from '../components/Modal/modal';
+import { ConfirmModal } from '../components/modal_confirm';
 
 /**
  * 虚拟机，管理整个ASH
@@ -102,7 +104,16 @@ export class VM implements IVM {
         const checkResult = await this.projectManager.checkProjectCanSave();
         if (!checkResult.pass) {
             if (checkResult.error === allProjectCheckError.FOLDER_NOT_EMPTY) {
-                const userWantRemoveAllFile = confirm(t('vm:project.removeAllFileAsk'));
+                
+                const userWantRemoveAllFile = await new Promise(resolve => {
+                    void modal.open(ConfirmModal, {
+                        message: t('vm:project.removeAllFileAsk'),
+                        callback: result => {
+                            resolve(result);
+                        },
+                    });
+                });
+
                 if (!userWantRemoveAllFile) throw new Error(checkResult.result);
                 const fileNames = await this.projectManager.listAllFileName(
                     this.projectManager.folderHandle,

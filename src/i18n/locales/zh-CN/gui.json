@@ -60,5 +60,14 @@
     "menu.redo": "重做",
     "menu.restore": "恢复默认设置",
     "menu.about": "关于 Astratch",
-    "menu.docs": "文档"
+    "menu.docs": "文档",
+    "alert": "提醒",
+    "alert_description": "提醒Modal的标题（为什么你想看我...一个标题能有什么提示）",
+    "confirm": "确认",
+    "confirm_description": "确认Modal的标题（早上好！假如再也见不到你，那就再祝你下午好，晚上好，晚安！）",
+    "prompt": "输入",
+    "prompt_description": "输入Modal的标题（请不要输入“赛博猫猫高瞻远瞩！”）",
+    "ok": "好的",
+    "no": "不要",
+    "done": "完成"
 }

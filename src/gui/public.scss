@@ -76,6 +76,7 @@ input:not([class*='blocklyHtmlInput']):not([class*='fieldColourSlider']) {
     color: $text-primary;
     border: 1px $ui-secondary solid;
     border-radius: 3px;
+    padding: 5px;
 }
 
 // 在暗色模式下积木输入框会变黑
