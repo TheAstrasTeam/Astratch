@@ -7,6 +7,7 @@ export const DEFAULT_GUITHEME = 'dark' as const;
 
 export const guiAccents = {
     blue: 'blue',
+    pink: 'pink'
 } as const;
 export type TGuiAccent = keyof typeof guiAccents;
 export const DEFAULT_GUIACCENT = 'blue' as const;

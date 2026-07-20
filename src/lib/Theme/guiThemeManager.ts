@@ -10,6 +10,7 @@ import dark from './gui/dark';
 import light from './gui/light';
 
 import blue from './accent/blue';
+import pink from './accent/pink';
 
 const DEFAULT_BLOCKLY_SPRITES_STYLE_ID = 'blockly_sprites_style';
 
@@ -25,6 +26,10 @@ const guiAccentMap: Record<TGuiAccent, Record<'gui' | 'block', Record<string, st
     blue: {
         gui: blue.guiColors,
         block: blue.blockColors,
+    },
+    pink: {
+        gui: pink.guiColors,
+        block: pink.blockColors
     },
 };
 
