@@ -29,7 +29,7 @@ const guiAccentMap: Record<TGuiAccent, Record<'gui' | 'block', Record<string, st
     },
     pink: {
         gui: pink.guiColors,
-        block: pink.blockColors
+        block: pink.blockColors,
     },
 };
 
@@ -61,7 +61,6 @@ const applyGuiTheme = (): void => {
                 `;
                 document.head.appendChild(blocklySpritesStyle);
             } else document.getElementById(DEFAULT_BLOCKLY_SPRITES_STYLE_ID)?.remove();
-            
         } else document.documentElement.style.setProperty(`--${css[0]}`, css[1]);
     });
     Object.entries(accents).forEach(color => {

@@ -7,7 +7,6 @@ import { useContextMenu } from '../../contextMenu';
 import { AllContextMenu } from '../../../types/gui';
 import { getBlocklyMenuOptions, getBlocklyMenuEvent } from '../../../vm/blocks';
 
-
 const BlocklyWorkspace = ({ vm }: { vm: IVM }): React.ReactNode => {
     const workspaceDiv = useRef<HTMLDivElement>(null);
 

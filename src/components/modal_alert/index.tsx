@@ -13,9 +13,9 @@ export const AlertModal = ({
     const { closeSelf } = useModalInstance();
 
     const handleButtonClick = async (result: unknown = null) => {
-        if(callback) callback();
+        if (callback) callback();
         await closeSelf(result);
-    }; 
+    };
 
     return (
         <Modal

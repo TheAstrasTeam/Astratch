@@ -187,7 +187,7 @@ class Blocks implements IBlocks {
                 minScale: 0.3,
                 scaleSpeed: 1.2,
                 // 这个捏可以让手机端用！
-                pinch: true
+                pinch: true,
                 // 调整缩放的设置
             },
             trashcan: true,

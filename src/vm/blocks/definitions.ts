@@ -135,8 +135,8 @@ const initBlocks = (blockly: typeof Blockly) => {
         void modal.open(PromptModal, {
             message,
             defaultValue,
-            callback
-        })
+            callback,
+        });
     });
 
     // 事实上对于如下的`message0`在blockly都是无效的
