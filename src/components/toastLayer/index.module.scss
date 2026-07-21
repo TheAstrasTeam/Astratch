@@ -1,0 +1,183 @@
+@use '../../gui/styles/color.scss' as *;
+@use '../../gui/styles/constants.scss' as *;
+@use '../../gui/styles/zIndex.scss' as *;
+
+.layer {
+    position: fixed;
+    display: flex;
+    flex-direction: column-reverse;
+    right: 5px;
+    transform: translateY(-100%);
+    pointer-events: none;
+    z-index: $toast;
+}
+
+.toast {
+    pointer-events: auto;
+    min-width: 240px;
+    max-width: 320px;
+    min-height: 35px;
+    margin-bottom: 4px;
+    background-color: $ui-secondary;
+    color: $text-primary;
+    border: $ui-black-transparent $border-width solid;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.content {
+    margin: 5px 6px;
+    flex: 1;
+    &.not-spinner {
+        margin-bottom: 10px;
+    }
+}
+
+.text {
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.progress {
+    width: 100%;
+    height: 4px;
+    margin: 0;
+    -webkit-appearance: none;
+    appearance: none;
+    &::-webkit-progress-bar {
+        background-color: $ui-black-transparent;
+    }
+    &::-webkit-progress-value {
+        background-color: $looks-secondary;
+    }
+}
+
+.spinner {
+    position: relative;
+    width: 100%;
+    height: 4px;
+    background-color: $ui-black-transparent;
+    overflow: hidden;
+}
+
+.spinner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 40%;
+    height: 100%;
+    background-color: $looks-secondary;
+    animation: toast-indeterminate 1.2s ease-in-out infinite;
+}
+
+@keyframes toast-indeterminate {
+    0% {
+        left: -40%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+.title {
+    display: flex;
+    margin: 0;
+    gap: 5px;
+    line-height: 1;
+    align-items: center;
+    margin-top: 6px;
+    padding: 0 5px;
+    & svg {
+        width: 16px;
+        height: 16px;
+    }
+}
+.title-text {
+    opacity: 0.5;
+    font-size: smaller;
+}
+
+.historyPanel {
+    position: fixed;
+    right: 0;
+    transform: translateY(-100%);
+    width: 340px;
+    max-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    background-color: $ui-secondary;
+    border: $ui-black-transparent $border-width solid;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+    overflow: hidden;
+}
+
+.historyHeader {
+    height: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 10px;
+    border-bottom: $ui-black-transparent $border-width solid;
+    font-size: 12px;
+    color: $text-primary;
+}
+
+.historyClose {
+    height: 22px !important;
+    width: 22px !important;
+    min-width: 22px !important;
+    display: flex;
+    background: none;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    color: $text-primary;
+    font-size: 16px;
+    line-height: 1;
+    border-radius: 16px !important;
+    cursor: pointer;
+    flex: 0 !important;
+    padding: 0 !important;
+    opacity: 0.6;
+    &:hover {
+        opacity: 1;
+    }
+    & svg {
+        height: 12px !important;
+        width: 12px !important;
+    }
+}
+
+.historyList {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.historyEmpty {
+    padding: 20px;
+    text-align: center;
+    color: $text-primary;
+    opacity: 0.4;
+    font-size: 12px;
+}
+
+/* 归档态：稍微降低饱和度 */
+
+.toast[data-archived='true'] {
+    opacity: 0.7;
+}

@@ -12,6 +12,7 @@ import { ModalProvider } from '@reactleaf/modal';
 import { initBuiltInSettings } from './settings/index.ts';
 import { Settings } from './settings/SettingsRegistry.ts';
 import { events } from './types/vm.ts';
+import { Toast } from './lib/ToastManager/index.ts';
 
 // 等待国际化初始化
 await i18nReady.then(() => {
@@ -36,6 +37,7 @@ await i18nReady.then(() => {
     Object.assign(window, {
         vm,
         Settings,
+        Toast
     });
 
     applyGuiTheme(); //初始化主题

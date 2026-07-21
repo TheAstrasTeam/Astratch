@@ -16,6 +16,7 @@ import { modal } from '../../components/Modal/modal';
 import { AlertModal } from '../../components/modal_alert';
 import { ConfirmModal } from '../../components/modal_confirm';
 import { PromptModal } from '../../components/modal_prompt';
+import { Toast as AshToast } from '../../lib/ToastManager';
 
 /**
  * 对于链接积木的配置项
@@ -138,6 +139,32 @@ const initBlocks = (blockly: typeof Blockly) => {
             callback,
         });
     });
+
+    // 拦截 Blockly 的 toast。
+    // 此patch由ai制作
+    const shownOnceIds = new Set<string>();
+    const forwardToast = (options: Blockly.ToastOptions) => {
+        if (options.oncePerSession && options.id) {
+            if (shownOnceIds.has(options.id)) return;
+            shownOnceIds.add(options.id);
+        }
+        const duration = options.duration !== undefined ? options.duration * 1000 : undefined;
+        AshToast.create({
+            id: options.id ?? `blockly-toast-${Date.now().toString()}`,
+            type: 'info',
+            text: options.message,
+            duration,
+        });
+    };
+    blockly.dialog.setToast((_workspace, options) => {
+        forwardToast(options);
+    });
+    blockly.Toast.show = (_workspace, options) => {
+        forwardToast(options);
+    };
+    blockly.Toast.hide = (_workspace, id) => {
+        if (id) AshToast.removeToast(id);
+    };
 
     // 事实上对于如下的`message0`在blockly都是无效的
     // i18next 不支持在消息id中填入空格

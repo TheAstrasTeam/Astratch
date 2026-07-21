@@ -70,5 +70,13 @@
     "ok": "OK",
     "no": "No",
     "done": "Done",
-    "scale": "Scale"
+    "scale": "Scale",
+    "bottomBar_positionText": "Workspace x: {{x}}, y: {{y}} scale: {{scale}}",
+    "toast": "Notifications",
+    "toast.noRecords": "No records",
+    "info": "Info",
+    "warn": "Warn",
+    "error": "Error",
+    "spinner": "Loading",
+    "progress": "Progress"
 }

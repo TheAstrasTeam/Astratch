@@ -1,3 +1,5 @@
+// shortcut manager
+
 import type Mousetrap from 'mousetrap';
 
 export const ALL_SHORTCUTS_IDS = {
@@ -39,4 +41,89 @@ export interface IShortcut {
     formatHotKey: (key: string) => string;
     setHotKey: (id: ShortcutIds, hotKey: string) => SetShortcutResult;
     resetHotKey: (id: ShortcutIds) => void;
+}
+
+// toastManager
+
+export interface IToastManger {
+    /**
+     * 创建一个通知
+     * 并返回是否创建成功
+     */
+    create: (meta: IToast) => boolean;
+    emit: (data: TToastEvent) => void;
+    on: (id: string, callback: (data: TToastEvent) => void, opts?: { once?: boolean }) => () => void;
+    off: (id: string) => void;
+    /**
+     * 当前活跃的通知（未归档）
+     */
+    getAllHistory: () => ReadonlyMap<string, IToast>;
+    /**
+     * 完整历史（活跃 + 已归档），按 createdAt 倒序
+     */
+    getFullHistory: () => IToast[];
+    /**
+     * 删除一个通知（程序移除，不会触发 action）
+     * 归档到完整历史中
+     * @param id 通知id
+     * @returns 是否成功删除
+     */
+    removeToast: (id: string) => boolean;
+    /**
+     * 用户点击通知时调用，会触发 action 并归档
+     * @returns 是否成功（通知存在时为 true）
+     */
+    interact: (id: string) => boolean;
+    /**
+     * 仅触发 action，不归档（供历史面板使用）
+     * @returns 是否成功
+     */
+    trigger: (id: string) => boolean;
+    /**
+     * 设置 progress 类型通知的进度
+     * @returns 是否成功
+     */
+    setProgress: (id: string, progress: number) => boolean;
+}
+
+export type TToastMode = 'info' | 'error' | 'warn' | 'spinner' | 'progress';
+
+export interface IToast {
+    id: string;
+    type: TToastMode;
+    text: string;
+    duration?: number;
+    /**
+     * 用户点击通知时触发的回调
+     * 仅在 interact/trigger 时被调用，result 恒为 true
+     */
+    action?: (result: boolean) => void;
+    /**
+     * 进度值，仅 type === 'progress' 时有效
+     * spinner 类型不应使用此字段（永远显示滚动动画）
+     */
+    progress?: number;
+    /**
+     * 创建时间戳（由 ToastManager 自动填充）
+     */
+    createdAt?: number;
+    /**
+     * 归档时间戳（被 dismiss 后由 ToastManager 填充，存在表示已归档）
+     */
+    archivedAt?: number;
+}
+
+/**
+ * toast 事件
+ * - refresh: 增删/全量刷新
+ * - progress: 单条 loading 进度更新（UI 可局部刷新）
+ */
+export type TToastEvent =
+    | { type: 'refresh' }
+    | { type: 'progress'; id: string; progress: number };
+
+export interface IEvent {
+    callback?: (data: TToastEvent) => void;
+    once?: boolean;
+    id: string;
 }
