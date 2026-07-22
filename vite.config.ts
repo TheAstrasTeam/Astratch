@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import { resolve } from 'node:path';
 import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import pageReload from 'vite-plugin-page-reload';
 import babel from '@rolldown/plugin-babel';
@@ -39,7 +40,7 @@ Give we a star⭐ in\x1b[34m https://github.com/TheAstrasTeam/Astratch\x1b[0m , 
 // https://vite.dev/config/
 export default defineConfig({
     root: 'src',
-    publicDir: '../public',
+    publicDir: resolve(import.meta.dirname, 'src/public'),
     build: {
         outDir: '../dist',
         emptyOutDir: true,
