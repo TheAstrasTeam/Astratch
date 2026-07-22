@@ -135,26 +135,30 @@
         </noscript>
         <script type="module" src="./main.tsx"></script>
         <script>
-            // 例子：
-            // "{\"userName\":\"Player_76136\",\"guiTheme\":{\"gui\":\"dark\",\"accent\":\"blue\"}}"
             const ashSettings = localStorage.getItem('ash_settings');
             const Loading = document.querySelector('.loading');
+            const circle = document.querySelectorAll('.circle');
             if (ashSettings && ashSettings) {
                 try {
-                    const ashTheme = JSON.parse(ashSettings).guiTheme;
-                    if (ashTheme.gui === 'dark') {
+                    const ashThemeMode = JSON.parse(ashSettings).guiThemeMode;
+                    const ashThemeAccent = JSON.parse(ashSettings).guiThemeAccent;
+                    if (ashThemeMode === 'dark') {
                         Loading.style.backgroundColor = '#1e1e1e';
                         Loading.style.color = '#eee';
                     } else {
-                        Loading.style.color = '#111';
-                        switch (ashTheme.accent) {
-                            case 'blue':
-                                Loading.style.backgroundColor = '#09f';
-                                break;
-                            default:
-                                Loading.style.backgroundColor = '#09f';
-                                break;
-                        }
+                        Loading.style.color = '#eee';
+                        let getColor = () => {
+                            switch (ashThemeAccent) {
+                                case 'blue':
+                                    return '#09f';
+                                case 'pink':
+                                    return '#ff9b86';
+                                default:
+                                    return '#09f';
+                            }
+                        };
+
+                        circle.forEach(ele => (ele.style.backgroundColor = getColor()));
                     }
                 } catch {}
             }
