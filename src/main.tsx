@@ -37,7 +37,7 @@ await i18nReady.then(() => {
     Object.assign(window, {
         vm,
         Settings,
-        Toast
+        Toast,
     });
 
     applyGuiTheme(); //初始化主题

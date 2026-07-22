@@ -5,7 +5,7 @@ import { MenuItem, MenuDivider } from '@szhsin/react-menu';
 
 import { useContextMenu } from '../../contextMenu';
 import { AllContextMenu } from '../../../types/gui';
-import { getBlocklyMenuOptions, getBlocklyMenuEvent } from '../../../vm/blocks';
+import { getBlocklyMenuOptions, getBlocklyMenuEvent } from '../../../lib/BlocklyAdapter/index';
 
 const BlocklyWorkspace = ({ vm }: { vm: IVM }): React.ReactNode => {
     const workspaceDiv = useRef<HTMLDivElement>(null);

@@ -3,7 +3,7 @@ import { Toast } from '../../lib/ToastManager';
 import type { IToast } from '../../types/lib';
 import { ToastItem } from './ToastItem';
 import styles from './index.module.scss';
-import Close from '../../assets/close.svg?react'
+import Close from '../../assets/close.svg?react';
 import { t } from 'i18next';
 
 const SUBSCRIBE_ID = 'toastHistoryPanel';
@@ -29,10 +29,7 @@ export const ToastHistoryPanel = ({
 
         const handleClickOutside = (e: MouseEvent) => {
             const target = e.target as Node;
-            if (
-                panelRef.current?.contains(target) ||
-                anchorRef.current?.contains(target)
-            ) {
+            if (panelRef.current?.contains(target) || anchorRef.current?.contains(target)) {
                 return;
             }
             onClose();

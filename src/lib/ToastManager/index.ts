@@ -66,10 +66,9 @@ class toastManager implements IToastManger {
     }
 
     getFullHistory() {
-        return [
-            ...Array.from(this.history.values()),
-            ...Array.from(this.archive.values()),
-        ].sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
+        return [...Array.from(this.history.values()), ...Array.from(this.archive.values())].sort(
+            (a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0),
+        );
     }
 
     removeToast(id: string) {

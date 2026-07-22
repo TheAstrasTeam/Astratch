@@ -4,32 +4,14 @@ import * as Blockly from 'blockly';
 import * as ContinuousToolbox from '../../../plugins/continuous-toolbox/src';
 import * as En from 'blockly/msg/en';
 import * as ZhHans from 'blockly/msg/zh-hans';
-import getToolbox from './toolbox';
-import { collectOptions, initBlocks } from './definitions';
+import getToolbox from '../../lib/BlocklyAdapter/toolbox';
+import { initBlocks } from '../../lib/BlocklyAdapter/definitions';
 import { AshConnectionChecker } from '../../../plugins/cBlockWrap';
 import { getBlocklyComponentStyles } from '../../lib/Theme/guiThemeManager';
 import { events, type IVM, type viewportUpdateEvent } from '../../types/vm';
 import { getBlocklyI18nByI18next } from '../../utils/ash-i18n';
 import i18next from 'i18next';
-import { replaceChineseI18n } from './i18n';
-import { closeContextMenu, openContextMenu } from '../../gui/contextMenu';
-import { AllContextMenu } from '../../types/gui';
-import {
-    installContextMenuPatch,
-    setContextMenuHandler,
-} from '../../../plugins/context-menu-patch';
-import { ScratchCommentBubble } from '../../../plugins/scratch-comment';
-
-let _blocklyMenuOptions: Blockly.ContextMenuRegistry.ContextMenuOption[] | null = null;
-let _blocklyMenuEvent: Event | null = null;
-
-export function getBlocklyMenuOptions(): Blockly.ContextMenuRegistry.ContextMenuOption[] | null {
-    return _blocklyMenuOptions;
-}
-
-export function getBlocklyMenuEvent(): Event | null {
-    return _blocklyMenuEvent;
-}
+import { replaceChineseI18n } from '../../lib/BlocklyAdapter/i18n';
 
 /**
  * 用于便捷的管理WebGPU或Blockly工作区
@@ -125,25 +107,6 @@ class Blocks implements IBlocks {
         void this.restartWorkspace();
     };
 
-    private _patchBlocklyContextMenu(): void {
-        // 此函数由 Ai 生成
-        installContextMenuPatch(this.Blockly);
-        setContextMenuHandler((options, event, location) => {
-            // ScratchCommentBubble 是 ASH 自定义的，不在插件覆盖范围内，单独处理
-            const focusedNode = this.Blockly.getFocusManager().getFocusedNode();
-            if (focusedNode instanceof ScratchCommentBubble) {
-                options = collectOptions(focusedNode, event);
-            }
-            _blocklyMenuOptions = options;
-            _blocklyMenuEvent = event;
-            if (options.length) {
-                openContextMenu(AllContextMenu.BLOCKLY, location);
-            } else {
-                closeContextMenu();
-            }
-        });
-    }
-
     constructor(BlocklySelf: typeof Blockly, vm: IVM) {
         this.vm = vm;
         this._DOM = null;
@@ -171,7 +134,7 @@ class Blocks implements IBlocks {
         });
         this.workspaceConfig = {
             toolbox: this.toolbox,
-            media: '/vm/blocks/images',
+            media: '/blockly-media',
             scrollbars: true,
             // 折叠积木
             // 这玩意会导致注释无法正常工作
@@ -269,10 +232,10 @@ class Blocks implements IBlocks {
             this.vm.on(events.UPDATE_THEME, this.handleThemeUpdate);
             this._DOM = DOM;
             if (i18next.language) this.setLanguage(getBlocklyI18nByI18next(i18next.language));
-            await this.init();
-            this.workspaceSvg = this.Blockly.inject(DOM, this.workspaceConfig);
 
-            this._patchBlocklyContextMenu();
+            await this.init();
+
+            this.workspaceSvg = this.Blockly.inject(DOM, this.workspaceConfig);
 
             const nowTarget = this.vm.runtime.getTargetByID(this.vm.runtime.editingTargetID);
             if (nowTarget?.blocks)

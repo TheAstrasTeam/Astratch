@@ -17,9 +17,7 @@ export const ToastLayer = ({ y }: { y: number }) => {
                 setToasts(Array.from(Toast.getAllHistory().values()));
             } else {
                 setToasts(prev =>
-                    prev.map(t =>
-                        t.id === data.id ? { ...t, progress: data.progress } : t,
-                    ),
+                    prev.map(t => (t.id === data.id ? { ...t, progress: data.progress } : t)),
                 );
             }
         });
@@ -37,11 +35,7 @@ export const ToastLayer = ({ y }: { y: number }) => {
             }}
         >
             {toasts.map(toast => (
-                <ToastItem
-                    key={toast.id}
-                    toast={toast}
-                    onClick={() => Toast.interact(toast.id)}
-                />
+                <ToastItem key={toast.id} toast={toast} onClick={() => Toast.interact(toast.id)} />
             ))}
         </div>
     );

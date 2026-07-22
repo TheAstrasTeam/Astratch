@@ -7,17 +7,6 @@ import turnRight from './images/turnRight.svg';
 import greenFlag from './images/green-flag.svg';
 import repeatIcon from './images/repeat.svg';
 
-import { dropdownWithInput } from '../../../plugins/fieldDropdown';
-import { FieldAngle } from '../../../plugins/field-angle/src';
-import { FieldColourHsvSliders } from '../../../plugins/field-colour-hsv-sliders/src';
-import { registerScratchComment, ScratchCommentBubble } from '../../../plugins/scratch-comment';
-import { installCBlockWrap } from '../../../plugins/cBlockWrap';
-import { modal } from '../../components/Modal/modal';
-import { AlertModal } from '../../components/modal_alert';
-import { ConfirmModal } from '../../components/modal_confirm';
-import { PromptModal } from '../../components/modal_prompt';
-import { Toast as AshToast } from '../../lib/ToastManager';
-
 /**
  * 对于链接积木的配置项
  */
@@ -49,42 +38,6 @@ const returnConnections = {
     inputsInline: true,
 } as const;
 
-export const collectOptions = (focusedNode: Blockly.IFocusableNode | null, e: Event) => {
-    // 此函数由 Ai 生成
-    let options: Blockly.ContextMenuRegistry.ContextMenuOption[] = [];
-
-    if (focusedNode instanceof ScratchCommentBubble) {
-        options = (
-            focusedNode as unknown as {
-                getContextMenuOptions(): Blockly.ContextMenuRegistry.ContextMenuOption[];
-            }
-        ).getContextMenuOptions();
-    } else if (focusedNode instanceof Blockly.BlockSvg) {
-        options = Blockly.ContextMenuRegistry.registry.getContextMenuOptions(
-            { block: focusedNode, focusedNode },
-            e,
-        );
-    } else if (focusedNode instanceof Blockly.icons.Icon) {
-        const block = focusedNode.getSourceBlock() as Blockly.BlockSvg;
-        options = Blockly.ContextMenuRegistry.registry.getContextMenuOptions(
-            { block, focusedNode: block },
-            e,
-        );
-    } else if (focusedNode instanceof Blockly.comments.RenderedWorkspaceComment) {
-        options = Blockly.ContextMenuRegistry.registry.getContextMenuOptions(
-            { comment: focusedNode, focusedNode },
-            e,
-        );
-    } else if (focusedNode instanceof Blockly.WorkspaceSvg) {
-        options = Blockly.ContextMenuRegistry.registry.getContextMenuOptions(
-            { workspace: focusedNode, focusedNode },
-            e,
-        );
-    }
-
-    return options;
-};
-
 const initBlocks = (blockly: typeof Blockly) => {
     try {
         // 源代码所示，Blockly的注册积木仅会加入到 Map 中，
@@ -97,74 +50,6 @@ const initBlocks = (blockly: typeof Blockly) => {
     } catch {
         // 不需要管
     }
-
-    // 关于注释
-    try {
-        // 注册注释选项（添加/删除注释右键菜单），在空白工作区也可用
-        blockly.ContextMenuItems.registerCommentOptions();
-        // 注册 Scratch 风格注释图标，替换 Blockly 原生 CommentIcon
-        registerScratchComment(blockly);
-        // 内联切换，这个不该让用户手动修改
-        // todo: 确认是否需要禁用
-        blockly.ContextMenuRegistry.registry.unregister('blockInline');
-    } catch {
-        // 不需要管
-    }
-    blockly.fieldRegistry.unregister('field_dropdown_with_block');
-    blockly.fieldRegistry.unregister('field_angle');
-    blockly.fieldRegistry.unregister('field_colour');
-
-    installCBlockWrap(blockly);
-    blockly.fieldRegistry.register('field_dropdown_with_block', dropdownWithInput);
-    blockly.fieldRegistry.register('field_angle', FieldAngle);
-    blockly.fieldRegistry.register('field_colour', FieldColourHsvSliders);
-
-    // 替换 blockly 自己的modal
-    blockly.dialog.setAlert((message, callback) => {
-        void modal.open(AlertModal, {
-            message,
-            callback,
-        });
-    });
-    blockly.dialog.setConfirm((message, callback) => {
-        void modal.open(ConfirmModal, {
-            message,
-            callback,
-        });
-    });
-    blockly.dialog.setPrompt((message, defaultValue, callback) => {
-        void modal.open(PromptModal, {
-            message,
-            defaultValue,
-            callback,
-        });
-    });
-
-    // 拦截 Blockly 的 toast。
-    // 此patch由ai制作
-    const shownOnceIds = new Set<string>();
-    const forwardToast = (options: Blockly.ToastOptions) => {
-        if (options.oncePerSession && options.id) {
-            if (shownOnceIds.has(options.id)) return;
-            shownOnceIds.add(options.id);
-        }
-        const duration = options.duration !== undefined ? options.duration * 1000 : undefined;
-        AshToast.create({
-            id: options.id ?? `blockly-toast-${Date.now().toString()}`,
-            type: 'info',
-            text: options.message,
-            duration,
-        });
-    };
-    blockly.dialog.setToast((_workspace, options) => {
-        forwardToast(options);
-    });
-    blockly.Toast.show = (_workspace, options) => {
-        forwardToast(options);
-    };
-    blockly.Toast.hide = (_workspace, id) => {
-        if (id) AshToast.removeToast(id);
-    };
 
     // 事实上对于如下的`message0`在blockly都是无效的
     // i18next 不支持在消息id中填入空格
