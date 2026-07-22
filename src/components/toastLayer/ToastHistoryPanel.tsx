@@ -49,7 +49,7 @@ export const ToastHistoryPanel = ({
             document.removeEventListener('mousedown', handleClickOutside);
             document.removeEventListener('keydown', handleEsc);
         };
-    }, [onClose]);
+    }, [anchorRef, onClose]);
 
     return (
         <div

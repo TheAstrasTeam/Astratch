@@ -4,6 +4,9 @@ import { t } from 'i18next';
 import { Settings, type ISettingDefinition } from '../../settings/SettingsRegistry';
 import { useState } from 'react';
 import styles from './index.module.scss';
+import KeyInput from '../keyInput';
+import { DEFAULT_SHORTCUTS, type ShortcutIds } from '../../types/lib';
+import { shortcutManager } from '../../lib/ShortcutManager';
 
 const SpawnSetting = ({ settings }: { settings: ISettingDefinition }) => {
     const [nowValue, setNowValue] = useState(Settings.get(settings.key));
@@ -15,6 +18,11 @@ const SpawnSetting = ({ settings }: { settings: ISettingDefinition }) => {
     const handleSelectChanged = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setNowValue(e.target.value);
         Settings.set(settings.key, e.target.value);
+    };
+    const handleResetKey = () => {
+        const id = settings.key as ShortcutIds;
+        shortcutManager.resetHotKey(id);
+        setNowValue(DEFAULT_SHORTCUTS[id]);
     };
 
     return (
@@ -42,6 +50,20 @@ const SpawnSetting = ({ settings }: { settings: ISettingDefinition }) => {
                             <option value={option.value}>{option.label}</option>
                         ))}
                     </select>
+                ) : settings.type === 'key' ? (
+                    <>
+                        {Settings.get(settings.key) !==
+                            DEFAULT_SHORTCUTS[settings.key as ShortcutIds] && (
+                            <button onClick={handleResetKey}>Clear</button>
+                        )}
+                        <KeyInput
+                            value={nowValue as string}
+                            onChange={v => {
+                                setNowValue(v);
+                                shortcutManager.setHotKey(settings.key as ShortcutIds, v);
+                            }}
+                        />
+                    </>
                 ) : (
                     <></>
                 )}
@@ -78,9 +100,11 @@ export const SettingsModal = () => {
                 </div>
                 <div className={styles.settings}>
                     <span className={styles.settingsTitle}>{nowTab}</span>
-                    {categories[nowTab].map(settings => (
-                        <SpawnSetting key={settings.key} settings={settings}></SpawnSetting>
-                    ))}
+                    <div className={styles.settingsContent}>
+                        {categories[nowTab].map(settings => (
+                            <SpawnSetting key={settings.key} settings={settings}></SpawnSetting>
+                        ))}
+                    </div>
                 </div>
             </div>
         </Modal>

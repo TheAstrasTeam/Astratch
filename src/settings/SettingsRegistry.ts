@@ -4,7 +4,7 @@ import { create, type StoreApi, type UseBoundStore } from 'zustand';
 import { readLocalStorage, setItemToLocalStorage } from '../utils/localstorage';
 import { localStorageIDs } from '../types/storage';
 
-export type TSettingType = 'text' | 'number' | 'boolean' | 'select' | 'theme';
+export type TSettingType = 'text' | 'number' | 'boolean' | 'select' | 'theme' | 'key';
 
 export interface ISettingOption {
     value: string;

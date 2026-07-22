@@ -2,17 +2,21 @@
 @use '../../gui/styles/constants.scss' as *;
 
 .content {
-    min-width: 75vw;
-    min-height: 75vh;
+    width: 75vw;
+    height: 75vh;
     display: flex;
-    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
 }
 
 .tabs {
     display: flex;
+    flex: 0 0 20%;
     flex-direction: column;
     height: 100%;
-    width: 20%;
+    min-width: 0;
+    overflow-y: auto;
     background-color: $ui-modal-header-background;
     & button {
         margin: 0;
@@ -33,9 +37,14 @@
 .settings {
     margin: 0;
     padding: 25px;
-    width: 100%;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
 }
 .settings-title {
+    flex: 0 0 auto;
     font-size: xx-large;
 }
 
@@ -43,11 +52,14 @@
     padding: 15px;
     display: flex;
     justify-content: space-between;
+    min-width: 0;
+    gap: 16px;
 }
 
 .setting-text {
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
 .setting-text-title {
@@ -55,4 +67,17 @@
 }
 .setting-text-desc {
     opacity: 0.5;
+    overflow-wrap: anywhere;
+}
+
+.settings-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
 }

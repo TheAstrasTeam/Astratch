@@ -78,5 +78,19 @@
     "warn": "Warn",
     "error": "Error",
     "spinner": "Loading",
-    "progress": "Progress"
+    "progress": "Progress",
+    "keyInput.recording": "Press a key combo…",
+    "keyInput.placeholder": "Click to set",
+    "keyInput.ariaLabel": "Hotkey setting",
+    "shortcut.project.new": "New Project",
+    "shortcut.project.save": "Save Project",
+    "shortcut.project.open": "Open Project",
+    "shortcut.blockly.copy": "Copy",
+    "shortcut.blockly.cut": "Cut",
+    "shortcut.blockly.paste": "Paste",
+    "shortcut.blockly.undo": "Undo",
+    "shortcut.blockly.redo": "Redo",
+    "shortcut.blockly.duplicate": "Duplicate Block",
+    "shortcut.blockly.cleanup": "Clean Up Blocks",
+    "shortcut.blockly.disconnect": "Disconnect"
 }

@@ -1,0 +1,45 @@
+@use '../../gui/styles/color.scss' as *;
+@use '../../gui/styles/constants.scss' as *;
+
+.key-input {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-width: 120px;
+    min-height: 28px;
+    padding: 3px 8px;
+    background-color: $ui-tertiary;
+    color: $text-primary;
+    border: 1px $ui-secondary solid;
+    border-radius: 3px;
+    cursor: pointer;
+    &:hover {
+        border-color: $ui-black-transparent;
+    }
+}
+
+.badges {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    padding: 1px 5px;
+    background-color: $ui-secondary;
+    border-radius: 3px;
+    font-size: small;
+    font-family:
+        ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+        monospace;
+}
+
+.hint {
+    opacity: 0.5;
+    font-size: small;
+}

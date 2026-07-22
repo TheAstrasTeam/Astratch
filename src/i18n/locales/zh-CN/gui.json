@@ -78,5 +78,19 @@
     "warn": "警告",
     "error": "错误",
     "spinner": "加载中",
-    "progress": "进度"
+    "progress": "进度",
+    "keyInput.recording": "按下快捷键…",
+    "keyInput.placeholder": "点击设置",
+    "keyInput.ariaLabel": "快捷键设置",
+    "shortcut.project.new": "新建项目",
+    "shortcut.project.save": "保存项目",
+    "shortcut.project.open": "打开项目",
+    "shortcut.blockly.copy": "复制",
+    "shortcut.blockly.cut": "剪切",
+    "shortcut.blockly.paste": "粘贴",
+    "shortcut.blockly.undo": "撤销",
+    "shortcut.blockly.redo": "重做",
+    "shortcut.blockly.duplicate": "复制积木",
+    "shortcut.blockly.cleanup": "整理积木",
+    "shortcut.blockly.disconnect": "断开连接"
 }

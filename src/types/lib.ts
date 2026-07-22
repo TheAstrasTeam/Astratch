@@ -6,6 +6,14 @@ export const ALL_SHORTCUTS_IDS = {
     NEW_PROJECT: 'project.new',
     SAVE_PROJECT: 'project.save',
     OPEN_PROJECT: 'project.open',
+    BLOCKLY_COPY: 'blockly.copy',
+    BLOCKLY_CUT: 'blockly.cut',
+    BLOCKLY_PASTE: 'blockly.paste',
+    BLOCKLY_UNDO: 'blockly.undo',
+    BLOCKLY_REDO: 'blockly.redo',
+    BLOCKLY_DUPLICATE: 'blockly.duplicate',
+    BLOCKLY_CLEANUP: 'blockly.cleanup',
+    BLOCKLY_DISCONNECT: 'blockly.disconnect',
 } as const;
 
 export type ShortcutIds = (typeof ALL_SHORTCUTS_IDS)[keyof typeof ALL_SHORTCUTS_IDS];
@@ -14,6 +22,14 @@ export const DEFAULT_SHORTCUTS = {
     [ALL_SHORTCUTS_IDS.NEW_PROJECT]: 'mod+e',
     [ALL_SHORTCUTS_IDS.SAVE_PROJECT]: 'mod+s',
     [ALL_SHORTCUTS_IDS.OPEN_PROJECT]: 'mod+o',
+    [ALL_SHORTCUTS_IDS.BLOCKLY_COPY]: 'mod+c',
+    [ALL_SHORTCUTS_IDS.BLOCKLY_CUT]: 'mod+x',
+    [ALL_SHORTCUTS_IDS.BLOCKLY_PASTE]: 'mod+v',
+    [ALL_SHORTCUTS_IDS.BLOCKLY_UNDO]: 'mod+z',
+    [ALL_SHORTCUTS_IDS.BLOCKLY_REDO]: 'mod+shift+z',
+    [ALL_SHORTCUTS_IDS.BLOCKLY_DUPLICATE]: 'd',
+    [ALL_SHORTCUTS_IDS.BLOCKLY_CLEANUP]: 'c',
+    [ALL_SHORTCUTS_IDS.BLOCKLY_DISCONNECT]: 'shift+x',
 } satisfies Record<ShortcutIds, string>;
 
 export type ShortcutCommand = (
@@ -23,24 +39,33 @@ export type ShortcutCommand = (
 
 export interface IShortcutMeta {
     id: ShortcutIds;
-    command: ShortcutCommand;
+    scope: string;
+    command?: ShortcutCommand;
 }
-
-export type ICustomShortcuts = Partial<Record<ShortcutIds, string>>;
 
 export type SetShortcutResult =
     | { ok: true }
     | { ok: false; reason: 'empty' | 'conflict'; conflictWith?: ShortcutIds };
 
+export interface ShortcutChangeEvent {
+    id: ShortcutIds;
+    scope: string;
+    oldKey: string | undefined;
+    newKey: string | undefined;
+}
+
+export type ShortcutChangeListener = (event: ShortcutChangeEvent) => void;
+
 export interface IShortcut {
     readonly shortcuts: ReadonlyMap<ShortcutIds, IShortcutMeta>;
-    readonly customShortcuts: Readonly<ICustomShortcuts>;
     register: (meta: IShortcutMeta) => () => void;
     unregister: (id: ShortcutIds) => boolean;
     getHotKey: (id: ShortcutIds) => string;
+    getMeta: (id: ShortcutIds) => IShortcutMeta | undefined;
     formatHotKey: (key: string) => string;
     setHotKey: (id: ShortcutIds, hotKey: string) => SetShortcutResult;
     resetHotKey: (id: ShortcutIds) => void;
+    onChange: (listener: ShortcutChangeListener) => () => void;
 }
 
 // toastManager
@@ -52,7 +77,11 @@ export interface IToastManger {
      */
     create: (meta: IToast) => boolean;
     emit: (data: TToastEvent) => void;
-    on: (id: string, callback: (data: TToastEvent) => void, opts?: { once?: boolean }) => () => void;
+    on: (
+        id: string,
+        callback: (data: TToastEvent) => void,
+        opts?: { once?: boolean },
+    ) => () => void;
     off: (id: string) => void;
     /**
      * 当前活跃的通知（未归档）
@@ -118,9 +147,7 @@ export interface IToast {
  * - refresh: 增删/全量刷新
  * - progress: 单条 loading 进度更新（UI 可局部刷新）
  */
-export type TToastEvent =
-    | { type: 'refresh' }
-    | { type: 'progress'; id: string; progress: number };
+export type TToastEvent = { type: 'refresh' } | { type: 'progress'; id: string; progress: number };
 
 export interface IEvent {
     callback?: (data: TToastEvent) => void;
