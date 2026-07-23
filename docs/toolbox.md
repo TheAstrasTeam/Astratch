@@ -25,7 +25,6 @@
         - 图层 Layer
             - 设自己的图层为number层
             - 将自己的图层(_上移_，下移)number层
-
             ***
             - 获取自己的图层
     - 外观 Appearance
@@ -148,12 +147,20 @@
         - (真,假)
     - 科学 Scientific
         - (sin,cos,tan,asin,acos,atan...)(number)
+
+
+- 数据 Data
+    - [新增一个数据]
+    - 将(数据名)设为 unknown
+    - 将(数据名)增加 number
+    - 将(数据名)(自增,自减,自除,自乘,自余) number
     - 字符串 String
         - 合并string和string
         - 通过string拆分string为数组
         - string的第number位到number位
         - string的长度
     - 数组 Array
+        - 空数组
         - 向(array)内添加 unknown 项
         - 让(array)删除第 number 项
         - 让(array)删除(开始,结束)项
@@ -162,17 +169,15 @@
         - 筛选(array)中不符合[表达式]的项
         - 查找(array)中值为unknown的(项数)
     - 对象 Object
+        - 空对象
         - 向(object)内添加 string 键，unknown 值
         - 让(object)删除键 string 和其中的值
         - 获取(object)的所有(键,值)
         - 获取(object)中对应键 string 的值
         - 获取(object)的项长度
-
-- 数据 Data
-    - [新增一个数据]
-    - 将(数据名)设为 unknown
-    - 将(数据名)增加 number
-    - 将(数据名)(自增,自减,自除,自乘,自余) number
+    - 类型
+        - unknown 的类型
+        - 将 unknown 转换为 unknown
 
 - 函数 Function
     - 行内函数[函数]
