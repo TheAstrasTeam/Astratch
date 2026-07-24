@@ -144,3 +144,65 @@ span {
 .blocklyZoom.blocklyZoomReset {
     transform: translateY(10px);
 }
+
+// Toolbox的图标
+
+.blocklyToolboxCategory {
+    display: flex;
+    align-items: center;
+
+    &.entity::before {
+        background-image: url('../assets/sprite.svg');
+        // 这个图标比其它的略大
+        width: 12px !important;
+        height: 12px !important;
+        flex: 0 0 12px !important;
+    }
+    &.audio::before {
+        background-image: url('../assets/sound.svg');
+    }
+    &.resources::before {
+        background-image: url('../assets/files.svg');
+    }
+    &.events::before {
+        background-image: url('../assets/events.svg');
+    }
+    &.control::before {
+        background-image: url('../assets/control.svg');
+    }
+    &.operator::before {
+        background-image: url('../assets/operator.svg');
+    }
+    &.data::before {
+        background-image: url('../assets/data.svg');
+    }
+    &.function::before {
+        background-image: url('../assets/function.svg');
+    }
+    &.debug::before {
+        background-image: url('../assets/debug.svg');
+    }
+    &:is(.entity, .audio, .resources, .events, .control, .operator, .data, .function, .debug) {
+        &::before {
+            content: '';
+            width: 14px;
+            height: 14px;
+            background-repeat: round;
+            margin-left: 5px;
+            margin-right: 3px;
+            filter: $svg-filter;
+            flex: 0 0 14px;
+        }
+    }
+
+    .blocklyTreeRowContentContainer {
+        flex: 1 1 auto;
+        width: auto;
+        min-width: 0;
+    }
+}
+
+.blocklyToolbox {
+    scrollbar-color: $ui-black-transparent transparent;
+    scrollbar-width: thin;
+}
