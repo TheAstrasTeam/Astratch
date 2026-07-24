@@ -55,7 +55,11 @@
     - 碰撞 Collision
         - 自己是否碰到了(对象名)
         - 当自己碰到了(对象名)
-
+    - 生命周期 Lifecycle
+        - 复制我自己作为新实体，并设置[(data)设为(unknown)] // 可以自由增加
+        - 删除这个复制实体
+        - 当实体被创建
+        
 
 
 - 音频 Audio
@@ -81,7 +85,7 @@
         ***
         - 获取ID为string的音频的(特效集)特效百分比
 
-- 资源 Resources
+- 资源 Asset
     - 从URL[string]获取并添加一个资源并称做string
     - 获取资源string // 返回一个ID，在实体会做多池检查，这个ID是无序的，不用担心重名
     - 资源string是否存在
@@ -90,6 +94,9 @@
       // 数据应该是 dataUrl
 
 - 事件 Events
+    - 广播 Broadcast
+        - 发送广播 string 并附带数据 unknown
+        - 监听广播(string)，执行附带(广播数据)的(function)，然后(堵塞直到监听到, 继续)
     - 生命周期 Lifecycle
         - 当项目开始运行
         - 当项目结束运行
@@ -154,6 +161,7 @@
     - 将(数据名)设为 unknown
     - 将(数据名)增加 number
     - 将(数据名)(自增,自减,自除,自乘,自余) number
+    ***
     - 字符串 String
         - 合并string和string
         - 通过string拆分string为数组
@@ -180,9 +188,10 @@
         - 将 unknown 转换为 unknown
 
 - 函数 Function
-    - 行内函数[函数]
+    - 行内函数[函数]，将[(这个地方是可以选塞入函数的参数)设为(unknown)]
     ***
     - [创建一个函数]
+    - 执行 function，将[(这个地方是可以选塞入函数的参数)设为(unknown)]
     - 返回 unknown
     - 运行标签为(分支标签)的分支
     - 将(值)数据设为unknown

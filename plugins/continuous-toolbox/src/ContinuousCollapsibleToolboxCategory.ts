@@ -1,28 +1,18 @@
 /**
  * @license
  * Copyright 2020 Google LLC
+ * Copyright 2026 AstrasTeam
  * SPDX-License-Identifier: Apache-2.0
- *
- * 由 AstrasTeam 修改于 2026/7/3:
- * - 增加一个降低HEX亮度的方法
- * - 修改边框颜色为`this.colour_`降低20%亮度的颜色
- * 
- * 由 AstrasTeam 修改于 2026/7/25:
- * - 删除修改的圆形，使用 Blockly 原生的样式
- * - 将类的 padding 改为 margin
- * - 修改选中时的颜色
  */
-
 /**
- * @fileoverview Toolbox category with styling for continuous toolbox.
+ * @fileoverview 修改可折叠工具箱
  */
 
 import * as Blockly from 'blockly/core';
 
 const { aria, dom } = Blockly.utils;
 
-/** Toolbox category for continuous toolbox. */
-export class ContinuousCategory extends Blockly.ToolboxCategory {
+export class CollapsibleContinuousCategory extends Blockly.CollapsibleToolboxCategory {
     static override borderWidth = 2;
     defaultBackgroundColour = '#ffffff50';
 
@@ -60,7 +50,7 @@ export class ContinuousCategory extends Blockly.ToolboxCategory {
         if (isSelected) {
             const defaultColour = this.defaultBackgroundColour;
             if (!this.colour_) this.colour_ = defaultColour;
-            if (this.colour_.length === 7) this.colour_ += '50';
+            else if (this.colour_.length === 7) this.colour_ = `${this.colour_}50`;
             this.rowDiv_.style.backgroundColor = this.colour_;
             if (className) {
                 dom.addClass(this.rowDiv_, className);
@@ -72,5 +62,37 @@ export class ContinuousCategory extends Blockly.ToolboxCategory {
             }
         }
         aria.setState(this.htmlDiv_ as Element, aria.State.SELECTED, isSelected);
+    }
+
+    /**
+     * Create the DOM for all subcategories.
+     *
+     * @param subcategories The subcategories.
+     * @returns The div holding all the subcategories.
+     */
+    protected createSubCategoriesDom_(subcategories: Blockly.IToolboxItem[]): HTMLDivElement {
+        const contentsContainer = document.createElement('div');
+        contentsContainer.style.display = 'none';
+        const className = this.cssConfig_['contents'];
+        if (className) {
+            dom.addClass(contentsContainer, className);
+        }
+        dom.addClass(contentsContainer, 'continuousToolboxIndentGuide');
+
+        contentsContainer.style.setProperty(
+            '--continuous-toolbox-guide-offset',
+            `${Blockly.ToolboxCategory.nestedPadding * this.getLevel()}px`,
+        );
+
+        for (let i = 0; i < subcategories.length; i++) {
+            const newCategory = subcategories[i];
+            newCategory.init();
+            const newCategoryDiv = newCategory.getDiv();
+            contentsContainer.appendChild(newCategoryDiv!);
+            if (newCategory.getClickTarget) {
+                newCategory.getClickTarget()?.setAttribute('id', newCategory.getId());
+            }
+        }
+        return contentsContainer;
     }
 }

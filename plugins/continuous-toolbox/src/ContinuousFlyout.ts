@@ -6,6 +6,11 @@
  * 由 AstrasTeam 修改于 2026/6/27:
  * - 覆盖 getFlyoutScale 为返回固定值
  * - 增加 FLYOUT_SCALE 常量
+ * 
+ * 由 AstrasTeam 修改于 2026/7/25:
+ * - 修改 name 定位为 id 定位
+ * - 修改滚动的代码，让它更精确
+ * - 将 if (this.scrollTarget) 改为 if (this.scrollTarget !== undefined)
  */
 
 /**
@@ -39,7 +44,7 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
     private scrollTarget?: number;
 
     /**
-     * Map from category name to its position in the flyout.
+     * Map from category id to its position in the flyout.
      */
     private scrollPositions = new Map<string, number>();
 
@@ -106,7 +111,7 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
             .map(item => item.getElement())
             .forEach(label => {
                 this.scrollPositions.set(
-                    label.getButtonText(),
+                    (label.info as Blockly.utils.toolbox.LabelInfo).id ?? '',
                     Math.max(0, label.getPosition().y - this.GAP_Y / 2),
                 );
             });
@@ -125,8 +130,7 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
             item.getType() === 'label' &&
             // Note that `FlyoutButton` represents both buttons and labels.
             element instanceof Blockly.FlyoutButton &&
-            element.isLabel() &&
-            this.getParentToolbox()?.getCategoryByName(element.getButtonText())
+            element.isLabel()
         );
     }
 
@@ -153,14 +157,16 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
     private selectCategoryByScrollPosition(position: number) {
         // If we are currently auto-scrolling, due to selecting a category by
         // clicking on it, do not update the category selection.
-        if (this.scrollTarget) return;
+        if (this.scrollTarget !== undefined) return;
 
-        const scaledPosition = Math.round(position / this.getWorkspace().scale);
+        const scaledPosition = position / this.getWorkspace().scale;
+        const positionTolerance = 1;
+
         // Traverse the array of scroll positions in reverse, so we can select the
         // furthest category that the scroll position is beyond.
-        for (const [name, position] of [...this.scrollPositions.entries()].reverse()) {
-            if (scaledPosition >= position) {
-                this.getParentToolbox()?.selectCategoryByName(name);
+        for (const [id, categoryPosition] of [...this.scrollPositions.entries()].reverse()) {
+            if (scaledPosition + positionTolerance >= categoryPosition) {
+                this.getParentToolbox()?.selectCategoryById(id);
                 return;
             }
         }
@@ -189,9 +195,9 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
      * @param category The toolbox category to scroll to in the flyout.
      */
     scrollToCategory(category: Blockly.ISelectableToolboxItem) {
-        const position = this.scrollPositions.get(category.getName());
+        const position = this.scrollPositions.get(category.getId());
         if (position === undefined) {
-            console.warn(`Scroll position not recorded for category ${name}`);
+            console.warn(`Scroll position not recorded for category ${category.getId()}`);
             return;
         }
         this.scrollTo(position);
@@ -224,7 +230,7 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
     protected override wheel_(e: WheelEvent) {
         // Don't scroll in response to mouse wheel events if we're currently
         // animating scrolling to a category.
-        if (this.scrollTarget) return;
+        if (this.scrollTarget !== undefined) return;
 
         super.wheel_(e);
     }

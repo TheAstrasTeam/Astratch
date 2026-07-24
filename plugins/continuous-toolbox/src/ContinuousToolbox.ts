@@ -6,6 +6,16 @@
  * 由 AstrasTeam 修改于 2026/6/26:
  * - 修改 getInitialFlyoutContents 函数来保证作用域
  * - 修改 convertToolboxItemToFlyoutItems 对于动态积木栏的处理
+ *
+ * 由 AstrasTeam 修改于 2026/7/24:
+ * - 覆盖了 createToolboxItem 方法来让DOM拥有id
+ * 
+ * 由 AstrasTeam 修改于 2026/7/25:
+ * - 将 getCategoryByName 改为 getCategoryById
+ * - 将 selectCategoryByName 改为 selectCategoryById
+ * - 将 flyout 上的 label 加入 id
+ * - 让滚动时可以自动展开toolbox
+ * - 加入滚动时的动画
  */
 
 /**
@@ -18,12 +28,25 @@ import { ContinuousFlyout } from './ContinuousFlyout';
 /**
  * Class for continuous toolbox.
  */
+// @ts-expect-error 扩展基类这是有必要的
 export class ContinuousToolbox extends Blockly.Toolbox {
     /**
      * Timeout ID used to prevent refreshing the flyout during extensive block
      * changes.
      */
     private refreshDebouncer?: ReturnType<typeof setTimeout>;
+    private static readonly TOOLBOX_WIDTH = 115;
+
+    override position() {
+        if (this.HtmlDiv && !this.isHorizontal()) {
+            this.HtmlDiv.style.width = `${ContinuousToolbox.TOOLBOX_WIDTH}px`;
+
+            // 在 super.position() 调用 getMetrics() 前更新。
+            this.width_ = this.HtmlDiv.offsetWidth;
+        }
+
+        super.position();
+    }
 
     /**
      * Initializes the continuous toolbox.
@@ -78,7 +101,11 @@ export class ContinuousToolbox extends Blockly.Toolbox {
         let contents: Blockly.utils.toolbox.FlyoutItemInfoArray = [];
         if (toolboxItem instanceof Blockly.ToolboxCategory) {
             // Create a label node to go at the top of the category
-            contents.push({ kind: 'LABEL', text: toolboxItem.getName() });
+            contents.push({
+                kind: 'LABEL',
+                text: toolboxItem.getName(),
+                id: toolboxItem.getId(),
+            });
             let itemContents = toolboxItem.getContents();
 
             // Handle custom categories (e.g. variables and functions)
@@ -146,34 +173,48 @@ export class ContinuousToolbox extends Blockly.Toolbox {
     }
 
     /**
-     * Gets a category by name.
+     * Gets a category by id.
      *
-     * @param name Name of category to get.
+     * @param id Id of category to get.
      * @returns Category, or null if not found.
      * @internal
      */
-    getCategoryByName(name: string): Blockly.ISelectableToolboxItem | null {
-        const category = this.getToolboxItems().find(
-            item =>
-                item instanceof Blockly.ToolboxCategory &&
-                item.isSelectable() &&
-                name === item.getName(),
-        );
-        if (!category) return null;
-        return category as Blockly.ISelectableToolboxItem;
+    getCategoryById(id: string): Blockly.ISelectableToolboxItem | null {
+        const category = this.getToolboxItemById(id);
+        if (!(category instanceof Blockly.ToolboxCategory)) {
+            return null;
+        }
+        return category;
     }
 
     /**
-     * Selects the category with the given name.
+     * Selects the category with the given id.
      * Similar to setSelectedItem, but importantly, does not call updateFlyout
      * because this is called while the flyout is being scrolled.
      *
-     * @param name Name of category to select.
+     * @param id Id of category to select.
      * @internal
      */
-    selectCategoryByName(name: string) {
-        const newItem = this.getCategoryByName(name);
+    selectCategoryById(id: string) {
+        const newItem = this.getCategoryById(id);
         if (!newItem) return;
+
+        const ancestors: Blockly.ICollapsibleToolboxItem[] = [];
+        let parent = newItem.getParent();
+
+        while (parent) {
+            ancestors.push(parent as Blockly.ICollapsibleToolboxItem);
+            parent = parent.getParent();
+        }
+
+        for (const ancestor of ancestors.reverse()) {
+            if (!ancestor.isExpanded()) {
+                ancestor.toggleExpanded();
+            }
+        }
+
+        // hidden 等其他原因仍可能令分类不可选
+        if (!newItem.isSelectable()) return;
 
         const oldItem = this.selectedItem_;
 
@@ -183,6 +224,21 @@ export class ContinuousToolbox extends Blockly.Toolbox {
 
         if (this.shouldSelectItem_(oldItem, newItem)) {
             this.selectItem_(oldItem, newItem);
+            const categoryDiv = newItem.getDiv();
+
+            if (categoryDiv && this.HtmlDiv) {
+                const target = Blockly.utils.style.getContainerOffsetToScrollInto(
+                    categoryDiv,
+                    this.HtmlDiv,
+                    false,
+                );
+
+                this.HtmlDiv.scrollTo({
+                    top: target.y,
+                    left: target.x,
+                    behavior: 'smooth',
+                });
+            }
         }
     }
 
@@ -200,5 +256,58 @@ export class ContinuousToolbox extends Blockly.Toolbox {
             return flyout.getClientRect();
         }
         return super.getClientRect();
+    }
+
+    /**
+     * Creates and renders the toolbox item.
+     *
+     * @param toolboxItemDef Any information that can be used to create an item in
+     *     the toolbox.
+     * @param fragment The document fragment to add the child toolbox elements to.
+     */
+    // @ts-expect-error 实际内部方法使用了
+    private createToolboxItem(
+        toolboxItemDef: Blockly.utils.toolbox.ToolboxItemInfo,
+        fragment: DocumentFragment,
+    ) {
+        let registryName = toolboxItemDef['kind'];
+
+        // Categories that are collapsible are created using a class registered
+        // under a different name.
+        if (
+            registryName.toUpperCase() === 'CATEGORY' &&
+            Blockly.utils.toolbox.isCategoryCollapsible(
+                toolboxItemDef as Blockly.utils.toolbox.CategoryInfo,
+            )
+        ) {
+            registryName = Blockly.CollapsibleToolboxCategory.registrationName;
+        }
+
+        const ToolboxItemClass = Blockly.registry.getClass(
+            Blockly.registry.Type.TOOLBOX_ITEM,
+            registryName.toLowerCase(),
+        );
+        if (ToolboxItemClass) {
+            const toolboxItem = new ToolboxItemClass(toolboxItemDef, this);
+            toolboxItem.init();
+            this.addToolboxItem_(toolboxItem);
+            const toolboxItemDom = toolboxItem.getDiv();
+            if (toolboxItemDom) {
+                fragment.appendChild(toolboxItemDom);
+            }
+
+            // 加id到dom，这个只针对第一组，子组不影响（子组没用id）
+            if ((toolboxItemDef as Blockly.utils.toolbox.CategoryInfo).id) {
+                toolboxItem
+                    .getClickTarget()
+                    ?.classList.add(
+                        (toolboxItemDef as Blockly.utils.toolbox.CategoryInfo).id ?? '',
+                    );
+            }
+
+            // Adds the ID to the HTML element that can receive a click.
+            // This is used in onClick_ to find the toolboxItem that was clicked.
+            toolboxItem.getClickTarget()?.setAttribute('id', toolboxItem.getId());
+        }
     }
 }

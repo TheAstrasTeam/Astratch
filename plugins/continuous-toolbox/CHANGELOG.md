@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [Unreleased]
+
+### Features
+
+- Add continuous indentation guides for nested toolbox categories.
+- Add collapsible nested category support to the continuous toolbox.
+- Use Blockly runtime IDs for flyout labels, category navigation, and selection
+  synchronization, allowing categories with duplicate names.
+- Automatically expand collapsed ancestors when scrolling to a nested category.
+- Automatically scroll the toolbox to keep the selected category visible.
+- Add smooth scrolling when the flyout or toolbox follows a selected category.
+- Synchronize the fixed 115px vertical toolbox width before Blockly calculates
+  workspace metrics.
+
+### Bug Fixes
+
+- Prevent flyout scrolling from selecting the wrong category when names are
+  duplicated or localized.
+- Prevent nested category selection from being lost when ancestor categories
+  are collapsed.
+- Improve scroll-position boundary detection by preserving fractional positions
+  and applying a small tolerance.
+- Correct zero-valued scroll targets so the first category is not treated as
+  an inactive animation.
+
+### Maintenance
+
+- Use Blockly's public `Blockly.utils` exports for DOM, ARIA, and style helpers
+  instead of importing copied Blockly utility implementations.
+
 ## [7.0.9](https://github.com/RaspberryPiFoundation/blockly-samples/compare/@blockly/continuous-toolbox@7.0.8...@blockly/continuous-toolbox@7.0.9) (2026-04-09)
 
 **Note:** Version bump only for package @blockly/continuous-toolbox

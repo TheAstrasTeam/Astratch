@@ -9,6 +9,10 @@
  * 由 AstrasTeam 修改于 2026/7/6:
  * - 减小`blocklyToolboxCategoryLabel`的字体大小
  * - 增加`blocklyToolboxCategory`的宽度设置（60px）
+ * 
+ * 由 AstrasTeam 修改于 2026/7/25:
+ * - 修改 CSS
+ * - 注册 CollapsibleContinuousCategory
  */
 
 /**
@@ -23,6 +27,7 @@ import type { LabelFlyoutItem } from './ContinuousFlyout';
 import { ContinuousMetrics } from './ContinuousMetrics';
 import { ContinuousToolbox } from './ContinuousToolbox';
 import { RecyclableBlockFlyoutInflater } from './RecyclableBlockFlyoutInflater';
+import { CollapsibleContinuousCategory } from './ContinuousCollapsibleToolboxCategory';
 
 export {
     ContinuousCategory,
@@ -73,29 +78,41 @@ export function registerContinuousToolbox() {
         true,
     );
 
+    Blockly.registry.register(
+        Blockly.registry.Type.TOOLBOX_ITEM,
+        Blockly.CollapsibleToolboxCategory.registrationName,
+        CollapsibleContinuousCategory,
+        true,
+    );
+
     Blockly.Css.register(`
-  .categoryBubble {
-    margin: 0 auto 0.125rem;
-    border-radius: 100%;
-    border: 2px solid;
-    width: 1.25rem;
-    height: 1.25rem;
-  }
-  .blocklyToolboxCategory {
-    height: initial;
-    width: 60px;
-    padding: 3px 0;
-  }
-  .blocklyTreeRowContentContainer {
-    display: flex;
-    flex-direction: column;
-  }
-  .blocklyToolboxCategoryLabel {
-    font-size: 0.65rem;
-    margin: auto;
-  }
-  .blocklyToolboxCategoryLabel {
-    text-align: center;
-  }
+    .blocklyToolboxCategory {
+        height: initial;
+        padding: 3px 0;
+    }
+    .blocklyTreeRowContentContainer {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: space-between;
+        width: 100%
+    }
+    .blocklyToolboxCategoryLabel {
+        font-size: 0.65rem;
+    }
+    .blocklyToolboxCategory {
+        border-width: 2px !important;
+        margin-bottom: 0 !important
+    }
+    .continuousToolboxIndentGuide {
+        position: relative;
+    }
+    .continuousToolboxIndentGuide::before {
+        content: '';
+        position: absolute;
+        inset-block: 0;
+        inset-inline-start: var(--continuous-toolbox-guide-offset);
+        border-inline-start: 2px solid rgb(128 128 128 / 0.45);
+        pointer-events: none;
+    }
   `);
 }

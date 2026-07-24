@@ -64,496 +64,863 @@ const sep = (gap = 36) => ({ kind: 'sep', gap });
 
 const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
     await i18nReady;
-    const MOTION = t('blocks:motion');
-    const LOOKS = t('blocks:looks');
-    const SOUND = t('blocks:sound');
-    const EVENTS = t('blocks:events');
-    const CONTROL = t('blocks:control');
-    const SENSING = t('blocks:sensing');
-    const OPERATORS = t('blocks:operators');
-    const VARIABLES = t('blocks:variables');
-    const MY_BLOCKS = t('blocks:my_blocks');
+
     return {
         kind: 'categoryToolbox',
         contents: [
             {
                 kind: 'category',
-                name: MOTION,
-                colour: BlocksColor.motion.primary,
+                id: 'entity',
+                name: t('blocks:entity'),
                 contents: [
                     {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.motion_movesteps,
-                        inputs: { STEPS: num(10) },
+                        kind: 'category',
+                        name: t('blocks:transform'),
+                        colour: BlocksColor.position.primary,
+                        contents: [
+                            {
+                                kind: 'category',
+                                name: t('blocks:position'),
+                                colour: BlocksColor.position.secondary,
+                                contents: [
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODE.ENTITY_TRANSFORM_POSITION_MOVESTEP,
+                                    },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODE.ENTITY_TRANSFORM_POSITION_SETPOSITION,
+                                    },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODE.ENTITY_TRANSFORM_POSITION_ADDPOSITION,
+                                    },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODE.ENTITY_TRANSFORM_POSITION_GETPOSITION,
+                                    },
+                                ],
+                            },
+                            {
+                                kind: 'category',
+                                name: t('blocks:scale'),
+                                colour: BlocksColor.scale.primary,
+                                contents: [
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODE.ENTITY_TRANSFORM_SCALE_SETSCALE,
+                                    },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODE.ENTITY_TRANSFORM_SCALE_ADDSCALE,
+                                    },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODE.ENTITY_TRANSFORM_SCALE_GETSCALE,
+                                    },
+                                ],
+                            },
+                            {
+                                kind: 'category',
+                                name: t('blocks:direction'),
+                                colour: BlocksColor.direction.primary,
+                                contents: [
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODE.ENTITY_TRANSFORM_DIRECTION_SETDIRECTION,
+                                    },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODE.ENTITY_TRANSFORM_DIRECTION_ADDDIRECTION,
+                                    },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODE.ENTITY_TRANSFORM_DIRECTION_FACEDIRECTION,
+                                    },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODE.ENTITY_TRANSFORM_DIRECTION_GETDIRECTION,
+                                    },
+                                ],
+                            },
+                            {
+                                kind: 'category',
+                                name: t('blocks:layer'),
+                                colour: BlocksColor.layer.primary,
+                                contents: [
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODE.ENTITY_TRANSFORM_LAYER_SETLAYER,
+                                    },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODE.ENTITY_TRANSFORM_LAYER_MOVELAYER,
+                                    },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODE.ENTITY_TRANSFORM_LAYER_GETLAYER,
+                                    },
+                                ],
+                            },
+                        ],
                     },
                     {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.motion_turnright,
-                        inputs: { DEGREES: num(15) },
+                        kind: 'category',
+                        name: t('blocks:appearance'),
+                        colour: BlocksColor.Images.primary,
+                        contents: [
+                            {
+                                kind: 'category',
+                                name: t('blocks:images'),
+                                colour: BlocksColor.Images.secondary,
+                                contents: [
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODE.ENTITY_APPEARANCE_IMAGES_SHOWIMAGE,
+                                    },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODE.ENTITY_APPEARANCE_IMAGES_SETSTRETCH,
+                                    },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODE.ENTITY_APPEARANCE_IMAGES_ADDSTRETCH,
+                                    },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODE.ENTITY_APPEARANCE_IMAGES_GETSTRETCH,
+                                    },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODE.ENTITY_APPEARANCE_IMAGES_SETGRID,
+                                    },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODE.ENTITY_APPEARANCE_IMAGES_SETGRIDDISTANCE,
+                                    },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODE.ENTITY_APPEARANCE_IMAGES_GETGRID,
+                                    },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODE.ENTITY_APPEARANCE_IMAGES_GETGRIDDISTANCE,
+                                    },
+                                ],
+                            },
+                            {
+                                kind: 'category',
+                                name: t('blocks:effects'),
+                                colour: BlocksColor.effects.primary,
+                                contents: [
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODE.ENTITY_APPEARANCE_EFFECTS_SETEFFECT,
+                                    },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODE.ENTITY_APPEARANCE_EFFECTS_ADDEFFECT,
+                                    },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODE.ENTITY_APPEARANCE_EFFECTS_GETEFFECT,
+                                    },
+                                ],
+                            },
+                        ],
                     },
                     {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.motion_turnleft,
-                        inputs: { DEGREES: num(15) },
-                    },
-                    sep(),
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.motion_goto,
-                        inputs: { TO: menu(OPCODE.motion_goto_menu) },
-                    },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.motion_gotoxy,
-                        inputs: { X: num(0), Y: num(0) },
+                        kind: 'category',
+                        name: t('blocks:collision'),
+                        colour: BlocksColor.collision.primary,
+                        contents: [
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.ENTITY_COLLISION_ISTOUCHING,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.ENTITY_COLLISION_WHENTOUCHING,
+                            },
+                        ],
                     },
                     {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.motion_glideto,
-                        inputs: { SECS: num(1), TO: menu(OPCODE.motion_glideto_menu) },
-                    },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.motion_glidesecstoxy,
-                        inputs: { SECS: num(1), X: num(0), Y: num(0) },
-                    },
-                    sep(),
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.motion_pointindirection,
-                        inputs: { DIRECTION: numAngle(90) },
-                    },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.motion_pointtowards,
-                        inputs: { TOWARDS: menu(OPCODE.motion_pointtowards_menu) },
-                    },
-                    sep(),
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.motion_changexby,
-                        inputs: { DX: num(10) },
-                    },
-                    { gap: 12, kind: 'block', type: OPCODE.motion_setx, inputs: { X: num(0) } },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.motion_changeyby,
-                        inputs: { DY: num(10) },
-                    },
-                    { gap: 12, kind: 'block', type: OPCODE.motion_sety, inputs: { Y: num(0) } },
-                    sep(),
-                    { gap: 12, kind: 'block', type: OPCODE.motion_ifonedgebounce },
-                    sep(),
-                    { gap: 12, kind: 'block', type: OPCODE.motion_setrotationstyle },
-                    sep(),
-                    { gap: 12, kind: 'block', type: OPCODE.motion_xposition },
-                    { gap: 12, kind: 'block', type: OPCODE.motion_yposition },
-                    { gap: 12, kind: 'block', type: OPCODE.motion_direction },
-                ],
-            },
-            {
-                kind: 'category',
-                name: LOOKS,
-                colour: BlocksColor.looks.primary,
-                contents: [
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.looks_sayforsecs,
-                        inputs: { MESSAGE: txt(t('blocks:hello')), SECS: num(2) },
-                    },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.looks_say,
-                        inputs: { MESSAGE: txt(t('blocks:hello')) },
-                    },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.looks_thinkforsecs,
-                        inputs: { MESSAGE: txt(t('blocks:hmm')), SECS: num(2) },
-                    },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.looks_think,
-                        inputs: { MESSAGE: txt(t('blocks:hmm')) },
-                    },
-                    sep(),
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.looks_switchcostumeto,
-                        inputs: { COSTUME: menu(OPCODE.looks_costume) },
-                    },
-                    { gap: 12, kind: 'block', type: OPCODE.looks_nextcostume },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.looks_switchbackdropto,
-                        inputs: { BACKDROP: menu(OPCODE.looks_backdrops) },
-                    },
-                    { gap: 12, kind: 'block', type: OPCODE.looks_nextbackdrop },
-                    sep(),
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.looks_changesizeby,
-                        inputs: { CHANGE: num(10) },
-                    },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.looks_setsizeto,
-                        inputs: { SIZE: num(100) },
-                    },
-                    sep(),
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.looks_changeeffectby,
-                        inputs: { CHANGE: num(25) },
-                    },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.looks_seteffectto,
-                        inputs: { VALUE: num(0) },
-                    },
-                    { gap: 12, kind: 'block', type: OPCODE.looks_cleargraphiceffects },
-                    sep(),
-                    { gap: 12, kind: 'block', type: OPCODE.looks_show },
-                    { gap: 12, kind: 'block', type: OPCODE.looks_hide },
-                    sep(),
-                    { gap: 12, kind: 'block', type: OPCODE.looks_gotofrontback },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.looks_goforwardbackwardlayers,
-                        inputs: { NUM: numInt(1) },
-                    },
-                    { gap: 12, kind: 'block', type: OPCODE.looks_costumenumbername },
-                    { gap: 12, kind: 'block', type: OPCODE.looks_backdropnumbername },
-                    { gap: 12, kind: 'block', type: OPCODE.looks_size },
-                ],
-            },
-            {
-                kind: 'category',
-                name: SOUND,
-                colour: BlocksColor.sounds.primary,
-                contents: [
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.sound_playuntildone,
-                        inputs: { SOUND_MENU: menu(OPCODE.sound_sounds_menu) },
-                    },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.sound_play,
-                        inputs: { SOUND_MENU: menu(OPCODE.sound_sounds_menu) },
-                    },
-                    { gap: 12, kind: 'block', type: OPCODE.sound_stopallsounds },
-                    sep(),
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.sound_changeeffectby,
-                        inputs: { VALUE: num(10) },
-                    },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.sound_seteffectto,
-                        inputs: { VALUE: num(100) },
-                    },
-                    { gap: 12, kind: 'block', type: OPCODE.sound_cleareffects },
-                    sep(),
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.sound_changevolumeby,
-                        inputs: { VOLUME: num(-10) },
-                    },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.sound_setvolumeto,
-                        inputs: { VOLUME: num(100) },
-                    },
-                    { gap: 12, kind: 'block', type: OPCODE.sound_volume },
-                ],
-            },
-            {
-                kind: 'category',
-                name: EVENTS,
-                colour: BlocksColor.event.primary,
-                contents: [
-                    { gap: 12, kind: 'block', type: OPCODE.event_whenflagclicked },
-                    { gap: 12, kind: 'block', type: OPCODE.event_whenkeypressed },
-                    { gap: 12, kind: 'block', type: OPCODE.event_whenthisspriteclicked },
-                    { gap: 12, kind: 'block', type: OPCODE.event_whenstageclicked },
-                    { gap: 12, kind: 'block', type: OPCODE.event_whenbackdropswitchesto },
-                    sep(),
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.event_whengreaterthan,
-                        inputs: { VALUE: num(10) },
-                    },
-                    sep(),
-                    { gap: 12, kind: 'block', type: OPCODE.event_whenbroadcastreceived },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.event_broadcast,
-                        inputs: { BROADCAST_INPUT: menu(OPCODE.event_broadcast_menu) },
-                    },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.event_broadcastandwait,
-                        inputs: { BROADCAST_INPUT: menu(OPCODE.event_broadcast_menu) },
+                        kind: 'category',
+                        name: t('blocks:lifecycle'),
+                        colour: BlocksColor.lifecycle.primary,
+                        contents: [
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.ENTITY_LIFECYCLE_ONCREATED,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.ENTITY_LIFECYCLE_CLONE,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.ENTITY_LIFECYCLE_DELETECLONE,
+                            },
+                        ],
                     },
                 ],
             },
             {
                 kind: 'category',
-                name: CONTROL,
-                colour: BlocksColor.control.primary,
+                id: 'audio',
+                name: t('blocks:audio'),
                 contents: [
                     {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.control_wait,
-                        inputs: { DURATION: numPos(1) },
+                        kind: 'category',
+                        name: t('blocks:play'),
+                        colour: BlocksColor.audio.primary,
+                        contents: [
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.AUDIO_PLAY_PLAY,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.AUDIO_PLAY_CONTROL,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.AUDIO_PLAY_SETTIME,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.AUDIO_PLAY_CONTROLALL,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.AUDIO_PLAY_GETALLIDS,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.AUDIO_PLAY_GETINFO,
+                            },
+                        ],
                     },
-                    sep(),
                     {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.control_repeat,
-                        inputs: { TIMES: numWhole(10) },
+                        kind: 'category',
+                        name: t('blocks:effects'),
+                        colour: BlocksColor.audio.secondary,
+                        contents: [
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.AUDIO_EFFECTS_SETEFFECT,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.AUDIO_EFFECTS_ADDEFFECT,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.AUDIO_EFFECTS_RESETEFFECT,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.AUDIO_EFFECTS_RESETALLEFFECTS,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.AUDIO_EFFECTS_RESETEFFECTALL,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.AUDIO_EFFECTS_RESETALLEFFECTSALL,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.AUDIO_EFFECTS_GETEFFECT,
+                            },
+                        ],
                     },
-                    { gap: 12, kind: 'block', type: OPCODE.control_forever },
-                    sep(),
-                    { gap: 12, kind: 'block', type: OPCODE.control_if },
-                    { gap: 12, kind: 'block', type: OPCODE.control_if_else },
-                    { gap: 12, kind: 'block', type: OPCODE.control_wait_until },
-                    { gap: 12, kind: 'block', type: OPCODE.control_repeat_until },
-                    sep(),
-                    { gap: 12, kind: 'block', type: OPCODE.control_stop },
-                    sep(),
-                    { gap: 12, kind: 'block', type: OPCODE.control_start_as_clone },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.control_create_clone_of,
-                        inputs: { CLONE_OPTION: menu(OPCODE.control_create_clone_of_menu) },
-                    },
-                    { gap: 12, kind: 'block', type: OPCODE.control_delete_this_clone },
                 ],
             },
             {
                 kind: 'category',
-                name: SENSING,
-                colour: BlocksColor.sensing.primary,
+                id: 'resources',
+                name: t('blocks:resources'),
                 contents: [
                     {
                         gap: 12,
                         kind: 'block',
-                        type: OPCODE.sensing_touchingobject,
-                        inputs: { TOUCHINGOBJECTMENU: menu(OPCODE.sensing_touchingobjectmenu) },
+                        type: OPCODE.RESOURCES_ADDFROMURL,
                     },
                     {
                         gap: 12,
                         kind: 'block',
-                        type: OPCODE.sensing_touchingcolor,
-                        inputs: { COLOR: colour('#0099ff') },
+                        type: OPCODE.RESOURCES_GET,
                     },
                     {
                         gap: 12,
                         kind: 'block',
-                        type: OPCODE.sensing_coloristouchingcolor,
-                        inputs: { COLOR: colour('#66ccff'), COLOR2: colour('#ff9b86') },
+                        type: OPCODE.RESOURCES_EXISTS,
                     },
                     {
                         gap: 12,
                         kind: 'block',
-                        type: OPCODE.sensing_distanceto,
-                        inputs: { DISTANCETOMENU: menu(OPCODE.sensing_distancetomenu) },
+                        type: OPCODE.RESOURCES_RENAME,
                     },
-                    sep(),
                     {
                         gap: 12,
                         kind: 'block',
-                        type: OPCODE.sensing_askandwait,
-                        inputs: { QUESTION: txt(t('blocks:whatsyourname')) },
+                        type: OPCODE.RESOURCES_DELETE,
                     },
-                    { gap: 12, kind: 'block', type: OPCODE.sensing_answer },
-                    sep(),
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.sensing_keypressed,
-                        inputs: { KEY_OPTION: menu(OPCODE.sensing_keyoptions) },
-                    },
-                    { gap: 12, kind: 'block', type: OPCODE.sensing_mousedown },
-                    { gap: 12, kind: 'block', type: OPCODE.sensing_mousex },
-                    { gap: 12, kind: 'block', type: OPCODE.sensing_mousey },
-                    sep(),
-                    { gap: 12, kind: 'block', type: OPCODE.sensing_setdragmode },
-                    sep(),
-                    { gap: 12, kind: 'block', type: OPCODE.sensing_loudness },
-                    sep(),
-                    { gap: 12, kind: 'block', type: OPCODE.sensing_timer },
-                    { gap: 12, kind: 'block', type: OPCODE.sensing_resettimer },
-                    sep(),
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.sensing_of,
-                        inputs: { OBJECT: menu(OPCODE.sensing_of_object_menu) },
-                    },
-                    sep(),
-                    { gap: 12, kind: 'block', type: OPCODE.sensing_current },
-                    { gap: 12, kind: 'block', type: OPCODE.sensing_dayssince2000 },
-                    sep(),
-                    { gap: 12, kind: 'block', type: OPCODE.sensing_username },
                 ],
             },
             {
                 kind: 'category',
-                name: OPERATORS,
-                colour: BlocksColor.operators.primary,
+                id: 'events',
+                name: t('blocks:events'),
+                contents: [
+                    {
+                        kind: 'category',
+                        name: t('blocks:broadcast'),
+                        colour: BlocksColor.event.primary,
+                        contents: [
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.EVENT_BROADCAST_SEND,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.EVENT_BROADCAST_LISTEN,
+                            },
+                        ],
+                    },
+                    {
+                        kind: 'category',
+                        name: t('blocks:lifecycle'),
+                        colour: BlocksColor.event.primary,
+                        contents: [
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.EVENT_LIFECYCLE_ONSTART,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.EVENT_LIFECYCLE_ONSTOP,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.EVENT_LIFECYCLE_ONRUNNINGFORMS,
+                            },
+                        ],
+                    },
+                    {
+                        kind: 'category',
+                        name: t('blocks:time'),
+                        colour: BlocksColor.event.secondary,
+                        contents: [
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.EVENT_TIME_RUNNINGDURATION,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.EVENT_TIME_CREATETIMER,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.EVENT_TIME_RESETTIMER,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.EVENT_TIME_DELETETIMER,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.EVENT_TIME_TIMERVALUE,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.EVENT_TIME_WHENTIMEREXCEEDS,
+                            },
+                        ],
+                    },
+                    {
+                        kind: 'category',
+                        name: t('blocks:input'),
+                        colour: BlocksColor.event.tertiary,
+                        contents: [
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.EVENT_INPUT_GETMOUSEPOSITION,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.EVENT_INPUT_ISMOUSETOUCHING,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.EVENT_INPUT_ISKEYPRESSED,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.EVENT_INPUT_GETLASTKEYPRESSED,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.EVENT_INPUT_GETLOUDNESS,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.EVENT_INPUT_GETFREQUENCYSPECTRUM,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.EVENT_INPUT_WHENMOUSEHOVER,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.EVENT_INPUT_WHENMOUSEMOVED,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.EVENT_INPUT_WHENMOUSEBUTTON,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.EVENT_INPUT_WHENKEYPRESSED,
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                kind: 'category',
+                id: 'control',
+                name: t('blocks:control'),
+                contents: [
+                    {
+                        kind: 'category',
+                        name: t('blocks:flow'),
+                        colour: BlocksColor.control.primary,
+                        contents: [
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.CONTROL_FLOW_WAIT,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.CONTROL_FLOW_WAITUNTIL,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.CONTROL_FLOW_BREAK,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.CONTROL_FLOW_STOPSCRIPT,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.CONTROL_FLOW_STOPPROJECT,
+                            },
+                        ],
+                    },
+                    {
+                        kind: 'category',
+                        name: t('blocks:condition'),
+                        colour: BlocksColor.control.secondary,
+                        contents: [
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.CONTROL_CONDITION_IF,
+                            },
+                        ],
+                    },
+                    {
+                        kind: 'category',
+                        name: t('blocks:loop'),
+                        colour: BlocksColor.control.tertiary,
+                        contents: [
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.CONTROL_LOOP_WHILE,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.CONTROL_LOOP_REPEAT,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.CONTROL_LOOP_FOREACH,
+                            },
+                        ],
+                    },
+                    {
+                        kind: 'category',
+                        name: t('blocks:match'),
+                        colour: BlocksColor.control.secondary,
+                        contents: [
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.CONTROL_MATCH_MATCH,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.CONTROL_MATCH_CASE,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.CONTROL_MATCH_DEFAULT,
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                kind: 'category',
+                id: 'operator',
+                name: t('blocks:operator'),
+                contents: [
+                    {
+                        kind: 'category',
+                        name: t('blocks:math'),
+                        colour: BlocksColor.operator.primary,
+                        contents: [
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.OPERATOR_MATH_OP,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.OPERATOR_MATH_RANDOM,
+                            },
+                        ],
+                    },
+                    {
+                        kind: 'category',
+                        name: t('blocks:logic'),
+                        colour: BlocksColor.operator.secondary,
+                        contents: [
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.OPERATOR_LOGIC_COMPARE,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.OPERATOR_LOGIC_NOT,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.OPERATOR_LOGIC_BOOLEAN,
+                            },
+                        ],
+                    },
+                    {
+                        kind: 'category',
+                        name: t('blocks:scientific'),
+                        colour: BlocksColor.operator.tertiary,
+                        contents: [
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.OPERATOR_SCIENTIFIC_FUNC,
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                kind: 'category',
+                id: 'data',
+                name: t('blocks:data'),
+                contents: [
+                    {
+                        kind: 'category',
+                        name: t('blocks:variable'),
+                        colour: BlocksColor.data.primary,
+                        contents: [
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.DATA_VARIABLE_SET,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.DATA_VARIABLE_ADD,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.DATA_VARIABLE_COMPUTE,
+                            },
+                        ],
+                    },
+                    {
+                        kind: 'category',
+                        name: t('blocks:string'),
+                        colour: BlocksColor.data.secondary,
+                        contents: [
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.DATA_STRING_JOIN,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.DATA_STRING_SPLIT,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.DATA_STRING_SUBSTRING,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.DATA_STRING_LENGTH,
+                            },
+                        ],
+                    },
+                    {
+                        kind: 'category',
+                        name: t('blocks:array'),
+                        colour: BlocksColor.data.tertiary,
+                        contents: [
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.DATA_ARRAY_EMPTY,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.DATA_ARRAY_PUSH,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.DATA_ARRAY_REMOVEAT,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.DATA_ARRAY_REMOVEENDS,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.DATA_ARRAY_GET,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.DATA_ARRAY_LENGTH,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.DATA_ARRAY_FILTER,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.DATA_ARRAY_INDEXOF,
+                            },
+                        ],
+                    },
+                    {
+                        kind: 'category',
+                        name: t('blocks:object'),
+                        colour: BlocksColor.data.secondary,
+                        contents: [
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.DATA_OBJECT_EMPTY,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.DATA_OBJECT_SET,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.DATA_OBJECT_DELETE,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.DATA_OBJECT_GETALL,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.DATA_OBJECT_GET,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.DATA_OBJECT_LENGTH,
+                            },
+                        ],
+                    },
+                    {
+                        kind: 'category',
+                        name: t('blocks:type'),
+                        colour: BlocksColor.data.tertiary,
+                        contents: [
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.DATA_TYPE_TYPEOF,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODE.DATA_TYPE_CAST,
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                kind: 'category',
+                id: 'function',
+                name: t('blocks:function'),
                 contents: [
                     {
                         gap: 12,
                         kind: 'block',
-                        type: OPCODE.operator_add,
-                        inputs: { NUM1: num(''), NUM2: num('') },
+                        type: OPCODE.FUNCTION_DEFINITION,
                     },
                     {
                         gap: 12,
                         kind: 'block',
-                        type: OPCODE.operator_subtract,
-                        inputs: { NUM1: num(''), NUM2: num('') },
+                        type: OPCODE.FUNCTION_CALL,
                     },
                     {
                         gap: 12,
                         kind: 'block',
-                        type: OPCODE.operator_multiply,
-                        inputs: { NUM1: num(''), NUM2: num('') },
+                        type: OPCODE.FUNCTION_RETURN,
                     },
                     {
                         gap: 12,
                         kind: 'block',
-                        type: OPCODE.operator_divide,
-                        inputs: { NUM1: num(''), NUM2: num('') },
-                    },
-                    sep(),
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.operator_random,
-                        inputs: { FROM: num(1), TO: num(10) },
-                    },
-                    sep(),
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.operator_gt,
-                        inputs: { OPERAND1: txt(''), OPERAND2: txt('') },
+                        type: OPCODE.FUNCTION_INLINE,
                     },
                     {
                         gap: 12,
                         kind: 'block',
-                        type: OPCODE.operator_lt,
-                        inputs: { OPERAND1: txt(''), OPERAND2: txt('') },
+                        type: OPCODE.FUNCTION_RUNBRANCH,
                     },
                     {
                         gap: 12,
                         kind: 'block',
-                        type: OPCODE.operator_equals,
-                        inputs: { OPERAND1: txt(''), OPERAND2: txt('') },
-                    },
-                    sep(),
-                    { gap: 12, kind: 'block', type: OPCODE.operator_and },
-                    { gap: 12, kind: 'block', type: OPCODE.operator_or },
-                    { gap: 12, kind: 'block', type: OPCODE.operator_not },
-                    sep(),
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.operator_join,
-                        inputs: {
-                            STRING1: txt(t('blocks:apple_')),
-                            STRING2: txt(t('blocks:banana')),
-                        },
-                    },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.operator_letter_of,
-                        inputs: { LETTER: numWhole(1), STRING: txt(t('blocks:apple')) },
-                    },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.operator_length,
-                        inputs: { STRING: txt(t('blocks:apple')) },
-                    },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.operator_contains,
-                        inputs: { STRING1: txt(t('blocks:apple')), STRING2: txt('a') },
-                    },
-                    sep(),
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.operator_mod,
-                        inputs: { NUM1: num(''), NUM2: num('') },
-                    },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.operator_round,
-                        inputs: { NUM: num('') },
-                    },
-                    sep(),
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODE.operator_mathop,
-                        inputs: { NUM: num('') },
+                        type: OPCODE.FUNCTION_SETDATAVALUE,
                     },
                 ],
             },
-            // 制作变量、自制积木
             {
                 kind: 'category',
-                name: VARIABLES,
-                colour: BlocksColor.data.primary,
-            },
-            {
-                kind: 'category',
-                name: MY_BLOCKS,
-                colour: BlocksColor.more.primary,
+                id: 'debug',
+                name: t('blocks:debug'),
+                contents: [
+                    {
+                        gap: 12,
+                        kind: 'block',
+                        type: OPCODE.DEBUG_LOG,
+                    },
+                    {
+                        gap: 12,
+                        kind: 'block',
+                        type: OPCODE.DEBUG_CRASH,
+                    },
+                    {
+                        gap: 12,
+                        kind: 'block',
+                        type: OPCODE.DEBUG_BREAKPOINT,
+                    },
+                ],
             },
         ],
     };
