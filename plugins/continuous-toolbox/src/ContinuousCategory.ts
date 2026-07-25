@@ -24,7 +24,7 @@ const { aria, dom } = Blockly.utils;
 /** Toolbox category for continuous toolbox. */
 export class ContinuousCategory extends Blockly.ToolboxCategory {
     static override borderWidth = 2;
-    defaultBackgroundColour = '#ffffff50';
+    defaultBackgroundColour = '#55555540';
 
     /**
      * Creates the parent of the contents container. All clicks will happen on
@@ -58,9 +58,8 @@ export class ContinuousCategory extends Blockly.ToolboxCategory {
         }
         const className = this.cssConfig_['selected'];
         if (isSelected) {
-            const defaultColour = this.defaultBackgroundColour;
-            if (!this.colour_) this.colour_ = defaultColour;
-            if (this.colour_.length === 7) this.colour_ += '50';
+            if (!this.colour_) this.colour_ = this.defaultBackgroundColour;
+            else if (this.colour_.length === 7) this.colour_ += '50';
             this.rowDiv_.style.backgroundColor = this.colour_;
             if (className) {
                 dom.addClass(this.rowDiv_, className);

@@ -205,6 +205,12 @@ span {
     scrollbar-color: $ui-black-transparent transparent;
     scrollbar-width: thin;
 }
+.blocklyToolboxCategoryLabel {
+    color: $text-primary !important;
+}
+.blocklyToolboxCategoryIcon {
+    filter: $svg-filter;
+}
 
 .ash-toolbox-tools {
     display: flex;
