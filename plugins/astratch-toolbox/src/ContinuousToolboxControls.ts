@@ -15,7 +15,7 @@ export type ContinuousToolboxControlTranslator = (key: string) => string;
 export interface ContinuousToolboxControlCallbacks {
     collapseOtherCategories(): void;
 }
-let translate: ContinuousToolboxControlTranslator = key => key;
+export let translate: ContinuousToolboxControlTranslator = key => key;
 
 /** 配置之后创建的工具箱按钮所使用的翻译函数。 */
 export function setContinuousToolboxControlTranslator(

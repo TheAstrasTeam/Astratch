@@ -27,7 +27,7 @@ In short, `Astratch` draws on the strengths of other `Scratch editors`, using **
 
 `Astratch` clones, modifies, and uses several plugins from [blockly-examples](https://github.com/RaspberryPiFoundation/blockly-samples):
 
-- [Continuous Toolbox](./plugins/continuous-toolbox/)
+- [Astratch Toolbox](./plugins/astratch-toolbox/) (extended from Continuous Toolbox)
 - [field-angle](./plugins/field-angle/)
 - [field-colour-hsv-sliders](./plugins/field-colour-hsv-sliders/)
 - [field-colour](./plugins/field-colour/)

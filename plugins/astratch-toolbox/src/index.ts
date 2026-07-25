@@ -13,12 +13,14 @@
  * 由 AstrasTeam 修改于 2026/7/25:
  * - 修改 CSS
  * - 注册 CollapsibleContinuousCategory
- * - 支持配置连续工具箱按钮的翻译函数
+ * - 支持配置 Astratch Toolbox 按钮的翻译函数
  * - 将工具箱快捷键注册移到插件注册阶段，避免重复注册
+ * - 将插件入口更名为 Astratch Toolbox
  */
 
 /**
  * @fileoverview Continuous-scroll toolbox and flyout that is always open.
+ * Astratch 内部将其扩展并命名为 Astratch Toolbox。
  */
 
 import * as Blockly from 'blockly/core';
@@ -45,15 +47,15 @@ export {
 };
 export type { LabelFlyoutItem };
 
-export interface ContinuousToolboxRegistrationOptions {
-    /** 用于翻译连续工具箱按钮文本的函数。 */
+export interface AstratchToolboxRegistrationOptions {
+    /** 用于翻译 Astratch Toolbox 按钮文本的函数。 */
     translate?: ContinuousToolboxControlTranslator;
 }
 
 const COLLAPSE_OTHER_CATEGORIES_SHORTCUT = 'collapseOtherCategories';
 
-/** 注册连续工具箱的全局操作快捷键。 */
-function registerContinuousToolboxShortcuts() {
+/** 注册 Astratch Toolbox 的全局操作快捷键。 */
+function registerAstratchToolboxShortcuts() {
     const registry = Blockly.ShortcutRegistry.registry;
     if (registry.getRegistry()[COLLAPSE_OTHER_CATEGORIES_SHORTCUT]) return;
 
@@ -86,10 +88,11 @@ function registerContinuousToolboxShortcuts() {
 /**
  * Registers the components of the continuous toolbox, replacing Blockly's
  * built-in defaults.
+ * Astratch 内部通过此入口注册完整的 Astratch Toolbox。
  */
-export function registerContinuousToolbox(options: i18n['t']) {
+export function registerAstratchToolbox(options: i18n['t']) {
     setContinuousToolboxControlTranslator(options);
-    registerContinuousToolboxShortcuts();
+    registerAstratchToolboxShortcuts();
 
     Blockly.registry.register(
         Blockly.registry.Type.TOOLBOX_ITEM,
@@ -161,6 +164,22 @@ export function registerContinuousToolbox(options: i18n['t']) {
         inset-inline-start: var(--continuous-toolbox-guide-offset);
         border-inline-start: 2px solid rgb(128 128 128 / 0.45);
         pointer-events: none;
+    }
+    .continuousFlyoutSearchContainer {
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        padding: 6px 8px;
+    }
+    .continuousFlyoutSearchInput {
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+        height: 28px;
+        border-radius: 999px !important;
+        padding-left: 10px !important;
     }
   `);
 }

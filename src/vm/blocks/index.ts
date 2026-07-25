@@ -1,7 +1,7 @@
 import { SNAP_RADIUS, type IBlocks, type IWorkspaceState, type Language } from '../../types/blocks';
 import * as Blockly from 'blockly';
 // 导入两个插件试试
-import * as ContinuousToolbox from '../../../plugins/continuous-toolbox/src';
+import * as AstratchToolbox from '../../../plugins/astratch-toolbox/src';
 import * as En from 'blockly/msg/en';
 import * as ZhHans from 'blockly/msg/zh-hans';
 import getToolbox from '../../lib/BlocklyAdapter/toolbox';
@@ -162,9 +162,9 @@ class Blocks implements IBlocks {
             renderer: 'Zelos',
             theme: this.theme,
             plugins: {
-                toolbox: ContinuousToolbox.ContinuousToolbox,
-                flyoutsVerticalToolbox: ContinuousToolbox.ContinuousFlyout,
-                metricsManager: ContinuousToolbox.ContinuousMetrics,
+                toolbox: AstratchToolbox.ContinuousToolbox,
+                flyoutsVerticalToolbox: AstratchToolbox.ContinuousFlyout,
+                metricsManager: AstratchToolbox.ContinuousMetrics,
                 connectionChecker: AshConnectionChecker,
             },
             // 网格，暂定48
@@ -187,8 +187,8 @@ class Blocks implements IBlocks {
             flyoutOpacity: 0.5,
         };
 
-        // 对于完全不需要现在的工作区的
-        ContinuousToolbox.registerContinuousToolbox(i18next.t);
+        // 在创建工作区前注册 Astratch Toolbox
+        AstratchToolbox.registerAstratchToolbox(i18next.t);
 
         // 定义积木
         initBlocks(this.Blockly);

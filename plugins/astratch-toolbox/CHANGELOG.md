@@ -1,4 +1,4 @@
-# Change Log
+# Astratch Toolbox Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
@@ -8,7 +8,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 ### Features
 
 - Add continuous indentation guides for nested toolbox categories.
-- Add collapsible nested category support to the continuous toolbox.
+- Add collapsible nested category support to Astratch Toolbox.
 - Use Blockly runtime IDs for flyout labels, category navigation, and selection
   synchronization, allowing categories with duplicate names.
 - Automatically expand collapsed ancestors when scrolling to a nested category.
@@ -36,6 +36,13 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
   instead of importing copied Blockly utility implementations.
 - Decouple toolbox control rendering from `ContinuousToolbox` through callbacks
   and host-provided translations.
+- Rename the Astratch internal component and registration entry from Continuous
+  Toolbox to Astratch Toolbox.
+
+## Upstream history
+
+The following entries are retained from the Apache-2.0 licensed
+`@blockly/continuous-toolbox` project to preserve its development history.
 
 ## [7.0.9](https://github.com/RaspberryPiFoundation/blockly-samples/compare/@blockly/continuous-toolbox@7.0.8...@blockly/continuous-toolbox@7.0.9) (2026-04-09)
 

@@ -233,3 +233,21 @@ span {
         }
     }
 }
+
+.continuousFlyoutSearchInput {
+    &::-webkit-search-cancel-button {
+        -webkit-appearance: none;
+        appearance: none;
+        height: 16px;
+        width: 16px;
+        background-image: url('../assets/close.svg');
+        background-repeat: round;
+        cursor: pointer;
+        border-radius: 50%;
+        transition: background-color 0.3s ease;
+        &:hover {
+            background-color: $ui-secondary;
+            
+        }
+    }
+}

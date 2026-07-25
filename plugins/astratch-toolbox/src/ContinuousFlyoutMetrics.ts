@@ -9,6 +9,17 @@ import type { ContinuousFlyout } from './ContinuousFlyout';
 
 /** Adds additional padding to the bottom of the flyout if needed. */
 export class ContinuousFlyoutMetrics extends Blockly.FlyoutMetricsManager {
+    /** 从可滚动视口中扣除固定搜索栏占用的高度。 */
+    override getViewMetrics(getWorkspaceCoordinates?: boolean) {
+        const viewMetrics = super.getViewMetrics(getWorkspaceCoordinates);
+        const searchBarHeight = (this.flyout_ as ContinuousFlyout).getSearchBarHeight(
+            getWorkspaceCoordinates,
+        );
+
+        viewMetrics.height = Math.max(0, viewMetrics.height - searchBarHeight);
+        return viewMetrics;
+    }
+
     /**
      * Returns the metrics for the scroll area of the continuous flyout's
      * workspace. Adds additional padding to the bottom of the flyout if needed in
@@ -40,6 +51,7 @@ export class ContinuousFlyoutMetrics extends Blockly.FlyoutMetricsManager {
             scrollMetrics.height += (this.flyout_ as ContinuousFlyout).calculateBottomPadding(
                 contentMetrics,
                 viewMetrics,
+                getWorkspaceCoordinates,
             );
         }
         return scrollMetrics;

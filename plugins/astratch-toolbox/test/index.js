@@ -1,7 +1,11 @@
 /**
  * @license
  * Copyright 2020 Google LLC
+ * Copyright 2026 AstrasTeam
  * SPDX-License-Identifier: Apache-2.0
+ *
+ * 由 AstrasTeam 修改于 2026/7/25:
+ * - 更新 Astratch Toolbox 的测试入口与翻译函数
  */
 
 /**
@@ -10,7 +14,7 @@
 
 import * as Blockly from 'blockly';
 import { createPlayground } from '@blockly/dev-tools';
-import { registerContinuousToolbox } from '../src/index';
+import { registerAstratchToolbox } from '../src/index';
 
 /**
  * Create a workspace.
@@ -23,7 +27,7 @@ function createWorkspace(blocklyDiv, options) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    registerContinuousToolbox();
+    registerAstratchToolbox(key => key);
     createPlayground(document.getElementById('root'), createWorkspace, {
         plugins: {
             flyoutsVerticalToolbox: 'ContinuousFlyout',
