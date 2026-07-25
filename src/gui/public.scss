@@ -247,7 +247,24 @@ span {
         transition: background-color 0.3s ease;
         &:hover {
             background-color: $ui-secondary;
-            
+        }
+    }
+}
+
+// 针对Flyout的文字
+
+g {
+    &.astratchFlyoutGroupLevel0 {
+        & text {
+            font-size: x-large !important;
+            font-weight: bold !important;
+            transform: translate(10px, 5px);
+        }
+    }
+    &.astratchFlyoutGroupLevel1 {
+        & text {
+            font-size: larger !important;
+            transform: translate(5px, 5px);
         }
     }
 }

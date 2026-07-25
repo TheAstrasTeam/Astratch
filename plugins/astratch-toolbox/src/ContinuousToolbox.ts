@@ -138,6 +138,8 @@ export class ContinuousToolbox extends Blockly.Toolbox {
                 kind: 'LABEL',
                 text: toolboxItem.getName(),
                 id: toolboxItem.getId(),
+                // @ts-expect-error 用于添加类，这在实际实现是有的
+                'web-class': `astratchFlyoutGroupLevel${toolboxItem.getLevel()}`,
             });
             let itemContents = toolboxItem.getContents();
 
