@@ -1,47 +1,95 @@
-// shortcut manager
+// 快捷键管理器的统一常量与类型定义
 
 import type Mousetrap from 'mousetrap';
 
-export const ALL_SHORTCUTS_IDS = {
-    NEW_PROJECT: 'project.new',
-    SAVE_PROJECT: 'project.save',
-    OPEN_PROJECT: 'project.open',
-    BLOCKLY_COPY: 'blockly.copy',
-    BLOCKLY_CUT: 'blockly.cut',
-    BLOCKLY_PASTE: 'blockly.paste',
-    BLOCKLY_UNDO: 'blockly.undo',
-    BLOCKLY_REDO: 'blockly.redo',
-    BLOCKLY_DUPLICATE: 'blockly.duplicate',
-    BLOCKLY_CLEANUP: 'blockly.cleanup',
-    BLOCKLY_DISCONNECT: 'blockly.disconnect',
-} as const;
+export interface ShortcutDefinition {
+    id: string;
+    defaultKey: string;
+    scope: 'global' | 'blockly';
+    blocklyName?: string;
+}
 
-export type ShortcutIds = (typeof ALL_SHORTCUTS_IDS)[keyof typeof ALL_SHORTCUTS_IDS];
+export const SHORTCUTS = {
+    NEW_PROJECT: {
+        id: 'project.new',
+        defaultKey: 'mod+e',
+        scope: 'global',
+    },
+    SAVE_PROJECT: {
+        id: 'project.save',
+        defaultKey: 'mod+s',
+        scope: 'global',
+    },
+    OPEN_PROJECT: {
+        id: 'project.open',
+        defaultKey: 'mod+o',
+        scope: 'global',
+    },
+    BLOCKLY_COPY: {
+        id: 'blockly.copy',
+        defaultKey: 'mod+c',
+        scope: 'blockly',
+        blocklyName: 'copy',
+    },
+    BLOCKLY_CUT: {
+        id: 'blockly.cut',
+        defaultKey: 'mod+x',
+        scope: 'blockly',
+        blocklyName: 'cut',
+    },
+    BLOCKLY_PASTE: {
+        id: 'blockly.paste',
+        defaultKey: 'mod+v',
+        scope: 'blockly',
+        blocklyName: 'paste',
+    },
+    BLOCKLY_UNDO: {
+        id: 'blockly.undo',
+        defaultKey: 'mod+z',
+        scope: 'blockly',
+        blocklyName: 'undo',
+    },
+    BLOCKLY_REDO: {
+        id: 'blockly.redo',
+        defaultKey: 'mod+shift+z',
+        scope: 'blockly',
+        blocklyName: 'redo',
+    },
+    BLOCKLY_DUPLICATE: {
+        id: 'blockly.duplicate',
+        defaultKey: 'd',
+        scope: 'blockly',
+        blocklyName: 'duplicate',
+    },
+    BLOCKLY_CLEANUP: {
+        id: 'blockly.cleanup',
+        defaultKey: 'c',
+        scope: 'blockly',
+        blocklyName: 'cleanup',
+    },
+    BLOCKLY_DISCONNECT: {
+        id: 'blockly.disconnect',
+        defaultKey: 'shift+x',
+        scope: 'blockly',
+        blocklyName: 'disconnect',
+    },
+    COLLAPSE_OTHER_CATEGORIES: {
+        id: 'blockly.collapseOtherCategories',
+        defaultKey: 'mod+shift+o',
+        scope: 'blockly',
+        blocklyName: 'collapseOtherCategories',
+    },
+} as const satisfies Record<string, ShortcutDefinition>;
 
-export const DEFAULT_SHORTCUTS = {
-    [ALL_SHORTCUTS_IDS.NEW_PROJECT]: 'mod+e',
-    [ALL_SHORTCUTS_IDS.SAVE_PROJECT]: 'mod+s',
-    [ALL_SHORTCUTS_IDS.OPEN_PROJECT]: 'mod+o',
-    [ALL_SHORTCUTS_IDS.BLOCKLY_COPY]: 'mod+c',
-    [ALL_SHORTCUTS_IDS.BLOCKLY_CUT]: 'mod+x',
-    [ALL_SHORTCUTS_IDS.BLOCKLY_PASTE]: 'mod+v',
-    [ALL_SHORTCUTS_IDS.BLOCKLY_UNDO]: 'mod+z',
-    [ALL_SHORTCUTS_IDS.BLOCKLY_REDO]: 'mod+shift+z',
-    [ALL_SHORTCUTS_IDS.BLOCKLY_DUPLICATE]: 'd',
-    [ALL_SHORTCUTS_IDS.BLOCKLY_CLEANUP]: 'c',
-    [ALL_SHORTCUTS_IDS.BLOCKLY_DISCONNECT]: 'shift+x',
-} satisfies Record<ShortcutIds, string>;
+export type ShortcutIds = (typeof SHORTCUTS)[keyof typeof SHORTCUTS]['id'];
+export type ResolvedShortcutDefinition = ShortcutDefinition & { id: ShortcutIds };
 
 export type ShortcutCommand = (
     event: Mousetrap.ExtendedKeyboardEvent,
     combo: string,
 ) => void | Promise<void>;
 
-export interface IShortcutMeta {
-    id: ShortcutIds;
-    scope: string;
-    command?: ShortcutCommand;
-}
+export type ShortcutCommands = Partial<Record<ShortcutIds, ShortcutCommand>>;
 
 export type SetShortcutResult =
     | { ok: true }
@@ -49,7 +97,7 @@ export type SetShortcutResult =
 
 export interface ShortcutChangeEvent {
     id: ShortcutIds;
-    scope: string;
+    scope: ShortcutDefinition['scope'];
     oldKey: string | undefined;
     newKey: string | undefined;
 }
@@ -57,11 +105,13 @@ export interface ShortcutChangeEvent {
 export type ShortcutChangeListener = (event: ShortcutChangeEvent) => void;
 
 export interface IShortcut {
-    readonly shortcuts: ReadonlyMap<ShortcutIds, IShortcutMeta>;
-    register: (meta: IShortcutMeta) => () => void;
-    unregister: (id: ShortcutIds) => boolean;
+    readonly shortcuts: ReadonlyMap<ShortcutIds, ResolvedShortcutDefinition>;
+    registerSettings: () => void;
+    bindCommands: (commands: ShortcutCommands) => () => void;
+    getDefinition: (id: ShortcutIds) => ResolvedShortcutDefinition;
+    getDefinitions: () => readonly ResolvedShortcutDefinition[];
+    getDefaultHotKey: (id: ShortcutIds) => string;
     getHotKey: (id: ShortcutIds) => string;
-    getMeta: (id: ShortcutIds) => IShortcutMeta | undefined;
     formatHotKey: (key: string) => string;
     setHotKey: (id: ShortcutIds, hotKey: string) => SetShortcutResult;
     resetHotKey: (id: ShortcutIds) => void;

@@ -1,8 +1,9 @@
 // 此文件由 Ai 生成
+// 由 AstrasTeam 修改于 2026/7/25：根据统一快捷键声明自动同步 Blockly 键位
 
 import type * as BlocklyType from 'blockly';
 import { shortcutManager } from '../ShortcutManager';
-import { ALL_SHORTCUTS_IDS, type ShortcutIds } from '../../types/lib';
+import type { ShortcutIds } from '../../types/lib';
 import { ALL_PLATFORMS, getPlatfrom } from '../../utils/ash-navigator';
 
 import { dropdownWithInput } from '../../../plugins/fieldDropdown';
@@ -23,18 +24,6 @@ import {
     installContextMenuPatch,
     setContextMenuHandler,
 } from '../../../plugins/context-menu-patch';
-
-// 仅列出 blockly 作用域的 id → Blockly ShortcutRegistry name 映射
-const ID_TO_NAME: Partial<Record<ShortcutIds, string>> = {
-    [ALL_SHORTCUTS_IDS.BLOCKLY_COPY]: 'copy',
-    [ALL_SHORTCUTS_IDS.BLOCKLY_CUT]: 'cut',
-    [ALL_SHORTCUTS_IDS.BLOCKLY_PASTE]: 'paste',
-    [ALL_SHORTCUTS_IDS.BLOCKLY_UNDO]: 'undo',
-    [ALL_SHORTCUTS_IDS.BLOCKLY_REDO]: 'redo',
-    [ALL_SHORTCUTS_IDS.BLOCKLY_DUPLICATE]: 'duplicate',
-    [ALL_SHORTCUTS_IDS.BLOCKLY_CLEANUP]: 'cleanup',
-    [ALL_SHORTCUTS_IDS.BLOCKLY_DISCONNECT]: 'disconnect',
-};
 
 const IS_MAC = getPlatfrom() === ALL_PLATFORMS.MAC;
 
@@ -158,12 +147,17 @@ export function setupBlocklyAdapter(blockly: typeof BlocklyType): () => void {
     let unsubscribe: (() => void) | null = null;
 
     function sync(id: ShortcutIds, newKey: string | undefined): void {
-        const name = ID_TO_NAME[id];
-        if (!name) return;
-        registry.removeAllKeyMappings(name);
+        const definition = shortcutManager.getDefinition(id);
+        if (definition.scope !== 'blockly' || !definition.blocklyName) return;
+
+        registry.removeAllKeyMappings(definition.blocklyName);
         if (newKey !== undefined) {
             try {
-                registry.addKeyMapping(mousetrapToBlocklyKey(newKey), name, false);
+                registry.addKeyMapping(
+                    mousetrapToBlocklyKey(newKey),
+                    definition.blocklyName,
+                    false,
+                );
             } catch (error: unknown) {
                 console.warn(`[BlocklyAdapter] Failed to bind "${id}" to "${newKey}":`, error);
             }
@@ -174,6 +168,12 @@ export function setupBlocklyAdapter(blockly: typeof BlocklyType): () => void {
         if (event.scope !== 'blockly') return;
         sync(event.id, event.newKey);
     });
+
+    for (const definition of shortcutManager.getDefinitions()) {
+        if (definition.scope === 'blockly') {
+            sync(definition.id, shortcutManager.getHotKey(definition.id));
+        }
+    }
 
     // 关于注释
     try {

@@ -92,5 +92,6 @@
     "shortcut.blockly.redo": "重做",
     "shortcut.blockly.duplicate": "复制积木",
     "shortcut.blockly.cleanup": "整理积木",
-    "shortcut.blockly.disconnect": "断开连接"
+    "shortcut.blockly.disconnect": "断开连接",
+    "shortcut.blockly.collapseOtherCategories": "收起其它分类"
 }

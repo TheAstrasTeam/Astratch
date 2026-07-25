@@ -8,7 +8,7 @@ import { AllContextMenu, guiInterface } from '../../types/gui';
 import { useGUIStore } from '../../stores/useGUIStore';
 import { selectProjectThenJump } from '../../utils/ash-gui';
 import { shortcutManager } from '../../lib/ShortcutManager';
-import { ALL_SHORTCUTS_IDS } from '../../types/lib';
+import { SHORTCUTS } from '../../types/lib';
 import { modal } from '../../components/Modal/modal';
 import { SettingsModal } from '../../components/modal_settings';
 
@@ -31,7 +31,7 @@ const MenuBar = ({ vm }: { vm: IVM }): React.ReactNode => {
                 <MenuTextWithShortCut
                     text={t('gui:menu.new')}
                     shortcut={shortcutManager.formatHotKey(
-                        shortcutManager.getHotKey(ALL_SHORTCUTS_IDS.NEW_PROJECT),
+                        shortcutManager.getHotKey(SHORTCUTS.NEW_PROJECT.id),
                     )}
                 />
             </MenuItem>
@@ -39,7 +39,7 @@ const MenuBar = ({ vm }: { vm: IVM }): React.ReactNode => {
                 <MenuTextWithShortCut
                     text={t('gui:menu.open')}
                     shortcut={shortcutManager.formatHotKey(
-                        shortcutManager.getHotKey(ALL_SHORTCUTS_IDS.OPEN_PROJECT),
+                        shortcutManager.getHotKey(SHORTCUTS.OPEN_PROJECT.id),
                     )}
                 />
             </MenuItem>

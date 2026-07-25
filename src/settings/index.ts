@@ -2,6 +2,7 @@ import { Settings } from './SettingsRegistry';
 import { spawnUserName } from '../utils/username';
 import { DEFAULT_GUITHEME_MAP, guiThemes, guiAccents } from '../types/gui';
 import { t } from 'i18next';
+import { shortcutManager } from '../lib/ShortcutManager';
 
 export const initBuiltInSettings = () => {
     Settings.registerMany([
@@ -30,6 +31,8 @@ export const initBuiltInSettings = () => {
             options: Object.keys(guiAccents).map(k => ({ value: k, label: `gui:accent_${k}` })),
         },
     ]);
+
+    shortcutManager.registerSettings();
 
     Settings.build();
 };

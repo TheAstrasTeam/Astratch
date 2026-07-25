@@ -14,6 +14,7 @@
  * - 修改 CSS
  * - 注册 CollapsibleContinuousCategory
  * - 支持配置连续工具箱按钮的翻译函数
+ * - 将工具箱快捷键注册移到插件注册阶段，避免重复注册
  */
 
 /**
@@ -49,12 +50,46 @@ export interface ContinuousToolboxRegistrationOptions {
     translate?: ContinuousToolboxControlTranslator;
 }
 
+const COLLAPSE_OTHER_CATEGORIES_SHORTCUT = 'collapseOtherCategories';
+
+/** 注册连续工具箱的全局操作快捷键。 */
+function registerContinuousToolboxShortcuts() {
+    const registry = Blockly.ShortcutRegistry.registry;
+    if (registry.getRegistry()[COLLAPSE_OTHER_CATEGORIES_SHORTCUT]) return;
+
+    const keyCode = registry.createSerializedKey(Blockly.utils.KeyCodes.O, [
+        Blockly.utils.KeyCodes.CTRL_CMD,
+        Blockly.utils.KeyCodes.SHIFT,
+    ]);
+    const hasConfiguredKey =
+        registry.getKeyCodesByShortcutName(COLLAPSE_OTHER_CATEGORIES_SHORTCUT).length > 0;
+
+    registry.register({
+        name: COLLAPSE_OTHER_CATEGORIES_SHORTCUT,
+        callback: (workspace, event) => {
+            const targetWorkspace = workspace.isFlyout ? workspace.targetWorkspace : workspace;
+            const toolbox = targetWorkspace?.getToolbox();
+            if (!(toolbox instanceof ContinuousToolbox)) return false;
+
+            event.preventDefault();
+            toolbox.collapseOtherCategories();
+            return true;
+        },
+    });
+
+    // 可能已经根据用户设置提前绑定键位；仅在没有配置时补充插件默认值。
+    if (!hasConfiguredKey) {
+        registry.addKeyMapping(keyCode, COLLAPSE_OTHER_CATEGORIES_SHORTCUT);
+    }
+}
+
 /**
  * Registers the components of the continuous toolbox, replacing Blockly's
  * built-in defaults.
  */
 export function registerContinuousToolbox(options: i18n['t']) {
     setContinuousToolboxControlTranslator(options);
+    registerContinuousToolboxShortcuts();
 
     Blockly.registry.register(
         Blockly.registry.Type.TOOLBOX_ITEM,

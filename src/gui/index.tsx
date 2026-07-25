@@ -13,7 +13,7 @@ import MenuBar from './menubar';
 import { ContextMenuLayer } from './contextMenu';
 import { shortcutManager } from '../lib/ShortcutManager';
 import { setupBlocklyAdapter } from '../lib/BlocklyAdapter';
-import { ALL_SHORTCUTS_IDS } from '../types/lib';
+import { SHORTCUTS } from '../types/lib';
 import { useEffect } from 'react';
 import { guiInterface } from '../types/gui';
 import { selectProjectThenJump } from '../utils/ash-gui';
@@ -25,71 +25,16 @@ const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
     useEffect(() => {
         const teardownBlocklyAdapter = setupBlocklyAdapter(Blockly);
 
-        const unregisterSave = shortcutManager.register({
-            id: ALL_SHORTCUTS_IDS.SAVE_PROJECT,
-            scope: 'global',
-            command: () => vm.saveProject(),
-        });
-
-        const unregisterNew = shortcutManager.register({
-            id: ALL_SHORTCUTS_IDS.NEW_PROJECT,
-            scope: 'global',
-            command: () => {
+        const unbindShortcutCommands = shortcutManager.bindCommands({
+            [SHORTCUTS.SAVE_PROJECT.id]: () => vm.saveProject(),
+            [SHORTCUTS.NEW_PROJECT.id]: () => {
                 setInterface(guiInterface.CREATE_PROJECT);
             },
-        });
-
-        const unregisterOpen = shortcutManager.register({
-            id: ALL_SHORTCUTS_IDS.OPEN_PROJECT,
-            scope: 'global',
-            command: () => selectProjectThenJump(vm, setInterface),
-        });
-
-        const unregisterBlocklyCopy = shortcutManager.register({
-            id: ALL_SHORTCUTS_IDS.BLOCKLY_COPY,
-            scope: 'blockly',
-        });
-        const unregisterBlocklyCut = shortcutManager.register({
-            id: ALL_SHORTCUTS_IDS.BLOCKLY_CUT,
-            scope: 'blockly',
-        });
-        const unregisterBlocklyPaste = shortcutManager.register({
-            id: ALL_SHORTCUTS_IDS.BLOCKLY_PASTE,
-            scope: 'blockly',
-        });
-        const unregisterBlocklyUndo = shortcutManager.register({
-            id: ALL_SHORTCUTS_IDS.BLOCKLY_UNDO,
-            scope: 'blockly',
-        });
-        const unregisterBlocklyRedo = shortcutManager.register({
-            id: ALL_SHORTCUTS_IDS.BLOCKLY_REDO,
-            scope: 'blockly',
-        });
-        const unregisterBlocklyDuplicate = shortcutManager.register({
-            id: ALL_SHORTCUTS_IDS.BLOCKLY_DUPLICATE,
-            scope: 'blockly',
-        });
-        const unregisterBlocklyCleanup = shortcutManager.register({
-            id: ALL_SHORTCUTS_IDS.BLOCKLY_CLEANUP,
-            scope: 'blockly',
-        });
-        const unregisterBlocklyDisconnect = shortcutManager.register({
-            id: ALL_SHORTCUTS_IDS.BLOCKLY_DISCONNECT,
-            scope: 'blockly',
+            [SHORTCUTS.OPEN_PROJECT.id]: () => selectProjectThenJump(vm, setInterface),
         });
 
         return () => {
-            unregisterSave();
-            unregisterNew();
-            unregisterOpen();
-            unregisterBlocklyCopy();
-            unregisterBlocklyCut();
-            unregisterBlocklyPaste();
-            unregisterBlocklyUndo();
-            unregisterBlocklyRedo();
-            unregisterBlocklyDuplicate();
-            unregisterBlocklyCleanup();
-            unregisterBlocklyDisconnect();
+            unbindShortcutCommands();
             teardownBlocklyAdapter();
         };
     }, [vm, setInterface]);

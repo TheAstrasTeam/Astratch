@@ -5,7 +5,7 @@ import { Settings, type ISettingDefinition } from '../../settings/SettingsRegist
 import { useState } from 'react';
 import styles from './index.module.scss';
 import KeyInput from '../keyInput';
-import { DEFAULT_SHORTCUTS, type ShortcutIds } from '../../types/lib';
+import type { ShortcutIds } from '../../types/lib';
 import { shortcutManager } from '../../lib/ShortcutManager';
 
 const SpawnSetting = ({ settings }: { settings: ISettingDefinition }) => {
@@ -22,7 +22,7 @@ const SpawnSetting = ({ settings }: { settings: ISettingDefinition }) => {
     const handleResetKey = () => {
         const id = settings.key as ShortcutIds;
         shortcutManager.resetHotKey(id);
-        setNowValue(DEFAULT_SHORTCUTS[id]);
+        setNowValue(shortcutManager.getDefaultHotKey(id));
     };
 
     return (
@@ -53,7 +53,7 @@ const SpawnSetting = ({ settings }: { settings: ISettingDefinition }) => {
                 ) : settings.type === 'key' ? (
                     <>
                         {Settings.get(settings.key) !==
-                            DEFAULT_SHORTCUTS[settings.key as ShortcutIds] && (
+                            shortcutManager.getDefaultHotKey(settings.key as ShortcutIds) && (
                             <button onClick={handleResetKey}>Clear</button>
                         )}
                         <KeyInput

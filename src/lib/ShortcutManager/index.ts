@@ -1,67 +1,93 @@
-// 此文件由 Ai 生成
+/**
+ * 由 AstrasTeam 重构于 2026/7/25：
+ * - 使用统一快捷键声明生成设置项和默认键位
+ * - 将运行时命令绑定与快捷键定义分离
+ * - 让全局快捷键和 Blockly 快捷键共享冲突检测与变更通知
+ */
 
 import mousetrap from 'mousetrap';
 import {
-    DEFAULT_SHORTCUTS,
     type IShortcut,
-    type IShortcutMeta,
+    type ResolvedShortcutDefinition,
     type SetShortcutResult,
     type ShortcutChangeEvent,
     type ShortcutChangeListener,
+    type ShortcutCommand,
+    type ShortcutCommands,
     type ShortcutIds,
+    SHORTCUTS,
 } from '../../types/lib';
 import { ALL_PLATFORMS, getPlatfrom } from '../../utils/ash-navigator';
 import { Settings } from '../../settings/SettingsRegistry';
 import { t } from 'i18next';
 
 class ShortcutManager implements IShortcut {
-    readonly shortcuts = new Map<ShortcutIds, IShortcutMeta>();
+    readonly shortcuts = new Map<ShortcutIds, ResolvedShortcutDefinition>(
+        Object.values(SHORTCUTS).map(definition => [
+            definition.id,
+            definition as ResolvedShortcutDefinition,
+        ]),
+    );
+    private commands = new Map<ShortcutIds, ShortcutCommand>();
     private listeners = new Set<ShortcutChangeListener>();
 
-    register(meta: IShortcutMeta): () => void {
-        this.unregister(meta.id);
-        this.shortcuts.set(meta.id, meta);
-        Settings.register({
-            key: meta.id,
-            defaultValue: DEFAULT_SHORTCUTS[meta.id],
-            category: 'shortcuts',
-            type: 'key',
-            label: t(`gui:shortcut.${meta.id}`),
-        });
-        if (Settings.get(meta.id) == null) {
-            Settings.set(meta.id, DEFAULT_SHORTCUTS[meta.id]);
+    /** 在 Settings 构建前，一次性注册所有快捷键设置。 */
+    registerSettings(): void {
+        for (const definition of this.shortcuts.values()) {
+            Settings.register({
+                key: definition.id,
+                defaultValue: definition.defaultKey,
+                category: 'shortcuts',
+                type: 'key',
+                label: t(`gui:shortcut.${definition.id}`),
+            });
         }
-        if (meta.scope === 'global') this.bindMousetrap(meta);
-
-        this.emit({
-            id: meta.id,
-            scope: meta.scope,
-            oldKey: undefined,
-            newKey: this.getHotKey(meta.id),
-        });
-
-        return () => this.unregister(meta.id);
     }
 
-    unregister(id: ShortcutIds): boolean {
-        const meta = this.shortcuts.get(id);
-        if (!meta) return false;
+    /** 绑定依赖运行时对象的全局快捷键命令，并返回统一清理函数。 */
+    bindCommands(commands: ShortcutCommands): () => void {
+        const bindings: [ShortcutIds, ShortcutCommand][] = [];
 
-        const oldKey = this.getHotKey(id);
-        if (meta.scope === 'global') mousetrap.unbind(oldKey);
-        this.shortcuts.delete(id);
+        for (const [rawId, command] of Object.entries(commands)) {
+            const id = rawId as ShortcutIds;
+            const definition = this.getDefinition(id);
+            if (definition.scope !== 'global') {
+                throw new Error(`Shortcut "${id}" is not a global shortcut.`);
+            }
 
-        this.emit({ id, scope: meta.scope, oldKey, newKey: undefined });
-        return true;
+            const previousCommand = this.commands.get(id);
+            if (previousCommand) mousetrap.unbind(this.getHotKey(id));
+            this.commands.set(id, command);
+            this.bindMousetrap(id);
+            bindings.push([id, command]);
+        }
+
+        return () => {
+            for (const [id, command] of bindings) {
+                if (this.commands.get(id) !== command) continue;
+                mousetrap.unbind(this.getHotKey(id));
+                this.commands.delete(id);
+            }
+        };
+    }
+
+    getDefinition(id: ShortcutIds): ResolvedShortcutDefinition {
+        const definition = this.shortcuts.get(id);
+        if (!definition) throw new Error(`Unknown shortcut: ${id}`);
+        return definition;
+    }
+
+    getDefinitions(): readonly ResolvedShortcutDefinition[] {
+        return [...this.shortcuts.values()];
+    }
+
+    getDefaultHotKey(id: ShortcutIds): string {
+        return this.getDefinition(id).defaultKey;
     }
 
     getHotKey(id: ShortcutIds): string {
         const stored = Settings.get(id);
-        return typeof stored === 'string' && stored ? stored : DEFAULT_SHORTCUTS[id];
-    }
-
-    getMeta(id: ShortcutIds): IShortcutMeta | undefined {
-        return this.shortcuts.get(id);
+        return typeof stored === 'string' && stored ? stored : this.getDefaultHotKey(id);
     }
 
     formatHotKey(key: string): string {
@@ -83,28 +109,28 @@ class ShortcutManager implements IShortcut {
         const conflictWith = this.findConflict(id, nextHotKey);
         if (conflictWith) return { ok: false, reason: 'conflict', conflictWith };
 
-        const meta = this.shortcuts.get(id);
+        const definition = this.getDefinition(id);
         const oldKey = this.getHotKey(id);
-        if (meta?.scope === 'global') mousetrap.unbind(oldKey);
+        if (definition.scope === 'global') mousetrap.unbind(oldKey);
 
         Settings.set(id, nextHotKey);
 
-        if (meta?.scope === 'global') this.bindMousetrap(meta);
-        if (meta) this.emit({ id, scope: meta.scope, oldKey, newKey: nextHotKey });
+        if (definition.scope === 'global') this.bindMousetrap(id);
+        this.emit({ id, scope: definition.scope, oldKey, newKey: nextHotKey });
         return { ok: true };
     }
 
     resetHotKey(id: ShortcutIds): void {
-        if (this.getHotKey(id) === DEFAULT_SHORTCUTS[id]) return;
+        if (this.getHotKey(id) === this.getDefaultHotKey(id)) return;
 
-        const meta = this.shortcuts.get(id);
+        const definition = this.getDefinition(id);
         const oldKey = this.getHotKey(id);
-        if (meta?.scope === 'global') mousetrap.unbind(oldKey);
+        if (definition.scope === 'global') mousetrap.unbind(oldKey);
 
         Settings.reset(id);
 
-        if (meta?.scope === 'global') this.bindMousetrap(meta);
-        if (meta) this.emit({ id, scope: meta.scope, oldKey, newKey: this.getHotKey(id) });
+        if (definition.scope === 'global') this.bindMousetrap(id);
+        this.emit({ id, scope: definition.scope, oldKey, newKey: this.getHotKey(id) });
     }
 
     onChange(listener: ShortcutChangeListener): () => void {
@@ -118,14 +144,14 @@ class ShortcutManager implements IShortcut {
         for (const listener of this.listeners) listener(event);
     }
 
-    private bindMousetrap(meta: IShortcutMeta): void {
-        const hotKey = this.getHotKey(meta.id);
-        const command = meta.command;
+    private bindMousetrap(id: ShortcutIds): void {
+        const hotKey = this.getHotKey(id);
+        const command = this.commands.get(id);
         if (!command) return;
         mousetrap.bind(hotKey, (event, combo) => {
             event.preventDefault();
             void Promise.resolve(command(event, combo)).catch((error: unknown) => {
-                console.error(`Shortcut command failed: ${meta.id}`, error);
+                console.error(`Shortcut command failed: ${id}`, error);
             });
         });
     }
