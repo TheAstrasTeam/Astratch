@@ -26,6 +26,10 @@
             color: $text-primary;
             filter: brightness(1.5);
         }
+        & svg {
+            width: 12px;
+            height: 12px;
+        }
     }
 }
 

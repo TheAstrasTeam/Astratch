@@ -5,6 +5,10 @@ import { t } from 'i18next';
 import { ToastLayer } from '../../components/toastLayer';
 import { ToastHistoryPanel } from '../../components/toastLayer/ToastHistoryPanel';
 
+import NotificationIcon from '../../assets/notifications.svg?react';
+import NotificationUnreadIcon from '../../assets/notificationsUnread.svg?react';
+import { Toast } from '../../lib/ToastManager';
+
 export const BottomBar = ({ vm }: { vm: IVM }): React.ReactNode => {
     const [noticeY, setNoticeY] = useState(0);
     const [historyOpen, setHistoryOpen] = useState(false);
@@ -77,7 +81,11 @@ export const BottomBar = ({ vm }: { vm: IVM }): React.ReactNode => {
                     }}
                     aria-expanded={historyOpen}
                 >
-                    notices
+                    {Toast.getFullHistory().length > 0 ? (
+                        <NotificationUnreadIcon />
+                    ) : (
+                        <NotificationIcon />
+                    )}
                 </button>
             </div>
         </div>
