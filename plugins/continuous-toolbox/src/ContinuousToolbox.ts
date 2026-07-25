@@ -39,7 +39,7 @@ export class ContinuousToolbox extends Blockly.Toolbox {
      * changes.
      */
     private refreshDebouncer?: ReturnType<typeof setTimeout>;
-    private static readonly TOOLBOX_WIDTH = 115;
+    private static readonly TOOLBOX_WIDTH = 120;
     private preserveSelectionDuringPointerDown = false;
 
     protected override createDom_(workspace: Blockly.WorkspaceSvg): HTMLDivElement {
