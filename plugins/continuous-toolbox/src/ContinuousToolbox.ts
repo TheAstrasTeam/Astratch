@@ -9,13 +9,16 @@
  *
  * 由 AstrasTeam 修改于 2026/7/24:
  * - 覆盖了 createToolboxItem 方法来让DOM拥有id
- * 
+ *
  * 由 AstrasTeam 修改于 2026/7/25:
  * - 将 getCategoryByName 改为 getCategoryById
  * - 将 selectCategoryByName 改为 selectCategoryById
  * - 将 flyout 上的 label 加入 id
  * - 让滚动时可以自动展开toolbox
  * - 加入滚动时的动画
+ * - 将工具箱操作按钮拆分到 ContinuousToolboxControls
+ * - 增加收起选中路径以外分类的操作
+ * - 支持由宿主注入按钮的国际化文本
  */
 
 /**
@@ -24,6 +27,7 @@
 
 import * as Blockly from 'blockly/core';
 import { ContinuousFlyout } from './ContinuousFlyout';
+import { createContinuousToolboxControls } from './ContinuousToolboxControls';
 
 /**
  * Class for continuous toolbox.
@@ -36,6 +40,35 @@ export class ContinuousToolbox extends Blockly.Toolbox {
      */
     private refreshDebouncer?: ReturnType<typeof setTimeout>;
     private static readonly TOOLBOX_WIDTH = 115;
+    private preserveSelectionDuringPointerDown = false;
+
+    protected override createDom_(workspace: Blockly.WorkspaceSvg): HTMLDivElement {
+        const container = super.createDom_(workspace);
+        container.prepend(
+            createContinuousToolboxControls({
+                collapseOtherCategories: () => this.collapseOtherCategories(),
+            }),
+        );
+        return container;
+    }
+
+    protected override onClick_(e: PointerEvent) {
+        this.preserveSelectionDuringPointerDown = this.getSelectedItem() !== null;
+
+        try {
+            super.onClick_(e);
+        } finally {
+            this.preserveSelectionDuringPointerDown = false;
+        }
+    }
+
+    override clearSelection() {
+        if (this.preserveSelectionDuringPointerDown && this.getSelectedItem()) {
+            return;
+        }
+
+        super.clearSelection();
+    }
 
     override position() {
         if (this.HtmlDiv && !this.isHorizontal()) {
@@ -265,7 +298,6 @@ export class ContinuousToolbox extends Blockly.Toolbox {
      *     the toolbox.
      * @param fragment The document fragment to add the child toolbox elements to.
      */
-    // @ts-expect-error 实际内部方法使用了
     private createToolboxItem(
         toolboxItemDef: Blockly.utils.toolbox.ToolboxItemInfo,
         fragment: DocumentFragment,
@@ -309,5 +341,44 @@ export class ContinuousToolbox extends Blockly.Toolbox {
             // This is used in onClick_ to find the toolboxItem that was clicked.
             toolboxItem.getClickTarget()?.setAttribute('id', toolboxItem.getId());
         }
+    }
+
+    /** 收起当前选中分类及其祖先路径之外的所有可折叠分类。 */
+    collapseOtherCategories() {
+        const selected = this.getSelectedItem();
+        const selectedPath = new Set<Blockly.IToolboxItem>();
+
+        let item: Blockly.IToolboxItem | null = selected;
+        while (item) {
+            selectedPath.add(item);
+            item = item.getParent();
+        }
+
+        this.contents.forEach(toolboxItem => {
+            if (
+                toolboxItem instanceof Blockly.CollapsibleToolboxCategory &&
+                !selectedPath.has(toolboxItem)
+            ) {
+                toolboxItem.setExpanded(false);
+            }
+        });
+    }
+
+    /**
+     * Adds all the toolbox items to the toolbox.
+     *
+     * @param toolboxDef Array holding objects containing information on the
+     *     contents of the toolbox.
+     */
+    protected renderContents_(toolboxDef: Blockly.utils.toolbox.ToolboxItemInfo[]) {
+        // This is for performance reasons. By using document fragment we only have
+        // to add to the DOM once.
+        const fragment = document.createDocumentFragment();
+
+        for (let i = 0; i < toolboxDef.length; i++) {
+            const toolboxItemDef = toolboxDef[i];
+            this.createToolboxItem(toolboxItemDef, fragment);
+        }
+        this.contentsDiv_?.appendChild(fragment);
     }
 }

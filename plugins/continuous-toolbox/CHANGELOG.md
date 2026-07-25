@@ -16,6 +16,8 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 - Add smooth scrolling when the flyout or toolbox follows a selected category.
 - Synchronize the fixed 115px vertical toolbox width before Blockly calculates
   workspace metrics.
+- Add an accessible toolbox control bar with an action for collapsing categories
+  outside the selected path.
 
 ### Bug Fixes
 
@@ -32,6 +34,8 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 - Use Blockly's public `Blockly.utils` exports for DOM, ARIA, and style helpers
   instead of importing copied Blockly utility implementations.
+- Decouple toolbox control rendering from `ContinuousToolbox` through callbacks
+  and host-provided translations.
 
 ## [7.0.9](https://github.com/RaspberryPiFoundation/blockly-samples/compare/@blockly/continuous-toolbox@7.0.8...@blockly/continuous-toolbox@7.0.9) (2026-04-09)
 

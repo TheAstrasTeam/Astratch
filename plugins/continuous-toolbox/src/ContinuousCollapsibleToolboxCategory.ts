@@ -95,4 +95,25 @@ export class CollapsibleContinuousCategory extends Blockly.CollapsibleToolboxCat
         }
         return contentsContainer;
     }
+
+    /**
+     * Opens or closes the current category and the associated flyout.
+     *
+     * @param isExpanded True to expand the category, false to close.
+     */
+    setExpanded(isExpanded: boolean) {
+        if (this.expanded_ === isExpanded) return;
+
+        this.expanded_ = isExpanded;
+        if (isExpanded) {
+            this.subcategoriesDiv_!.style.display = 'block';
+            this.openIcon_(this.iconDom_);
+        } else {
+            this.subcategoriesDiv_!.style.display = 'none';
+            this.closeIcon_(this.iconDom_);
+        }
+        aria.setState(this.htmlDiv_ as HTMLDivElement, aria.State.EXPANDED, isExpanded);
+
+        this.parentToolbox_.handleToolboxItemResize();
+    }
 }

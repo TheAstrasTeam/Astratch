@@ -9,10 +9,11 @@
  * 由 AstrasTeam 修改于 2026/7/6:
  * - 减小`blocklyToolboxCategoryLabel`的字体大小
  * - 增加`blocklyToolboxCategory`的宽度设置（60px）
- * 
+ *
  * 由 AstrasTeam 修改于 2026/7/25:
  * - 修改 CSS
  * - 注册 CollapsibleContinuousCategory
+ * - 支持配置连续工具箱按钮的翻译函数
  */
 
 /**
@@ -28,6 +29,11 @@ import { ContinuousMetrics } from './ContinuousMetrics';
 import { ContinuousToolbox } from './ContinuousToolbox';
 import { RecyclableBlockFlyoutInflater } from './RecyclableBlockFlyoutInflater';
 import { CollapsibleContinuousCategory } from './ContinuousCollapsibleToolboxCategory';
+import {
+    setContinuousToolboxControlTranslator,
+    type ContinuousToolboxControlTranslator,
+} from './ContinuousToolboxControls';
+import type { i18n } from 'i18next';
 
 export {
     ContinuousCategory,
@@ -38,11 +44,18 @@ export {
 };
 export type { LabelFlyoutItem };
 
+export interface ContinuousToolboxRegistrationOptions {
+    /** 用于翻译连续工具箱按钮文本的函数。 */
+    translate?: ContinuousToolboxControlTranslator;
+}
+
 /**
  * Registers the components of the continuous toolbox, replacing Blockly's
  * built-in defaults.
  */
-export function registerContinuousToolbox() {
+export function registerContinuousToolbox(options: i18n['t']) {
+    setContinuousToolboxControlTranslator(options);
+
     Blockly.registry.register(
         Blockly.registry.Type.TOOLBOX_ITEM,
         Blockly.ToolboxCategory.registrationName,

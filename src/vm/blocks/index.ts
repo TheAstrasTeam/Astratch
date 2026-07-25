@@ -188,7 +188,7 @@ class Blocks implements IBlocks {
         };
 
         // 对于完全不需要现在的工作区的
-        ContinuousToolbox.registerContinuousToolbox();
+        ContinuousToolbox.registerContinuousToolbox(i18next.t);
 
         // 定义积木
         initBlocks(this.Blockly);
