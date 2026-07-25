@@ -37,7 +37,7 @@
 
 ### ICONS
 
-`Astratch` 使用了一下开源仓库的图标：
+`Astratch` 使用了以下开源仓库的图标：
 
 - [Material Symbols](https://github.com/google/material-design-icons)
 - [Typicons](https://github.com/stephenhutchings/typicons.font)
