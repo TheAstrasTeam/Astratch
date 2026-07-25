@@ -6,7 +6,7 @@
  * 由 AstrasTeam 修改于 2026/7/3:
  * - 增加一个降低HEX亮度的方法
  * - 修改边框颜色为`this.colour_`降低20%亮度的颜色
- * 
+ *
  * 由 AstrasTeam 修改于 2026/7/25:
  * - 删除修改的圆形，使用 Blockly 原生的样式
  * - 将类的 padding 改为 margin

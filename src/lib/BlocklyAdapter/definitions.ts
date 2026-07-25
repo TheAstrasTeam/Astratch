@@ -2,7 +2,6 @@ import { t } from 'i18next';
 import * as Blockly from 'blockly/core';
 import { BlocksColor, OPCODE } from '../../types/blocks';
 
-
 /**
  * 对于链接积木的配置项
  */
