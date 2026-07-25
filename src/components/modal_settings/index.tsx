@@ -3,12 +3,14 @@ import { Modal } from '../Modal/modalWindow';
 import { t } from 'i18next';
 import { Settings, type ISettingDefinition } from '../../settings/SettingsRegistry';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from './index.module.scss';
 import KeyInput from '../keyInput';
 import type { ShortcutIds } from '../../types/lib';
 import { shortcutManager } from '../../lib/ShortcutManager';
 
 const SpawnSetting = ({ settings }: { settings: ISettingDefinition }) => {
+    const { t } = useTranslation();
     const [nowValue, setNowValue] = useState(Settings.get(settings.key));
 
     const handleInputChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,9 +30,9 @@ const SpawnSetting = ({ settings }: { settings: ISettingDefinition }) => {
     return (
         <div className={styles.settingContent}>
             <div className={styles.settingText}>
-                <span className={styles.settingTextTitle}>{settings.label}</span>
+                <span className={styles.settingTextTitle}>{t(settings.label)}</span>
                 {settings.description && (
-                    <span className={styles.settingTextDesc}>{settings.description}</span>
+                    <span className={styles.settingTextDesc}>{t(settings.description)}</span>
                 )}
             </div>
             <div className={styles.settingNode}>
@@ -47,7 +49,9 @@ const SpawnSetting = ({ settings }: { settings: ISettingDefinition }) => {
                         onChange={handleSelectChanged}
                     >
                         {settings.options?.map(option => (
-                            <option value={option.value}>{option.label}</option>
+                            <option key={option.value} value={option.value}>
+                                {t(option.label)}
+                            </option>
                         ))}
                     </select>
                 ) : settings.type === 'key' ? (
@@ -73,6 +77,7 @@ const SpawnSetting = ({ settings }: { settings: ISettingDefinition }) => {
 };
 
 export const SettingsModal = () => {
+    const { t } = useTranslation();
     const { closeSelf } = useModalInstance();
     const categories = Settings.getDefinitionsByCategory();
 
@@ -94,12 +99,14 @@ export const SettingsModal = () => {
                                 setTab(tab[0]);
                             }}
                         >
-                            {tab[0]}
+                            {t(`gui:settings_category.${tab[0]}`)}
                         </button>
                     ))}
                 </div>
                 <div className={styles.settings}>
-                    <span className={styles.settingsTitle}>{nowTab}</span>
+                    <span className={styles.settingsTitle}>
+                        {t(`gui:settings_category.${nowTab}`)}
+                    </span>
                     <div className={styles.settingsContent}>
                         {categories[nowTab].map(settings => (
                             <SpawnSetting key={settings.key} settings={settings}></SpawnSetting>

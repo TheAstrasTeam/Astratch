@@ -19,7 +19,6 @@ import {
 } from '../../types/lib';
 import { ALL_PLATFORMS, getPlatfrom } from '../../utils/ash-navigator';
 import { Settings } from '../../settings/SettingsRegistry';
-import { t } from 'i18next';
 
 class ShortcutManager implements IShortcut {
     readonly shortcuts = new Map<ShortcutIds, ResolvedShortcutDefinition>(
@@ -39,7 +38,7 @@ class ShortcutManager implements IShortcut {
                 defaultValue: definition.defaultKey,
                 category: 'shortcuts',
                 type: 'key',
-                label: t(`gui:shortcut.${definition.id}`),
+                label: `gui:shortcut.${definition.id}`,
             });
         }
     }

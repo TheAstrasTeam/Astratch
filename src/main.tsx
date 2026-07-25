@@ -13,10 +13,12 @@ import { initBuiltInSettings } from './settings/index.ts';
 import { Settings } from './settings/SettingsRegistry.ts';
 import { events } from './types/vm.ts';
 import { Toast } from './lib/ToastManager/index.ts';
+import i18next from 'i18next';
+import { isSupportedLanguage } from './i18n/index.ts';
 
 // 等待国际化初始化
-await i18nReady.then(() => {
-    initBuiltInSettings();
+await i18nReady.then(async () => {
+    await initBuiltInSettings();
     // 导入设置项
     // 一个很有趣的动画效果，渐隐加载
     const Loading: HTMLElement | null = document.querySelector('.loading');
@@ -50,7 +52,12 @@ await i18nReady.then(() => {
             applyGuiTheme();
             vm.emit(events.UPDATE_THEME);
         }
+
+        if (state.language !== prevState.language && isSupportedLanguage(state.language)) {
+            void i18next.changeLanguage(state.language);
+        }
     });
+
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     createRoot(document.getElementById('root')!).render(
         <StrictMode>
