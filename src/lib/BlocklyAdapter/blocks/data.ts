@@ -1,0 +1,456 @@
+import * as Blockly from 'blockly/core';
+import { t } from 'i18next';
+import { BlocksColor, OPCODES } from '../../../types/blocks';
+import { connections, returnConnections } from './helpers';
+import { createMinusField } from './fieldMinus';
+import { createPlusField } from './fieldPlus';
+
+/**
+ * 注册数据类积木
+ * 涵盖：变量、字符串、数组、对象、类型
+ */
+export function initDataBlocks(blockly: typeof Blockly) {
+    // - 变量
+    blockly.Blocks[OPCODES.DATA_VARIABLE_SET] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...connections,
+                message0: t('blocks:data.variable.set'),
+                colour: BlocksColor.data.primary,
+                args0: [
+                    { type: 'input_value', name: 'NAME', check: 'String' },
+                    { type: 'input_value', name: 'VALUE' },
+                ],
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.DATA_VARIABLE_ADD] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...connections,
+                message0: t('blocks:data.variable.add'),
+                colour: BlocksColor.data.primary,
+                args0: [
+                    { type: 'input_value', name: 'NAME', check: 'String' },
+                    { type: 'input_value', name: 'VALUE', check: 'Number' },
+                ],
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.DATA_VARIABLE_COMPUTE] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...connections,
+                message0: t('blocks:data.variable.compute'),
+                colour: BlocksColor.data.primary,
+                args0: [
+                    { type: 'input_value', name: 'NAME', check: 'String' },
+                    { type: 'input_value', name: 'OPERATOR', check: 'String' },
+                    { type: 'input_value', name: 'VALUE', check: 'Number' },
+                ],
+            });
+        },
+    } as Blockly.Block;
+
+    // - 字符串
+
+    interface SavedConnection {
+        shadow: Blockly.serialization.blocks.State;
+        block: Blockly.Block | null;
+    }
+    interface DataStringJoinBlock extends Blockly.Block {
+        itemCount: number;
+        savedConns_: Map<string, SavedConnection>;
+        plus: () => void;
+        minus: (index?: number) => void;
+        updateShape: () => void;
+        saveConnections_: () => void;
+        restoreConnection_: (inputName: string) => void;
+    }
+    blockly.Blocks[OPCODES.DATA_STRING_JOIN] = {
+        init(this: DataStringJoinBlock) {
+            this.jsonInit({
+                ...returnConnections,
+                output: 'String',
+                colour: BlocksColor.data.secondary,
+            });
+            this.itemCount = 2;
+            this.savedConns_ = new Map();
+            this.updateShape();
+        },
+        plus(this: DataStringJoinBlock) {
+            this.saveConnections_();
+            this.itemCount++;
+            this.updateShape();
+        },
+        minus(this: DataStringJoinBlock, index?: number) {
+            if (this.itemCount === 0) return;
+
+            const removeIndex = index ?? this.itemCount - 1;
+            if (removeIndex < 0 || removeIndex >= this.itemCount) return;
+
+            this.saveConnections_();
+            for (let i = removeIndex + 1; i < this.itemCount; i++) {
+                const saved = this.savedConns_.get(`DATA${i.toString()}`);
+                if (saved) {
+                    this.savedConns_.set(`DATA${(i - 1).toString()}`, saved);
+                }
+            }
+            this.savedConns_.delete(`DATA${(this.itemCount - 1).toString()}`);
+            this.itemCount--;
+            this.updateShape();
+        },
+        saveConnections_(this: DataStringJoinBlock) {
+            this.savedConns_ = new Map();
+            for (let i = 0; i < this.itemCount; i++) {
+                const inputName = `DATA${i.toString()}`;
+                const connection = this.getInput(inputName)?.connection;
+                if (!connection) continue;
+
+                const shadow = connection.getShadowState(true);
+                const target = connection.targetBlock();
+                this.savedConns_.set(inputName, {
+                    shadow: shadow ?? {
+                        type: OPCODES.text,
+                        fields: { TEXT: t('blocks:example.text') },
+                    },
+                    block: target && !target.isShadow() ? target : null,
+                });
+            }
+        },
+        restoreConnection_(this: DataStringJoinBlock, inputName: string) {
+            const connection = this.getInput(inputName)?.connection;
+            if (!connection) return;
+
+            const saved = this.savedConns_.get(inputName);
+            connection.setShadowState(
+                saved?.shadow ?? {
+                    type: OPCODES.text,
+                    fields: { TEXT: t('blocks:example.text') },
+                },
+            );
+
+            if (saved?.block?.outputConnection) {
+                connection.connect(saved.block.outputConnection);
+            }
+        },
+        updateShape(this: DataStringJoinBlock) {
+            for (const input of this.inputList.slice()) {
+                this.removeInput(input.name);
+            }
+
+            this.appendDummyInput('CONTENT').appendField(
+                t(this.isInFlyout ? 'blocks:data.string.joinText' : 'blocks:data.string.join'),
+            );
+
+            if (this.isInFlyout) return;
+
+            if (this.itemCount > 0) {
+                for (let i = 0; i < this.itemCount; i++) {
+                    this.appendValueInput(`DATA${i.toString()}`).setAlign(
+                        Blockly.inputs.Align.RIGHT,
+                    );
+                    this.restoreConnection_(`DATA${i.toString()}`);
+                    this.appendDummyInput(`REMOVE${i.toString()}`)
+                        .setAlign(Blockly.inputs.Align.RIGHT)
+                        .appendField(
+                            createMinusField({
+                                removeIndex: i,
+                            }),
+                            'MINUS',
+                        );
+                }
+
+                this.appendEndRowInput('END_ROW_BUTTONS');
+                this.appendDummyInput('ADD')
+                    .setAlign(Blockly.inputs.Align.LEFT)
+                    .appendField(createPlusField(), 'ADD');
+            } else {
+                this.appendDummyInput('SUB').appendField(createPlusField(), 'ADD');
+            }
+
+            this.savedConns_.clear();
+        },
+        saveExtraState(this: DataStringJoinBlock) {
+            return { itemCount: this.itemCount };
+        },
+        loadExtraState(this: DataStringJoinBlock, state: { itemCount?: number }) {
+            this.itemCount = state.itemCount ?? 0;
+            this.savedConns_ = new Map();
+            this.updateShape();
+        },
+    } as DataStringJoinBlock;
+
+    blockly.Blocks[OPCODES.DATA_STRING_SPLIT] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:data.string.split'),
+                colour: BlocksColor.data.secondary,
+                output: 'Array',
+                args0: [
+                    { type: 'input_value', name: 'TEXT', check: 'String' },
+                    { type: 'input_value', name: 'SEPARATOR', check: 'String' },
+                ],
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.DATA_STRING_SUBSTRING] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:data.string.substring'),
+                colour: BlocksColor.data.secondary,
+                output: 'String',
+                args0: [
+                    { type: 'input_value', name: 'TEXT', check: 'String' },
+                    { type: 'input_value', name: 'START', check: 'Number' },
+                    { type: 'input_value', name: 'END', check: 'Number' },
+                ],
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.DATA_STRING_LENGTH] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:data.string.length'),
+                colour: BlocksColor.data.secondary,
+                output: 'Number',
+                args0: [{ type: 'input_value', name: 'TEXT', check: 'String' }],
+            });
+        },
+    } as Blockly.Block;
+
+    // - 数组
+    blockly.Blocks[OPCODES.DATA_ARRAY_EMPTY] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:data.array.empty'),
+                colour: BlocksColor.data.tertiary,
+                output: 'Array',
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.DATA_ARRAY_PUSH] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:data.array.push'),
+                output: 'Array',
+                colour: BlocksColor.data.tertiary,
+                args0: [
+                    { type: 'input_value', name: 'ARRAY', check: 'Array' },
+                    { type: 'input_value', name: 'VALUE' },
+                ],
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.DATA_ARRAY_REMOVEAT] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:data.array.removeAt'),
+                output: 'Array',
+                colour: BlocksColor.data.tertiary,
+                args0: [
+                    { type: 'input_value', name: 'ARRAY', check: 'Array' },
+                    { type: 'input_value', name: 'INDEX', check: 'Number' },
+                ],
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.DATA_ARRAY_REMOVEENDS] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:data.array.removeEnds'),
+                output: 'Array',
+                colour: BlocksColor.data.tertiary,
+                args0: [
+                    { type: 'input_value', name: 'ARRAY', check: 'Array' },
+                    { type: 'input_value', name: 'START', check: 'Number' },
+                    { type: 'input_value', name: 'END', check: 'Number' },
+                ],
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.DATA_ARRAY_GET] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:data.array.get'),
+                colour: BlocksColor.data.tertiary,
+                output: null,
+                args0: [
+                    { type: 'input_value', name: 'ARRAY', check: 'Array' },
+                    { type: 'input_value', name: 'INDEX', check: 'Number' },
+                ],
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.DATA_ARRAY_LENGTH] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:data.array.length'),
+                colour: BlocksColor.data.tertiary,
+                output: 'Number',
+                args0: [{ type: 'input_value', name: 'ARRAY', check: 'Array' }],
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.DATA_ARRAY_FILTER] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:data.array.filter'),
+                colour: BlocksColor.data.tertiary,
+                output: 'Array',
+                args0: [
+                    { type: 'input_value', name: 'ARRAY', check: 'Array' },
+                    { type: 'input_value', name: 'FILTER' },
+                ],
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.DATA_ARRAY_INDEXOF] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:data.array.indexOf'),
+                colour: BlocksColor.data.tertiary,
+                output: 'Number',
+                args0: [
+                    { type: 'input_value', name: 'ARRAY', check: 'Array' },
+                    { type: 'input_value', name: 'VALUE' },
+                ],
+            });
+        },
+    } as Blockly.Block;
+
+    // - 对象
+    blockly.Blocks[OPCODES.DATA_OBJECT_EMPTY] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:data.object.empty'),
+                colour: BlocksColor.data.secondary,
+                output: 'Object',
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.DATA_OBJECT_SET] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:data.object.set'),
+                colour: BlocksColor.data.secondary,
+                output: 'Object',
+                args0: [
+                    { type: 'input_value', name: 'OBJECT', check: 'Object' },
+                    { type: 'input_value', name: 'KEY', check: 'String' },
+                    { type: 'input_value', name: 'VALUE' },
+                ],
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.DATA_OBJECT_DELETE] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:data.object.delete'),
+                colour: BlocksColor.data.secondary,
+                output: 'Object',
+                args0: [
+                    { type: 'input_value', name: 'OBJECT', check: 'Object' },
+                    { type: 'input_value', name: 'KEY', check: 'String' },
+                ],
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.DATA_OBJECT_GETALL] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:data.object.getAll'),
+                colour: BlocksColor.data.secondary,
+                output: 'Array',
+                args0: [
+                    { type: 'input_value', name: 'OBJECT', check: 'Object' },
+                    { type: 'input_value', name: 'KIND', check: 'String' },
+                ],
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.DATA_OBJECT_GET] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:data.object.get'),
+                colour: BlocksColor.data.secondary,
+                output: null,
+                args0: [
+                    { type: 'input_value', name: 'OBJECT', check: 'Object' },
+                    { type: 'input_value', name: 'KEY', check: 'String' },
+                ],
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.DATA_OBJECT_LENGTH] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:data.object.length'),
+                colour: BlocksColor.data.secondary,
+                output: 'Number',
+                args0: [{ type: 'input_value', name: 'OBJECT', check: 'Object' }],
+            });
+        },
+    } as Blockly.Block;
+
+    // - 类型
+    blockly.Blocks[OPCODES.DATA_TYPE_TYPEOF] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:data.type.typeof'),
+                colour: BlocksColor.data.tertiary,
+                output: 'String',
+                args0: [{ type: 'input_value', name: 'VALUE' }],
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.DATA_TYPE_CAST] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:data.type.cast'),
+                colour: BlocksColor.data.tertiary,
+                output: null,
+                args0: [
+                    { type: 'input_value', name: 'VALUE' },
+                    { type: 'input_value', name: 'TYPE', check: 'String' },
+                ],
+            });
+        },
+    } as Blockly.Block;
+}

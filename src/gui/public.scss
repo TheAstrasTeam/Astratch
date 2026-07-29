@@ -266,3 +266,12 @@ g {
         }
     }
 }
+
+// 针对积木控件
+
+// 积木图片按钮
+g.blocklyImageField[role="button"] {
+    padding: 5px;
+    outline: 2px solid #ffffff50;
+    border-radius: 5px;
+}

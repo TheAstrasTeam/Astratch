@@ -1,32 +1,54 @@
 import * as Blockly from 'blockly';
 import type { IVM } from './vm';
 
-const OPCODE = {
+const OPCODES = {
+    // 菜单
+    POSITION_MENU: 'position_menu',
+    POSITION_ADDORSET_MENU: 'position_addOrSet_menu',
+    SCALE_ADDORSET_MENU: 'scale_addOrSet_menu',
+    DIRECTION_SETWHERE_MENU: 'direction_setWhere_menu',
+    DIRECTION_SETFACE_MENU: 'direction_setFace_menu',
+    LAYER_ADDORSET_MENU: 'layer_addOrSet_menu',
+    IMAGES_STRETCH_MENU: 'images_stretch_menu',
+    IMAGES_IMAGES_ADDORSET_MENU: 'images_images_addOrSet_menu',
+    IMAGES_GRID_MENU: 'images_grid_menu',
+    IMAGES_GRID_SIZE_MENU: 'images_grid_size_menu',
+    EFFECTS_MENU: 'effects_menu',
+    EFFECTS_ADDORSET_MENU: 'effects_addOrSet_menu',
+    COLLISION_MENU: 'collision_menu',
+    LIFECYCLE_CLONE_MUTATOR: 'lifecycle_clone_mutator',
+    AUDIO_THEN_MENU: 'audio_then_menu',
+    AUDIO_CONTROL_MENU: 'audio_control_menu',
+    AUDIO_ADDORSET_MENU: 'audio_addOrSet_menu',
+    AUDIO_GET_MENU: 'audio_get_menu',
+    AUDIO_GET_IS_MENU: 'audio_get_is_menu',
+    MATH_OPERATOR_MENU: 'math_operator_menu',
+    LOGIC_COMPARE_MENU: 'logic_compare_menu',
+    SCIENTIFIC_FUNCTION_MENU: 'scientific_function_menu',
+    DATA_NAME_MENU: 'data_name_menu',
+    DATA_COMPUTE_MENU: 'data_compute_menu',
+    FUNCTION_BRANCH_MENU: 'function_branch_menu',
+    FUNCTION_PARAMETER_MENU: 'function_parameter_menu',
     // 实体
     // - 变换
     // - - 位置
     ENTITY_TRANSFORM_POSITION_MOVESTEP: 'entity_transform_position_moveStep',
     ENTITY_TRANSFORM_POSITION_SETPOSITION: 'entity_transform_position_setPosition',
-    ENTITY_TRANSFORM_POSITION_ADDPOSITION: 'entity_transform_position_addPosition',
     ENTITY_TRANSFORM_POSITION_GETPOSITION: 'entity_transform_position_getPosition',
     // - - 缩放
     ENTITY_TRANSFORM_SCALE_SETSCALE: 'entity_transform_scale_setScale',
-    ENTITY_TRANSFORM_SCALE_ADDSCALE: 'entity_transform_scale_addScale',
     ENTITY_TRANSFORM_SCALE_GETSCALE: 'entity_transform_scale_getScale',
     // - - 方向
     ENTITY_TRANSFORM_DIRECTION_SETDIRECTION: 'entity_transform_direction_setDirection',
-    ENTITY_TRANSFORM_DIRECTION_ADDDIRECTION: 'entity_transform_direction_addDirection',
     ENTITY_TRANSFORM_DIRECTION_FACEDIRECTION: 'entity_transform_direction_faceDirection',
     ENTITY_TRANSFORM_DIRECTION_GETDIRECTION: 'entity_transform_direction_getDirection',
     // - - 图层
     ENTITY_TRANSFORM_LAYER_SETLAYER: 'entity_transform_layer_setLayer',
-    ENTITY_TRANSFORM_LAYER_MOVELAYER: 'entity_transform_layer_moveLayer',
     ENTITY_TRANSFORM_LAYER_GETLAYER: 'entity_transform_layer_getLayer',
     // - 外观
     // - - 图像
     ENTITY_APPEARANCE_IMAGES_SHOWIMAGE: 'entity_appearance_images_showImage',
     ENTITY_APPEARANCE_IMAGES_SETSTRETCH: 'entity_appearance_images_setStretch',
-    ENTITY_APPEARANCE_IMAGES_ADDSTRETCH: 'entity_appearance_images_addStretch',
     ENTITY_APPEARANCE_IMAGES_GETSTRETCH: 'entity_appearance_images_getStretch',
     ENTITY_APPEARANCE_IMAGES_SETGRID: 'entity_appearance_images_setGrid',
     ENTITY_APPEARANCE_IMAGES_SETGRIDDISTANCE: 'entity_appearance_images_setGridDistance',
@@ -34,7 +56,6 @@ const OPCODE = {
     ENTITY_APPEARANCE_IMAGES_GETGRIDDISTANCE: 'entity_appearance_images_getGridDistance',
     // - - 特效
     ENTITY_APPEARANCE_EFFECTS_SETEFFECT: 'entity_appearance_effects_setEffect',
-    ENTITY_APPEARANCE_EFFECTS_ADDEFFECT: 'entity_appearance_effects_addEffect',
     ENTITY_APPEARANCE_EFFECTS_GETEFFECT: 'entity_appearance_effects_getEffect',
     // - 碰撞
     ENTITY_COLLISION_ISTOUCHING: 'entity_collision_isTouching',
@@ -52,9 +73,9 @@ const OPCODE = {
     AUDIO_PLAY_CONTROLALL: 'audio_play_controlAll',
     AUDIO_PLAY_GETALLIDS: 'audio_play_getAllIds',
     AUDIO_PLAY_GETINFO: 'audio_play_getInfo',
+    AUDIO_PLAY_ISINFO: 'audio_play_isInfo',
     // - 特效
     AUDIO_EFFECTS_SETEFFECT: 'audio_effects_setEffect',
-    AUDIO_EFFECTS_ADDEFFECT: 'audio_effects_addEffect',
     AUDIO_EFFECTS_RESETEFFECT: 'audio_effects_resetEffect',
     AUDIO_EFFECTS_RESETALLEFFECTS: 'audio_effects_resetAllEffects',
     AUDIO_EFFECTS_RESETEFFECTALL: 'audio_effects_resetEffectAll',
@@ -185,7 +206,7 @@ const OPCODE = {
     argument_reporter_boolean: 'argument_reporter_boolean',
 } as const;
 
-type TOpcodeValue = (typeof OPCODE)[keyof typeof OPCODE];
+type TOpcodeValue = (typeof OPCODES)[keyof typeof OPCODES];
 
 const BlocksColor = {
     position: {
@@ -342,7 +363,7 @@ export interface IBlocksConfig {
     color: IBlocksColor;
 }
 
-export { OPCODE, BlocksColor };
+export { OPCODES, BlocksColor };
 
 export type Language = Record<string, string>;
 

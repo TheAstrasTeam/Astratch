@@ -1,24 +1,24 @@
 // 来自 Cyberexplorer 的积木箱配置
 import * as Blockly from 'blockly/core';
-import { BlocksColor, OPCODE } from '../../types/blocks';
+import { BlocksColor, OPCODES } from '../../types/blocks';
 import { t } from 'i18next';
 import i18nReady from '../../i18n';
 
 const num = (v: string | number) => ({
     shadow: {
-        type: OPCODE.math_number,
+        type: OPCODES.math_number,
         fields: { NUM: v },
     },
 });
 const numPos = (v: string | number) => ({
     shadow: {
-        type: OPCODE.math_positive_number,
+        type: OPCODES.math_positive_number,
         fields: { NUM: v },
     },
 });
 const numWhole = (v: string | number) => ({
     shadow: {
-        type: OPCODE.math_whole_number,
+        type: OPCODES.math_whole_number,
         fields: {
             NUM: v,
         },
@@ -26,7 +26,7 @@ const numWhole = (v: string | number) => ({
 });
 const numInt = (v: string | number) => ({
     shadow: {
-        type: OPCODE.math_integer,
+        type: OPCODES.math_integer,
         fields: {
             NUM: v,
         },
@@ -34,13 +34,13 @@ const numInt = (v: string | number) => ({
 });
 const numAngle = (v: string | number) => ({
     shadow: {
-        type: OPCODE.math_angle,
+        type: OPCODES.math_angle,
         fields: { NUM: v },
     },
 });
 const txt = (v: string) => ({
     shadow: {
-        type: OPCODE.text,
+        type: OPCODES.text,
         fields: {
             TEXT: v,
         },
@@ -48,7 +48,7 @@ const txt = (v: string) => ({
 });
 const colour = (v = '#ff0000') => ({
     shadow: {
-        type: OPCODE.colour_picker,
+        type: OPCODES.colour_picker,
         fields: {
             COLOUR: v,
         },
@@ -86,22 +86,26 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                     {
                                         gap: 12,
                                         kind: 'block',
-                                        type: OPCODE.ENTITY_TRANSFORM_POSITION_MOVESTEP,
+                                        type: OPCODES.ENTITY_TRANSFORM_POSITION_MOVESTEP,
+                                        inputs: { STEPS: num(10) },
                                     },
                                     {
                                         gap: 12,
                                         kind: 'block',
-                                        type: OPCODE.ENTITY_TRANSFORM_POSITION_SETPOSITION,
+                                        type: OPCODES.ENTITY_TRANSFORM_POSITION_SETPOSITION,
+                                        inputs: {
+                                            POSITION: menu(OPCODES.POSITION_MENU),
+                                            DO: menu(OPCODES.POSITION_ADDORSET_MENU),
+                                            UNIT: num(10),
+                                        },
                                     },
                                     {
                                         gap: 12,
                                         kind: 'block',
-                                        type: OPCODE.ENTITY_TRANSFORM_POSITION_ADDPOSITION,
-                                    },
-                                    {
-                                        gap: 12,
-                                        kind: 'block',
-                                        type: OPCODE.ENTITY_TRANSFORM_POSITION_GETPOSITION,
+                                        type: OPCODES.ENTITY_TRANSFORM_POSITION_GETPOSITION,
+                                        inputs: {
+                                            POSITION: menu(OPCODES.POSITION_MENU),
+                                        },
                                     },
                                 ],
                             },
@@ -113,17 +117,16 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                     {
                                         gap: 12,
                                         kind: 'block',
-                                        type: OPCODE.ENTITY_TRANSFORM_SCALE_SETSCALE,
+                                        type: OPCODES.ENTITY_TRANSFORM_SCALE_SETSCALE,
+                                        inputs: {
+                                            DO: menu(OPCODES.SCALE_ADDORSET_MENU),
+                                            UNIT: num(10),
+                                        },
                                     },
                                     {
                                         gap: 12,
                                         kind: 'block',
-                                        type: OPCODE.ENTITY_TRANSFORM_SCALE_ADDSCALE,
-                                    },
-                                    {
-                                        gap: 12,
-                                        kind: 'block',
-                                        type: OPCODE.ENTITY_TRANSFORM_SCALE_GETSCALE,
+                                        type: OPCODES.ENTITY_TRANSFORM_SCALE_GETSCALE,
                                     },
                                 ],
                             },
@@ -135,22 +138,24 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                     {
                                         gap: 12,
                                         kind: 'block',
-                                        type: OPCODE.ENTITY_TRANSFORM_DIRECTION_SETDIRECTION,
+                                        type: OPCODES.ENTITY_TRANSFORM_DIRECTION_SETDIRECTION,
+                                        inputs: {
+                                            DO: menu(OPCODES.DIRECTION_SETWHERE_MENU),
+                                            UNIT: numAngle(45),
+                                        },
                                     },
                                     {
                                         gap: 12,
                                         kind: 'block',
-                                        type: OPCODE.ENTITY_TRANSFORM_DIRECTION_ADDDIRECTION,
+                                        type: OPCODES.ENTITY_TRANSFORM_DIRECTION_FACEDIRECTION,
+                                        inputs: {
+                                            TARGET: menu(OPCODES.DIRECTION_SETFACE_MENU),
+                                        },
                                     },
                                     {
                                         gap: 12,
                                         kind: 'block',
-                                        type: OPCODE.ENTITY_TRANSFORM_DIRECTION_FACEDIRECTION,
-                                    },
-                                    {
-                                        gap: 12,
-                                        kind: 'block',
-                                        type: OPCODE.ENTITY_TRANSFORM_DIRECTION_GETDIRECTION,
+                                        type: OPCODES.ENTITY_TRANSFORM_DIRECTION_GETDIRECTION,
                                     },
                                 ],
                             },
@@ -162,17 +167,16 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                     {
                                         gap: 12,
                                         kind: 'block',
-                                        type: OPCODE.ENTITY_TRANSFORM_LAYER_SETLAYER,
+                                        type: OPCODES.ENTITY_TRANSFORM_LAYER_SETLAYER,
+                                        inputs: {
+                                            DO: menu(OPCODES.LAYER_ADDORSET_MENU),
+                                            UNIT: num(1),
+                                        },
                                     },
                                     {
                                         gap: 12,
                                         kind: 'block',
-                                        type: OPCODE.ENTITY_TRANSFORM_LAYER_MOVELAYER,
-                                    },
-                                    {
-                                        gap: 12,
-                                        kind: 'block',
-                                        type: OPCODE.ENTITY_TRANSFORM_LAYER_GETLAYER,
+                                        type: OPCODES.ENTITY_TRANSFORM_LAYER_GETLAYER,
                                     },
                                 ],
                             },
@@ -191,42 +195,57 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                     {
                                         gap: 12,
                                         kind: 'block',
-                                        type: OPCODE.ENTITY_APPEARANCE_IMAGES_SHOWIMAGE,
+                                        type: OPCODES.ENTITY_APPEARANCE_IMAGES_SHOWIMAGE,
+                                        inputs: { IMAGE_NAME: txt(t('blocks:imageNameExample')) },
                                     },
                                     {
                                         gap: 12,
                                         kind: 'block',
-                                        type: OPCODE.ENTITY_APPEARANCE_IMAGES_SETSTRETCH,
+                                        type: OPCODES.ENTITY_APPEARANCE_IMAGES_SETSTRETCH,
+                                        inputs: {
+                                            POS: menu(OPCODES.IMAGES_STRETCH_MENU),
+                                            SET: menu(OPCODES.IMAGES_IMAGES_ADDORSET_MENU),
+                                            NUMBER: num(20),
+                                        },
                                     },
                                     {
                                         gap: 12,
                                         kind: 'block',
-                                        type: OPCODE.ENTITY_APPEARANCE_IMAGES_ADDSTRETCH,
+                                        type: OPCODES.ENTITY_APPEARANCE_IMAGES_GETSTRETCH,
+                                        inputs: {
+                                            POS: menu(OPCODES.IMAGES_STRETCH_MENU),
+                                        },
                                     },
                                     {
                                         gap: 12,
                                         kind: 'block',
-                                        type: OPCODE.ENTITY_APPEARANCE_IMAGES_GETSTRETCH,
+                                        type: OPCODES.ENTITY_APPEARANCE_IMAGES_SETGRID,
+                                        inputs: { POS: menu(OPCODES.IMAGES_GRID_SIZE_MENU) },
                                     },
                                     {
                                         gap: 12,
                                         kind: 'block',
-                                        type: OPCODE.ENTITY_APPEARANCE_IMAGES_SETGRID,
+                                        type: OPCODES.ENTITY_APPEARANCE_IMAGES_SETGRIDDISTANCE,
+                                        inputs: {
+                                            POS: menu(OPCODES.IMAGES_STRETCH_MENU),
+                                            SET: menu(OPCODES.IMAGES_IMAGES_ADDORSET_MENU),
+                                            NUMBER: num(20),
+                                            UNIT: menu(OPCODES.IMAGES_GRID_MENU),
+                                        },
                                     },
                                     {
                                         gap: 12,
                                         kind: 'block',
-                                        type: OPCODE.ENTITY_APPEARANCE_IMAGES_SETGRIDDISTANCE,
+                                        type: OPCODES.ENTITY_APPEARANCE_IMAGES_GETGRID,
                                     },
                                     {
                                         gap: 12,
                                         kind: 'block',
-                                        type: OPCODE.ENTITY_APPEARANCE_IMAGES_GETGRID,
-                                    },
-                                    {
-                                        gap: 12,
-                                        kind: 'block',
-                                        type: OPCODE.ENTITY_APPEARANCE_IMAGES_GETGRIDDISTANCE,
+                                        type: OPCODES.ENTITY_APPEARANCE_IMAGES_GETGRIDDISTANCE,
+                                        inputs: {
+                                            UNIT: menu(OPCODES.IMAGES_GRID_MENU),
+                                            POS: menu(OPCODES.IMAGES_STRETCH_MENU),
+                                        },
                                     },
                                 ],
                             },
@@ -238,17 +257,20 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                     {
                                         gap: 12,
                                         kind: 'block',
-                                        type: OPCODE.ENTITY_APPEARANCE_EFFECTS_SETEFFECT,
+                                        type: OPCODES.ENTITY_APPEARANCE_EFFECTS_SETEFFECT,
+                                        inputs: {
+                                            EFFECT: menu(OPCODES.EFFECTS_MENU),
+                                            SET: menu(OPCODES.EFFECTS_ADDORSET_MENU),
+                                            VALUE: num(25),
+                                        },
                                     },
                                     {
                                         gap: 12,
                                         kind: 'block',
-                                        type: OPCODE.ENTITY_APPEARANCE_EFFECTS_ADDEFFECT,
-                                    },
-                                    {
-                                        gap: 12,
-                                        kind: 'block',
-                                        type: OPCODE.ENTITY_APPEARANCE_EFFECTS_GETEFFECT,
+                                        type: OPCODES.ENTITY_APPEARANCE_EFFECTS_GETEFFECT,
+                                        inputs: {
+                                            EFFECT: menu(OPCODES.EFFECTS_MENU),
+                                        },
                                     },
                                 ],
                             },
@@ -262,12 +284,14 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.ENTITY_COLLISION_ISTOUCHING,
+                                type: OPCODES.ENTITY_COLLISION_ISTOUCHING,
+                                inputs: { TARGETS: menu(OPCODES.COLLISION_MENU) },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.ENTITY_COLLISION_WHENTOUCHING,
+                                type: OPCODES.ENTITY_COLLISION_WHENTOUCHING,
+                                inputs: { TARGETS: menu(OPCODES.COLLISION_MENU) },
                             },
                         ],
                     },
@@ -279,17 +303,17 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.ENTITY_LIFECYCLE_ONCREATED,
+                                type: OPCODES.ENTITY_LIFECYCLE_ONCREATED,
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.ENTITY_LIFECYCLE_CLONE,
+                                type: OPCODES.ENTITY_LIFECYCLE_CLONE,
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.ENTITY_LIFECYCLE_DELETECLONE,
+                                type: OPCODES.ENTITY_LIFECYCLE_DELETECLONE,
                             },
                         ],
                     },
@@ -308,32 +332,62 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.AUDIO_PLAY_PLAY,
+                                type: OPCODES.AUDIO_PLAY_PLAY,
+                                inputs: {
+                                    AUDIO: txt(t('blocks:audio.play.exampleAudioName')),
+                                    NAME: txt(t('blocks:audio.play.exampleName')),
+                                    DO: menu(OPCODES.AUDIO_THEN_MENU),
+                                },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.AUDIO_PLAY_CONTROL,
+                                type: OPCODES.AUDIO_PLAY_CONTROL,
+                                inputs: {
+                                    NAME: txt(t('blocks:audio.play.exampleName')),
+                                    DO: menu(OPCODES.AUDIO_CONTROL_MENU),
+                                },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.AUDIO_PLAY_SETTIME,
+                                type: OPCODES.AUDIO_PLAY_SETTIME,
+                                inputs: {
+                                    NAME: txt(t('blocks:audio.play.exampleName')),
+                                    DO: menu(OPCODES.AUDIO_ADDORSET_MENU),
+                                    TIME: num(5),
+                                },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.AUDIO_PLAY_CONTROLALL,
+                                type: OPCODES.AUDIO_PLAY_CONTROLALL,
+                                inputs: {
+                                    DO: menu(OPCODES.AUDIO_CONTROL_MENU),
+                                },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.AUDIO_PLAY_GETALLIDS,
+                                type: OPCODES.AUDIO_PLAY_GETALLIDS,
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.AUDIO_PLAY_GETINFO,
+                                type: OPCODES.AUDIO_PLAY_GETINFO,
+                                inputs: {
+                                    NAME: txt(t('blocks:audio.play.exampleName')),
+                                    DO: menu(OPCODES.AUDIO_GET_MENU),
+                                },
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODES.AUDIO_PLAY_ISINFO,
+                                inputs: {
+                                    NAME: txt(t('blocks:audio.play.exampleName')),
+                                    DO: menu(OPCODES.AUDIO_GET_IS_MENU),
+                                },
                             },
                         ],
                     },
@@ -345,37 +399,47 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.AUDIO_EFFECTS_SETEFFECT,
+                                type: OPCODES.AUDIO_EFFECTS_SETEFFECT,
+                                inputs: {
+                                    NAME: txt(t('blocks:audio.play.exampleName')),
+                                    EFFECT: txt(t('blocks:example.audioEffect')),
+                                    VALUE: num(0),
+                                },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.AUDIO_EFFECTS_ADDEFFECT,
+                                type: OPCODES.AUDIO_EFFECTS_RESETEFFECT,
+                                inputs: {
+                                    NAME: txt(t('blocks:audio.play.exampleName')),
+                                    EFFECT: txt(t('blocks:example.audioEffect')),
+                                },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.AUDIO_EFFECTS_RESETEFFECT,
+                                type: OPCODES.AUDIO_EFFECTS_RESETALLEFFECTS,
+                                inputs: { NAME: txt(t('blocks:audio.play.exampleName')) },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.AUDIO_EFFECTS_RESETALLEFFECTS,
+                                type: OPCODES.AUDIO_EFFECTS_RESETEFFECTALL,
+                                inputs: { EFFECT: txt(t('blocks:example.audioEffect')) },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.AUDIO_EFFECTS_RESETEFFECTALL,
+                                type: OPCODES.AUDIO_EFFECTS_RESETALLEFFECTSALL,
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.AUDIO_EFFECTS_RESETALLEFFECTSALL,
-                            },
-                            {
-                                gap: 12,
-                                kind: 'block',
-                                type: OPCODE.AUDIO_EFFECTS_GETEFFECT,
+                                type: OPCODES.AUDIO_EFFECTS_GETEFFECT,
+                                inputs: {
+                                    NAME: txt(t('blocks:audio.play.exampleName')),
+                                    EFFECT: txt(t('blocks:example.audioEffect')),
+                                },
                             },
                         ],
                     },
@@ -389,27 +453,35 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     {
                         gap: 12,
                         kind: 'block',
-                        type: OPCODE.RESOURCES_ADDFROMURL,
+                        type: OPCODES.RESOURCES_ADDFROMURL,
+                        inputs: { URL: txt('https://'), NAME: txt(t('blocks:example.resource')) },
                     },
                     {
                         gap: 12,
                         kind: 'block',
-                        type: OPCODE.RESOURCES_GET,
+                        type: OPCODES.RESOURCES_GET,
+                        inputs: { NAME: txt(t('blocks:example.resource')) },
                     },
                     {
                         gap: 12,
                         kind: 'block',
-                        type: OPCODE.RESOURCES_EXISTS,
+                        type: OPCODES.RESOURCES_EXISTS,
+                        inputs: { NAME: txt(t('blocks:example.resource')) },
                     },
                     {
                         gap: 12,
                         kind: 'block',
-                        type: OPCODE.RESOURCES_RENAME,
+                        type: OPCODES.RESOURCES_RENAME,
+                        inputs: {
+                            OLD_NAME: txt(t('blocks:example.resource')),
+                            NEW_NAME: txt(t('blocks:example.newResource')),
+                        },
                     },
                     {
                         gap: 12,
                         kind: 'block',
-                        type: OPCODE.RESOURCES_DELETE,
+                        type: OPCODES.RESOURCES_DELETE,
+                        inputs: { NAME: txt(t('blocks:example.resource')) },
                     },
                 ],
             },
@@ -426,12 +498,17 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.EVENT_BROADCAST_SEND,
+                                type: OPCODES.EVENT_BROADCAST_SEND,
+                                inputs: {
+                                    CHANNEL: txt(t('blocks:example.channel')),
+                                    DATA: txt(t('blocks:example.data')),
+                                },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.EVENT_BROADCAST_LISTEN,
+                                type: OPCODES.EVENT_BROADCAST_LISTEN,
+                                inputs: { CHANNEL: txt(t('blocks:example.channel')) },
                             },
                         ],
                     },
@@ -443,17 +520,18 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.EVENT_LIFECYCLE_ONSTART,
+                                type: OPCODES.EVENT_LIFECYCLE_ONSTART,
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.EVENT_LIFECYCLE_ONSTOP,
+                                type: OPCODES.EVENT_LIFECYCLE_ONSTOP,
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.EVENT_LIFECYCLE_ONRUNNINGFORMS,
+                                type: OPCODES.EVENT_LIFECYCLE_ONRUNNINGFORMS,
+                                inputs: { DURATION: numWhole(1000) },
                             },
                         ],
                     },
@@ -465,32 +543,40 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.EVENT_TIME_RUNNINGDURATION,
+                                type: OPCODES.EVENT_TIME_RUNNINGDURATION,
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.EVENT_TIME_CREATETIMER,
+                                type: OPCODES.EVENT_TIME_CREATETIMER,
+                                inputs: { NAME: txt(t('blocks:example.timer')) },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.EVENT_TIME_RESETTIMER,
+                                type: OPCODES.EVENT_TIME_RESETTIMER,
+                                inputs: { NAME: txt(t('blocks:example.timer')) },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.EVENT_TIME_DELETETIMER,
+                                type: OPCODES.EVENT_TIME_DELETETIMER,
+                                inputs: { NAME: txt(t('blocks:example.timer')) },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.EVENT_TIME_TIMERVALUE,
+                                type: OPCODES.EVENT_TIME_TIMERVALUE,
+                                inputs: { NAME: txt(t('blocks:example.timer')) },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.EVENT_TIME_WHENTIMEREXCEEDS,
+                                type: OPCODES.EVENT_TIME_WHENTIMEREXCEEDS,
+                                inputs: {
+                                    NAME: txt(t('blocks:example.timer')),
+                                    DURATION: numWhole(1000),
+                                },
                             },
                         ],
                     },
@@ -502,52 +588,63 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.EVENT_INPUT_GETMOUSEPOSITION,
+                                type: OPCODES.EVENT_INPUT_GETMOUSEPOSITION,
+                                inputs: { AXIS: txt('x') },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.EVENT_INPUT_ISMOUSETOUCHING,
+                                type: OPCODES.EVENT_INPUT_ISMOUSETOUCHING,
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.EVENT_INPUT_ISKEYPRESSED,
+                                type: OPCODES.EVENT_INPUT_ISKEYPRESSED,
+                                inputs: { KEY: txt(t('blocks:example.spaceKey')) },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.EVENT_INPUT_GETLASTKEYPRESSED,
+                                type: OPCODES.EVENT_INPUT_GETLASTKEYPRESSED,
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.EVENT_INPUT_GETLOUDNESS,
+                                type: OPCODES.EVENT_INPUT_GETLOUDNESS,
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.EVENT_INPUT_GETFREQUENCYSPECTRUM,
+                                type: OPCODES.EVENT_INPUT_GETFREQUENCYSPECTRUM,
+                                inputs: { COUNT: numWhole(32) },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.EVENT_INPUT_WHENMOUSEHOVER,
+                                type: OPCODES.EVENT_INPUT_WHENMOUSEHOVER,
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.EVENT_INPUT_WHENMOUSEMOVED,
+                                type: OPCODES.EVENT_INPUT_WHENMOUSEMOVED,
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.EVENT_INPUT_WHENMOUSEBUTTON,
+                                type: OPCODES.EVENT_INPUT_WHENMOUSEBUTTON,
+                                inputs: {
+                                    BUTTON: txt(t('blocks:example.leftMouseButton')),
+                                    ACTION: txt(t('blocks:example.pressed')),
+                                },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.EVENT_INPUT_WHENKEYPRESSED,
+                                type: OPCODES.EVENT_INPUT_WHENKEYPRESSED,
+                                inputs: {
+                                    KEY: txt(t('blocks:example.anyKey')),
+                                    ACTION: txt(t('blocks:example.pressed')),
+                                },
                             },
                         ],
                     },
@@ -566,27 +663,28 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.CONTROL_FLOW_WAIT,
+                                type: OPCODES.CONTROL_FLOW_WAIT,
+                                inputs: { DURATION: num(1) },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.CONTROL_FLOW_WAITUNTIL,
+                                type: OPCODES.CONTROL_FLOW_WAITUNTIL,
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.CONTROL_FLOW_BREAK,
+                                type: OPCODES.CONTROL_FLOW_BREAK,
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.CONTROL_FLOW_STOPSCRIPT,
+                                type: OPCODES.CONTROL_FLOW_STOPSCRIPT,
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.CONTROL_FLOW_STOPPROJECT,
+                                type: OPCODES.CONTROL_FLOW_STOPPROJECT,
                             },
                         ],
                     },
@@ -598,7 +696,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.CONTROL_CONDITION_IF,
+                                type: OPCODES.CONTROL_CONDITION_IF,
                             },
                         ],
                     },
@@ -610,17 +708,19 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.CONTROL_LOOP_WHILE,
+                                type: OPCODES.CONTROL_LOOP_WHILE,
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.CONTROL_LOOP_REPEAT,
+                                type: OPCODES.CONTROL_LOOP_REPEAT,
+                                inputs: { TIMES: numWhole(10) },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.CONTROL_LOOP_FOREACH,
+                                type: OPCODES.CONTROL_LOOP_FOREACH,
+                                inputs: { ITEM_NAME: txt(t('blocks:example.item')) },
                             },
                         ],
                     },
@@ -632,17 +732,19 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.CONTROL_MATCH_MATCH,
+                                type: OPCODES.CONTROL_MATCH_MATCH,
+                                inputs: { VALUE: txt(t('blocks:example.value')) },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.CONTROL_MATCH_CASE,
+                                type: OPCODES.CONTROL_MATCH_CASE,
+                                inputs: { VALUE: txt(t('blocks:example.case')) },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.CONTROL_MATCH_DEFAULT,
+                                type: OPCODES.CONTROL_MATCH_DEFAULT,
                             },
                         ],
                     },
@@ -661,12 +763,18 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.OPERATOR_MATH_OP,
+                                type: OPCODES.OPERATOR_MATH_OP,
+                                inputs: {
+                                    LEFT: num(0),
+                                    OPERATOR: menu(OPCODES.MATH_OPERATOR_MENU),
+                                    RIGHT: num(0),
+                                },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.OPERATOR_MATH_RANDOM,
+                                type: OPCODES.OPERATOR_MATH_RANDOM,
+                                inputs: { FROM: num(1), TO: num(10) },
                             },
                         ],
                     },
@@ -678,17 +786,22 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.OPERATOR_LOGIC_COMPARE,
+                                type: OPCODES.OPERATOR_LOGIC_COMPARE,
+                                inputs: {
+                                    LEFT: txt('a'),
+                                    OPERATOR: menu(OPCODES.LOGIC_COMPARE_MENU),
+                                    RIGHT: txt('b'),
+                                },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.OPERATOR_LOGIC_NOT,
+                                type: OPCODES.OPERATOR_LOGIC_NOT,
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.OPERATOR_LOGIC_BOOLEAN,
+                                type: OPCODES.OPERATOR_LOGIC_BOOLEAN,
                             },
                         ],
                     },
@@ -700,7 +813,11 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.OPERATOR_SCIENTIFIC_FUNC,
+                                type: OPCODES.OPERATOR_SCIENTIFIC_FUNC,
+                                inputs: {
+                                    FUNCTION: menu(OPCODES.SCIENTIFIC_FUNCTION_MENU),
+                                    VALUE: num(0),
+                                },
                             },
                         ],
                     },
@@ -719,17 +836,27 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.DATA_VARIABLE_SET,
+                                type: OPCODES.DATA_VARIABLE_SET,
+                                inputs: {
+                                    NAME: menu(OPCODES.DATA_NAME_MENU),
+                                    VALUE: txt(t('blocks:example.value')),
+                                },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.DATA_VARIABLE_ADD,
+                                type: OPCODES.DATA_VARIABLE_ADD,
+                                inputs: { NAME: menu(OPCODES.DATA_NAME_MENU), VALUE: num(1) },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.DATA_VARIABLE_COMPUTE,
+                                type: OPCODES.DATA_VARIABLE_COMPUTE,
+                                inputs: {
+                                    NAME: menu(OPCODES.DATA_NAME_MENU),
+                                    OPERATOR: menu(OPCODES.DATA_COMPUTE_MENU),
+                                    VALUE: num(1),
+                                },
                             },
                         ],
                     },
@@ -741,22 +868,29 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.DATA_STRING_JOIN,
+                                type: OPCODES.DATA_STRING_JOIN,
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.DATA_STRING_SPLIT,
+                                type: OPCODES.DATA_STRING_SPLIT,
+                                inputs: { TEXT: txt('a,b'), SEPARATOR: txt(',') },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.DATA_STRING_SUBSTRING,
+                                type: OPCODES.DATA_STRING_SUBSTRING,
+                                inputs: {
+                                    TEXT: txt(t('blocks:example.text')),
+                                    START: numWhole(1),
+                                    END: numWhole(1),
+                                },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.DATA_STRING_LENGTH,
+                                type: OPCODES.DATA_STRING_LENGTH,
+                                inputs: { TEXT: txt(t('blocks:example.text')) },
                             },
                         ],
                     },
@@ -768,42 +902,48 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.DATA_ARRAY_EMPTY,
+                                type: OPCODES.DATA_ARRAY_EMPTY,
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.DATA_ARRAY_PUSH,
+                                type: OPCODES.DATA_ARRAY_PUSH,
+                                inputs: { VALUE: txt(t('blocks:example.item')) },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.DATA_ARRAY_REMOVEAT,
+                                type: OPCODES.DATA_ARRAY_REMOVEAT,
+                                inputs: { INDEX: numWhole(1) },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.DATA_ARRAY_REMOVEENDS,
+                                type: OPCODES.DATA_ARRAY_REMOVEENDS,
+                                inputs: { START: numWhole(1), END: numWhole(1) },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.DATA_ARRAY_GET,
+                                type: OPCODES.DATA_ARRAY_GET,
+                                inputs: { INDEX: numWhole(1) },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.DATA_ARRAY_LENGTH,
+                                type: OPCODES.DATA_ARRAY_LENGTH,
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.DATA_ARRAY_FILTER,
+                                type: OPCODES.DATA_ARRAY_FILTER,
+                                inputs: { FILTER: txt(t('blocks:example.condition')) },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.DATA_ARRAY_INDEXOF,
+                                type: OPCODES.DATA_ARRAY_INDEXOF,
+                                inputs: { VALUE: txt(t('blocks:example.item')) },
                             },
                         ],
                     },
@@ -815,32 +955,39 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.DATA_OBJECT_EMPTY,
+                                type: OPCODES.DATA_OBJECT_EMPTY,
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.DATA_OBJECT_SET,
+                                type: OPCODES.DATA_OBJECT_SET,
+                                inputs: {
+                                    KEY: txt(t('blocks:example.key')),
+                                    VALUE: txt(t('blocks:example.value')),
+                                },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.DATA_OBJECT_DELETE,
+                                type: OPCODES.DATA_OBJECT_DELETE,
+                                inputs: { KEY: txt(t('blocks:example.key')) },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.DATA_OBJECT_GETALL,
+                                type: OPCODES.DATA_OBJECT_GETALL,
+                                inputs: { KIND: txt(t('blocks:example.key')) },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.DATA_OBJECT_GET,
+                                type: OPCODES.DATA_OBJECT_GET,
+                                inputs: { KEY: txt(t('blocks:example.key')) },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.DATA_OBJECT_LENGTH,
+                                type: OPCODES.DATA_OBJECT_LENGTH,
                             },
                         ],
                     },
@@ -852,12 +999,17 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.DATA_TYPE_TYPEOF,
+                                type: OPCODES.DATA_TYPE_TYPEOF,
+                                inputs: { VALUE: txt(t('blocks:example.value')) },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODE.DATA_TYPE_CAST,
+                                type: OPCODES.DATA_TYPE_CAST,
+                                inputs: {
+                                    VALUE: txt(t('blocks:example.value')),
+                                    TYPE: txt(t('blocks:example.string')),
+                                },
                             },
                         ],
                     },
@@ -871,32 +1023,44 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     {
                         gap: 12,
                         kind: 'block',
-                        type: OPCODE.FUNCTION_DEFINITION,
+                        type: OPCODES.FUNCTION_DEFINITION,
+                        inputs: { NAME: txt(t('blocks:example.function')) },
                     },
                     {
                         gap: 12,
                         kind: 'block',
-                        type: OPCODE.FUNCTION_CALL,
+                        type: OPCODES.FUNCTION_CALL,
                     },
                     {
                         gap: 12,
                         kind: 'block',
-                        type: OPCODE.FUNCTION_RETURN,
+                        type: OPCODES.FUNCTION_EXECUTE,
                     },
                     {
                         gap: 12,
                         kind: 'block',
-                        type: OPCODE.FUNCTION_INLINE,
+                        type: OPCODES.FUNCTION_RETURN,
+                        inputs: { VALUE: txt(t('blocks:example.value')) },
                     },
                     {
                         gap: 12,
                         kind: 'block',
-                        type: OPCODE.FUNCTION_RUNBRANCH,
+                        type: OPCODES.FUNCTION_INLINE,
                     },
                     {
                         gap: 12,
                         kind: 'block',
-                        type: OPCODE.FUNCTION_SETDATAVALUE,
+                        type: OPCODES.FUNCTION_RUNBRANCH,
+                        inputs: { BRANCH: menu(OPCODES.FUNCTION_BRANCH_MENU) },
+                    },
+                    {
+                        gap: 12,
+                        kind: 'block',
+                        type: OPCODES.FUNCTION_SETDATAVALUE,
+                        inputs: {
+                            NAME: menu(OPCODES.FUNCTION_PARAMETER_MENU),
+                            VALUE: txt(t('blocks:example.data')),
+                        },
                     },
                 ],
             },
@@ -908,17 +1072,22 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     {
                         gap: 12,
                         kind: 'block',
-                        type: OPCODE.DEBUG_LOG,
+                        type: OPCODES.DEBUG_LOG,
+                        inputs: {
+                            LEVEL: txt(t('blocks:example.log')),
+                            MESSAGE: txt(t('blocks:example.message')),
+                        },
                     },
                     {
                         gap: 12,
                         kind: 'block',
-                        type: OPCODE.DEBUG_CRASH,
+                        type: OPCODES.DEBUG_CRASH,
+                        inputs: { MESSAGE: txt(t('blocks:example.error')) },
                     },
                     {
                         gap: 12,
                         kind: 'block',
-                        type: OPCODE.DEBUG_BREAKPOINT,
+                        type: OPCODES.DEBUG_BREAKPOINT,
                     },
                 ],
             },

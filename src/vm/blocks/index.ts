@@ -5,7 +5,7 @@ import * as AstratchToolbox from '../../../plugins/astratch-toolbox/src';
 import * as En from 'blockly/msg/en';
 import * as ZhHans from 'blockly/msg/zh-hans';
 import getToolbox from '../../lib/BlocklyAdapter/toolbox';
-import { initBlocks } from '../../lib/BlocklyAdapter/definitions';
+import { initBlocks } from '../../lib/BlocklyAdapter/blocks';
 import { AshConnectionChecker } from '../../../plugins/cBlockWrap';
 import { getBlocklyComponentStyles } from '../../lib/Theme/guiThemeManager';
 import { events, type IVM, type viewportUpdateEvent } from '../../types/vm';
@@ -191,7 +191,7 @@ class Blocks implements IBlocks {
         AstratchToolbox.registerAstratchToolbox(i18next.t);
 
         // 定义积木
-        initBlocks(this.Blockly);
+        initBlocks(this.Blockly, this.vm);
     }
 
     /**
