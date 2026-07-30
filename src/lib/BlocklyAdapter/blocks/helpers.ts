@@ -18,6 +18,7 @@ export const connections = {
  */
 export const hatConnections = {
     nextStatement: 'Action',
+    inputsInline: true,
     hat: 'cap',
 } as const;
 
@@ -26,6 +27,7 @@ export const hatConnections = {
  */
 export const endConnections = {
     previousStatement: 'Action',
+    inputsInline: true,
 } as const;
 
 /**
