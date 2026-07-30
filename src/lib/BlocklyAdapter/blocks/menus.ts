@@ -510,4 +510,83 @@ export function initMenuBlocks(blockly: typeof Blockly, vm: IVM) {
             });
         },
     } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.KEY_MENU] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                message0: '%1',
+                args0: [
+                    {
+                        type: 'field_dropdown_with_block',
+                        name: 'ASH_BLOCKMENU',
+                        options: [
+                            [t('blocks:key.any'), 'Any'],
+                            [t('blocks:key.space'), ' '],
+                            ['上', 'ArrowUp'],
+                            ['↓', 'ArrowDown'],
+                            ['←', 'ArrowLeft'],
+                            ['→', 'ArrowRight'],
+                            ['Enter', 'Enter'],
+                            ['Ssc', 'Escape'],
+                            ['Tab', 'Tab'],
+                            [t('blocks:key.backspace'), 'Backspace'],
+                            ['Shift', 'Shift'],
+                            ['Ctrl', 'Control'],
+                            ['Alt', 'Alt'],
+                            ...'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+                                .split('')
+                                .map(key => [key, key.toLowerCase()] as [string, string]),
+                            ...'0123456789'.split('').map(key => [key, key] as [string, string]),
+                        ],
+                    },
+                ],
+                output: 'String',
+                colour: BlocksColor.control.secondary,
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.MOUSE_KEY_MENU] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                message0: '%1',
+                args0: [
+                    {
+                        type: 'field_dropdown_with_block',
+                        name: 'ASH_BLOCKMENU',
+                        options: [
+                            [t('blocks:leftMouseButton'), '_LEFTBUTTON_'],
+                            [t('blocks:centerMouseButton'), '_CENTERBUTTON_'],
+                            [t('blocks:rightMouseButton'), '_RIGHTBUTTON_'],
+                            [t('blocks:xMouseButton') + ' 1', '_XBUTTON1_'],
+                            [t('blocks:xMouseButton') + ' 2', '_XBUTTON2_'],
+                        ],
+                    },
+                ],
+                output: 'String',
+                colour: BlocksColor.control.secondary,
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.KEY_ISPRESS_MENU] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                message0: '%1',
+                args0: [
+                    {
+                        type: 'field_dropdown_with_block',
+                        name: 'ASH_BLOCKMENU',
+                        options: [
+                            [t('blocks:pressDown'), '_PRESSDOWN_'],
+                            [t('blocks:pressIn'), '_PRESSIN_'],
+                            [t('blocks:pressUp'), '_PRESSUP_'],
+                        ],
+                    },
+                ],
+                output: 'String',
+                colour: BlocksColor.control.secondary,
+            });
+        },
+    } as Blockly.Block;
 }

@@ -59,6 +59,12 @@ const menu = (type: string) => ({
         type,
     },
 });
+const bool = (value = true) => ({
+    shadow: {
+        type: OPCODES.OPERATOR_LOGIC_BOOLEAN,
+        extraState: { value },
+    },
+});
 
 const sep = (gap = 36) => ({ kind: 'sep', gap });
 
@@ -600,7 +606,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                 gap: 12,
                                 kind: 'block',
                                 type: OPCODES.EVENT_INPUT_ISKEYPRESSED,
-                                inputs: { KEY: txt(t('blocks:example.spaceKey')) },
+                                inputs: { KEY: menu(OPCODES.KEY_MENU) },
                             },
                             {
                                 gap: 12,
@@ -633,8 +639,8 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                 kind: 'block',
                                 type: OPCODES.EVENT_INPUT_WHENMOUSEBUTTON,
                                 inputs: {
-                                    BUTTON: txt(t('blocks:example.leftMouseButton')),
-                                    ACTION: txt(t('blocks:example.pressed')),
+                                    BUTTON: menu(OPCODES.MOUSE_KEY_MENU),
+                                    ACTION: menu(OPCODES.KEY_ISPRESS_MENU),
                                 },
                             },
                             {
@@ -642,8 +648,8 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                 kind: 'block',
                                 type: OPCODES.EVENT_INPUT_WHENKEYPRESSED,
                                 inputs: {
-                                    KEY: txt(t('blocks:example.anyKey')),
-                                    ACTION: txt(t('blocks:example.pressed')),
+                                    KEY: menu(OPCODES.KEY_MENU),
+                                    ACTION: menu(OPCODES.KEY_ISPRESS_MENU),
                                 },
                             },
                         ],
@@ -670,6 +676,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                 gap: 12,
                                 kind: 'block',
                                 type: OPCODES.CONTROL_FLOW_WAITUNTIL,
+                                inputs: { CONDITION: bool(false) },
                             },
                             {
                                 gap: 12,
@@ -697,6 +704,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                 gap: 12,
                                 kind: 'block',
                                 type: OPCODES.CONTROL_CONDITION_IF,
+                                inputs: { CONDITION: bool(false) },
                             },
                         ],
                     },
@@ -709,6 +717,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                 gap: 12,
                                 kind: 'block',
                                 type: OPCODES.CONTROL_LOOP_WHILE,
+                                inputs: { CONDITION: bool(false) },
                             },
                             {
                                 gap: 12,
@@ -720,7 +729,13 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                 gap: 12,
                                 kind: 'block',
                                 type: OPCODES.CONTROL_LOOP_FOREACH,
-                                inputs: { ITEM_NAME: txt(t('blocks:example.item')) },
+                                inputs: {
+                                    ITEM_NAME: {
+                                        block: {
+                                            type: OPCODES.CONTROL_LOOP_FOREACH_ITEM,
+                                        },
+                                    },
+                                },
                             },
                         ],
                     },
@@ -797,6 +812,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                 gap: 12,
                                 kind: 'block',
                                 type: OPCODES.OPERATOR_LOGIC_NOT,
+                                inputs: { VALUE: bool(false) },
                             },
                             {
                                 gap: 12,

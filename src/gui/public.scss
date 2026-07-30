@@ -241,6 +241,7 @@ span {
         height: 16px;
         width: 16px;
         background-image: url('../assets/close.svg');
+        filter: $svg-filter;
         background-repeat: round;
         cursor: pointer;
         border-radius: 50%;

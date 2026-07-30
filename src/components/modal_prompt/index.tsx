@@ -39,7 +39,8 @@ export const PromptModal = ({
                         onChange={e => {
                             setValue(e.target.value);
                         }}
-                    ></input>
+                        autoFocus
+                    />
                 </div>
                 <div className={styles.buttons}>
                     <button

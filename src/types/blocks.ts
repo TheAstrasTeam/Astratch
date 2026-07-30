@@ -29,6 +29,9 @@ const OPCODES = {
     DATA_COMPUTE_MENU: 'data_compute_menu',
     FUNCTION_BRANCH_MENU: 'function_branch_menu',
     FUNCTION_PARAMETER_MENU: 'function_parameter_menu',
+    KEY_MENU: 'key_menu',
+    MOUSE_KEY_MENU: 'mouse_key_menu',
+    KEY_ISPRESS_MENU: 'key_isPress_menu',
     // 实体
     // - 变换
     // - - 位置
@@ -129,6 +132,7 @@ const OPCODES = {
     CONTROL_LOOP_WHILE: 'control_loop_while',
     CONTROL_LOOP_REPEAT: 'control_loop_repeat',
     CONTROL_LOOP_FOREACH: 'control_loop_forEach',
+    CONTROL_LOOP_FOREACH_ITEM: 'control_loop_forEach_item',
     // - 匹配
     CONTROL_MATCH_MATCH: 'control_match_match',
     CONTROL_MATCH_CASE: 'control_match_case',

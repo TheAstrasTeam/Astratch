@@ -12,6 +12,12 @@
 
 import * as Blockly from 'blockly/core';
 
+interface AshConnection extends Blockly.Connection {
+    /** foreach 头部的项源插槽只允许内部代码补入源积木。 */
+    isLoopItemSourceSlot?: boolean;
+    allowLoopItemSource?: boolean;
+}
+
 /** 防止重复安装 */
 let installed = false;
 
@@ -19,6 +25,26 @@ let installed = false;
  * 自定义连接检查器：放宽 terminal C 块（无 nextConnection，如 forever）的拖拽限制
  */
 export class AshConnectionChecker extends Blockly.ConnectionChecker {
+    override doTypeChecks(a: Blockly.Connection, b: Blockly.Connection): boolean {
+        const loopItemSlot = [a, b]
+            .map(connection => connection as AshConnection)
+            .find(connection => connection.isLoopItemSourceSlot);
+        if (loopItemSlot && !loopItemSlot.allowLoopItemSource) return false;
+
+        const checksA = a.getCheck();
+        const checksB = b.getCheck();
+        const restrictedTypes = ['Function', 'MatchBranch'];
+
+        // Blockly 默认允许有一侧未声明类型的连接接收任意值。
+        // Function 与 MatchBranch 是封闭类型，不能借此进入普通万能插槽。
+        if (!checksA || !checksB) {
+            const declaredChecks = checksA ?? checksB;
+            if (declaredChecks?.some(check => restrictedTypes.includes(check))) return false;
+        }
+
+        return super.doTypeChecks(a, b);
+    }
+
     override doDragChecks(
         a: Blockly.RenderedConnection,
         b: Blockly.RenderedConnection,

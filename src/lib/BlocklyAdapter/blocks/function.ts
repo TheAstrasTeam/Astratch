@@ -28,7 +28,7 @@ export function initFunctionBlocks(blockly: typeof Blockly) {
                 message1: '%1',
                 colour: BlocksColor.function.primary,
                 output: null,
-                args1: [{ type: 'input_value', name: 'FUNCTION' }],
+                args1: [{ type: 'input_value', name: 'FUNCTION', check: 'Function' }],
             });
         },
     } as Blockly.Block;
@@ -40,7 +40,7 @@ export function initFunctionBlocks(blockly: typeof Blockly) {
                 message0: t('blocks:function.execute'),
                 message1: '%1',
                 colour: BlocksColor.function.secondary,
-                args1: [{ type: 'input_value', name: 'FUNCTION' }],
+                args1: [{ type: 'input_value', name: 'FUNCTION', check: 'Function' }],
             });
         },
     } as Blockly.Block;

@@ -12,6 +12,7 @@ import { events, type IVM, type viewportUpdateEvent } from '../../types/vm';
 import { getBlocklyI18nByI18next } from '../../utils/ash-i18n';
 import i18next from 'i18next';
 import { replaceChineseI18n } from '../../lib/BlocklyAdapter/i18n';
+import { registerAstratchRenderer } from '../../lib/BlocklyAdapter/renderer';
 
 /**
  * 用于便捷的管理WebGPU或Blockly工作区
@@ -108,6 +109,7 @@ class Blocks implements IBlocks {
     };
 
     constructor(BlocklySelf: typeof Blockly, vm: IVM) {
+        registerAstratchRenderer();
         this.vm = vm;
         this._DOM = null;
         this.workspaceSvg = null;
@@ -159,7 +161,7 @@ class Blocks implements IBlocks {
                 drag: true,
                 wheel: true,
             },
-            renderer: 'Zelos',
+            renderer: 'astratch',
             theme: this.theme,
             plugins: {
                 toolbox: AstratchToolbox.ContinuousToolbox,

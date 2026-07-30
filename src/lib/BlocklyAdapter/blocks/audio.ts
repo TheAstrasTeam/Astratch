@@ -70,7 +70,7 @@ export function initAudioBlocks(blockly: typeof Blockly) {
                 ...returnConnections,
                 message0: t('blocks:audio.play.getAllIds'),
                 colour: BlocksColor.audio.primary,
-                output: 'String', // TODO: 使用数组类型
+                output: 'Array',
             });
         },
     } as Blockly.Block;

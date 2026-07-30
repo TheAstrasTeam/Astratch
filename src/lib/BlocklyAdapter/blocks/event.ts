@@ -167,7 +167,12 @@ export function initEventBlocks(blockly: typeof Blockly) {
                 ...returnConnections,
                 message0: t('blocks:event.input.isKeyPressed'),
                 colour: BlocksColor.event.tertiary,
-                args0: [{ type: 'input_value', name: 'KEY' }],
+                args0: [
+                    {
+                        type: 'input_value',
+                        name: 'KEY',
+                    },
+                ],
                 output: 'Boolean',
             });
         },

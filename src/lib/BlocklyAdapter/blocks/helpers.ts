@@ -1,6 +1,6 @@
 import * as Blockly from 'blockly/core';
 import { t } from 'i18next';
-import { BlocksColor, OPCODES} from '../../../types/blocks';
+import { BlocksColor, OPCODES } from '../../../types/blocks';
 import type { IVM } from '../../../types/vm';
 import { dropdownWithInput } from '../../../../plugins/fieldDropdown';
 
@@ -26,6 +26,23 @@ export const hatConnections = {
  */
 export const endConnections = {
     previousStatement: 'Action',
+} as const;
+
+/**
+ * 匹配分支只能连接到匹配积木内部。
+ */
+export const matchBranchConnections = {
+    previousStatement: 'MatchBranch',
+    nextStatement: 'MatchBranch',
+    inputsInline: true,
+} as const;
+
+/**
+ * 默认分支必须位于匹配分支栈末尾。
+ */
+export const matchBranchEndConnections = {
+    previousStatement: 'MatchBranch',
+    inputsInline: true,
 } as const;
 
 /**
@@ -77,4 +94,4 @@ export function createStaticMenu(options: Blockly.MenuOption[]) {
     return new dropdownWithInput(options);
 }
 
-export { BlocksColor, OPCODES};
+export { BlocksColor, OPCODES };

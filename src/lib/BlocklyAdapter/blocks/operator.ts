@@ -3,6 +3,9 @@ import { t } from 'i18next';
 import { BlocksColor, OPCODES } from '../../../types/blocks';
 import { returnConnections } from './helpers';
 
+import enable from '../../../assets/blocks/enable.svg';
+import unable from '../../../assets/blocks/unable.svg';
+
 /**
  * 注册运算类积木
  * 涵盖：数学、逻辑、科学
@@ -69,17 +72,101 @@ export function initOperatorBlocks(blockly: typeof Blockly) {
         },
     } as Blockly.Block;
 
+    interface BooleanBlockState {
+        value?: boolean;
+    }
+
+    interface BooleanBlock extends Blockly.Block {
+        booleanValue: boolean;
+        updateBooleanView(): void;
+        updateBooleanIcon(): void;
+        updateBooleanColour(): void;
+        toggleBoolean(): void;
+        saveExtraState(): BooleanBlockState;
+        loadExtraState(state: BooleanBlockState): void;
+        onchange(event: Blockly.Events.Abstract): void;
+        getCurrentColour(): string;
+        createBooleanIcon(): string;
+    }
+
     blockly.Blocks[OPCODES.OPERATOR_LOGIC_BOOLEAN] = {
-        init(this: Blockly.Block) {
-            this.jsonInit({
-                ...returnConnections,
-                message0: t('blocks:operator.logic.boolean'),
-                colour: BlocksColor.operator.secondary,
-                output: 'Boolean',
-                args0: [{ type: 'input_value', name: 'VALUE', check: 'Boolean' }],
+        init(this: BooleanBlock) {
+            this.booleanValue = true;
+            this.appendDummyInput().appendField(
+                new Blockly.FieldImage(this.createBooleanIcon(), 20, 18, t('blocks:boolean.true')),
+                'BOOL_ICON',
+            );
+            this.setInputsInline(true);
+            this.setOutput(true, 'Boolean');
+            this.setColour(BlocksColor.operator.primary);
+        },
+        createBooleanIcon() {
+            return this.booleanValue ? enable : unable;
+        },
+        getCurrentColour() {
+            return this.booleanValue
+                ? BlocksColor.operator.primary
+                : (this.getParent()?.getColour() ?? BlocksColor.operator.tertiary);
+        },
+        onchange(this: BooleanBlock, event: Blockly.Events.Abstract) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+            if (event.type === Blockly.Events.CLICK && !this.isInFlyout) {
+                const clickEvent = event as Blockly.Events.Click;
+                if (
+                    clickEvent.targetType === Blockly.Events.ClickTarget.BLOCK &&
+                    clickEvent.blockId === this.id
+                ) {
+                    this.toggleBoolean();
+                }
+                return;
+            }
+            if (
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+                event.type === Blockly.Events.BLOCK_MOVE &&
+                (event as Blockly.Events.BlockMove).blockId === this.id
+            ) {
+                this.updateBooleanColour();
+            }
+        },
+        toggleBoolean(this: BooleanBlock) {
+            if (!this.isEditable()) return;
+
+            const oldState = JSON.stringify(this.saveExtraState());
+            this.booleanValue = !this.booleanValue;
+            this.updateBooleanView();
+            const newState = JSON.stringify(this.saveExtraState());
+            Blockly.Events.fire(
+                new Blockly.Events.BlockChange(this, 'mutation', null, oldState, newState),
+            );
+        },
+        updateBooleanView(this: BooleanBlock) {
+            this.updateBooleanIcon();
+            this.updateBooleanColour();
+        },
+        updateBooleanIcon(this: BooleanBlock) {
+            const icon = this.getField('BOOL_ICON') as Blockly.FieldImage | null;
+            icon?.setValue(this.createBooleanIcon());
+            icon?.setAlt(t(this.booleanValue ? 'blocks:boolean.true' : 'blocks:boolean.false'));
+        },
+        updateBooleanColour(this: BooleanBlock) {
+            this.setColour(this.getCurrentColour());
+        },
+        saveExtraState(this: BooleanBlock) {
+            return { value: this.booleanValue };
+        },
+        loadExtraState(this: BooleanBlock, state: BooleanBlockState) {
+            this.booleanValue = state.value ?? true;
+            this.updateBooleanIcon();
+            this.setColour(
+                this.booleanValue ? BlocksColor.operator.primary : BlocksColor.operator.tertiary,
+            );
+
+            // Blockly 在恢复 extraState 后才连接父块，延后到连接完成再继承父色。
+            queueMicrotask(() => {
+                if (!this.isDeadOrDying()) this.updateBooleanColour();
             });
         },
-    } as Blockly.Block;
+    } as BooleanBlock;
 
     // - 科学
     blockly.Blocks[OPCODES.OPERATOR_SCIENTIFIC_FUNC] = {

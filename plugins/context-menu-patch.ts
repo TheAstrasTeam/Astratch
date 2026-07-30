@@ -103,6 +103,22 @@ const patchBlockSvg = (BlocklyNS: typeof Blockly): void => {
             y: location.y,
         });
     };
+    BlocklyNS.ContextMenu.show = (
+        e: Event,
+        menuOptions: (
+            | Blockly.ContextMenuRegistry.ContextMenuOption
+            | Blockly.ContextMenuRegistry.LegacyContextMenuOption
+        )[],
+        _rtl: boolean,
+        _workspace: Blockly.WorkspaceSvg | undefined,
+        location: Blockly.utils.Coordinate | undefined,
+    ) => {
+        if (!menuOptions?.length || !location) return;
+        showCustom(menuOptions as Blockly.ContextMenuRegistry.ContextMenuOption[], e, {
+            x: location.x,
+            y: location.y,
+        });
+    };
 };
 
 /**
