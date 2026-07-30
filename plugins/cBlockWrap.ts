@@ -16,6 +16,9 @@ interface AshConnection extends Blockly.Connection {
     /** foreach 头部的项源插槽只允许内部代码补入源积木。 */
     isLoopItemSourceSlot?: boolean;
     allowLoopItemSource?: boolean;
+    /** 循环计数/广播数据等作用域 reporter 源插槽只允许内部补入源积木。 */
+    isScopedSourceSlot?: boolean;
+    allowScopedSource?: boolean;
 }
 
 /** 防止重复安装 */
@@ -30,6 +33,11 @@ export class AshConnectionChecker extends Blockly.ConnectionChecker {
             .map(connection => connection as AshConnection)
             .find(connection => connection.isLoopItemSourceSlot);
         if (loopItemSlot && !loopItemSlot.allowLoopItemSource) return false;
+
+        const scopedSourceSlot = [a, b]
+            .map(connection => connection as AshConnection)
+            .find(connection => connection.isScopedSourceSlot);
+        if (scopedSourceSlot && !scopedSourceSlot.allowScopedSource) return false;
 
         const checksA = a.getCheck();
         const checksB = b.getCheck();

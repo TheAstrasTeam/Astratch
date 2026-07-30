@@ -15,6 +15,7 @@ const OPCODES = {
     IMAGES_GRID_SIZE_MENU: 'images_grid_size_menu',
     EFFECTS_MENU: 'effects_menu',
     EFFECTS_ADDORSET_MENU: 'effects_addOrSet_menu',
+    VISIBILITY_MENU: 'visibility_menu',
     COLLISION_MENU: 'collision_menu',
     LIFECYCLE_CLONE_MUTATOR: 'lifecycle_clone_mutator',
     AUDIO_THEN_MENU: 'audio_then_menu',
@@ -22,8 +23,10 @@ const OPCODES = {
     AUDIO_ADDORSET_MENU: 'audio_addOrSet_menu',
     AUDIO_GET_MENU: 'audio_get_menu',
     AUDIO_GET_IS_MENU: 'audio_get_is_menu',
+    AUDIO_EFFECT_MENU: 'audio_effect_menu',
     MATH_OPERATOR_MENU: 'math_operator_menu',
     LOGIC_COMPARE_MENU: 'logic_compare_menu',
+    LOGIC_OPERATION_MENU: 'logic_operation_menu',
     SCIENTIFIC_FUNCTION_MENU: 'scientific_function_menu',
     DATA_NAME_MENU: 'data_name_menu',
     DATA_COMPUTE_MENU: 'data_compute_menu',
@@ -57,6 +60,7 @@ const OPCODES = {
     ENTITY_APPEARANCE_IMAGES_SETGRIDDISTANCE: 'entity_appearance_images_setGridDistance',
     ENTITY_APPEARANCE_IMAGES_GETGRID: 'entity_appearance_images_getGrid',
     ENTITY_APPEARANCE_IMAGES_GETGRIDDISTANCE: 'entity_appearance_images_getGridDistance',
+    ENTITY_APPEARANCE_VISIBILITY_SET: 'entity_appearance_visibility_set',
     // - - 特效
     ENTITY_APPEARANCE_EFFECTS_SETEFFECT: 'entity_appearance_effects_setEffect',
     ENTITY_APPEARANCE_EFFECTS_GETEFFECT: 'entity_appearance_effects_getEffect',
@@ -96,6 +100,7 @@ const OPCODES = {
     // - 广播
     EVENT_BROADCAST_SEND: 'event_broadcast_send',
     EVENT_BROADCAST_LISTEN: 'event_broadcast_listen',
+    EVENT_BROADCAST_DATA: 'event_broadcast_data',
     // - 生命周期
     EVENT_LIFECYCLE_ONSTART: 'event_lifecycle_onStart',
     EVENT_LIFECYCLE_ONSTOP: 'event_lifecycle_onStop',
@@ -110,6 +115,7 @@ const OPCODES = {
     // - 输入
     EVENT_INPUT_GETMOUSEPOSITION: 'event_input_getMousePosition',
     EVENT_INPUT_ISMOUSETOUCHING: 'event_input_isMouseTouching',
+    EVENT_INPUT_ISMOUSEBUTTONPRESSED: 'event_input_isMouseButtonPressed',
     EVENT_INPUT_ISKEYPRESSED: 'event_input_isKeyPressed',
     EVENT_INPUT_GETLASTKEYPRESSED: 'event_input_getLastKeyPressed',
     EVENT_INPUT_GETLOUDNESS: 'event_input_getLoudness',
@@ -131,6 +137,7 @@ const OPCODES = {
     // - 循环
     CONTROL_LOOP_WHILE: 'control_loop_while',
     CONTROL_LOOP_REPEAT: 'control_loop_repeat',
+    CONTROL_LOOP_REPEAT_COUNT: 'control_loop_repeat_count',
     CONTROL_LOOP_FOREACH: 'control_loop_forEach',
     CONTROL_LOOP_FOREACH_ITEM: 'control_loop_forEach_item',
     // - 匹配
@@ -142,10 +149,15 @@ const OPCODES = {
     // - 数学
     OPERATOR_MATH_OP: 'operator_math_op',
     OPERATOR_MATH_RANDOM: 'operator_math_random',
+    OPERATOR_MATH_MIN: 'operator_math_min',
+    OPERATOR_MATH_MAX: 'operator_math_max',
+    OPERATOR_MATH_CLAMP: 'operator_math_clamp',
     // - 逻辑
     OPERATOR_LOGIC_COMPARE: 'operator_logic_compare',
+    OPERATOR_LOGIC_OPERATION: 'operator_logic_operation',
     OPERATOR_LOGIC_NOT: 'operator_logic_not',
     OPERATOR_LOGIC_BOOLEAN: 'operator_logic_boolean',
+    OPERATOR_LOGIC_TERNARY: 'operator_logic_ternary',
     // - 科学
     OPERATOR_SCIENTIFIC_FUNC: 'operator_scientific_func',
 
@@ -159,6 +171,9 @@ const OPCODES = {
     DATA_STRING_SPLIT: 'data_string_split',
     DATA_STRING_SUBSTRING: 'data_string_substring',
     DATA_STRING_LENGTH: 'data_string_length',
+    DATA_STRING_CONTAINS: 'data_string_contains',
+    DATA_STRING_INDEXOF: 'data_string_indexOf',
+    DATA_STRING_REPLACE: 'data_string_replace',
     // - 数组
     DATA_ARRAY_EMPTY: 'data_array_empty',
     DATA_ARRAY_PUSH: 'data_array_push',
@@ -168,6 +183,10 @@ const OPCODES = {
     DATA_ARRAY_LENGTH: 'data_array_length',
     DATA_ARRAY_FILTER: 'data_array_filter',
     DATA_ARRAY_INDEXOF: 'data_array_indexOf',
+    DATA_ARRAY_SET: 'data_array_set',
+    DATA_ARRAY_INSERT: 'data_array_insert',
+    DATA_ARRAY_CONTAINS: 'data_array_contains',
+    DATA_ARRAY_SLICE: 'data_array_slice',
     // - 对象
     DATA_OBJECT_EMPTY: 'data_object_empty',
     DATA_OBJECT_SET: 'data_object_set',
@@ -175,9 +194,11 @@ const OPCODES = {
     DATA_OBJECT_GETALL: 'data_object_getAll',
     DATA_OBJECT_GET: 'data_object_get',
     DATA_OBJECT_LENGTH: 'data_object_length',
+    DATA_OBJECT_HAS: 'data_object_has',
     // - 类型
     DATA_TYPE_TYPEOF: 'data_type_typeof',
     DATA_TYPE_CAST: 'data_type_cast',
+    DATA_TYPE_NULL: 'data_type_null',
 
     // 函数
     FUNCTION_DEFINITION: 'function_definition',

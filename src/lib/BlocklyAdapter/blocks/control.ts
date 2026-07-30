@@ -10,6 +10,12 @@ import {
 } from './helpers';
 import { modal } from '../../../components/Modal/modal';
 import { PromptModal } from '../../../components/modal_prompt';
+import {
+    createMinusField,
+    createPlusField,
+    MutationConnectionStore,
+    removeMutationInputs,
+} from './mutation';
 
 /**
  * 注册控制类积木
@@ -70,8 +76,21 @@ export function initControlBlocks(blockly: typeof Blockly) {
     } as Blockly.Block;
 
     // - 条件
+    interface IfBlock extends Blockly.Block {
+        elseIfCount: number;
+        hasElse: boolean;
+        connectionStore_: MutationConnectionStore;
+        plus(): void;
+        minus(index?: number): void;
+        updateShape(): void;
+        saveConnections_(): void;
+        restoreConnection_(inputName: string): void;
+        saveExtraState(): { elseIfCount: number; hasElse: boolean };
+        loadExtraState(state: { elseIfCount?: number; hasElse?: boolean }): void;
+    }
+
     blockly.Blocks[OPCODES.CONTROL_CONDITION_IF] = {
-        init(this: Blockly.Block) {
+        init(this: IfBlock) {
             this.jsonInit({
                 ...connections,
                 colour: BlocksColor.control.secondary,
@@ -80,8 +99,115 @@ export function initControlBlocks(blockly: typeof Blockly) {
                 args0: [{ type: 'input_value', name: 'CONDITION', check: 'Boolean' }],
                 args1: [{ type: 'input_statement', name: 'DO', check: 'Action' }],
             });
+            this.elseIfCount = 0;
+            this.hasElse = false;
+            this.connectionStore_ = new MutationConnectionStore();
+            this.updateShape();
         },
-    } as Blockly.Block;
+        plus(this: IfBlock) {
+            this.saveConnections_();
+            if (this.hasElse) this.elseIfCount++;
+            else this.hasElse = true;
+            this.updateShape();
+        },
+        minus(this: IfBlock, index = this.elseIfCount - 1) {
+            if (index === -1 && !this.hasElse) return;
+            this.saveConnections_();
+            if (index === -1) {
+                if (this.elseIfCount > 0) {
+                    const promoted = this.connectionStore_.get(
+                        `ELSE_IF_DO_${(this.elseIfCount - 1).toString()}`,
+                    );
+                    this.connectionStore_.delete('ELSE_DO');
+                    if (promoted) this.connectionStore_.set('ELSE_DO', promoted);
+                    this.elseIfCount--;
+                } else {
+                    this.connectionStore_.delete('ELSE_DO');
+                    this.hasElse = false;
+                }
+            } else if (index >= 0 && index < this.elseIfCount) {
+                const elseConnection = this.connectionStore_.get('ELSE_DO');
+                this.connectionStore_.removeIndex(this.elseIfCount, index, i => [
+                    `ELSE_IF_CONDITION_${i.toString()}`,
+                    `ELSE_IF_DO_${i.toString()}`,
+                ]);
+                if (elseConnection) this.connectionStore_.set('ELSE_DO', elseConnection);
+                this.elseIfCount--;
+            }
+            this.updateShape();
+        },
+        saveConnections_(this: IfBlock) {
+            this.connectionStore_.capture(
+                this,
+                this.inputList
+                    .filter(input => input.name.startsWith('ELSE_IF_') || input.name === 'ELSE_DO')
+                    .map(input => input.name),
+            );
+        },
+        restoreConnection_(this: IfBlock, inputName: string) {
+            this.connectionStore_.restore(this, inputName);
+        },
+        updateShape(this: IfBlock) {
+            removeMutationInputs(
+                this,
+                input =>
+                    input.name.startsWith('ELSE_IF_') ||
+                    input.name === 'ELSE_DO' ||
+                    input.name === 'ELSE_LABEL' ||
+                    input.name === 'ELSE_REMOVE' ||
+                    input.name === 'ADD_ELSE_IF' ||
+                    input.name === 'ADD_ELSE',
+            );
+            if (this.isInFlyout) return;
+
+            for (let i = 0; i < this.elseIfCount; i++) {
+                this.appendValueInput(`ELSE_IF_CONDITION_${i.toString()}`)
+                    .setCheck('Boolean')
+                    .appendField(createMinusField({ removeIndex: i }))
+                    .appendField(t('blocks:control.condition.elseIf'));
+                this.appendDummyInput(`ELSE_IF_CONDITION_TEXT_${i.toString()}`).appendField(
+                    t('blocks:control.condition.then'),
+                );
+
+                this.appendStatementInput(`ELSE_IF_DO_${i.toString()}`).setCheck('Action');
+            }
+
+            if (this.hasElse) {
+                this.appendDummyInput('ELSE_LABEL')
+                    .appendField(createMinusField({ removeIndex: -1 }))
+                    .appendField(t('blocks:control.condition.else'));
+                this.appendStatementInput('ELSE_DO').setCheck('Action');
+            }
+
+            this.appendDummyInput('ADD_ELSE_IF')
+                .setAlign(Blockly.inputs.Align.RIGHT)
+                .appendField(createPlusField());
+
+            for (let i = 0; i < this.elseIfCount; i++) {
+                const conditionName = `ELSE_IF_CONDITION_${i.toString()}`;
+                this.restoreConnection_(conditionName);
+                const savedCondition = this.connectionStore_.get(conditionName);
+                if (!savedCondition?.shadow && !savedCondition?.block) {
+                    this.getInput(conditionName)?.connection?.setShadowState({
+                        type: OPCODES.OPERATOR_LOGIC_BOOLEAN,
+                        extraState: { value: false },
+                    });
+                }
+                this.restoreConnection_(`ELSE_IF_CONDITION_TEXT_${i.toString()}`);
+                this.restoreConnection_(`ELSE_IF_DO_${i.toString()}`);
+            }
+            this.restoreConnection_('ELSE_DO');
+        },
+        saveExtraState(this: IfBlock) {
+            return { elseIfCount: this.elseIfCount, hasElse: this.hasElse };
+        },
+        loadExtraState(this: IfBlock, state: { elseIfCount?: number; hasElse?: boolean }) {
+            this.saveConnections_();
+            this.elseIfCount = Math.max(0, state.elseIfCount ?? 0);
+            this.hasElse = state.hasElse ?? false;
+            this.updateShape();
+        },
+    } as IfBlock;
 
     // - 循环
     blockly.Blocks[OPCODES.CONTROL_LOOP_WHILE] = {
@@ -97,18 +223,164 @@ export function initControlBlocks(blockly: typeof Blockly) {
         },
     } as Blockly.Block;
 
+    interface ScopedSourceConnection extends Blockly.Connection {
+        isScopedSourceSlot?: boolean;
+        allowScopedSource?: boolean;
+    }
+
+    interface RepeatCountBlock extends Blockly.Block {
+        ownerId?: string;
+        updateLabel(name: string): void;
+        saveExtraState(): { ownerId?: string };
+        loadExtraState(state: { ownerId?: string }): void;
+    }
+
+    interface RepeatBlock extends Blockly.Block {
+        isCreatingCount: boolean;
+        countName: string;
+        ensureCountBlock(): void;
+        updateCountLabels(): void;
+        renameCount(name: string): void;
+        onchange(event: Blockly.Events.Abstract): void;
+        saveExtraState(): { countName: string };
+        loadExtraState(state: { countName?: string }): void;
+    }
+
     blockly.Blocks[OPCODES.CONTROL_LOOP_REPEAT] = {
-        init(this: Blockly.Block) {
+        init(this: RepeatBlock) {
+            this.isCreatingCount = false;
+            this.countName = t('blocks:control.loop.count');
             this.jsonInit({
                 ...connections,
                 message0: t('blocks:control.loop.repeat'),
                 message1: '%1',
                 colour: BlocksColor.control.tertiary,
-                args0: [{ type: 'input_value', name: 'TIMES', check: 'Number' }],
+                args0: [
+                    { type: 'input_value', name: 'TIMES', check: 'Number' },
+                    { type: 'input_value', name: 'COUNT', check: 'Number' },
+                ],
                 args1: [{ type: 'input_statement', name: 'DO', check: 'Action' }],
             });
+
+            const countConnection = this.getInput('COUNT')
+                ?.connection as ScopedSourceConnection | null;
+            if (countConnection) {
+                countConnection.isScopedSourceSlot = true;
+                countConnection.allowScopedSource = true;
+            }
+            queueMicrotask(() => {
+                if (countConnection) countConnection.allowScopedSource = false;
+                this.ensureCountBlock();
+            });
         },
-    } as Blockly.Block;
+        onchange(this: RepeatBlock, event: Blockly.Events.Abstract) {
+            if (
+                event.type === Blockly.Events.BLOCK_CREATE ||
+                event.type === Blockly.Events.BLOCK_MOVE ||
+                event.type === Blockly.Events.BLOCK_DELETE ||
+                event.type === Blockly.Events.FINISHED_LOADING
+            ) {
+                this.ensureCountBlock();
+            }
+        },
+        ensureCountBlock(this: RepeatBlock) {
+            if (this.isCreatingCount || this.isInFlyout || this.isDeadOrDying()) return;
+
+            const connection = this.getInput('COUNT')?.connection as ScopedSourceConnection | null;
+            if (!connection) return;
+
+            const current = connection.targetBlock() as RepeatCountBlock | null;
+            if (current?.type === OPCODES.CONTROL_LOOP_REPEAT_COUNT) {
+                connection.allowScopedSource = false;
+                current.ownerId = this.id;
+                current.updateLabel(this.countName);
+                return;
+            }
+
+            connection.allowScopedSource = false;
+            this.isCreatingCount = true;
+            try {
+                if (current) connection.disconnect();
+                const count = this.workspace.newBlock(
+                    OPCODES.CONTROL_LOOP_REPEAT_COUNT,
+                ) as RepeatCountBlock;
+                count.ownerId = this.id;
+                count.updateLabel(this.countName);
+                if (this.workspace.rendered) (count as unknown as Blockly.BlockSvg).initSvg();
+                if (!count.outputConnection) return;
+                connection.allowScopedSource = true;
+                try {
+                    connection.connect(count.outputConnection);
+                } finally {
+                    connection.allowScopedSource = false;
+                }
+                if (this.workspace.rendered) (count as unknown as Blockly.BlockSvg).render();
+            } finally {
+                this.isCreatingCount = false;
+            }
+        },
+        updateCountLabels(this: RepeatBlock) {
+            for (const block of this.workspace.getAllBlocks(false)) {
+                const count = block as unknown as RepeatCountBlock;
+                if (count.type === OPCODES.CONTROL_LOOP_REPEAT_COUNT && count.ownerId === this.id) {
+                    count.updateLabel(this.countName);
+                }
+            }
+        },
+        renameCount(this: RepeatBlock, name: string) {
+            const nextName = name.trim();
+            if (!nextName || nextName === this.countName || this.isDeadOrDying()) return;
+            const oldState = JSON.stringify(this.saveExtraState());
+            this.countName = nextName;
+            this.updateCountLabels();
+            const newState = JSON.stringify(this.saveExtraState());
+            Blockly.Events.fire(
+                new Blockly.Events.BlockChange(this, 'mutation', null, oldState, newState),
+            );
+        },
+        saveExtraState(this: RepeatBlock) {
+            return { countName: this.countName };
+        },
+        loadExtraState(this: RepeatBlock, state: { countName?: string }) {
+            this.countName = state.countName ?? t('blocks:control.loop.count');
+            this.updateCountLabels();
+        },
+    } as RepeatBlock;
+
+    blockly.Blocks[OPCODES.CONTROL_LOOP_REPEAT_COUNT] = {
+        init(this: RepeatCountBlock) {
+            this.appendDummyInput().appendField(t('blocks:control.loop.count'), 'NAME');
+            this.setOutput(true, 'Number');
+            this.setColour(BlocksColor.control.tertiary);
+        },
+        updateLabel(this: RepeatCountBlock, name: string) {
+            this.getField('NAME')?.setValue(name);
+        },
+        onchange(this: RepeatCountBlock, event: Blockly.Events.Abstract) {
+            if (event.type !== Blockly.Events.CLICK) return;
+            const click = event as Blockly.Events.Click;
+            if (click.targetType !== Blockly.Events.ClickTarget.BLOCK || click.blockId !== this.id)
+                return;
+            const owner = this.ownerId
+                ? (this.workspace.getBlockById(this.ownerId) as RepeatBlock | null)
+                : null;
+            if (owner?.type !== OPCODES.CONTROL_LOOP_REPEAT) return;
+            const message = owner.countName;
+            void modal.open(PromptModal, {
+                message: t('blocks:rename_repeatCount_prompt', { message }),
+                defaultValue: message,
+                callback: result => {
+                    owner.renameCount(result);
+                },
+            });
+        },
+        saveExtraState(this: RepeatCountBlock) {
+            return { ownerId: this.ownerId };
+        },
+        loadExtraState(this: RepeatCountBlock, state: { ownerId?: string }) {
+            this.ownerId = state.ownerId;
+        },
+    } as RepeatCountBlock;
 
     interface ForEachItemState {
         ownerId?: string;
@@ -283,7 +555,7 @@ export function initControlBlocks(blockly: typeof Blockly) {
                 const owner = this.ownerId
                     ? (this.workspace.getBlockById(this.ownerId) as ForEachBlock | null)
                     : null;
-                if (!owner || owner.type !== OPCODES.CONTROL_LOOP_FOREACH) return;
+                if (owner?.type !== OPCODES.CONTROL_LOOP_FOREACH) return;
 
                 const message = owner.itemName;
                 const callback = (result: string) => {

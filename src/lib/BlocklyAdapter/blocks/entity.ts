@@ -2,8 +2,12 @@ import * as Blockly from 'blockly/core';
 import { t } from 'i18next';
 import { BlocksColor, OPCODES } from '../../../types/blocks';
 import { connections, endConnections, hatConnections, returnConnections } from './helpers';
-import { createPlusField } from './fieldPlus';
-import { createMinusField } from './fieldMinus';
+import {
+    createMinusField,
+    createPlusField,
+    MutationConnectionStore,
+    removeMutationInputs,
+} from './mutation';
 
 /**
  * 注册实体类积木
@@ -263,6 +267,17 @@ export function initEntityBlocks(blockly: typeof Blockly) {
         },
     } as Blockly.Block;
 
+    blockly.Blocks[OPCODES.ENTITY_APPEARANCE_VISIBILITY_SET] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...connections,
+                message0: t('blocks:entity.appearance.visibility.set'),
+                args0: [{ type: 'input_value', name: 'VISIBILITY' }],
+                colour: BlocksColor.Images.primary,
+            });
+        },
+    } as Blockly.Block;
+
     // - 碰撞
     blockly.Blocks[OPCODES.ENTITY_COLLISION_ISTOUCHING] = {
         init(this: Blockly.Block) {
@@ -298,13 +313,9 @@ export function initEntityBlocks(blockly: typeof Blockly) {
         },
     } as Blockly.Block;
 
-    interface SavedConn {
-        shadow: Blockly.serialization.blocks.State;
-        block: Blockly.Block | null;
-    }
     interface ENTITY_LIFECYCLE_CLONE extends Blockly.Block {
         itemCount: number;
-        savedConns_: Map<string, SavedConn>;
+        connectionStore_: MutationConnectionStore;
         plus: () => void;
         minus: (index?: number) => void;
         updateShape: () => void;
@@ -318,7 +329,7 @@ export function initEntityBlocks(blockly: typeof Blockly) {
                 colour: BlocksColor.lifecycle.primary,
             });
             this.itemCount = 0;
-            this.savedConns_ = new Map();
+            this.connectionStore_ = new MutationConnectionStore();
             this.updateShape();
         },
         plus(this: ENTITY_LIFECYCLE_CLONE) {
@@ -330,51 +341,30 @@ export function initEntityBlocks(blockly: typeof Blockly) {
             if (this.itemCount === 0) return;
             this.saveConnections_();
             const removeIdx = index ?? this.itemCount - 1;
-            const newConns = new Map<string, SavedConn>();
-            for (let i = 0, j = 0; i < this.itemCount; i++) {
-                if (i === removeIdx) continue;
-                for (const key of [`DATA${i.toString()}`, `DATA${i.toString()}_CONTENT`]) {
-                    const saved = this.savedConns_.get(key);
-                    if (saved) newConns.set(key.replace(`DATA${i.toString()}`, `DATA${j.toString()}`), saved);
-                }
-                j++;
-            }
-            this.savedConns_ = newConns;
+            this.connectionStore_.removeIndex(this.itemCount, removeIdx, i => [
+                `DATA${i.toString()}`,
+                `DATA${i.toString()}_CONTENT`,
+            ]);
             this.itemCount--;
             this.updateShape();
         },
         saveConnections_(this: ENTITY_LIFECYCLE_CLONE) {
-            this.savedConns_ = new Map();
-            for (let i = 0; i < this.itemCount; i++) {
-                for (const key of [`DATA${i.toString()}`, `DATA${i.toString()}_CONTENT`]) {
-                    const conn = this.getInput(key)?.connection;
-                    if (!conn) continue;
-                    const shadow = conn.getShadowState(true);
-                    const target = conn.targetBlock();
-                    const saved: SavedConn = {
-                        shadow: shadow ?? { type: 'text', fields: { TEXT: '' } },
-                        block: target && !target.isShadow() ? target : null,
-                    };
-                    this.savedConns_.set(key, saved);
-                }
-            }
+            this.connectionStore_.capture(
+                this,
+                Array.from({ length: this.itemCount }, (_, i) => [
+                    `DATA${i.toString()}`,
+                    `DATA${i.toString()}_CONTENT`,
+                ]).flat(),
+            );
         },
         restoreConnection_(this: ENTITY_LIFECYCLE_CLONE, inputName: string, defaultText: string) {
-            const conn = this.getInput(inputName)?.connection;
-            if (!conn) return;
-            const saved = this.savedConns_.get(inputName);
-            const shadowState = saved?.shadow ?? { type: 'text', fields: { TEXT: defaultText } };
-            conn.setShadowState(shadowState);
-            if (saved?.block) {
-                const blockConn = saved.block.outputConnection ?? saved.block.previousConnection;
-                if (blockConn) conn.connect(blockConn);
-            }
+            this.connectionStore_.restore(this, inputName, {
+                type: 'text',
+                fields: { TEXT: defaultText },
+            });
         },
         updateShape(this: ENTITY_LIFECYCLE_CLONE) {
-            const inputNames = this.inputList.map(input => input.name);
-            for (const inputName of inputNames) {
-                this.removeInput(inputName);
-            }
+            removeMutationInputs(this, () => true);
 
             this.appendDummyInput('CONTENT').appendField(
                 t(
@@ -401,9 +391,12 @@ export function initEntityBlocks(blockly: typeof Blockly) {
                     this.restoreConnection_(`DATA${i.toString()}_CONTENT`, '10086');
                     this.appendDummyInput('SUB')
                         .setAlign(Blockly.inputs.Align.RIGHT)
-                        .appendField(createMinusField({
-                            removeIndex: i
-                        }), 'MINUS');
+                        .appendField(
+                            createMinusField({
+                                removeIndex: i,
+                            }),
+                            'MINUS',
+                        );
                 }
 
                 this.appendEndRowInput('END_ROW_BUTTONS');
@@ -414,14 +407,14 @@ export function initEntityBlocks(blockly: typeof Blockly) {
                 this.appendDummyInput('SUB').appendField(createPlusField(), 'ADD');
             }
 
-            this.savedConns_ = new Map();
+            this.connectionStore_.clear();
         },
         saveExtraState(this: ENTITY_LIFECYCLE_CLONE) {
             return { itemCount: this.itemCount };
         },
         loadExtraState(this: ENTITY_LIFECYCLE_CLONE, state: { itemCount?: number }) {
             this.itemCount = state.itemCount ?? 0;
-            this.savedConns_ = new Map();
+            this.connectionStore_ = new MutationConnectionStore();
             this.updateShape();
         },
     } as ENTITY_LIFECYCLE_CLONE;

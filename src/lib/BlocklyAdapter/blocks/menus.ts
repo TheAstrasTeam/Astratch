@@ -33,6 +33,26 @@ export function initMenuBlocks(blockly: typeof Blockly, vm: IVM) {
         },
     } as Blockly.Block;
 
+    blockly.Blocks[OPCODES.VISIBILITY_MENU] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                message0: '%1',
+                args0: [
+                    {
+                        type: 'field_dropdown_with_block',
+                        name: 'ASH_BLOCKMENU',
+                        options: [
+                            [t('blocks:visibility.show'), '_SHOW_'],
+                            [t('blocks:visibility.hide'), '_HIDE_'],
+                        ],
+                    },
+                ],
+                output: 'String',
+                colour: BlocksColor.Images.primary,
+            });
+        },
+    } as Blockly.Block;
+
     blockly.Blocks[OPCODES.POSITION_ADDORSET_MENU] = {
         init(this: Blockly.Block) {
             this.jsonInit({
@@ -358,6 +378,27 @@ export function initMenuBlocks(blockly: typeof Blockly, vm: IVM) {
         },
     } as Blockly.Block;
 
+    blockly.Blocks[OPCODES.AUDIO_EFFECT_MENU] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                message0: '%1',
+                args0: [
+                    {
+                        type: 'field_dropdown_with_block',
+                        name: 'ASH_BLOCKMENU',
+                        options: [
+                            [t('blocks:audioEffect.pitch'), '_PITCH_'],
+                            [t('blocks:audioEffect.speed'), '_SPEED_'],
+                            [t('blocks:audioEffect.volume'), '_VOLUME_'],
+                        ],
+                    },
+                ],
+                output: 'String',
+                colour: BlocksColor.audio.secondary,
+            });
+        },
+    } as Blockly.Block;
+
     blockly.Blocks[OPCODES.MATH_OPERATOR_MENU] = {
         init(this: Blockly.Block) {
             this.jsonInit({
@@ -397,6 +438,26 @@ export function initMenuBlocks(blockly: typeof Blockly, vm: IVM) {
                             ['>=', '_GREATER_OR_EQUAL_'],
                             ['<', '_LESS_THAN_'],
                             ['<=', '_LESS_OR_EQUAL_'],
+                        ],
+                    },
+                ],
+                output: 'String',
+                colour: BlocksColor.operator.secondary,
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.LOGIC_OPERATION_MENU] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                message0: '%1',
+                args0: [
+                    {
+                        type: 'field_dropdown_with_block',
+                        name: 'ASH_BLOCKMENU',
+                        options: [
+                            [t('blocks:logicOperation.and'), '_AND_'],
+                            [t('blocks:logicOperation.or'), '_OR_'],
                         ],
                     },
                 ],

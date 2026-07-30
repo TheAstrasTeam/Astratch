@@ -43,6 +43,52 @@ export function initOperatorBlocks(blockly: typeof Blockly) {
         },
     } as Blockly.Block;
 
+    blockly.Blocks[OPCODES.OPERATOR_MATH_MIN] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:operator.math.min'),
+                colour: BlocksColor.operator.primary,
+                output: 'Number',
+                args0: [
+                    { type: 'input_value', name: 'LEFT', check: 'Number' },
+                    { type: 'input_value', name: 'RIGHT', check: 'Number' },
+                ],
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.OPERATOR_MATH_MAX] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:operator.math.max'),
+                colour: BlocksColor.operator.primary,
+                output: 'Number',
+                args0: [
+                    { type: 'input_value', name: 'LEFT', check: 'Number' },
+                    { type: 'input_value', name: 'RIGHT', check: 'Number' },
+                ],
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.OPERATOR_MATH_CLAMP] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:operator.math.clamp'),
+                colour: BlocksColor.operator.primary,
+                output: 'Number',
+                args0: [
+                    { type: 'input_value', name: 'VALUE', check: 'Number' },
+                    { type: 'input_value', name: 'MIN', check: 'Number' },
+                    { type: 'input_value', name: 'MAX', check: 'Number' },
+                ],
+            });
+        },
+    } as Blockly.Block;
+
     // - 逻辑
     blockly.Blocks[OPCODES.OPERATOR_LOGIC_COMPARE] = {
         init(this: Blockly.Block) {
@@ -60,6 +106,22 @@ export function initOperatorBlocks(blockly: typeof Blockly) {
         },
     } as Blockly.Block;
 
+    blockly.Blocks[OPCODES.OPERATOR_LOGIC_OPERATION] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:operator.logic.operation'),
+                colour: BlocksColor.operator.secondary,
+                output: 'Boolean',
+                args0: [
+                    { type: 'input_value', name: 'LEFT', check: 'Boolean' },
+                    { type: 'input_value', name: 'OPERATOR', check: 'String' },
+                    { type: 'input_value', name: 'RIGHT', check: 'Boolean' },
+                ],
+            });
+        },
+    } as Blockly.Block;
+
     blockly.Blocks[OPCODES.OPERATOR_LOGIC_NOT] = {
         init(this: Blockly.Block) {
             this.jsonInit({
@@ -68,6 +130,22 @@ export function initOperatorBlocks(blockly: typeof Blockly) {
                 colour: BlocksColor.operator.secondary,
                 output: 'Boolean',
                 args0: [{ type: 'input_value', name: 'VALUE', check: 'Boolean' }],
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.OPERATOR_LOGIC_TERNARY] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:operator.logic.ternary'),
+                colour: BlocksColor.operator.secondary,
+                output: null,
+                args0: [
+                    { type: 'input_value', name: 'CONDITION', check: 'Boolean' },
+                    { type: 'input_value', name: 'THEN' },
+                    { type: 'input_value', name: 'ELSE' },
+                ],
             });
         },
     } as Blockly.Block;
