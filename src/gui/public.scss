@@ -277,6 +277,20 @@ g.blocklyImageField[role='button'] {
     border-radius: 5px;
     transition: outline-width 0.3s ease-in-out;
     &:hover {
-        outline-width: 4.0px;
+        outline-width: 4px;
+    }
+}
+
+// 布尔积木
+// 在Flyout中没法切换，所以排除
+
+[class*='operator_logic_boolean'] {
+    &:hover {
+        cursor: pointer !important;
+    }
+}
+[class*='blocklyFlyout'] [class*='operator_logic_boolean'] {
+    &:hover {
+        cursor: unset !important;
     }
 }

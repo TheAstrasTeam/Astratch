@@ -176,6 +176,7 @@ export function initOperatorBlocks(blockly: typeof Blockly) {
             );
             this.setInputsInline(true);
             this.setOutput(true, 'Boolean');
+            this.setStyle('operator_logic_boolean');
             this.setColour(BlocksColor.operator.primary);
         },
         createBooleanIcon() {
