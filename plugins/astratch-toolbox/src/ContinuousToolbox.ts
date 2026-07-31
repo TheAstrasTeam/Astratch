@@ -34,11 +34,6 @@ import { createContinuousToolboxControls } from './ContinuousToolboxControls';
  */
 // @ts-expect-error 扩展基类这是有必要的
 export class ContinuousToolbox extends Blockly.Toolbox {
-    /**
-     * Timeout ID used to prevent refreshing the flyout during extensive block
-     * changes.
-     */
-    private refreshDebouncer?: ReturnType<typeof setTimeout>;
     private static readonly TOOLBOX_WIDTH = 120;
     private preserveSelectionDuringPointerDown = false;
 
@@ -161,14 +156,9 @@ export class ContinuousToolbox extends Blockly.Toolbox {
      * Updates the flyout's contents if it is visible.
      */
     override refreshSelection() {
-        if (this.getFlyout().isVisible()) {
-            if (this.refreshDebouncer) {
-                clearTimeout(this.refreshDebouncer);
-            }
-            this.refreshDebouncer = setTimeout(() => {
-                this.getFlyout().show(this.getInitialFlyoutContents());
-            }, 100);
-        }
+        if (this.getFlyout().isVisible()) 
+            this.getFlyout().show(this.getInitialFlyoutContents());
+        
     }
 
     /**

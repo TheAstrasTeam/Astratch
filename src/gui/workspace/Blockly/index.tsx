@@ -54,9 +54,8 @@ const BlocklyWorkspace = ({ vm }: { vm: IVM }): React.ReactNode => {
         };
         const restartWorkspace = () => {
             if (!workspaceDiv.current) return;
-            if (vm.runtime.blocks.workspaceSvg) vm.runtime.blocks.dispose();
 
-            void vm.runtime.blocks.createWorkspace(workspaceDiv.current);
+            void vm.runtime.blocks.createWorkspace(workspaceDiv.current, false);
         };
 
         vm.off(events.SWITCH_TARGET, handleTargetChanged);

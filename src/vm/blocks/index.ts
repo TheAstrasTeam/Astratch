@@ -13,6 +13,8 @@ import { getBlocklyI18nByI18next } from '../../utils/ash-i18n';
 import i18next from 'i18next';
 import { replaceChineseI18n } from '../../lib/BlocklyAdapter/i18n';
 import { registerAstratchRenderer } from '../../lib/BlocklyAdapter/renderer';
+import { Toast } from '../../lib/ToastManager';
+import { spawnRandomString } from '../../utils/ash-string';
 
 /**
  * 用于便捷的管理WebGPU或Blockly工作区
@@ -71,8 +73,12 @@ class Blocks implements IBlocks {
                         this.workspaceSvg,
                     ) as IWorkspaceState,
                 );
-            } catch (e) {
-                console.warn(e);
+            } catch (error) {
+                Toast.create({
+                    id: `Workspace_save_Error${spawnRandomString()}`,
+                    text: i18next.t('gui:err.save.failed', { err: (error as Error).message }),
+                    type: 'warn',
+                });
             }
         };
         const getInfoOfViewportUpdate = (
@@ -218,36 +224,47 @@ class Blocks implements IBlocks {
         // await this.restartWorkspace();
     }
 
-    async createWorkspace(DOM: HTMLDivElement): Promise<boolean> {
+    async createWorkspace(DOM: HTMLDivElement, restart = true): Promise<boolean> {
         // 如果创建工作区过于频繁·
         // 会出现init没进行完成就再次运行以此
         // 从而创建了多次工作区
         if (this._isCreating) return false;
 
         this._isCreating = true;
+        // 禁止发送事件，切换target的时候
+        // 会广播大量`delete`和`create`
+        // flyout 会被这些处理搞炸
+        this.Blockly.Events.disable();
         try {
-            if (this.workspaceSvg) {
+            if (this.workspaceSvg && restart) {
                 // 若已有存在的工作区，*即刻重启*
                 this.dispose();
+                this.vm.on(events.UPDATE_THEME, this.handleThemeUpdate);
             }
 
-            this.vm.on(events.UPDATE_THEME, this.handleThemeUpdate);
-            this._DOM = DOM;
             if (i18next.language) this.setLanguage(getBlocklyI18nByI18next(i18next.language));
-
-            await this.init();
-
-            this.workspaceSvg = this.Blockly.inject(DOM, this.workspaceConfig);
+            if (restart || !this.workspaceSvg) {
+                this._DOM = DOM;
+                await this.init();
+                this.workspaceSvg = this.Blockly.inject(DOM, this.workspaceConfig);
+            }
 
             const nowTarget = this.vm.runtime.getTargetByID(this.vm.runtime.editingTargetID);
-            if (nowTarget?.blocks)
-                this.Blockly.serialization.workspaces.load(
-                    nowTarget.blocks._workspace,
-                    this.workspaceSvg,
-                );
+            const blocks = nowTarget?.blocks;
+            if (blocks)
+                this.Blockly.serialization.workspaces.load(blocks._workspace, this.workspaceSvg);
+
             this.workspaceSvg.addChangeListener(this.handleWorkspaceChange);
+        } catch (Error) {
+            Toast.create({
+                id: 'Workspace_create_Error',
+                text: i18next.t('gui:err.workspace.failed', { err: (Error as Error).message }),
+                type: 'error',
+            });
+            throw Error;
         } finally {
             this._isCreating = false;
+            this.Blockly.Events.enable();
         }
 
         return !!this.workspaceSvg;

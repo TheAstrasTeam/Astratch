@@ -42,7 +42,7 @@ interface SearchEntry {
  */
 export class ContinuousFlyout extends Blockly.VerticalFlyout {
     private static readonly SEARCH_BAR_HEIGHT = 40;
-    private static readonly SEARCH_DEBOUNCE_DELAY = 120;
+    private static readonly SEARCH_DEBOUNCE_DELAY = 0;
 
     /**
      * Flyout的缩放
@@ -65,9 +65,6 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
 
     /** 用于输入积木搜索内容的 HTML 输入框。 */
     private searchInput?: HTMLInputElement;
-
-    /** 搜索输入防抖计时器。 */
-    private searchDebouncer?: ReturnType<typeof setTimeout>;
 
     /** 当前完整 flyout 内容，用于退出搜索时恢复。 */
     private sourceContents: Blockly.utils.toolbox.FlyoutItemInfoArray = [];
@@ -158,7 +155,6 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
     }
 
     override dispose() {
-        if (this.searchDebouncer) clearTimeout(this.searchDebouncer);
         super.dispose();
     }
 
@@ -507,17 +503,13 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
 
     /** 延迟应用输入内容，避免连续输入时频繁重建 flyout。 */
     private queueSearch(query: string) {
-        if (this.searchDebouncer) clearTimeout(this.searchDebouncer);
 
         if (!query.trim()) {
             this.applySearch('');
             return;
         }
 
-        this.searchDebouncer = setTimeout(() => {
-            this.searchDebouncer = undefined;
-            this.applySearch(query);
-        }, ContinuousFlyout.SEARCH_DEBOUNCE_DELAY);
+        this.applySearch(query);
     }
 
     /** 应用搜索内容，并在清空时返回当前选中分类。 */
@@ -547,10 +539,6 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
 
     /** 取消搜索和未执行的防抖任务，但不主动改变分类。 */
     private clearSearch() {
-        if (this.searchDebouncer) {
-            clearTimeout(this.searchDebouncer);
-            this.searchDebouncer = undefined;
-        }
         if (this.searchInput) this.searchInput.value = '';
 
         if (!this.isSearchMode()) return;

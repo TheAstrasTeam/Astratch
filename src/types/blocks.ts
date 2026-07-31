@@ -1,5 +1,5 @@
 import * as Blockly from 'blockly';
-import type { IVM } from './vm';
+ import type { IVM } from './vm';
 
 const OPCODES = {
     // 菜单
@@ -465,9 +465,10 @@ export interface IBlocks {
     /**
      * 创建一个工作区
      *
+     * @param restore 是否重置，若为 `false` 则若已初始化则不重置
      * @returns 是否创建成功
      */
-    createWorkspace: (DOM: HTMLDivElement) => Promise<boolean>;
+    createWorkspace: (DOM: HTMLDivElement, restart?: boolean) => Promise<boolean>;
     /**
      * 重启工作区
      */

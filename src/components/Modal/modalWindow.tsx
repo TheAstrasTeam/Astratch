@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import CloseICON from '../../assets/close.svg?react';
 import MiniSizeICON from '../../assets/miniScreen.svg?react';
 import FullSizeICON from '../../assets/fullScreen.svg?react';
+import { useModalInstance } from '@reactleaf/modal';
 
 export const Modal = ({
     fullScreen,
@@ -21,6 +22,7 @@ export const Modal = ({
 }) => {
     const [isFullScreen, setFullScreen] = useState<boolean>(fullScreen ?? false);
     const modalRef = useRef<HTMLDivElement>(null);
+    const { closeSelf } = useModalInstance();
 
     useEffect(() => {
         const modalElement = modalRef.current;
@@ -61,6 +63,7 @@ export const Modal = ({
                     <button
                         onClick={() => {
                             if (close) void close();
+                            else void closeSelf();
                         }}
                         className={styles.controlButton}
                     >

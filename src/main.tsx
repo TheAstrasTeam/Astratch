@@ -62,7 +62,8 @@ await i18nReady.then(async () => {
     createRoot(document.getElementById('root')!).render(
         <StrictMode>
             <Suspense fallback='loading...'>
-                <ModalProvider manager={modal}>
+                {/*  不加延迟会导致错误的关闭 */}
+                <ModalProvider manager={modal} defaultLayerOptions={{ closeDelay: 180 }}>
                     {vm.projectManager.isAPIAvailable ? (
                         <GUI vm={vm} />
                     ) : (

@@ -109,5 +109,10 @@
     "shortcut.blockly.duplicate": "复制积木",
     "shortcut.blockly.cleanup": "整理积木",
     "shortcut.blockly.disconnect": "断开连接",
-    "shortcut.blockly.collapseOtherCategories": "收起其它分类"
+    "shortcut.blockly.collapseOtherCategories": "收起其它分类",
+
+    "targets": "目标",
+
+    "err.workspace.failed": "工作区创建失败。\n {{err}}",
+    "err.save.failed": "目标数据保存失败。\n {{err}}"
 }

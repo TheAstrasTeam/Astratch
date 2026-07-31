@@ -2,7 +2,7 @@ import { useModalInstance } from '@reactleaf/modal';
 import { Modal } from '../Modal/modalWindow';
 import { t } from 'i18next';
 import styles from './index.module.scss';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export const PromptModal = ({
     message,
@@ -13,13 +13,27 @@ export const PromptModal = ({
     defaultValue: string;
     callback: ((result: string) => void) | undefined;
 }) => {
-    const { closeSelf } = useModalInstance();
     const [nowValue, setValue] = useState<string>(defaultValue);
+    const { closeSelf } = useModalInstance();
 
-    const handleButtonClick = async (result: string, close: unknown = null) => {
-        if (callback) callback(result);
-        await closeSelf(close);
-    };
+    const handleButtonClick = useCallback(
+        async (result: string, close: unknown = null) => {
+            if (callback) callback(result);
+            await closeSelf(close);
+        },
+        [callback, closeSelf],
+    );
+
+    useEffect(() => {
+        const handleEnterClick = (e: KeyboardEvent) => {
+            if (e.key !== 'Enter' || e.isComposing) return;
+            void handleButtonClick(nowValue);
+        };
+        document.addEventListener('keydown', handleEnterClick);
+        return () => {
+            document.removeEventListener('keydown', handleEnterClick);
+        };
+    }, [handleButtonClick, nowValue]);
 
     return (
         <Modal

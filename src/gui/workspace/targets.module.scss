@@ -18,6 +18,9 @@
     &.selected {
         background-color: $ui-black-transparent;
     }
+    &:hover:not(.selected) {
+        background-color: color-mix(in srgb, $ui-black-transparent 50%, #ffffff00 50%);
+    }
     & svg {
         color: $text-primary;
         width: 20px;
@@ -32,4 +35,55 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
+}
+
+.targets-tab {
+    display: flex;
+    flex: 0 1;
+}
+
+.target-tab {
+    flex: 1;
+    margin: 0;
+    border-radius: 0;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: x-small;
+
+    border: none;
+    &:hover {
+        border: none !important;
+        box-shadow: inset var(--looks-secondary) 0px -1px 0px 0px;
+    }
+
+    &.is-enable {
+        box-shadow: inset var(--looks-secondary) 0px -2px 0px 0px;
+    }
+}
+
+.object-search {
+    flex: 1 0;
+    height: 15px;
+}
+
+.bar {
+    display: flex;
+    padding: 5px;
+    align-items: center;
+}
+
+.object-add {
+    width: 25px;
+    height: 25px;
+    padding: 0;
+    background-color: transparent;
+    align-items: center;
+    justify-content: center;
+
+    & svg {
+        width: 15px;
+        height: 15px;
+    }
 }
