@@ -6,8 +6,8 @@
     "comment": "我也要是模块吗？",
     "scripts": {
         "dev": "vite",
-        "build": "tsc -b && vite build",
-        "lint": "eslint .",
+        "build": "vite build",
+        "lint": "eslint . && tsc -b",
         "check": "prettier --check .",
         "format": "prettier --write .",
         "preview": "vite preview"

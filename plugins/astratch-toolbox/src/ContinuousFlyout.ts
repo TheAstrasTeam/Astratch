@@ -42,7 +42,6 @@ interface SearchEntry {
  */
 export class ContinuousFlyout extends Blockly.VerticalFlyout {
     private static readonly SEARCH_BAR_HEIGHT = 40;
-    private static readonly SEARCH_DEBOUNCE_DELAY = 0;
 
     /**
      * Flyout的缩放
