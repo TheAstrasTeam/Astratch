@@ -91,17 +91,17 @@ export class ContinuousToolbox extends Blockly.Toolbox {
         const flyout = this.getFlyout();
         flyout.show(this.getInitialFlyoutContents());
 
-        this.getWorkspace().addChangeListener((e: Blockly.Events.Abstract) => {
-            if (
-                e.type === Blockly.Events.BLOCK_CREATE ||
-                e.type === Blockly.Events.BLOCK_DELETE
-                // TODO：我们不确定是否需要检测积木更改事件，实际上
-                // 它（this.refreshSelection();）应被显式调用而不是自动检测
-                // e.type === Blockly.Events.BLOCK_CHANGE
-            ) {
-                this.refreshSelection();
-            }
-        });
+        // TODO：我们不确定是否需要检测积木更改事件，实际上
+        // 它（this.refreshSelection();）应被显式调用而不是自动检测
+        // this.getWorkspace().addChangeListener((e: Blockly.Events.Abstract) => {
+        //     if (
+        //         e.type === Blockly.Events.BLOCK_CREATE ||
+        //         e.type === Blockly.Events.BLOCK_DELETE
+        //         e.type === Blockly.Events.BLOCK_CHANGE
+        //     ) {
+        //         this.refreshSelection();
+        //     }
+        // });
     }
 
     /**
@@ -171,6 +171,16 @@ export class ContinuousToolbox extends Blockly.Toolbox {
                 this.getFlyout().show(this.getInitialFlyoutContents());
             }, 100);
         }
+    }
+
+    /**
+     * 卸载Toolbox，同时清理防抖计时器
+     */
+    override dispose() {
+        if (this.refreshDebouncer) {
+            clearTimeout(this.refreshDebouncer);
+        }
+        super.dispose();
     }
 
     /**
