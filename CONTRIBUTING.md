@@ -1,5 +1,7 @@
 # Contributing
 
+[中文](./CONTRIBUTING-ZH-CN.md)
+
 We warmly welcome community contributions! Whether it's **fixing bugs, improving documentation, submitting new features,** or **proposing suggestions**, feel free to participate and speak your mind.
 
 ## Code
