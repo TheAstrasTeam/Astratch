@@ -52,18 +52,7 @@ Once again, we express our great thanks!
 
 ## Contributing
 
-We warmly welcome community contributions! Whether it's **fixing bugs, improving documentation, submitting new features,** or **proposing suggestions**, feel free to participate and speak your mind.
-
-You can search online for how to submit a `Pull Request` / `Issue`!
-
-Before you contribute, please note:
-
-- Keep code style consistent with the project;
-- Add or update corresponding test cases (if needed);
-- All tests must pass;
-- Commit messages should clearly describe the changes.
-
-Also, ensure that the `CI` of your forked repository passes!
+See [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 ## Development
 

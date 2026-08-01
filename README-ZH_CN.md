@@ -52,45 +52,4 @@
 
 ## 贡献
 
-我们非常欢迎社区贡献！无论是**修复 Bug、改进文档、提交新功能**，还是**提出建议**，都可大胆地参与进来，畅所欲言。
-
-如何进行`Pull Request`/`提交 Issue`可以自行搜索！
-
-在您贡献前，请注意：
-
-- 代码风格与项目保持一致；
-- 已添加或更新相应的测试用例（若需要）；
-- 所有测试通过；
-- 提交信息清晰描述变更内容。
-
-并且确保您`fork`的仓库的`CI`可以通过！
-
-## 开发
-
-如果想基于 `Astratch` 开发自己的版本，请确保您的电脑满足以下要求：
-
-- 安装了`node`环境，且版本>=v24.16.0
-- 安装了`pnpm`包管理器
-- 安装了`git`
-- 拥有可以访问`Github`的网络
-
-### 克隆仓库
-
-> 如果您`fork`了自己的仓库，就要`clone`对应的仓库
-
-```bash
-git clone https://github.com/TheAstrasTeam/Astratch.git
-```
-
-### 安装依赖
-
-```bash
-cd Astratch
-pnpm install
-```
-
-### 启动开发服务器
-
-```bash
-pnpm dev # 可运行`pnpm run`查看更多指令
-```
+参见 [CONTRIBUTING-ZH-CN.md](./CONTRIBUTING-ZH-CN.md)
