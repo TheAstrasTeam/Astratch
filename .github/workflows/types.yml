@@ -1,0 +1,36 @@
+name: Type Check
+
+on:
+    push:
+        branches: [develop]
+    pull_request:
+        branches: [develop, main]
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '24'
+
+            - uses: pnpm/action-setup@v3
+              with:
+                  version: 9
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Lint
+              run: pnpm lint
+
+            - name: Type check
+              run: pnpm tsc -b
+
+            - name: Format check
+              run: pnpm check
+              continue-on-error: true

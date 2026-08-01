@@ -1,0 +1,17 @@
+.app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+}
+
+.toolbar {
+    flex-shrink: 0;
+}
+
+.workspace-area {
+    flex: 1;
+    min-height: 0;
+}

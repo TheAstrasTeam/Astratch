@@ -1,0 +1,12 @@
+tabWidth: 4
+singleQuote: true
+jsxSingleQuote: true
+bracketSpacing: true
+# 对于简单点的没啥必要
+arrowParens: avoid
+endOfLine: lf
+semi: true
+printWidth: 100
+# 在git diff中更干净（仅限换行了的），
+# 以及在添加值时不再需要先写个逗号了！
+trailingComma: all

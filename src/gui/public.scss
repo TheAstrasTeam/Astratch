@@ -1,0 +1,309 @@
+@use './styles/color' as *;
+
+// 全局滚动条样式
+* {
+    scrollbar-width: thin;
+    scrollbar-color: $ui-tertiary transparent;
+
+    &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: $ui-tertiary;
+        border-radius: 4px;
+
+        &:hover {
+            background-color: $text-primary;
+        }
+    }
+}
+
+// 关于控件的默认CSS
+
+@mixin control-base {
+    border: 0;
+    background-color: $ui-tertiary;
+    color: $text-primary;
+    border-radius: 5px;
+    margin: 5px;
+
+    &:hover {
+        filter: brightness(var(--hover-bright));
+    }
+}
+
+body {
+    color: $text-primary;
+}
+
+button {
+    @include control-base;
+    padding: var(--button-padding);
+    border: transparent 1px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+button:hover:not(:disabled) {
+    border: $ui-black-transparent 1px solid;
+}
+button:active:not(:disabled) {
+    filter: $active-button;
+}
+button:disabled {
+    filter: brightness(0.5);
+}
+
+select {
+    @include control-base;
+    padding: var(--select-padding);
+}
+
+code {
+    font-family:
+        ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+        monospace;
+    background-color: $ui-secondary;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+// blocklyHtmlInput 是 blockly 输入框的选中时名
+input:not([class*='blocklyHtmlInput']):not([class*='fieldColourSlider']) {
+    background-color: $ui-tertiary;
+    outline: none;
+    color: $text-primary;
+    border: 1px $ui-secondary solid;
+    border-radius: 3px;
+    padding: 5px;
+}
+
+// 在暗色模式下积木输入框会变黑
+input[class*='blocklyHtmlInput'] {
+    color-scheme: light;
+}
+
+span {
+    font-size: small;
+}
+
+// 关于Blockly高亮
+
+[id*='blocklySelectedGlowFilter'] feFlood {
+    flood-color: $ui-blockly-border;
+    flood-opacity: 0.5;
+}
+
+// 在 v13.1.0 后使用它会导致积木插槽出现奇妙的高亮
+// .blocklyHighlightedConnectionPath {
+//     stroke: $ui-blockly-border !important;
+// }
+
+.injectionDiv {
+    --blockly-active-node-color: $ui-blockly-border;
+    --blockly-active-tree-color: $ui-blockly-border;
+    --blockly-selection-width: 1px;
+}
+
+// 关于Blockly下拉框，提示框地方
+
+.blocklyDropDownDiv {
+    background-color: $ui-secondary;
+    border-color: $ui-tertiary;
+    & span {
+        color: $text-primary;
+    }
+    & hr {
+        border-top: 1px solid $ui-tertiary;
+    }
+}
+
+.fieldColourEyedropper {
+    color: $text-primary;
+}
+
+.fieldColourSlider {
+    background-color: $ui-secondary;
+}
+
+.blocklyToast {
+    background-color: $ui-secondary;
+    border-color: $ui-tertiary;
+    & .blocklyToastMessage {
+        color: $text-primary;
+    }
+    & .blocklyToastCloseButton svg {
+        & rect {
+            // X 的图标
+            fill: $text-primary !important;
+        }
+    }
+}
+
+.blocklyZoom.blocklyZoomReset {
+    transform: translateY(10px);
+}
+
+// Toolbox的图标
+
+.blocklyToolboxCategory {
+    display: flex;
+    align-items: center;
+
+    &.entity::before {
+        background-image: url('../assets/sprite.svg');
+        // 这个图标比其它的略大
+        width: 12px !important;
+        height: 12px !important;
+    }
+    &.audio::before {
+        background-image: url('../assets/sound.svg');
+    }
+    &.resources::before {
+        background-image: url('../assets/files.svg');
+    }
+    &.events::before {
+        background-image: url('../assets/events.svg');
+    }
+    &.control::before {
+        background-image: url('../assets/control.svg');
+    }
+    &.operator::before {
+        background-image: url('../assets/operator.svg');
+    }
+    &.data::before {
+        background-image: url('../assets/data.svg');
+    }
+    &.function::before {
+        background-image: url('../assets/function.svg');
+    }
+    &.debug::before {
+        background-image: url('../assets/debug.svg');
+    }
+    &:is(.entity, .audio, .resources, .events, .control, .operator, .data, .function, .debug) {
+        &::before {
+            content: '';
+            width: 14px;
+            height: 14px;
+            background-repeat: round;
+            margin-left: 5px;
+            margin-right: 3px;
+            filter: $svg-filter;
+            flex: 0 0 14px;
+        }
+    }
+
+    .blocklyTreeRowContentContainer {
+        flex: 1 1 auto;
+        width: auto;
+        min-width: 0;
+    }
+}
+
+.blocklyToolbox {
+    scrollbar-color: $ui-black-transparent transparent;
+    scrollbar-width: thin;
+}
+.blocklyToolboxCategoryLabel {
+    color: $text-primary !important;
+}
+.blocklyToolboxCategoryIcon {
+    filter: $svg-filter;
+}
+
+.ash-toolbox-tools {
+    display: flex;
+    & button {
+        padding: 0;
+        width: 16px;
+        height: 16px;
+    }
+    & .ash-toolbox-tools-collapseAll {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        &::before {
+            content: '';
+            background-image: url('../assets/collapse.svg');
+            background-repeat: round;
+            width: 12px;
+            height: 12px;
+            filter: $svg-filter;
+        }
+    }
+}
+
+.continuousFlyoutSearchInput {
+    &::-webkit-search-cancel-button {
+        -webkit-appearance: none;
+        appearance: none;
+        height: 16px;
+        width: 16px;
+        background-image: url('../assets/close.svg');
+        filter: $svg-filter;
+        background-repeat: round;
+        cursor: pointer;
+        border-radius: 50%;
+        transition: background-color 0.3s ease;
+        &:hover {
+            background-color: $ui-secondary;
+        }
+    }
+}
+
+// 针对Flyout的文字
+
+g {
+    &.astratchFlyoutGroupLevel0 {
+        & text {
+            font-size: x-large !important;
+            font-weight: bold !important;
+        }
+    }
+    &.astratchFlyoutGroupLevel1 {
+        & text {
+            font-size: larger !important;
+        }
+    }
+}
+
+// 针对积木控件
+
+// 积木图片按钮
+g.blocklyImageField[role='button'] {
+    padding: 5px;
+    outline: 2px solid #ffffff50;
+    border-radius: 5px;
+    transition: outline-width 0.3s ease-in-out;
+    &:hover {
+        outline-width: 4px;
+    }
+}
+
+// 布尔积木
+// 在Flyout中没法切换，所以排除
+
+[class*='math_number'],
+[class*='operator_logic_boolean'] {
+    &:hover {
+        cursor: pointer !important;
+        & path {
+            stroke: $ui-blockly-border !important;
+            stroke-width: 3px;
+            stroke-opacity: 0.5;
+        }
+    }
+}
+[class*='blocklyFlyout'] [class*='math_number'],
+[class*='operator_logic_boolean'] {
+    &:hover {
+        cursor: unset !important;
+        & path {
+            stroke: none !important;
+        }
+    }
+}

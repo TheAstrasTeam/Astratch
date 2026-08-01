@@ -1,0 +1,16 @@
+@use '../../gui/styles/color.scss' as *;
+@use '../../gui/styles/constants.scss' as *;
+
+.content {
+    min-width: 25vw;
+    min-height: 25vh;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.text {
+    display: flex;
+    flex: 1;
+    padding: 1rem;
+}

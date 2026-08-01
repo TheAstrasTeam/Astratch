@@ -1,0 +1,84 @@
+@use '../../gui/styles/color.scss' as *;
+@use '../../gui/styles/constants.scss' as *;
+
+.content {
+    width: 75vw;
+    height: 75vh;
+    display: flex;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.tabs {
+    display: flex;
+    flex: 0 0 20%;
+    flex-direction: column;
+    height: 100%;
+    min-width: 0;
+    overflow-y: auto;
+    background-color: $ui-modal-header-background;
+    & button {
+        margin: 0;
+        text-align: left;
+        padding-left: 20%;
+        border-radius: 0;
+        background-color: $ui-modal-header-background;
+        justify-content: left;
+    }
+}
+
+.tabs-title {
+    padding-left: 10%;
+    border-radius: 0;
+    font-weight: bolder;
+    margin: 10px 0;
+}
+
+.settings {
+    margin: 0;
+    padding: 25px;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+}
+.settings-title {
+    flex: 0 0 auto;
+    font-size: xx-large;
+}
+
+.setting-content {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    min-width: 0;
+    gap: 16px;
+}
+
+.setting-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.setting-text-title {
+    font-size: large;
+}
+.setting-text-desc {
+    opacity: 0.5;
+    overflow-wrap: anywhere;
+}
+
+.settings-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+}

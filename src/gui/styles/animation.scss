@@ -1,0 +1,12 @@
+$content-in: content-in;
+
+@keyframes content-in {
+    from {
+        transform: translateY(50px) scale(0.99);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
