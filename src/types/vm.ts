@@ -67,6 +67,14 @@ export interface ITarget {
     volume?: number;
     x?: number;
     y?: number;
+    /**
+     * 文件夹从属，null则为顶层
+     */
+    parentID: string | null;
+    /**
+     * 从属，模块或对象
+     */
+    from: TTargetMode;
 }
 
 export const TargetModes = {
@@ -79,6 +87,8 @@ export interface ITargetMeta {
     name?: string;
     mode?: TTargetMode;
     id?: string;
+    parent?: string;
+    from?: string;
     /**
      * 数据，如果是导入的target的话
      * todo: 确认类型注解
@@ -96,17 +106,41 @@ export interface IObjectInfo {
     y: number;
 }
 
+export interface IFS {
+    name: string;
+    id: string;
+    color: string;
+    /**
+     * 父ID，若为null则为根目录
+     */
+    parentID: string | null;
+}
+
+export interface TTargetTreeNode {
+    children: (TTargetTreeNode | (ITarget & { type: string }))[];
+    type: 'folder' | 'target';
+    id: string;
+    name: string;
+}
+
+export type TTargetTree = (TTargetTreeNode | (ITarget & { type: string }))[];
+
 export interface IRuntime {
     /**
      * 关于积木的
      */
     blocks: IBlocks;
     /**
-     * 关于*角色*的
+     * 关于*目标*的
      *
-     * ps: 角色是 Scratch 的`sprite`的中文叫法，target 在 ASH 指代是“实体”
+     * ps: 角色是 Scratch 的`sprite`的中文叫法，target 在 ASH 指代是“目标”
      */
-    targets: ITarget[];
+    targets: Map<string, ITarget>;
+    /**
+     * 文件夹系统，存储整个项目的目录
+     * ASH 原生支持文件夹，来管理项目
+     */
+    fs: Map<TTargetMode, IFS[]>;
     /**
      * 对于实体额外的info
      */
@@ -135,9 +169,80 @@ export interface IRuntime {
      */
     setTargetBlock: (targetID: string, blocks: IWorkspaceState) => void;
     /**
-     * 通过ID获取这个target的index
+     * 通过ID获取这个target
      */
     getTargetByID: (id: string) => ITarget | undefined;
+
+    /**
+     * 根据id获取文件夹
+     * @param id
+     * @param pos "object" | "module"
+     * @returns
+     */
+    getFolderByID: (id: string, pos: TTargetMode) => IFS | null;
+    /**
+     * 添加一个新的文件夹
+     * @param pos "object" | "module"
+     * @param meta
+     * @returns
+     */
+    addFolder: (pos: TTargetMode, meta: IFS) => void;
+    /**
+     * 获取父文件夹（如果有，否则返回 null）
+     * @param pos "object" | "module"
+     * @param id
+     * @returns
+     */
+    getFolderParent: (pos: TTargetMode, id: string) => IFS | null;
+    /**
+     * 重设文件夹的名称
+     * @param pos "object" | "module"
+     * @param id
+     * @param name
+     * @returns
+     */
+    setFolderName: (pos: TTargetMode, id: string, name: string) => void;
+    /**
+     * 删除文件夹
+     * @param pos "object" | "module"
+     * @param id
+     * @returns
+     */
+    removeFolderFolder: (pos: TTargetMode, id: string) => void;
+    /**
+     * 重设文件夹的颜色
+     * @param pos "object" | "module"
+     * @param id
+     * @param color
+     * @returns
+     */
+    setFolderColor: (pos: TTargetMode, id: string, color: string) => void;
+    /**
+     * 获取文件夹的所有子项
+     * 只会获取第一层
+     * @param pos "object" | "module"
+     * @param id
+     * @returns
+     */
+    getFolderChildren: (pos: TTargetMode, id: string | null) => IFS[];
+    /**
+     * 获取文件夹的所有子项
+     * 会获取依赖它的所有文件夹及其子文件夹
+     * @param pos "object" | "module"
+     * @param id
+     * @returns
+     */
+    getFolderDescendants: (pos: TTargetMode, id: string | null) => IFS[];
+    /**
+     * 生成此界面的文件树，以树形式输出项目结构（包括targets和文件夹）
+     * @param pos "object" | "module"
+     * @returns
+     */
+    generateTargetsTree: (pos: TTargetMode) => TTargetTree;
+    /**
+     * 删除一个 Target，并返回是否成功删除
+     */
+    removeTarget: (id: string) => boolean;
 }
 
 export type folderType = FileSystemDirectoryHandle | undefined;
@@ -278,6 +383,7 @@ export const events = {
     CREATE_PROJECT: 'create_project',
     UPDATE_THEME: 'update_theme',
     VIEWPORT_VIEW: 'viewport_view',
+    UPDATE_TARGET_STRUCTURE: 'update_target_structure',
 } as const;
 
 export type TEvents = (typeof events)[keyof typeof events];

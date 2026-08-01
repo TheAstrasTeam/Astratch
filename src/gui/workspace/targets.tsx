@@ -1,8 +1,7 @@
 import classNames from 'classnames';
-import { events, type ITarget, type IVM } from '../../types/vm';
+import { events, type IVM } from '../../types/vm';
 import styles from './targets.module.scss';
 
-import SpriteIcon from '../../assets/sprite.svg?react';
 import { t } from 'i18next';
 import { guiInterface } from '../../types/gui';
 import { useGUIStore } from '../../stores/useGUIStore';
@@ -12,10 +11,12 @@ import { useEffect, useState } from 'react';
 
 import AddImg from '../../assets/add.svg?react';
 import { isValidTargetName } from '../../utils/ash-string';
+import { TargetsList } from '../../components/targets';
+import { useTargetsStore } from '../../stores/useTargetsStore';
 
 type targetTab = 'object' | 'module';
 
-const TargetsPanel = ({ targets, vm }: { targets: ITarget[]; vm: IVM }) => {
+const TargetsPanel = ({ vm }: { vm: IVM }) => {
     const setInterface = useGUIStore(state => state.setInterface);
 
     const [currentTargetTab, setCurrentTargetTab] = useState<targetTab>('object');
@@ -44,25 +45,32 @@ const TargetsPanel = ({ targets, vm }: { targets: ITarget[]; vm: IVM }) => {
         setInterface(guiInterface.CREATE_PROJECT);
     };
 
-    const filterTargetContent = () => {
-        return targets.filter(
-            target =>
-                !searchContent ||
-                // 转小写防止严格比较造成的问题
-                target.name.toLowerCase().includes(searchContent.toLocaleLowerCase()),
-        );
-    }
-
     const [selectedTargetID, setSelectedTargetID] = useState(vm.runtime.editingTargetID);
+    // React Compiler 的自动 memo 会跳过 props 未变化的子组件渲染
+    // 太坏了，害了AI花了很久才修复😭
+    const [targetsVersion, setTargetsVersion] = useState(0);
+
+    // 文件夹展开状态放在全局 store 管理，
+    // 这样 tab 切换导致本组件卸载/重挂载时展开状态也不会丢失
+    const expandedFolders = useTargetsStore(state => state.expandedFolders);
+    const toggleFolder = useTargetsStore(state => state.toggleFolder);
 
     useEffect(() => {
         const handleTargetSwitch = () => {
-            setSelectedTargetID(vm.runtime.editingTargetID);
+            setSelectedTargetID(() => vm.runtime.editingTargetID);
+            setTargetsVersion(v => v + 1);
         };
 
+        vm.off(events.SWITCH_TARGET, handleTargetSwitch);
+        vm.off(events.CREATE_PROJECT, handleTargetSwitch);
+        vm.off(events.UPDATE_TARGET_STRUCTURE, handleTargetSwitch);
         vm.on(events.SWITCH_TARGET, handleTargetSwitch);
+        vm.on(events.UPDATE_TARGET_STRUCTURE, handleTargetSwitch);
+        vm.on(events.CREATE_PROJECT, handleTargetSwitch);
         return () => {
             vm.off(events.SWITCH_TARGET, handleTargetSwitch);
+            vm.off(events.CREATE_PROJECT, handleTargetSwitch);
+            vm.off(events.UPDATE_TARGET_STRUCTURE, handleTargetSwitch);
         };
     }, [vm]);
 
@@ -113,23 +121,16 @@ const TargetsPanel = ({ targets, vm }: { targets: ITarget[]; vm: IVM }) => {
                                 </button>
                             </div>
                             <ul className={styles.targets}>
-                                {filterTargetContent().map(target => (
-                                    <li
-                                        key={target.id}
-                                        className={classNames(styles.target, {
-                                            [styles.selected]: target.id === selectedTargetID,
-                                        })}
-                                        onClick={() => {
-                                            handleTargetChange(target.id);
-                                        }}
-                                    >
-                                        <SpriteIcon />
-                                        {target.name}
-                                    </li>
-                                ))}
-                                {!filterTargetContent().length && (
-                                    <span>{t('gui:search.nothing')}</span>
-                                )}
+                                <TargetsList
+                                    key={targetsVersion}
+                                    mode='object'
+                                    vm={vm}
+                                    selected={selectedTargetID}
+                                    expandedFolders={expandedFolders}
+                                    toggleFolder={toggleFolder}
+                                    onSwitch={handleTargetChange}
+                                    searchQuery={searchContent ?? ''}
+                                />
                             </ul>
                         </div>
                     ) : (

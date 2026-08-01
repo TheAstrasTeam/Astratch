@@ -156,9 +156,7 @@ export class ContinuousToolbox extends Blockly.Toolbox {
      * Updates the flyout's contents if it is visible.
      */
     override refreshSelection() {
-        if (this.getFlyout().isVisible()) 
-            this.getFlyout().show(this.getInitialFlyoutContents());
-        
+        if (this.getFlyout().isVisible()) this.getFlyout().show(this.getInitialFlyoutContents());
     }
 
     /**

@@ -45,6 +45,7 @@
     "back": "返回",
     "object": "实体",
     "createObject": "创建一个实体",
+    "remove.confirm": "确定要删除「{{name}}」吗？",
     "panel.notInProject": "你还不在一个项目内！为什么不",
     "searchTip": "搜索",
     "menu.file": "文件",
@@ -112,6 +113,8 @@
     "shortcut.blockly.collapseOtherCategories": "收起其它分类",
 
     "targets": "目标",
+    "search.object.tip": "搜索实体...",
+    "search.nothing": "没有找到匹配的实体",
 
     "err.workspace.failed": "工作区创建失败。\n {{err}}",
     "err.save.failed": "目标数据保存失败。\n {{err}}"

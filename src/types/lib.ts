@@ -79,6 +79,21 @@ export const SHORTCUTS = {
         scope: 'blockly',
         blocklyName: 'collapseOtherCategories',
     },
+    SWITCH_TAB_TARGET: {
+        id: 'tabs.switchTab.target',
+        defaultKey: 'mod+1',
+        scope: 'global',
+    },
+    SWITCH_TAB_ADDON: {
+        id: 'tabs.switchTab.addon',
+        defaultKey: 'mod+2',
+        scope: 'global',
+    },
+    SWITCH_TAB_DEBUG: {
+        id: 'tabs.switchTab.debug',
+        defaultKey: 'mod+3',
+        scope: 'global',
+    },
 } as const satisfies Record<string, ShortcutDefinition>;
 
 export type ShortcutIds = (typeof SHORTCUTS)[keyof typeof SHORTCUTS]['id'];

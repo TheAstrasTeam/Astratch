@@ -1,10 +1,4 @@
-import {
-    allBuiltInTabs,
-    events,
-    type ITarget,
-    type IVM,
-    type TallBuiltInTabs,
-} from '../../types/vm';
+import { allBuiltInTabs, events, type IVM, type TallBuiltInTabs } from '../../types/vm';
 import styles from './index.module.scss';
 import BlocklyWorkspace from './Blockly/index';
 import { useEffect, useMemo, useState, type FunctionComponent, type SVGProps } from 'react';
@@ -21,6 +15,8 @@ import TargetsPanel from './targets';
 import SplitPane from '../../components/splitPane';
 import { debounce } from '../../utils/ash-debounce';
 import { BottomBar } from '../bottomBar';
+import { shortcutManager } from '../../lib/ShortcutManager';
+import { SHORTCUTS } from '../../types/lib';
 
 const TabButton = ({
     id,
@@ -47,8 +43,32 @@ const TabButton = ({
 
 const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
     const nowGuiInterface = useGUIStore(state => state.guiInterface);
-    const [targets, setTargets] = useState<ITarget[]>(vm.runtime.targets);
+    const [, setTargetsRevision] = useState(0);
     const [tabSelected, setTabSelect] = useState<TallBuiltInTabs>(allBuiltInTabs.TARGETS);
+
+    useEffect(() => {
+        const handleTargetsUpdate = () => {
+            setTargetsRevision(revision => revision + 1);
+        };
+
+        vm.off(events.UPDATE_TARGET_STRUCTURE, handleTargetsUpdate);
+        vm.on(events.UPDATE_TARGET_STRUCTURE, handleTargetsUpdate);
+        const unbindShortcutCommands = shortcutManager.bindCommands({
+            [SHORTCUTS.SWITCH_TAB_TARGET.id]: () => {
+                setTabSelect(allBuiltInTabs.TARGETS);
+            },
+            [SHORTCUTS.SWITCH_TAB_ADDON.id]: () => {
+                setTabSelect(allBuiltInTabs.ADDONS);
+            },
+            [SHORTCUTS.SWITCH_TAB_DEBUG.id]: () => {
+                setTabSelect(allBuiltInTabs.DEBUG);
+            },
+        });
+        return () => {
+            vm.off(events.UPDATE_TARGET_STRUCTURE, handleTargetsUpdate);
+            unbindShortcutCommands();
+        };
+    }, [vm]);
 
     const svgResizeDebounced = useMemo(
         () =>
@@ -61,20 +81,6 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
             ),
         [vm],
     );
-
-    useEffect(() => {
-        const handleTargetsUpdate = () => {
-            setTargets([...vm.runtime.targets]);
-        };
-        // 在开发模式下useEffect会执行两次
-        // 所以要先卸载
-        vm.off(events.UPDATE_PROJECT, handleTargetsUpdate);
-        vm.on(events.UPDATE_PROJECT, handleTargetsUpdate);
-        return () => {
-            vm.off(events.UPDATE_PROJECT, handleTargetsUpdate);
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     const renderEditorContent = () => {
         if (nowGuiInterface === guiInterface.START) {
@@ -89,7 +95,7 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
         if (tabSelected === allBuiltInTabs.TARGETS)
             return (
                 <SelectBar title={t('gui:targets')}>
-                    <TargetsPanel targets={targets} vm={vm} />
+                    <TargetsPanel vm={vm} />
                 </SelectBar>
             );
     };

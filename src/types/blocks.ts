@@ -1,5 +1,5 @@
 import * as Blockly from 'blockly';
- import type { IVM } from './vm';
+import type { IVM } from './vm';
 
 const OPCODES = {
     // 菜单

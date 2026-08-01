@@ -23,7 +23,7 @@
 .button {
     display: flex;
     gap: 5px;
-    align-content: center;
+    justify-content: flex-start;
     position: relative;
     background-color: transparent;
     font-size: large;

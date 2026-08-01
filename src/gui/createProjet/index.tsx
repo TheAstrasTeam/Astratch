@@ -234,7 +234,7 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
                                     tags={['recommended']}
                                     select={selectedTarget === targets.ASH}
                                 />
-                                {/* todo: 制作兼容 */}
+                                {/* TODO: 制作兼容 */}
                                 {/* <Target
                                     onClick={() => {
                                         setSelectTarget(targets.SCRATCH);
@@ -364,7 +364,7 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
                             </span>
                             <span className={styles.inputTextTip}>{t('gui:config.path.tip')}</span>
                         </div>
-                        <div>
+                        <div className={styles.inputPath}>
                             {projectFolderName && (
                                 <code className={styles.inputPathText}>{projectFolderName}</code>
                             )}

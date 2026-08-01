@@ -44,6 +44,9 @@ button {
     @include control-base;
     padding: var(--button-padding);
     border: transparent 1px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 button:hover:not(:disabled) {
     border: $ui-black-transparent 1px solid;
@@ -91,18 +94,18 @@ span {
 // 关于Blockly高亮
 
 [id*='blocklySelectedGlowFilter'] feFlood {
-    flood-color: var(--ui-blockly-border);
+    flood-color: $ui-blockly-border;
     flood-opacity: 0.5;
 }
 
 // 在 v13.1.0 后使用它会导致积木插槽出现奇妙的高亮
 // .blocklyHighlightedConnectionPath {
-//     stroke: var(--ui-blockly-border) !important;
+//     stroke: $ui-blockly-border !important;
 // }
 
 .injectionDiv {
-    --blockly-active-node-color: var(--ui-blockly-border);
-    --blockly-active-tree-color: var(--ui-blockly-border);
+    --blockly-active-node-color: $ui-blockly-border;
+    --blockly-active-tree-color: $ui-blockly-border;
     --blockly-selection-width: 1px;
 }
 
@@ -284,13 +287,23 @@ g.blocklyImageField[role='button'] {
 // 布尔积木
 // 在Flyout中没法切换，所以排除
 
+[class*='math_number'],
 [class*='operator_logic_boolean'] {
     &:hover {
         cursor: pointer !important;
+        & path {
+            stroke: $ui-blockly-border !important;
+            stroke-width: 3px;
+            stroke-opacity: 0.5;
+        }
     }
 }
-[class*='blocklyFlyout'] [class*='operator_logic_boolean'] {
+[class*='blocklyFlyout'] [class*='math_number'],
+[class*='operator_logic_boolean'] {
     &:hover {
         cursor: unset !important;
+        & path {
+            stroke: none !important;
+        }
     }
 }

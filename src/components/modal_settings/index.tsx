@@ -1,6 +1,5 @@
 import { useModalInstance } from '@reactleaf/modal';
 import { Modal } from '../Modal/modalWindow';
-import { t } from 'i18next';
 import { Settings, type ISettingDefinition } from '../../settings/SettingsRegistry';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +7,7 @@ import styles from './index.module.scss';
 import KeyInput from '../keyInput';
 import type { ShortcutIds } from '../../types/lib';
 import { shortcutManager } from '../../lib/ShortcutManager';
+import { t } from 'i18next';
 
 const SpawnSetting = ({ settings }: { settings: ISettingDefinition }) => {
     const { t } = useTranslation();
@@ -77,7 +77,6 @@ const SpawnSetting = ({ settings }: { settings: ISettingDefinition }) => {
 };
 
 export const SettingsModal = () => {
-    const { t } = useTranslation();
     const { closeSelf } = useModalInstance();
     const categories = Settings.getDefinitionsByCategory();
 
@@ -98,6 +97,7 @@ export const SettingsModal = () => {
                             onClick={() => {
                                 setTab(tab[0]);
                             }}
+                            key={tab[0]}
                         >
                             {t(`gui:settings_category.${tab[0]}`)}
                         </button>

@@ -1,0 +1,85 @@
+@use '../../gui/styles/color.scss' as *;
+
+.target,
+.folder {
+    list-style: none;
+    font-size: small;
+    ul {
+        // 这样正好能对齐
+        margin-left: 11.5px;
+        padding: 0;
+        border-left: transparent 2px solid;
+        transition: border-color 0.3s ease;
+        &:hover {
+            border-color: $looks-secondary;
+        }
+    }
+}
+
+.target,
+.folder-title {
+    padding: 3px 5px;
+    border-radius: 5px;
+    &.is-selected {
+        background-color: $ui-tertiary;
+    }
+    &:hover {
+        background-color: $ui-black-transparent;
+        .remove-icon {
+            opacity: 1 !important;
+        }
+    }
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .button {
+        background-color: transparent;
+        width: 15px;
+        height: 15px;
+        padding: 0;
+        margin: 0;
+        margin-right: 5px;
+
+        &:not(.remove) {
+            border: none;
+            &:hover {
+                border: none;
+            }
+        }
+    }
+    .expand-icon,
+    .remove-icon {
+        transition: opacity 0.3s ease;
+        &.expand-icon {
+            transition: transform 0.1s ease;
+            &:not(.is-expand) {
+                transform: rotate(270deg);
+            }
+            transform: rotate(90deg);
+        }
+        &.remove-icon {
+            opacity: 0.1;
+        }
+        width: 15px;
+        height: 15px;
+    }
+}
+.folder-right,
+.folder-left {
+    display: flex;
+    align-items: center;
+}
+
+.folder-items {
+    &:not(.is-expand) {
+        display: none;
+    }
+}
+
+.empty {
+    padding: 6px 5px;
+    font-size: small;
+    color: $ui-blockly-border;
+    text-align: center;
+}

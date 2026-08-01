@@ -90,5 +90,14 @@
         "yscroll",
         "YSCROLL"
     ],
-    "commentTranslate.source": "Bing"
+    "commentTranslate.source": "Bing",
+
+    "files.watcherExclude": {
+        "**/node_modules/**": true,
+        "**/.git/objects/**": true,
+        "**/dist/**": true,
+        "**/build/**": true,
+        "**/__pycache__/**": true,
+        "**/venv/**": true
+    }
 }

@@ -503,7 +503,6 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
 
     /** 延迟应用输入内容，避免连续输入时频繁重建 flyout。 */
     private queueSearch(query: string) {
-
         if (!query.trim()) {
             this.applySearch('');
             return;

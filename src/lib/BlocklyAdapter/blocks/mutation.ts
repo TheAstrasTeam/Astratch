@@ -3,7 +3,6 @@ import * as Blockly from 'blockly/core';
 import plusImage from '../../../assets/blocks/add.svg';
 import minusImage from '../../../assets/blocks/minus.svg';
 
-
 export interface SavedMutationConnection {
     shadow: Blockly.serialization.blocks.State | null;
     block: Blockly.Block | null;

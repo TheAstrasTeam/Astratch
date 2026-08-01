@@ -10,12 +10,12 @@ const num = (v: string | number) => ({
         fields: { NUM: v },
     },
 });
-const _numPos = (v: string | number) => ({
-    shadow: {
-        type: OPCODES.math_positive_number,
-        fields: { NUM: v },
-    },
-});
+// const _numPos = (v: string | number) => ({
+//     shadow: {
+//         type: OPCODES.math_positive_number,
+//         fields: { NUM: v },
+//     },
+// });
 const numWhole = (v: string | number) => ({
     shadow: {
         type: OPCODES.math_whole_number,
@@ -24,14 +24,14 @@ const numWhole = (v: string | number) => ({
         },
     },
 });
-const _numInt = (v: string | number) => ({
-    shadow: {
-        type: OPCODES.math_integer,
-        fields: {
-            NUM: v,
-        },
-    },
-});
+// const _numInt = (v: string | number) => ({
+//     shadow: {
+//         type: OPCODES.math_integer,
+//         fields: {
+//             NUM: v,
+//         },
+//     },
+// });
 const numAngle = (v: string | number) => ({
     shadow: {
         type: OPCODES.math_angle,
@@ -46,14 +46,14 @@ const txt = (v: string) => ({
         },
     },
 });
-const _colour = (v = '#ff0000') => ({
-    shadow: {
-        type: OPCODES.colour_picker,
-        fields: {
-            COLOUR: v,
-        },
-    },
-});
+// const _colour = (v = '#ff0000') => ({
+//     shadow: {
+//         type: OPCODES.colour_picker,
+//         fields: {
+//             COLOUR: v,
+//         },
+//     },
+// });
 const menu = (type: string) => ({
     shadow: {
         type,
@@ -66,7 +66,7 @@ const bool = (value = true) => ({
     },
 });
 
-const _sep = (gap = 36) => ({ kind: 'sep', gap });
+const sep = (gap = 36) => ({ kind: 'sep', gap });
 
 const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
     await i18nReady;
@@ -222,6 +222,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                             POS: menu(OPCODES.IMAGES_STRETCH_MENU),
                                         },
                                     },
+                                    sep(),
                                     {
                                         gap: 12,
                                         kind: 'block',
@@ -253,6 +254,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                             POS: menu(OPCODES.IMAGES_STRETCH_MENU),
                                         },
                                     },
+                                    sep(),
                                     {
                                         gap: 12,
                                         kind: 'block',

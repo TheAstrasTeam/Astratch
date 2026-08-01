@@ -239,7 +239,6 @@ class Blocks implements IBlocks {
             if (this.workspaceSvg && restart) {
                 // 若已有存在的工作区，*即刻重启*
                 this.dispose();
-                this.vm.on(events.UPDATE_THEME, this.handleThemeUpdate);
             }
 
             if (i18next.language) this.setLanguage(getBlocklyI18nByI18next(i18next.language));
@@ -247,6 +246,7 @@ class Blocks implements IBlocks {
                 this._DOM = DOM;
                 await this.init();
                 this.workspaceSvg = this.Blockly.inject(DOM, this.workspaceConfig);
+                this.vm.on(events.UPDATE_THEME, this.handleThemeUpdate);
             }
 
             const nowTarget = this.vm.runtime.getTargetByID(this.vm.runtime.editingTargetID);
