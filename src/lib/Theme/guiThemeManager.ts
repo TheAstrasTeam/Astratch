@@ -49,6 +49,9 @@ const applyGuiTheme = (): void => {
             // 在亮色模式下将 blockly 右下角
             // 的图标为反色
             if (css[1] === 'light') {
+                document.querySelectorAll(`#${DEFAULT_BLOCKLY_SPRITES_STYLE_ID}`).forEach(style => {
+                    style.remove();
+                });
                 const blocklySpritesStyle = document.createElement('style');
                 blocklySpritesStyle.id = DEFAULT_BLOCKLY_SPRITES_STYLE_ID;
                 blocklySpritesStyle.textContent = `
@@ -60,7 +63,13 @@ const applyGuiTheme = (): void => {
                     }
                 `;
                 document.head.appendChild(blocklySpritesStyle);
-            } else document.getElementById(DEFAULT_BLOCKLY_SPRITES_STYLE_ID)?.remove();
+            } else {
+                document
+                    .querySelectorAll(`#${DEFAULT_BLOCKLY_SPRITES_STYLE_ID}`)
+                    .forEach(style => {
+                        style.remove();
+                    });
+            }
         } else document.documentElement.style.setProperty(`--${css[0]}`, css[1]);
     });
     Object.entries(accents).forEach(color => {
