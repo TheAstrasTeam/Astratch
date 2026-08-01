@@ -10,7 +10,8 @@ import Error from '../../assets/error.svg?react';
 const getImg = (toast: IToast) => {
     switch (toast.type) {
         case 'warn':
-            return <Warn style={{ color: '#eeee00' }} />;
+            // 是的，ae！这是一个彩蛋！
+            return <Warn style={{ color: '#eeae00' }} />;
         case 'error':
             return <Error style={{ color: '#ee2222' }} />;
         default:
