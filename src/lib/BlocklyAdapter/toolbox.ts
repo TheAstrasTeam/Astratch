@@ -261,6 +261,11 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                         type: OPCODES.ENTITY_APPEARANCE_VISIBILITY_SET,
                                         inputs: { VISIBILITY: menu(OPCODES.VISIBILITY_MENU) },
                                     },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODES.ENTITY_APPEARANCE_VISIBILITY_GET,
+                                    },
                                 ],
                             },
                             {

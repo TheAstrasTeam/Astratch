@@ -278,6 +278,17 @@ export function initEntityBlocks(blockly: typeof Blockly) {
         },
     } as Blockly.Block;
 
+    blockly.Blocks[OPCODES.ENTITY_APPEARANCE_VISIBILITY_GET] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:entity.appearance.visibility.get'),
+                output: 'Boolean',
+                colour: BlocksColor.Images.primary,
+            });
+        },
+    } as Blockly.Block;
+
     // - 碰撞
     blockly.Blocks[OPCODES.ENTITY_COLLISION_ISTOUCHING] = {
         init(this: Blockly.Block) {

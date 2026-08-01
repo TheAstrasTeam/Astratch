@@ -61,6 +61,7 @@ const OPCODES = {
     ENTITY_APPEARANCE_IMAGES_GETGRID: 'entity_appearance_images_getGrid',
     ENTITY_APPEARANCE_IMAGES_GETGRIDDISTANCE: 'entity_appearance_images_getGridDistance',
     ENTITY_APPEARANCE_VISIBILITY_SET: 'entity_appearance_visibility_set',
+    ENTITY_APPEARANCE_VISIBILITY_GET: 'entity_appearance_visibility_get',
     // - - 特效
     ENTITY_APPEARANCE_EFFECTS_SETEFFECT: 'entity_appearance_effects_setEffect',
     ENTITY_APPEARANCE_EFFECTS_GETEFFECT: 'entity_appearance_effects_getEffect',

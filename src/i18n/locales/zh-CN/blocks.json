@@ -137,6 +137,7 @@
     "entity.appearance.images.getGrid": "当前的切图层数",
     "entity.appearance.images.getGridDistance": "当前基于 %1 的 %2 切图距离",
     "entity.appearance.visibility.set": "让自己 %1",
+    "entity.appearance.visibility.get": "自己是否显示",
     "visibility.show": "显示",
     "visibility.hide": "隐藏",
 
