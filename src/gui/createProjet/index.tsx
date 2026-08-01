@@ -86,7 +86,7 @@ const CompareContentSelectTip = ({
 );
 
 const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
-    // todo: 制作兼容后再使用scheme这个tab
+    // TODO: 制作兼容后再使用scheme这个tab
     const [nowTab, setTab] = useState<TcreateProjectTabs>(tabs.CONFIG);
     const [selectedTarget, setSelectTarget] = useState<TallTarget>(targets.ASH);
 
@@ -161,7 +161,7 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
     };
     const handleBackClick = () => {
         if (nowTab === tabs.CONFIG) {
-            // todo: 制作兼容后再使用scheme这个tab
+            // TODO: 制作兼容后再使用scheme这个tab
             setGuiStore(guiInterface.START);
             // setTab(tabs.SCHEME);
         } else {
@@ -356,7 +356,7 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
                             }}
                         />
                     </div>
-                    {/* todo: 支持设备不支持FAS的情况 */}
+                    {/* TODO: 支持设备不支持FAS的情况 */}
                     <div className={styles.inputBox}>
                         <div className={styles.inputInputBox}>
                             <span ref={folderInput} className={styles.inputText}>

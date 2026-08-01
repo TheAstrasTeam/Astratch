@@ -91,7 +91,7 @@ export interface ITargetMeta {
     from?: string;
     /**
      * 数据，如果是导入的target的话
-     * todo: 确认类型注解
+     * TODO: 确认类型注解
      */
     data?: ArrayBuffer;
 }

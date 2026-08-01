@@ -104,7 +104,7 @@ export class VM implements IVM {
     }
 
     async initProject() {
-        // todo: 改进进入机制
+        // TODO: 改进进入机制
         const checkResult = await this.projectManager.checkProjectCanSave();
         if (!checkResult.pass) {
             if (checkResult.error === allProjectCheckError.FOLDER_NOT_EMPTY) {
@@ -147,7 +147,7 @@ export class VM implements IVM {
             this.projectManager.folderHandle,
             projectFileNames.meta,
         );
-        // todo: 读取其它数据
+        // TODO: 读取其它数据
 
         // 元数据
         if (!metaFileHandle) return false;

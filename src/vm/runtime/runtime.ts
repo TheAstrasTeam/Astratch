@@ -97,7 +97,7 @@ class Runtime implements IRuntime {
     }
 
     createTarget(meta: ITargetMeta, switchTo = true) {
-        // todo: 处理Data
+        // TODO: 处理Data
         const id = meta.id ?? crypto.randomUUID();
         this.targets.set(id, {
             // 直接 this.DEFAULT_TARGETINFO 会造成浅拷贝

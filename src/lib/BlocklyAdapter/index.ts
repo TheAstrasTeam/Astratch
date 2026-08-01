@@ -182,7 +182,7 @@ export function setupBlocklyAdapter(blockly: typeof BlocklyType): () => void {
         // 注册 Scratch 风格注释图标，替换 Blockly 原生 CommentIcon
         registerScratchComment(blockly);
         // 内联切换，这个不该让用户手动修改
-        // todo: 确认是否需要禁用
+        // TODO: 确认是否需要禁用
         blockly.ContextMenuRegistry.registry.unregister('blockInline');
     } catch {
         // 不需要管
