@@ -1,33 +1,6 @@
 @use '../styles/color' as *;
 @use '../styles/constants.scss' as *;
 
-.targets {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    list-style-type: none;
-    padding: 0 0.5rem;
-}
-.target {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    margin-bottom: 5px;
-    padding: 5px;
-    border-radius: 4px;
-    &.selected {
-        background-color: $ui-black-transparent;
-    }
-    &:hover:not(.selected) {
-        background-color: color-mix(in srgb, $ui-black-transparent 50%, #ffffff00 50%);
-    }
-    & svg {
-        color: $text-primary;
-        width: 20px;
-        height: auto;
-    }
-}
-
 .not-in-project-content {
     width: 100%;
     height: 100%;
@@ -60,30 +33,5 @@
 
     &.is-enable {
         box-shadow: inset var(--looks-secondary) 0px -2px 0px 0px;
-    }
-}
-
-.object-search {
-    flex: 1 0;
-    height: 15px;
-}
-
-.bar {
-    display: flex;
-    padding: 5px;
-    align-items: center;
-}
-
-.object-add {
-    width: 25px;
-    height: 25px;
-    padding: 0;
-    background-color: transparent;
-    align-items: center;
-    justify-content: center;
-
-    & svg {
-        width: 15px;
-        height: 15px;
     }
 }

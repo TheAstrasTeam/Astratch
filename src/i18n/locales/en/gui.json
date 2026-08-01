@@ -112,5 +112,7 @@
     "shortcut.blockly.duplicate": "Duplicate Block",
     "shortcut.blockly.cleanup": "Clean Up Blocks",
     "shortcut.blockly.disconnect": "Disconnect",
-    "shortcut.blockly.collapseOtherCategories": "Collapse other categories"
+    "shortcut.blockly.collapseOtherCategories": "Collapse other categories",
+
+    "remove": "Remove"
 }

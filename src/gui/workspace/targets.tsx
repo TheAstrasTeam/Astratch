@@ -9,8 +9,7 @@ import { modal } from '../../components/Modal/modal';
 import { PromptModal } from '../../components/modal_prompt';
 import { useEffect, useState } from 'react';
 
-import AddImg from '../../assets/add.svg?react';
-import { isValidTargetName } from '../../utils/ash-string';
+import { isValidTargetName, spawnRandomString } from '../../utils/ash-string';
 import { TargetsList } from '../../components/targets';
 import { useTargetsStore } from '../../stores/useTargetsStore';
 
@@ -20,7 +19,6 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
     const setInterface = useGUIStore(state => state.setInterface);
 
     const [currentTargetTab, setCurrentTargetTab] = useState<targetTab>('object');
-    const [searchContent, setSearchContent] = useState<string | null>(null);
 
     const handleSwitchTargetTab = (tab: targetTab) => {
         setCurrentTargetTab(tab);
@@ -30,12 +28,28 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
         vm.runtime.switchTarget(id);
     };
 
-    const handleCreateObject = () => {
+    const handleCreateObject = (parent: string | null = null) => {
         const handleCreateObjectCallback = (result: string) => {
-            if (isValidTargetName(result)) vm.runtime.createTarget({ name: result });
+            if (isValidTargetName(result)) vm.runtime.createTarget({ name: result, parent });
         };
         void modal.open(PromptModal, {
             message: t('gui:objectNameAsk'),
+            defaultValue: '',
+            callback: handleCreateObjectCallback,
+        });
+    };
+    const handleCreateFolder = (parent: string | null = null) => {
+        const handleCreateObjectCallback = (result: string) => {
+            if (isValidTargetName(result))
+                vm.runtime.addFolder(currentTargetTab, {
+                    name: result,
+                    id: spawnRandomString(),
+                    color: '#0099ff',
+                    parentID: parent,
+                });
+        };
+        void modal.open(PromptModal, {
+            message: t('gui:folderNameAsk'),
             defaultValue: '',
             callback: handleCreateObjectCallback,
         });
@@ -101,43 +115,21 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
                 </div>
                 <div>
                     {currentTargetTab === 'object' ? (
-                        <div>
-                            {/* 
-                            [搜索   ] + 
-                            模块     edit
-                            模块     edit
-                            */}
-                            <div className={styles.bar}>
-                                <input
-                                    className={styles.objectSearch}
-                                    placeholder={t('gui:search.object.tip')}
-                                    value={searchContent ?? ''}
-                                    onChange={e => {
-                                        setSearchContent(e.target.value);
-                                    }}
-                                />
-                                <button className={styles.objectAdd} onClick={handleCreateObject}>
-                                    <AddImg />
-                                </button>
-                            </div>
-                            <ul className={styles.targets}>
-                                <TargetsList
-                                    key={targetsVersion}
-                                    mode='object'
-                                    vm={vm}
-                                    selected={selectedTargetID}
-                                    expandedFolders={expandedFolders}
-                                    toggleFolder={toggleFolder}
-                                    onSwitch={handleTargetChange}
-                                    searchQuery={searchContent ?? ''}
-                                />
-                            </ul>
-                        </div>
+                        <TargetsList
+                            key={targetsVersion}
+                            mode='object'
+                            vm={vm}
+                            selected={selectedTargetID}
+                            expandedFolders={expandedFolders}
+                            toggleFolder={toggleFolder}
+                            onSwitch={handleTargetChange}
+                            onAdd={handleCreateObject}
+                            onAddFolder={handleCreateFolder}
+                        />
                     ) : (
                         <div></div>
                     )}
                 </div>
-                {/* <button onClick={handleCreateObject}>{t('gui:createObject')}</button> */}
             </>
         );
     else

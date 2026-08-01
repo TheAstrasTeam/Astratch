@@ -13,4 +13,14 @@ const selectProjectThenJump = async (vm: IVM, setInterface: (state: IGuiInterfac
     if (loadedProject) setInterface(guiInterface.EDITOR);
 };
 
-export { selectProjectThenJump };
+/**
+ * 打开Menu通过控件位置
+ */
+const openMenuByClick = (openFn: (point: { x: number; y: number }) => void) => {
+    return (e: React.MouseEvent<HTMLElement>) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        openFn({ x: rect.left, y: rect.bottom });
+    };
+};
+
+export { selectProjectThenJump, openMenuByClick };

@@ -6,7 +6,7 @@ import { MenuItem, MenuDivider } from '@szhsin/react-menu';
 import { useContextMenu } from '../contextMenu';
 import { AllContextMenu, guiInterface } from '../../types/gui';
 import { useGUIStore } from '../../stores/useGUIStore';
-import { selectProjectThenJump } from '../../utils/ash-gui';
+import { openMenuByClick, selectProjectThenJump } from '../../utils/ash-gui';
 import { shortcutManager } from '../../lib/ShortcutManager';
 import { SHORTCUTS } from '../../types/lib';
 import { modal } from '../../components/Modal/modal';
@@ -56,19 +56,12 @@ const MenuBar = ({ vm }: { vm: IVM }): React.ReactNode => {
         void modal.open(SettingsModal);
     };
 
-    const handleMenuClick = (openFn: (point: { x: number; y: number }) => void) => {
-        return (e: React.MouseEvent<HTMLElement>) => {
-            const rect = e.currentTarget.getBoundingClientRect();
-            openFn({ x: rect.left, y: rect.bottom });
-        };
-    };
-
     return (
         <div className={styles.menubarContents}>
             <div className={styles.menubarContentsLeft}>
                 <Logo className={styles.menubarContentLogo} />
                 <div className={styles.leftUl}>
-                    <button onClick={handleMenuClick(openFileMenu)}>{t('gui:menu.file')}</button>
+                    <button onClick={openMenuByClick(openFileMenu)}>{t('gui:menu.file')}</button>
                     <button>{t('gui:menu.edit')}</button>
                     <button>{t('gui:menu.run')}</button>
                     <button>{t('gui:menu.help')}</button>

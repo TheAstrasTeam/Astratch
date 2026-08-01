@@ -1,13 +1,20 @@
-import { type MouseEvent as ReactMouseEvent } from 'react';
+import { useState, type MouseEvent as ReactMouseEvent } from 'react';
 import type { IVM, TTargetMode, TTargetTree, TTargetTreeNode } from '../../types/vm';
 import styles from './index.module.scss';
 import classNames from 'classnames';
 
 import Expand from '../../assets/chevronRight.svg?react';
 import Remove from '../../assets/remove.svg?react';
+import AddImg from '../../assets/add.svg?react';
+import Folder from '../../assets/addFolder.svg?react';
+
 import { modal } from '../Modal/modal';
 import { ConfirmModal } from '../modal_confirm';
 import { t } from 'i18next';
+import { useContextMenu } from '../../gui/contextMenu';
+import { AllContextMenu } from '../../types/gui';
+import { MenuItem } from '@szhsin/react-menu';
+import { openMenuByClick } from '../../utils/ash-gui';
 
 /**
  * 按关键词过滤 targets 树。
@@ -42,6 +49,8 @@ const GenerateFoldersAndTargets = ({
     mode,
     onSwitch,
     forceExpand = false,
+    onAdd,
+    onAddFolder,
 }: {
     target: TTargetTreeNode;
     expandedFolders: Set<string>;
@@ -51,9 +60,11 @@ const GenerateFoldersAndTargets = ({
     mode: TTargetMode;
     onSwitch: (id: string) => void;
     /**
-     * 搜索时强制展开所有文件夹，让匹配的 target 可见
+     * 搜索时强制展开所有文件夹
      */
     forceExpand?: boolean;
+    onAdd?: (parent?: string | null) => void;
+    onAddFolder?: (parent?: string | null) => void;
 }) => {
     const isExpand = forceExpand || expandedFolders.has(target.id);
     const handleRemoveClicked = (e: ReactMouseEvent<HTMLButtonElement>) => {
@@ -71,6 +82,16 @@ const GenerateFoldersAndTargets = ({
     };
     const handleSwitchTarget = () => {
         onSwitch(target.id);
+    };
+    const handleCreateFolder = (e: ReactMouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        if (onAddFolder) onAddFolder(target.id);
+        if (!isExpand) toggleFolder(target.id);
+    };
+    const handleCreateTarget = (e: ReactMouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        if (onAdd) onAdd(target.id);
+        if (!isExpand) toggleFolder(target.id);
     };
 
     if (target.type === 'target') {
@@ -114,7 +135,22 @@ const GenerateFoldersAndTargets = ({
                 <div className={styles.folderLeft}>
                     <button
                         className={classNames(styles.button, styles.remove)}
+                        onClick={handleCreateTarget}
+                        title={t('gui:add')}
+                    >
+                        <AddImg className={classNames(styles.removeIcon)} />
+                    </button>
+                    <button
+                        className={classNames(styles.button, styles.remove)}
+                        onClick={handleCreateFolder}
+                        title={t('gui:createFolder')}
+                    >
+                        <Folder className={classNames(styles.removeIcon)} />
+                    </button>
+                    <button
+                        className={classNames(styles.button, styles.remove)}
                         onClick={handleRemoveClicked}
+                        title={t('gui:remove')}
                     >
                         <Remove className={classNames(styles.removeIcon)} />
                     </button>
@@ -138,6 +174,8 @@ const GenerateFoldersAndTargets = ({
                             mode={mode}
                             onSwitch={onSwitch}
                             forceExpand={forceExpand}
+                            onAdd={onAdd}
+                            onAddFolder={onAddFolder}
                         />
                     ))}
             </ul>
@@ -152,7 +190,8 @@ export const TargetsList = ({
     expandedFolders,
     toggleFolder,
     onSwitch,
-    searchQuery,
+    onAdd,
+    onAddFolder,
 }: {
     mode: TTargetMode;
     vm: IVM;
@@ -160,29 +199,73 @@ export const TargetsList = ({
     expandedFolders: Set<string>;
     toggleFolder: (id: string) => void;
     onSwitch: (id: string) => void;
-    searchQuery?: string;
+    onAdd?: (parent?: string | null) => void;
+    onAddFolder?: (parent?: string | null) => void;
 }) => {
-    const isSearching = !!searchQuery && searchQuery.trim() !== '';
-    const tree = filterTargetsTree(vm.runtime.generateTargetsTree(mode), searchQuery ?? '');
+    const [searchContent, setSearchContent] = useState('');
+    const isSearching = searchContent.trim() !== '';
+    const tree = filterTargetsTree(vm.runtime.generateTargetsTree(mode), searchContent);
+
+    const { openMenu: openAddMenu } = useContextMenu(AllContextMenu.ADD_TARGET, () => (
+        <>
+            <MenuItem
+                onClick={() => {
+                    if (onAdd) onAdd();
+                }}
+            >
+                {t('gui:createObject')}
+            </MenuItem>
+            <MenuItem
+                onClick={() => {
+                    if (onAddFolder) onAddFolder();
+                }}
+            >
+                {t('gui:createFolder')}
+            </MenuItem>
+        </>
+    ));
 
     return (
         <div className={styles.targetsList}>
-            {tree.map(target => (
-                <GenerateFoldersAndTargets
-                    key={target.id}
-                    target={target as TTargetTreeNode}
-                    expandedFolders={expandedFolders}
-                    toggleFolder={toggleFolder}
-                    selected={selected}
-                    vm={vm}
-                    mode={mode}
-                    onSwitch={onSwitch}
-                    forceExpand={isSearching}
+            <div className={styles.bar}>
+                <input
+                    className={styles.objectSearch}
+                    placeholder={t('gui:search.object.tip')}
+                    value={searchContent}
+                    onChange={e => {
+                        setSearchContent(e.target.value);
+                    }}
                 />
-            ))}
-            {isSearching && tree.length === 0 && (
-                <div className={styles.empty}>{t('gui:search.nothing')}</div>
-            )}
+                {onAdd && (
+                    <button
+                        className={styles.objectAdd}
+                        onClick={openMenuByClick(openAddMenu)}
+                        title={t('gui:create')}
+                    >
+                        <AddImg />
+                    </button>
+                )}
+            </div>
+            <div className={styles.list}>
+                {tree.map(target => (
+                    <GenerateFoldersAndTargets
+                        key={target.id}
+                        target={target as TTargetTreeNode}
+                        expandedFolders={expandedFolders}
+                        toggleFolder={toggleFolder}
+                        selected={selected}
+                        vm={vm}
+                        mode={mode}
+                        onSwitch={onSwitch}
+                        forceExpand={isSearching}
+                        onAdd={onAdd}
+                        onAddFolder={onAddFolder}
+                    />
+                ))}
+                {isSearching && tree.length === 0 && (
+                    <div className={styles.empty}>{t('gui:search.nothing')}</div>
+                )}
+            </div>
         </div>
     );
 };

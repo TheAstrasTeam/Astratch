@@ -87,7 +87,7 @@ export interface ITargetMeta {
     name?: string;
     mode?: TTargetMode;
     id?: string;
-    parent?: string;
+    parent?: string | null;
     from?: string;
     /**
      * 数据，如果是导入的target的话
