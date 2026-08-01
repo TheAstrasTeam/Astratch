@@ -116,8 +116,8 @@
     "search.object.tip": "搜索实体...",
     "search.nothing": "没有找到匹配的实体",
 
-    "err.workspace.failed": "工作区创建失败。\n {{err}}",
-    "err.save.failed": "目标数据保存失败。\n {{err}}",
+    "err.workspace.failed": "工作区创建失败。\n{{err}}",
+    "err.save.failed": "目标数据保存失败。\n{{err}}",
 
     "remove": "删除",
     "add": "添加",
