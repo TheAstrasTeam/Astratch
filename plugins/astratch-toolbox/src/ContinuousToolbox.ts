@@ -34,6 +34,11 @@ import { createContinuousToolboxControls } from './ContinuousToolboxControls';
  */
 // @ts-expect-error 扩展基类这是有必要的
 export class ContinuousToolbox extends Blockly.Toolbox {
+    /**
+     * Timeout ID used to prevent refreshing the flyout during extensive block
+     * changes.
+     */
+    private refreshDebouncer?: ReturnType<typeof setTimeout>;
     private static readonly TOOLBOX_WIDTH = 120;
     private preserveSelectionDuringPointerDown = false;
 
@@ -89,8 +94,10 @@ export class ContinuousToolbox extends Blockly.Toolbox {
         this.getWorkspace().addChangeListener((e: Blockly.Events.Abstract) => {
             if (
                 e.type === Blockly.Events.BLOCK_CREATE ||
-                e.type === Blockly.Events.BLOCK_DELETE ||
-                e.type === Blockly.Events.BLOCK_CHANGE
+                e.type === Blockly.Events.BLOCK_DELETE
+                // TODO：我们不确定是否需要检测积木更改事件，实际上
+                // 它（this.refreshSelection();）应被显式调用而不是自动检测
+                // e.type === Blockly.Events.BLOCK_CHANGE
             ) {
                 this.refreshSelection();
             }
@@ -156,7 +163,14 @@ export class ContinuousToolbox extends Blockly.Toolbox {
      * Updates the flyout's contents if it is visible.
      */
     override refreshSelection() {
-        if (this.getFlyout().isVisible()) this.getFlyout().show(this.getInitialFlyoutContents());
+        if (this.getFlyout().isVisible()) {
+            if (this.refreshDebouncer) {
+                clearTimeout(this.refreshDebouncer);
+            }
+            this.refreshDebouncer = setTimeout(() => {
+                this.getFlyout().show(this.getInitialFlyoutContents());
+            }, 100);
+        }
     }
 
     /**
