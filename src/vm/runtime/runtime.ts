@@ -234,6 +234,50 @@ class Runtime implements IRuntime {
         }
         return false;
     }
+
+    moveTarget(pos: TTargetMode, targetID: string, newParentID: string | null) {
+        const target = this.targets.get(targetID);
+        if (!target) return false;
+        if (newParentID && !this.getFolderByID(newParentID, pos)) {
+            sendError(`Not found folder "${newParentID}".`, 'warn');
+            return false;
+        }
+        target.parentID = newParentID;
+        this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
+        return true;
+    }
+
+    moveFolder(pos: TTargetMode, folderID: string, newParentID: string | null) {
+        const folder = this.getFolderByID(folderID, pos);
+        if (newParentID)
+            if (!this.getFolderByID(newParentID, pos)) {
+                sendError(
+                    i18next.t('gui:err.moveTarget.parentUndefined', {
+                        id: newParentID,
+                    }),
+                    'warn',
+                );
+                return false;
+            }
+        if (folder) {
+            if (folder.id === newParentID) {
+                sendError(i18next.t('gui:err.moveFolder.inSelf'), 'warn');
+                return false;
+            }
+            if (
+                this.getFolderDescendants(pos, folderID).findIndex(
+                    folder => folder.id === newParentID,
+                ) !== -1 &&
+                newParentID !== null
+            ) {
+                sendError(i18next.t('gui:err.moveFolder.inSelf'), 'warn');
+                return false;
+            }
+            folder.parentID = newParentID;
+            this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
+            return true;
+        } else return false;
+    }
 }
 
 export default Runtime;

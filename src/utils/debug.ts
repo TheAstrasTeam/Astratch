@@ -11,6 +11,10 @@ export const sendError = (error: unknown, type: 'error' | 'warn' = 'error') => {
         id: `Error_${spawnRandomString()}`,
         text: error as string,
     });
+    if (type === 'warn') {
+        console.warn(error);
+        return;
+    }
     if (typeof error === 'string') throw new Error(error);
     else throw error;
 };

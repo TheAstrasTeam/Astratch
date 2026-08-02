@@ -64,11 +64,9 @@ const applyGuiTheme = (): void => {
                 `;
                 document.head.appendChild(blocklySpritesStyle);
             } else {
-                document
-                    .querySelectorAll(`#${DEFAULT_BLOCKLY_SPRITES_STYLE_ID}`)
-                    .forEach(style => {
-                        style.remove();
-                    });
+                document.querySelectorAll(`#${DEFAULT_BLOCKLY_SPRITES_STYLE_ID}`).forEach(style => {
+                    style.remove();
+                });
             }
         } else document.documentElement.style.setProperty(`--${css[0]}`, css[1]);
     });

@@ -243,6 +243,14 @@ export interface IRuntime {
      * 删除一个 Target，并返回是否成功删除
      */
     removeTarget: (id: string) => boolean;
+    /**
+     * 修改一个Target的父id，并返回是否修改成功
+     */
+    moveTarget: (pos: TTargetMode, targetID: string, newParentID: string | null) => boolean;
+    /**
+     * 修改一个Folder的父id，并返回是否修改成功
+     */
+    moveFolder: (pos: TTargetMode, targetID: string, newParentID: string | null) => boolean;
 }
 
 export type folderType = FileSystemDirectoryHandle | undefined;

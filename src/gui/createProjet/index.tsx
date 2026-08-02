@@ -152,6 +152,7 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
                 return;
             }
             vm.settings.setProjectMeta({
+                projectName: projectName,
                 projectID: projectId || projectIdAuto,
                 author: [settingsStore],
             });

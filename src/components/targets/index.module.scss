@@ -1,4 +1,5 @@
 @use '../../gui/styles/color.scss' as *;
+@use '../../gui/styles/zIndex.scss' as *;
 
 .targets-list {
     display: flex;
@@ -40,6 +41,12 @@
     overflow-y: auto;
 }
 
+.root-drop-zone {
+    font-size: small;
+    padding: 5px;
+    border-bottom: $ui-tertiary 1px solid;
+}
+
 .target,
 .folder {
     list-style: none;
@@ -62,6 +69,7 @@
     padding: 3px 5px;
     border-radius: 5px;
     margin-top: 5px;
+    user-select: none;
     &.is-selected {
         background-color: $ui-tertiary;
     }
@@ -124,4 +132,30 @@
     font-size: small;
     color: $ui-blockly-border;
     text-align: center;
+}
+
+.is-drop-target {
+    background-color: $ui-tertiary;
+    outline: 1px solid $looks-secondary;
+    outline-offset: -1px;
+    border-radius: 5px;
+}
+
+.is-dragging-source {
+    opacity: 0.4;
+}
+
+.drag-overlay {
+    display: flex;
+    position: fixed;
+    z-index: $dragging;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    padding: 2px 8px;
+    border-radius: 5px;
+    background-color: $ui-tertiary;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    will-change: transform;
+    user-select: none;
 }
