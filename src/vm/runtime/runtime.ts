@@ -9,19 +9,22 @@ import {
     type IVM,
     type TTargetMode,
     type TTargetTree,
+    type IVMSettings,
 } from '../../types/vm';
+import Settings from './settings/index';
 import type { IWorkspaceState } from '../../types/blocks';
-import Blocks from '../blocks';
+import Blocks from './blocks';
 import * as Blockly from 'blockly';
 import { sendError } from '../../utils/debug';
 import i18next from 'i18next';
 
 /**
- * 运行时，管理关于项目的执行
+ * 运行时，管理关于项目的东西
  */
 class Runtime implements IRuntime {
     vm: IVM;
     blocks: Blocks;
+    settings: IVMSettings;
     targets: Map<string, ITarget>;
     DEFAULT_TARGETINFO: ITarget;
     editingTargetID: string;
@@ -34,6 +37,11 @@ class Runtime implements IRuntime {
          * Blockly/WebGPU 工作区管理
          */
         this.blocks = new Blocks(Blockly, vm);
+
+        /**
+         * 存储项目设置
+         */
+        this.settings = new Settings(this.vm);
 
         /**
          * Targets

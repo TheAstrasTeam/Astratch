@@ -151,7 +151,7 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
                 setCreateFailed(checkMetaResult);
                 return;
             }
-            vm.settings.setProjectMeta({
+            vm.runtime.settings.setProjectMeta({
                 projectName: projectName,
                 projectID: projectId || projectIdAuto,
                 author: [settingsStore],

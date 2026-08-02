@@ -131,6 +131,10 @@ export interface IRuntime {
      */
     blocks: IBlocks;
     /**
+     * 关于作品设置的
+     */
+    settings: IVMSettings;
+    /**
      * 关于*目标*的
      *
      * ps: 角色是 Scratch 的`sprite`的中文叫法，target 在 ASH 指代是“目标”
@@ -333,7 +337,6 @@ export const projectFileNames = {
 
 export interface IVM {
     runtime: IRuntime;
-    settings: IVMSettings;
     projectManager: IProjectManager;
     /**
      * 选择一个文件夹打开作为项目

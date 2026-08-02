@@ -1,20 +1,25 @@
-import { SNAP_RADIUS, type IBlocks, type IWorkspaceState, type Language } from '../../types/blocks';
+import {
+    SNAP_RADIUS,
+    type IBlocks,
+    type IWorkspaceState,
+    type Language,
+} from '../../../types/blocks';
 import * as Blockly from 'blockly';
 // 导入两个插件试试
-import * as AstratchToolbox from '../../../plugins/astratch-toolbox/src';
+import * as AstratchToolbox from '../../../../plugins/astratch-toolbox/src';
 import * as En from 'blockly/msg/en';
 import * as ZhHans from 'blockly/msg/zh-hans';
-import getToolbox from '../../lib/BlocklyAdapter/toolbox';
-import { initBlocks } from '../../lib/BlocklyAdapter/blocks';
-import { AshConnectionChecker } from '../../../plugins/cBlockWrap';
-import { getBlocklyComponentStyles } from '../../lib/Theme/guiThemeManager';
-import { events, type IVM, type viewportUpdateEvent } from '../../types/vm';
-import { getBlocklyI18nByI18next } from '../../utils/ash-i18n';
+import getToolbox from '../../../lib/BlocklyAdapter/toolbox';
+import { initBlocks } from '../../../lib/BlocklyAdapter/blocks';
+import { AshConnectionChecker } from '../../../../plugins/cBlockWrap';
+import { getBlocklyComponentStyles } from '../../../lib/Theme/guiThemeManager';
+import { events, type IVM, type viewportUpdateEvent } from '../../../types/vm';
+import { getBlocklyI18nByI18next } from '../../../utils/ash-i18n';
 import i18next from 'i18next';
-import { replaceChineseI18n } from '../../lib/BlocklyAdapter/i18n';
-import { registerAstratchRenderer } from '../../lib/BlocklyAdapter/renderer';
-import { Toast } from '../../lib/ToastManager';
-import { spawnRandomString } from '../../utils/ash-string';
+import { replaceChineseI18n } from '../../../lib/BlocklyAdapter/i18n';
+import { registerAstratchRenderer } from '../../../lib/BlocklyAdapter/renderer';
+import { Toast } from '../../../lib/ToastManager';
+import { spawnRandomString } from '../../../utils/ash-string';
 
 /**
  * 用于便捷的管理WebGPU或Blockly工作区

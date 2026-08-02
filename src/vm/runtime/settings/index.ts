@@ -1,4 +1,4 @@
-import { targets, type IProjectMeta, type IVMSettings, type IVM } from '../../types/vm';
+import { targets, type IProjectMeta, type IVMSettings, type IVM } from '../../../types/vm';
 
 /**
  * 设置，管理关于项目的一些设置

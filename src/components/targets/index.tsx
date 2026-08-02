@@ -441,7 +441,7 @@ export const TargetsList = ({
                 })}
                 data-root-drop
             >
-                {vm.settings.projectMeta.projectName}
+                {vm.runtime.settings.projectMeta.projectName}
             </div>
             <div className={styles.list}>
                 {tree.map(target => (

@@ -1,9 +1,7 @@
 import Runtime from './runtime/runtime';
-import Settings from './settings/index';
 import {
     type IVM,
     type IRuntime,
-    type IVMSettings,
     type IProjectManager,
     type IEvent,
     type TEvents,
@@ -22,7 +20,6 @@ import { ConfirmModal } from '../components/modal_confirm';
  */
 export class VM implements IVM {
     runtime: IRuntime;
-    settings: IVMSettings;
     projectManager: IProjectManager;
     isEditingProject: boolean;
 
@@ -33,14 +30,10 @@ export class VM implements IVM {
 
     constructor() {
         /**
-         * 运行时
+         * 运行时，它实际是是“项目”的总管
+         * 而非只管运行相关
          */
         this.runtime = new Runtime(this);
-
-        /**
-         * 存储项目设置
-         */
-        this.settings = new Settings(this);
 
         /**
          * 管理项目目录
@@ -99,7 +92,7 @@ export class VM implements IVM {
         await this.projectManager.createFile(
             this.projectManager.folderHandle,
             projectFileNames.meta,
-            JSON.stringify(this.settings.projectMeta),
+            JSON.stringify(this.runtime.settings.projectMeta),
         );
     }
 
@@ -157,7 +150,7 @@ export class VM implements IVM {
         if (!metaFileContent) return false;
         try {
             const projectMeta = JSON.parse(metaFileContent) as Partial<IProjectMeta>;
-            this.settings.setProjectMeta(projectMeta);
+            this.runtime.settings.setProjectMeta(projectMeta);
         } catch {
             return false;
         }
