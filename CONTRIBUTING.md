@@ -12,20 +12,7 @@ We are not against AI — your contributions can, of course, be partly written b
 // This feature was made by AI
 ```
 
-## Pull Request
-
-You need to merge your branch into the **develop** branch, not the **main** branch, and make sure it passes the merge checks.
-
-You can search online for how to submit a `Pull Request` / `Issue`!
-
-Before you contribute, please note:
-
-- Keep the code style consistent with the project;
-- Add or update corresponding test cases (if needed);
-- All tests must pass;
-- Commit messages should clearly describe the changes.
-
-Also, make sure that the `CI` of your forked repository passes!
+You need to make sure it passes the merge checks.
 
 ## Development
 
