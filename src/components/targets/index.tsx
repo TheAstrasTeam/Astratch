@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react';
 import type { IVM, TTargetMode, TTargetTree, TTargetTreeNode } from '../../types/vm';
 import styles from './index.module.scss';

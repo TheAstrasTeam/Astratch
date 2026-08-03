@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 // 快捷键管理器的统一常量与类型定义
 
 import type Mousetrap from 'mousetrap';

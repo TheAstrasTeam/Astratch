@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 // 此文件由 Ai 生成
 
 import { create, type StoreApi, type UseBoundStore } from 'zustand';

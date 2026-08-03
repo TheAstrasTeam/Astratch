@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 // GUI 界面状态管理
 // 控制当前显示哪个界面（start / editor / extension / loading）
 

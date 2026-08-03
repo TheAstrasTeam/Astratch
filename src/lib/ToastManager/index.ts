@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 // 本功能由Ai润色
 
 import type { IToast, IToastManger, IEvent, TToastMode, TToastEvent } from '../../types/lib';

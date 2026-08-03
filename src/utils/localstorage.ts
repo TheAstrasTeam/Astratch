@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 // 存储关于本地存储的实用函数
 
 import type { TLocalStorageIDs } from '../types/storage';

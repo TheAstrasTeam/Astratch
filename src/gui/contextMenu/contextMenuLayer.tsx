@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { useEffect } from 'react';
 import { ControlledMenu, useMenuState } from '@szhsin/react-menu';
 import useContextMenuStore from '../../stores/useContextMenuStore';

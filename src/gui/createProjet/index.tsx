@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { useRef, useState } from 'react';
 import { type IVM, type TallTarget, targets } from '../../types/vm';
 import styles from './index.module.scss';

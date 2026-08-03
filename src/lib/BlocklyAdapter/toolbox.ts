@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 // 来自 Cyberexplorer 的积木箱配置
 import * as Blockly from 'blockly/core';
 import { BlocksColor, OPCODES } from '../../types/blocks';

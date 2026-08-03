@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import styles from './index.module.scss';
 import { useSettings } from '../../settings/SettingsRegistry';
 import { guiInterface, guiThemes } from '../../types/gui';

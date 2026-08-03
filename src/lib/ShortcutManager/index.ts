@@ -1,4 +1,10 @@
 /**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
  * 由 AstrasTeam 重构于 2026/7/25：
  * - 使用统一快捷键声明生成设置项和默认键位
  * - 将运行时命令绑定与快捷键定义分离

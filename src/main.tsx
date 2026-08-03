@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { StrictMode, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import GUI from './gui/index.tsx';

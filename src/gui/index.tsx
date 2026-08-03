@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import i18next from 'i18next';
 import type { IVM } from '../types/vm';
 import WorkSpace from './workspace';

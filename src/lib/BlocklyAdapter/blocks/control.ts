@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
 import * as Blockly from 'blockly/core';
 import { t } from 'i18next';

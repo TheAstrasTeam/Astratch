@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { allBuiltInTabs, events, type IVM, type TallBuiltInTabs } from '../../types/vm';
 import styles from './index.module.scss';
 import BlocklyWorkspace from './Blockly/index';

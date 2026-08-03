@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 const guiColors = {
     'motion-primary': '#0099ff',
     'motion-primary-transparent': '#0099ffe6',

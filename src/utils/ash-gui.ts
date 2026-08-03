@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 // 关于部分常用 GUI 互动的实用工具
 
 import { guiInterface, type IGuiInterface } from '../types/gui';

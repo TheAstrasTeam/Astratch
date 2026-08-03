@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { create, type UseBoundStore, type StoreApi } from 'zustand';
 import type { TAllContextMenu } from '../types/gui';
 

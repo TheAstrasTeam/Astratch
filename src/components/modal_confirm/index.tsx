@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { useModalInstance } from '@reactleaf/modal';
 import { Modal } from '../Modal/modalWindow';
 import { t } from 'i18next';

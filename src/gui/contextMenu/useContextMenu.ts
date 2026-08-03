@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { useEffect } from 'react';
 import type { TAllContextMenu } from '../../types/gui';
 import useContextMenuStore from '../../stores/useContextMenuStore';

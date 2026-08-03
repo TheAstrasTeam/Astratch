@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 // 此文件由 Ai 生成
 // 由 AstrasTeam 修改于 2026/7/25：根据统一快捷键声明自动同步 Blockly 键位
 

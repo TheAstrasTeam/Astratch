@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { Settings } from './SettingsRegistry';
 import { spawnUserName } from '../utils/username';
 import { DEFAULT_GUITHEME_MAP, guiThemes, guiAccents } from '../types/gui';

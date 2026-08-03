@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { t } from 'i18next';
 import classNames from 'classnames';
 import type { IToast } from '../../types/lib';

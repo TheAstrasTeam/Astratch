@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { useEffect, useRef, useState } from 'react';
 import { events, type IVM, type viewportUpdateEvent } from '../../types/vm';
 import styles from './index.module.scss';
