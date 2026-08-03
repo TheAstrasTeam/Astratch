@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { events, type IVM } from '../../types/vm';
+import { events, type IVM, type TTargetMode } from '../../types/vm';
 import styles from './targets.module.scss';
 
 import { t } from 'i18next';
@@ -28,20 +28,20 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
         vm.runtime.switchTarget(id);
     };
 
-    const handleCreateObject = (parent: string | null = null) => {
+    const handleCreateObject = (mode: TTargetMode, parent: string | null = null) => {
         const handleCreateObjectCallback = (result: string) => {
-            if (isValidTargetName(result)) vm.runtime.createTarget({ name: result, parent });
+            if (isValidTargetName(result)) vm.runtime.createTarget({ name: result, parent, mode });
         };
         void modal.open(PromptModal, {
-            message: t('gui:objectNameAsk'),
+            message: mode === 'object' ? t('gui:modal.ask.object') : t('gui:modal.ask.module'),
             defaultValue: '',
             callback: handleCreateObjectCallback,
         });
     };
-    const handleCreateFolder = (parent: string | null = null) => {
+    const handleCreateFolder = (mode: TTargetMode, parent: string | null = null) => {
         const handleCreateObjectCallback = (result: string) => {
             if (isValidTargetName(result))
-                vm.runtime.addFolder(currentTargetTab, {
+                vm.runtime.addFolder(mode, {
                     name: result,
                     id: spawnRandomString(),
                     color: '#0099ff',
@@ -127,7 +127,17 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
                             onAddFolder={handleCreateFolder}
                         />
                     ) : (
-                        <div></div>
+                        <TargetsList
+                            key={targetsVersion}
+                            mode='module'
+                            vm={vm}
+                            selected={selectedTargetID}
+                            expandedFolders={expandedFolders}
+                            toggleFolder={toggleFolder}
+                            onSwitch={handleTargetChange}
+                            onAdd={handleCreateObject}
+                            onAddFolder={handleCreateFolder}
+                        />
                     )}
                 </div>
             </>

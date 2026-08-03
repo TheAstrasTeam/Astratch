@@ -123,5 +123,8 @@
 
     "remove": "删除",
     "add": "添加",
-    "createFolder": "添加文件夹"
+    "createFolder": "添加文件夹",
+
+    "modal.ask.object": "创建一个实体，命名为：",
+    "modal.ask.module": "创建一个模块，命名为："
 }

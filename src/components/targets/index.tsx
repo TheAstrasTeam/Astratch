@@ -106,8 +106,8 @@ const GenerateFoldersAndTargets = ({
      * 搜索时强制展开所有文件夹
      */
     forceExpand?: boolean;
-    onAdd?: (parent?: string | null) => void;
-    onAddFolder?: (parent?: string | null) => void;
+    onAdd?: (pos: TTargetMode, parent?: string | null) => void;
+    onAddFolder?: (pos: TTargetMode, parent?: string | null) => void;
     onItemMouseDown: (e: ReactMouseEvent<HTMLElement>, item: IDragItem) => void;
     dropFolderId: string | null;
     draggingItemId: string | null;
@@ -128,12 +128,12 @@ const GenerateFoldersAndTargets = ({
     };
     const handleCreateFolder = (e: ReactMouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
-        if (onAddFolder) onAddFolder(target.id);
+        if (onAddFolder) onAddFolder(mode, target.id);
         if (!isExpand) toggleFolder(target.id);
     };
     const handleCreateTarget = (e: ReactMouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
-        if (onAdd) onAdd(target.id);
+        if (onAdd) onAdd(mode, target.id);
         if (!isExpand) toggleFolder(target.id);
     };
 
@@ -267,8 +267,8 @@ export const TargetsList = ({
     expandedFolders: Set<string>;
     toggleFolder: (id: string) => void;
     onSwitch: (id: string) => void;
-    onAdd?: (parent?: string | null) => void;
-    onAddFolder?: (parent?: string | null) => void;
+    onAdd?: (pos: TTargetMode, parent?: string | null) => void;
+    onAddFolder?: (pos: TTargetMode, parent?: string | null) => void;
 }) => {
     const [searchContent, setSearchContent] = useState('');
     const isSearching = searchContent.trim() !== '';
@@ -399,14 +399,14 @@ export const TargetsList = ({
         <>
             <MenuItem
                 onClick={() => {
-                    if (onAdd) onAdd();
+                    if (onAdd) onAdd(mode, null);
                 }}
             >
-                {t('gui:createObject')}
+                {mode === 'object' ?  t("gui:createObject") : t('gui:createModule')}
             </MenuItem>
             <MenuItem
                 onClick={() => {
-                    if (onAddFolder) onAddFolder();
+                    if (onAddFolder) onAddFolder(mode, null);
                 }}
             >
                 {t('gui:createFolder')}
@@ -419,7 +419,9 @@ export const TargetsList = ({
             <div className={styles.bar}>
                 <input
                     className={styles.objectSearch}
-                    placeholder={t('gui:search.object.tip')}
+                    placeholder={
+                        mode === 'object' ? t('gui:search.object.tip') : t('gui:search.module.tip')
+                    }
                     value={searchContent}
                     onChange={e => {
                         setSearchContent(e.target.value);

@@ -74,7 +74,7 @@ export interface ITarget {
     /**
      * 从属，模块或对象
      */
-    from: TTargetMode;
+    mode: TTargetMode;
 }
 
 export const TargetModes = {

@@ -1,6 +1,5 @@
 import {
     events,
-    TargetModes,
     type IFS,
     type IObjectInfo,
     type IRuntime,
@@ -95,7 +94,7 @@ class Runtime implements IRuntime {
             },
             comments: {},
             parentID: null,
-            from: 'object',
+            mode: 'object',
         };
 
         /**
@@ -110,12 +109,11 @@ class Runtime implements IRuntime {
         this.targets.set(id, {
             // 直接 this.DEFAULT_TARGETINFO 会造成浅拷贝
             ...structuredClone(this.DEFAULT_TARGETINFO),
-            mode: meta.mode ?? TargetModes.OBJECT,
             name: meta.name ?? this.DEFAULT_TARGETINFO.name,
             parentID: meta.parent ?? this.DEFAULT_TARGETINFO.parentID,
-            from: meta.from ?? this.DEFAULT_TARGETINFO.from,
+            mode: meta.mode ?? this.DEFAULT_TARGETINFO.mode,
             id,
-        } as ITarget);
+        });
 
         this.vm.emit(events.UPDATE_PROJECT);
         this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
@@ -227,7 +225,7 @@ class Runtime implements IRuntime {
         // 先加入顶层，因为 `collectFoldersAndTargets` 并不处理最顶层的元素
         // 它只处理子元素
         this.targets.forEach(target => {
-            if (target.parentID === null && target.from === pos)
+            if (target.parentID === null && target.mode === pos)
                 result.push({ ...target, type: 'target' });
         });
         result.push(...collectFoldersAndTargets(null, pos));
