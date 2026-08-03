@@ -107,8 +107,7 @@ export type ShortcutCommand = (
 export type ShortcutCommands = Partial<Record<ShortcutIds, ShortcutCommand>>;
 
 export type SetShortcutResult =
-    | { ok: true }
-    | { ok: false; reason: 'empty' | 'conflict'; conflictWith?: ShortcutIds };
+    { ok: true } | { ok: false; reason: 'empty' | 'conflict'; conflictWith?: ShortcutIds };
 
 export interface ShortcutChangeEvent {
     id: ShortcutIds;
