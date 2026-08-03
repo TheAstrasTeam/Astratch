@@ -8,6 +8,11 @@ updates:
           all-dependencies:
               patterns:
                   - '*'
+      ignore:
+          # TS7.0不被ESLint支持，禁用直到7.1发布再做打算
+          - dependency-name: 'typescript'
+            versions: ['>=7.0.0', '<7.1.0']
+
       labels:
           - 'dependencies'
       assignees:
