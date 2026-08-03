@@ -46,7 +46,7 @@
         "mousetrap": "^1.6.5",
         "prettier": "^3.9.6",
         "sass": "^1.102.0",
-        "typescript": "~6.0.2",
+        "typescript": "~7.0.2",
         "typescript-eslint": "^8.65.0",
         "vite": "^8.2.0",
         "vite-plugin-page-reload": "^0.2.3"
