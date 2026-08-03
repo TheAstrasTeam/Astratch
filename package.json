@@ -34,7 +34,7 @@
         "@types/mousetrap": "^1.6.15",
         "@types/node": "^26.1.2",
         "@types/react": "^19.2.14",
-        "@types/react-dom": "^19.2.3",
+        "@types/react-dom": "^19.2.4",
         "@types/wicg-file-system-access": "^2023.10.7",
         "@vitejs/plugin-react": "^6.0.5",
         "babel-plugin-react-compiler": "^1.0.0",
