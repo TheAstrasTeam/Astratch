@@ -77,16 +77,16 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
             {
                 kind: 'category',
                 id: 'entity',
-                name: t('blocks:entity'),
+                name: t('blocks:category.entity'),
                 contents: [
                     {
                         kind: 'category',
-                        name: t('blocks:transform'),
+                        name: t('blocks:category.transform'),
                         colour: BlocksColor.position.primary,
                         contents: [
                             {
                                 kind: 'category',
-                                name: t('blocks:position'),
+                                name: t('blocks:category.position'),
                                 colour: BlocksColor.position.secondary,
                                 contents: [
                                     {
@@ -117,7 +117,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             },
                             {
                                 kind: 'category',
-                                name: t('blocks:scale'),
+                                name: t('blocks:category.scale'),
                                 colour: BlocksColor.scale.primary,
                                 contents: [
                                     {
@@ -138,7 +138,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             },
                             {
                                 kind: 'category',
-                                name: t('blocks:direction'),
+                                name: t('blocks:category.direction'),
                                 colour: BlocksColor.direction.primary,
                                 contents: [
                                     {
@@ -167,7 +167,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             },
                             {
                                 kind: 'category',
-                                name: t('blocks:layer'),
+                                name: t('blocks:category.layer'),
                                 colour: BlocksColor.layer.primary,
                                 contents: [
                                     {
@@ -190,19 +190,19 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     },
                     {
                         kind: 'category',
-                        name: t('blocks:appearance'),
+                        name: t('blocks:category.appearance'),
                         colour: BlocksColor.Images.primary,
                         contents: [
                             {
                                 kind: 'category',
-                                name: t('blocks:images'),
+                                name: t('blocks:category.images'),
                                 colour: BlocksColor.Images.secondary,
                                 contents: [
                                     {
                                         gap: 12,
                                         kind: 'block',
                                         type: OPCODES.ENTITY_APPEARANCE_IMAGES_SHOWIMAGE,
-                                        inputs: { IMAGE_NAME: txt(t('blocks:imageNameExample')) },
+                                        inputs: { IMAGE_NAME: txt(t('blocks:example.imageName')) },
                                     },
                                     {
                                         gap: 12,
@@ -270,7 +270,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             },
                             {
                                 kind: 'category',
-                                name: t('blocks:effects'),
+                                name: t('blocks:category.effects'),
                                 colour: BlocksColor.effects.primary,
                                 contents: [
                                     {
@@ -297,7 +297,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     },
                     {
                         kind: 'category',
-                        name: t('blocks:collision'),
+                        name: t('blocks:category.collision'),
                         colour: BlocksColor.collision.primary,
                         contents: [
                             {
@@ -316,7 +316,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     },
                     {
                         kind: 'category',
-                        name: t('blocks:lifecycle'),
+                        name: t('blocks:category.lifecycle'),
                         colour: BlocksColor.lifecycle.primary,
                         contents: [
                             {
@@ -341,11 +341,11 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
             {
                 kind: 'category',
                 id: 'audio',
-                name: t('blocks:audio'),
+                name: t('blocks:category.audio'),
                 contents: [
                     {
                         kind: 'category',
-                        name: t('blocks:play'),
+                        name: t('blocks:category.play'),
                         colour: BlocksColor.audio.primary,
                         contents: [
                             {
@@ -412,7 +412,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     },
                     {
                         kind: 'category',
-                        name: t('blocks:effects'),
+                        name: t('blocks:category.effects'),
                         colour: BlocksColor.audio.secondary,
                         contents: [
                             {
@@ -467,7 +467,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
             {
                 kind: 'category',
                 id: 'resources',
-                name: t('blocks:resources'),
+                name: t('blocks:category.resources'),
                 contents: [
                     {
                         gap: 12,
@@ -507,11 +507,11 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
             {
                 kind: 'category',
                 id: 'events',
-                name: t('blocks:events'),
+                name: t('blocks:category.events'),
                 contents: [
                     {
                         kind: 'category',
-                        name: t('blocks:broadcast'),
+                        name: t('blocks:category.broadcast'),
                         colour: BlocksColor.event.primary,
                         contents: [
                             {
@@ -536,7 +536,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     },
                     {
                         kind: 'category',
-                        name: t('blocks:lifecycle'),
+                        name: t('blocks:category.lifecycle'),
                         colour: BlocksColor.event.primary,
                         contents: [
                             {
@@ -559,7 +559,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     },
                     {
                         kind: 'category',
-                        name: t('blocks:time'),
+                        name: t('blocks:category.time'),
                         colour: BlocksColor.event.secondary,
                         contents: [
                             {
@@ -604,7 +604,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     },
                     {
                         kind: 'category',
-                        name: t('blocks:input'),
+                        name: t('blocks:category.input'),
                         colour: BlocksColor.event.tertiary,
                         contents: [
                             {
@@ -681,11 +681,11 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
             {
                 kind: 'category',
                 id: 'control',
-                name: t('blocks:control'),
+                name: t('blocks:category.control'),
                 contents: [
                     {
                         kind: 'category',
-                        name: t('blocks:flow'),
+                        name: t('blocks:category.flow'),
                         colour: BlocksColor.control.primary,
                         contents: [
                             {
@@ -719,7 +719,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     },
                     {
                         kind: 'category',
-                        name: t('blocks:condition'),
+                        name: t('blocks:category.condition'),
                         colour: BlocksColor.control.secondary,
                         contents: [
                             {
@@ -732,7 +732,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     },
                     {
                         kind: 'category',
-                        name: t('blocks:loop'),
+                        name: t('blocks:category.loop'),
                         colour: BlocksColor.control.tertiary,
                         contents: [
                             {
@@ -766,7 +766,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     },
                     {
                         kind: 'category',
-                        name: t('blocks:match'),
+                        name: t('blocks:category.match'),
                         colour: BlocksColor.control.secondary,
                         contents: [
                             {
@@ -793,11 +793,11 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
             {
                 kind: 'category',
                 id: 'operator',
-                name: t('blocks:operator'),
+                name: t('blocks:category.operator'),
                 contents: [
                     {
                         kind: 'category',
-                        name: t('blocks:math'),
+                        name: t('blocks:category.math'),
                         colour: BlocksColor.operator.primary,
                         contents: [
                             {
@@ -838,7 +838,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     },
                     {
                         kind: 'category',
-                        name: t('blocks:logic'),
+                        name: t('blocks:category.logic'),
                         colour: BlocksColor.operator.secondary,
                         contents: [
                             {
@@ -886,7 +886,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     },
                     {
                         kind: 'category',
-                        name: t('blocks:scientific'),
+                        name: t('blocks:category.scientific'),
                         colour: BlocksColor.operator.tertiary,
                         contents: [
                             {
@@ -905,11 +905,11 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
             {
                 kind: 'category',
                 id: 'data',
-                name: t('blocks:data'),
+                name: t('blocks:category.data'),
                 contents: [
                     {
                         kind: 'category',
-                        name: t('blocks:variable'),
+                        name: t('blocks:category.variable'),
                         colour: BlocksColor.data.primary,
                         contents: [
                             {
@@ -941,7 +941,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     },
                     {
                         kind: 'category',
-                        name: t('blocks:string'),
+                        name: t('blocks:category.string'),
                         colour: BlocksColor.data.secondary,
                         contents: [
                             {
@@ -1003,7 +1003,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     },
                     {
                         kind: 'category',
-                        name: t('blocks:array'),
+                        name: t('blocks:category.array'),
                         colour: BlocksColor.data.tertiary,
                         contents: [
                             {
@@ -1091,7 +1091,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     },
                     {
                         kind: 'category',
-                        name: t('blocks:object'),
+                        name: t('blocks:category.object'),
                         colour: BlocksColor.data.secondary,
                         contents: [
                             {
@@ -1143,7 +1143,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     },
                     {
                         kind: 'category',
-                        name: t('blocks:type'),
+                        name: t('blocks:category.type'),
                         colour: BlocksColor.data.tertiary,
                         contents: [
                             {
@@ -1173,7 +1173,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
             {
                 kind: 'category',
                 id: 'function',
-                name: t('blocks:function'),
+                name: t('blocks:category.function'),
                 contents: [
                     {
                         gap: 12,
@@ -1216,7 +1216,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
             {
                 kind: 'category',
                 id: 'debug',
-                name: t('blocks:debug'),
+                name: t('blocks:category.debug'),
                 contents: [
                     {
                         gap: 12,

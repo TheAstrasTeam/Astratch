@@ -90,8 +90,8 @@ export const SettingsModal = () => {
             fullScreen={false}
             onFullScreen={setFullScreen}
             close={closeSelf}
-            title={t('gui:settings_title')}
-            description={t('gui:settings_description')}
+            title={t('gui:settings.title')}
+            description={t('gui:settings.description')}
         >
             <div
                 className={classNames(styles.content, {
@@ -99,7 +99,7 @@ export const SettingsModal = () => {
                 })}
             >
                 <div className={styles.tabs}>
-                    <span className={styles.tabsTitle}>{t('gui:settings_title')}</span>
+                    <span className={styles.tabsTitle}>{t('gui:settings.title')}</span>
                     {Object.entries(categories).map(tab => (
                         <button
                             onClick={() => {
@@ -107,13 +107,13 @@ export const SettingsModal = () => {
                             }}
                             key={tab[0]}
                         >
-                            {t(`gui:settings_category.${tab[0]}`)}
+                            {t(`gui:settings.category.${tab[0]}`)}
                         </button>
                     ))}
                 </div>
                 <div className={styles.settings}>
                     <span className={styles.settingsTitle}>
-                        {t(`gui:settings_category.${nowTab}`)}
+                        {t(`gui:settings.category.${nowTab}`)}
                     </span>
                     <div className={styles.settingsContent}>
                         {categories[nowTab].map(settings => (

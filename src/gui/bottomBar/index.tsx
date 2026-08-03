@@ -56,7 +56,7 @@ export const BottomBar = ({ vm }: { vm: IVM }): React.ReactNode => {
             <div className={styles.left}>
                 <button className={styles.positionText}>
                     {isCreatedProject &&
-                        t(`gui:bottomBar_positionText`, {
+                        t(`gui:bottomBar.positionText`, {
                             x: overlayText.x,
                             y: overlayText.y,
                             scale: overlayText.scale,

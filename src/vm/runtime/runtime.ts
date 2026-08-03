@@ -143,7 +143,7 @@ class Runtime implements IRuntime {
 
     addFolder(pos: TTargetMode, meta: IFS) {
         if (this.fs.get(pos)?.find(folder => folder.id === meta.id))
-            sendError(i18next.t('error.fs.alreadyExist'));
+            sendError(i18next.t('err.fs.alreadyExist'));
         this.fs.get(pos)?.push(meta);
         this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
     }
@@ -158,14 +158,14 @@ class Runtime implements IRuntime {
     setFolderName(pos: TTargetMode, id: string, name: string) {
         const folder = this.fs.get(pos)?.find(folder => folder.id === id);
         if (folder) folder.name = name;
-        else sendError(i18next.t('error.fs.noExist'));
+        else sendError(i18next.t('err.fs.noExist'));
         this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
     }
 
     setFolderColor(pos: TTargetMode, id: string, color: string) {
         const folder = this.fs.get(pos)?.find(folder => folder.id === id);
         if (folder) folder.color = color;
-        else sendError(i18next.t('error.fs.noExist'));
+        else sendError(i18next.t('err.fs.noExist'));
         this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
     }
 

@@ -57,7 +57,7 @@ export const ToastHistoryPanel = ({
             }}
         >
             <div className={styles.historyHeader}>
-                <span>{t('gui:toast')}</span>
+                <span>{t('gui:toast.title')}</span>
                 <button className={styles.historyClose} onClick={onClose} aria-label='close'>
                     <Close />
                 </button>

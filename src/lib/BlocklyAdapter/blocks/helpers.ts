@@ -79,7 +79,7 @@ export function clearRegisteredBlocks(blockly: typeof Blockly) {
  */
 export function createEntitiesMenu(vm: IVM) {
     return new dropdownWithInput(() => {
-        const directionList: Blockly.MenuOption[] = [[t('blocks:mousePoint'), '_MOUSE_']];
+        const directionList: Blockly.MenuOption[] = [[t('blocks:menu.mousePoint'), '_MOUSE_']];
         vm.runtime.targets.forEach(target => {
             if (target.id === vm.runtime.editingTargetID) return;
             directionList.push([target.name, target.id]);

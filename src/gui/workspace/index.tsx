@@ -94,7 +94,7 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
     const renderToolBar = () => {
         if (tabSelected === allBuiltInTabs.TARGETS)
             return (
-                <SelectBar title={t('gui:targets')}>
+                <SelectBar title={t('gui:target.title')}>
                     <TargetsPanel vm={vm} />
                 </SelectBar>
             );

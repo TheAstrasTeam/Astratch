@@ -367,7 +367,7 @@ export function initControlBlocks(blockly: typeof Blockly) {
             if (owner?.type !== OPCODES.CONTROL_LOOP_REPEAT) return;
             const message = owner.countName;
             void modal.open(PromptModal, {
-                message: t('blocks:rename_repeatCount_prompt', { message }),
+                message: t('blocks:rename.repeatCount.prompt', { message }),
                 defaultValue: message,
                 callback: result => {
                     owner.renameCount(result);
@@ -562,7 +562,7 @@ export function initControlBlocks(blockly: typeof Blockly) {
                     owner.renameItem(result);
                 };
                 void modal.open(PromptModal, {
-                    message: t('blocks:rename_foreachItem_prompt', {
+                    message: t('blocks:rename.foreachItem.prompt', {
                         message,
                     }),
                     defaultValue: message,

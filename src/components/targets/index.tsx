@@ -156,6 +156,7 @@ const GenerateFoldersAndTargets = ({
                 <button
                     className={classNames(styles.button, styles.remove)}
                     onClick={handleRemoveClicked}
+                    title={t('gui:target.remove')}
                 >
                     <Remove className={classNames(styles.removeIcon)} />
                 </button>
@@ -199,21 +200,21 @@ const GenerateFoldersAndTargets = ({
                     <button
                         className={classNames(styles.button, styles.remove)}
                         onClick={handleCreateTarget}
-                        title={t('gui:add')}
+                        title={t('gui:target.add')}
                     >
                         <AddImg className={classNames(styles.removeIcon)} />
                     </button>
                     <button
                         className={classNames(styles.button, styles.remove)}
                         onClick={handleCreateFolder}
-                        title={t('gui:createFolder')}
+                        title={t('gui:target.createFolder')}
                     >
                         <Folder className={classNames(styles.removeIcon)} />
                     </button>
                     <button
                         className={classNames(styles.button, styles.remove)}
                         onClick={handleRemoveClicked}
-                        title={t('gui:remove')}
+                        title={t('gui:target.remove')}
                     >
                         <Remove className={classNames(styles.removeIcon)} />
                     </button>
@@ -402,14 +403,14 @@ export const TargetsList = ({
                     if (onAdd) onAdd(mode, null);
                 }}
             >
-                {mode === 'object' ?  t("gui:createObject") : t('gui:createModule')}
+                {mode === 'object' ? t('gui:target.createObject') : t('gui:target.createModule')}
             </MenuItem>
             <MenuItem
                 onClick={() => {
                     if (onAddFolder) onAddFolder(mode, null);
                 }}
             >
-                {t('gui:createFolder')}
+                {t('gui:target.createFolder')}
             </MenuItem>
         </>
     ));
@@ -431,7 +432,7 @@ export const TargetsList = ({
                     <button
                         className={styles.objectAdd}
                         onClick={openMenuByClick(openAddMenu)}
-                        title={t('gui:create')}
+                        title={t('gui:target.create')}
                     >
                         <AddImg />
                     </button>

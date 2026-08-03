@@ -21,12 +21,12 @@ export const AlertModal = ({
         <Modal
             fullScreen={false}
             close={handleButtonClick}
-            title={t('gui:alert')}
-            description={t('gui:alert_description')}
+            title={t('gui:alert.title')}
+            description={t('gui:alert.description')}
         >
             <div className={styles.content}>
                 <div className={styles.text}>{message}</div>
-                <button onClick={() => void handleButtonClick()}>{t('gui:ok')}</button>
+                <button onClick={() => void handleButtonClick()}>{t('gui:button.ok')}</button>
             </div>
         </Modal>
     );

@@ -41,8 +41,8 @@ export const PromptModal = ({
             close={async result => {
                 await handleButtonClick(nowValue, result);
             }}
-            title={t('gui:prompt')}
-            description={t('gui:prompt_description')}
+            title={t('gui:prompt.title')}
+            description={t('gui:prompt.description')}
         >
             <div className={styles.content}>
                 <div className={styles.state}>
@@ -62,7 +62,7 @@ export const PromptModal = ({
                             void handleButtonClick(nowValue);
                         }}
                     >
-                        {t('gui:done')}
+                        {t('gui:button.done')}
                     </button>
                 </div>
             </div>

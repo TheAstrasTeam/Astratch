@@ -68,7 +68,7 @@ const MenuBar = ({ vm }: { vm: IVM }): React.ReactNode => {
                 </div>
             </div>
             <div className={styles.menubarContentsCenter}>
-                <input className={styles.search} placeholder={t('gui:searchTip')}></input>
+                <input className={styles.search} placeholder={t('gui:search.tip')}></input>
             </div>
             <div className={styles.menubarContentsRight}>Right</div>
         </div>

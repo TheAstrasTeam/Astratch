@@ -21,7 +21,9 @@ const Start = ({ vm }: { vm: IVM }): React.ReactNode => {
     const setInterface = useGUIStore(state => state.setInterface);
     const spawnWelcomeText = () => {
         // eslint-disable-next-line react-hooks/purity
-        return t(`gui:welcomeText${Math.floor(Math.random() * 10).toString()}`, { name: userName });
+        return t(`gui:welcome.text.${Math.floor(Math.random() * 10).toString()}`, {
+            name: userName,
+        });
     };
     const handleCreateProject = () => {
         // 开始创建项目

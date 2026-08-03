@@ -175,10 +175,10 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
             <div className={styles.nextBar}>
                 {/* 这里的顺序是倒的 */}
                 <button className={styles.nextButton} onClick={() => void handleNextClick()}>
-                    {t('gui:next')}
+                    {t('gui:button.next')}
                 </button>
                 <button className={styles.backButton} onClick={handleBackClick}>
-                    {t('gui:back')}
+                    {t('gui:button.back')}
                 </button>
             </div>
             {nowTab === tabs.SCHEME && (

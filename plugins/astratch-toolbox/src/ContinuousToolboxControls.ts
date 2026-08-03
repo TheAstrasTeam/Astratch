@@ -32,7 +32,7 @@ export function createContinuousToolboxControls(
     controls.classList.add('ash-toolbox-tools');
 
     const collapseOtherCategoriesButton = document.createElement('button');
-    const collapseOtherCategoriesLabel = translate('blocks:uilts.collaposeOther');
+    const collapseOtherCategoriesLabel = translate('blocks:utils.collapseOther');
     collapseOtherCategoriesButton.type = 'button';
     collapseOtherCategoriesButton.classList.add('ash-toolbox-tools-collapseAll');
     collapseOtherCategoriesButton.title = collapseOtherCategoriesLabel;

@@ -23,8 +23,8 @@ export const ConfirmModal = ({
             close={async result => {
                 await handleButtonClick(false, result);
             }}
-            title={t('gui:confirm')}
-            description={t('gui:confirm_description')}
+            title={t('gui:confirm.title')}
+            description={t('gui:confirm.description')}
         >
             <div className={styles.content}>
                 <div className={styles.text}>{message}</div>
@@ -34,14 +34,14 @@ export const ConfirmModal = ({
                             void handleButtonClick(true);
                         }}
                     >
-                        {t('gui:ok')}
+                        {t('gui:button.ok')}
                     </button>
                     <button
                         onClick={() => {
                             void handleButtonClick(false);
                         }}
                     >
-                        {t('gui:no')}
+                        {t('gui:button.no')}
                     </button>
                 </div>
             </div>

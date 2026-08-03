@@ -134,7 +134,7 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
         this.searchInput.spellcheck = false;
         this.searchInput.classList.add('continuousFlyoutSearchInput');
 
-        const searchLabel = translate('blocks:uilts.searchBlocks');
+        const searchLabel = translate('blocks:utils.searchBlocks');
         this.searchInput.placeholder = searchLabel;
         this.searchInput.setAttribute('aria-label', searchLabel);
         this.searchInput.addEventListener('input', () => {
@@ -491,7 +491,7 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
         if (!results.length) {
             results.push({
                 kind: 'LABEL',
-                text: translate('blocks:uilts.noSearchResults'),
+                text: translate('blocks:utils.noSearchResults'),
                 id: 'continuousFlyoutSearchNoResults',
             });
         }

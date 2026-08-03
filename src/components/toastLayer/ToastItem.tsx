@@ -37,7 +37,7 @@ export const ToastItem = ({
         >
             <div className={styles.title}>
                 {getImg(toast)}
-                <span className={styles.titleText}>{t(`gui:${toast.type}`)}</span>
+                <span className={styles.titleText}>{t(`gui:toast.${toast.type}`)}</span>
             </div>
             <div
                 className={classNames(styles.content, {

@@ -49,7 +49,7 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
                 });
         };
         void modal.open(PromptModal, {
-            message: t('gui:folderNameAsk'),
+            message: t('gui:target.folderNameAsk'),
             defaultValue: '',
             callback: handleCreateObjectCallback,
         });
@@ -100,7 +100,7 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
                             handleSwitchTargetTab('object');
                         }}
                     >
-                        {t('gui:object')}
+                        {t('gui:target.object')}
                     </button>
                     <button
                         className={classNames(styles.targetTab, {
@@ -110,7 +110,7 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
                             handleSwitchTargetTab('module');
                         }}
                     >
-                        {t('gui:module')}
+                        {t('gui:target.module')}
                     </button>
                 </div>
                 <div>
