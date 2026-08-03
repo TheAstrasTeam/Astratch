@@ -8,6 +8,7 @@ import KeyInput from '../keyInput';
 import type { ShortcutIds } from '../../types/lib';
 import { shortcutManager } from '../../lib/ShortcutManager';
 import { t } from 'i18next';
+import classNames from 'classnames';
 
 const SpawnSetting = ({ settings }: { settings: ISettingDefinition }) => {
     const { t } = useTranslation();
@@ -82,14 +83,21 @@ export const SettingsModal = () => {
 
     const [nowTab, setTab] = useState<string>(Object.keys(categories)[0]);
 
+    const [isFullScreen, setFullScreen] = useState<boolean>(false);
+
     return (
         <Modal
             fullScreen={false}
+            onFullScreen={setFullScreen}
             close={closeSelf}
             title={t('gui:settings_title')}
             description={t('gui:settings_description')}
         >
-            <div className={styles.content}>
+            <div
+                className={classNames(styles.content, {
+                    [styles.fullScreen]: isFullScreen,
+                })}
+            >
                 <div className={styles.tabs}>
                     <span className={styles.tabsTitle}>{t('gui:settings_title')}</span>
                     {Object.entries(categories).map(tab => (

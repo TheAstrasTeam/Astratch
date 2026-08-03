@@ -9,12 +9,14 @@ import { useModalInstance } from '@reactleaf/modal';
 
 export const Modal = ({
     fullScreen,
+    onFullScreen,
     close,
     children,
     title,
     description,
 }: {
     fullScreen?: boolean;
+    onFullScreen?: (isFullScreen: boolean) => void;
     close?: (result?: unknown) => Promise<void>;
     children?: React.ReactNode;
     title?: string;
@@ -72,8 +74,13 @@ export const Modal = ({
                     <button
                         className={styles.controlButton}
                         onClick={() => {
-                            if (isFullScreen) setFullScreen(false);
-                            else setFullScreen(true);
+                            if (isFullScreen) {
+                                setFullScreen(false);
+                                if (onFullScreen) onFullScreen(false);
+                            } else {
+                                setFullScreen(true);
+                                if (onFullScreen) onFullScreen(true);
+                            }
                         }}
                     >
                         {isFullScreen ? <MiniSizeICON /> : <FullSizeICON />}
