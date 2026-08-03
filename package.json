@@ -33,7 +33,7 @@
         "@types/babel__core": "^7.20.5",
         "@types/mousetrap": "^1.6.15",
         "@types/node": "^26.1.2",
-        "@types/react": "^19.2.14",
+        "@types/react": "^19.2.18",
         "@types/react-dom": "^19.2.4",
         "@types/wicg-file-system-access": "^2023.10.7",
         "@vitejs/plugin-react": "^6.0.5",
