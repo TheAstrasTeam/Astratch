@@ -20,7 +20,7 @@ import { t } from 'i18next';
 import { useContextMenu } from '../../gui/contextMenu';
 import { AllContextMenu } from '../../types/gui';
 import { MenuItem } from '@szhsin/react-menu';
-import { openMenuByClick } from '../../utils/ash-gui';
+import { openMenuByMouseDown } from '../../utils/ash-gui';
 
 // 部分拖动代码由AI生成
 
@@ -437,7 +437,7 @@ export const TargetsList = ({
                 {onAdd && (
                     <button
                         className={styles.objectAdd}
-                        onClick={openMenuByClick(openAddMenu)}
+                        onMouseDown={openMenuByMouseDown(openAddMenu)}
                         title={t('gui:target.create')}
                     >
                         <AddImg />

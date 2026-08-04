@@ -12,7 +12,7 @@ import { MenuItem, MenuDivider } from '@szhsin/react-menu';
 import { useContextMenu } from '../contextMenu';
 import { AllContextMenu, guiInterface } from '../../types/gui';
 import { useGUIStore } from '../../stores/useGUIStore';
-import { openMenuByClick, selectProjectThenJump } from '../../utils/ash-gui';
+import { openMenuByMouseDown, selectProjectThenJump } from '../../utils/ash-gui';
 import { shortcutManager } from '../../lib/ShortcutManager';
 import { SHORTCUTS } from '../../types/lib';
 import { modal } from '../../components/Modal/modal';
@@ -67,7 +67,7 @@ const MenuBar = ({ vm }: { vm: IVM }): React.ReactNode => {
             <div className={styles.menubarContentsLeft}>
                 <Logo className={styles.menubarContentLogo} />
                 <div className={styles.leftUl}>
-                    <button onClick={openMenuByClick(openFileMenu)}>{t('gui:menu.file')}</button>
+                    <button onMouseDown={openMenuByMouseDown(openFileMenu)}>{t('gui:menu.file')}</button>
                     <button>{t('gui:menu.edit')}</button>
                     <button>{t('gui:menu.run')}</button>
                     <button>{t('gui:menu.help')}</button>

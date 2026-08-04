@@ -23,6 +23,11 @@ export function useContextMenu(id: TAllContextMenu, renderMenu: MenuContentRende
     }, [id, renderMenu]);
 
     const handleOpen = (point: ContextMenuAnchorPoint) => {
+        // 若该菜单已经打开，再次按下触发按钮则切换为关闭
+        if (useContextMenuStore.getState().openMenuId === id) {
+            closeMenu();
+            return;
+        }
         openMenu(id, point);
     };
 
