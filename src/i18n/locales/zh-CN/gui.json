@@ -46,6 +46,7 @@
     "button.ok": "好的",
     "button.no": "不要",
     "button.done": "完成",
+    "bottomBar.positionText": "工作区 x:{{x}} y:{{y}}，缩放 {{scale}}",
     "target.title": "目标",
     "target.object": "实体",
     "target.module": "模块",
