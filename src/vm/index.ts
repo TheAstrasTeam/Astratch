@@ -15,11 +15,15 @@ import {
     type IProjectMeta,
     events,
     allProjectCheckError,
+    type TTargetMode,
+    type folderType,
+    type IProjectMetaJSON,
 } from '../types/vm';
 import { ProjectManager } from './project';
 import { t } from 'i18next';
 import { modal } from '../components/Modal/modal';
 import { ConfirmModal } from '../components/modal_confirm';
+import { sendError } from '../utils/debug';
 
 /**
  * 虚拟机，管理整个ASH
@@ -90,15 +94,85 @@ export class VM implements IVM {
     }
 
     async saveProject() {
-        const checkResult = await this.projectManager.checkProjectCanSave();
-        if (!checkResult.pass) throw new Error(checkResult.result);
+        const saveTargets = async (mode: TTargetMode, folder: folderType) => {
+            // 存储所有文件名，这用来判断是否是已存在target名称
+            const allTargetNames: string[] = [];
+            const targets = new Map(
+                [...this.runtime.targets].filter(([_, target]) => target.mode === mode),
+            );
+            for (const targetMap of targets) {
+                const target = targetMap[1];
 
+                const targetFolderName = `${target.name}_${target.id}`;
+                allTargetNames.push(targetFolderName);
+                const spriteHandle = await this.projectManager.createFolder(
+                    folder,
+                    targetFolderName,
+                );
+
+                // 向对应的target存储meta.json和blocks.json
+                // hmm，事实上它们是存一起的，不过这里会分开
+                if (spriteHandle) {
+                    const targetExpectBlocks = Object.fromEntries(
+                        Object.entries(target).filter(targetInfo => targetInfo[0] !== 'blocks'),
+                    );
+                    await this.projectManager.createFile(
+                        spriteHandle,
+                        projectFileNames.targetMeta,
+                        JSON.stringify(targetExpectBlocks),
+                    );
+                    await this.projectManager.createFile(
+                        spriteHandle,
+                        projectFileNames.targetBlocks,
+                        JSON.stringify(target.blocks),
+                    );
+                }
+            }
+            const targetNames = await this.projectManager.listAllFileName(folder);
+            if (!targetNames) sendError(t('fs.error.cannotFoundTargets'));
+            else
+                // 删除不应有的target
+                for (const targetName of targetNames)
+                    if (!allTargetNames.includes(targetName))
+                        await this.projectManager.removeFile(folder, targetName);
+        };
+
+        const checkResult = await this.projectManager.checkProjectCanSave();
+        if (!checkResult.pass) sendError(checkResult.result, 'error');
+
+        // TODO: 资源
         await this.projectManager.createFolder(this.projectManager.folderHandle, 'assets');
-        await this.projectManager.createFolder(this.projectManager.folderHandle, 'sprites');
+
+        const objectHandle = await this.projectManager.createFolder(
+            this.projectManager.folderHandle,
+            'objects',
+        );
+        if (!objectHandle) sendError(t('fs.error.objectHandleLost'));
+        else await saveTargets('object', objectHandle);
+
+        const moduleHandle = await this.projectManager.createFolder(
+            this.projectManager.folderHandle,
+            'modules',
+        );
+        if (!moduleHandle) sendError(t('fs.error.moduleHandleLost'));
+        else await saveTargets('module', moduleHandle);
+
+        const objectsFolder = this.runtime.fs.get('object') ?? [];
+        const modulesFolder = this.runtime.fs.get('module') ?? [];
+
+        const projectMeta: IProjectMetaJSON = {
+            projectSaveVersion: 1,
+            meta: this.runtime.settings.projectMeta,
+            folders: {
+                object: objectsFolder,
+                module: modulesFolder,
+            },
+        };
+
         await this.projectManager.createFile(
             this.projectManager.folderHandle,
             projectFileNames.meta,
-            JSON.stringify(this.runtime.settings.projectMeta),
+            JSON.stringify(projectMeta),
         );
     }
 

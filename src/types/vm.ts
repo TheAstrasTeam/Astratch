@@ -342,6 +342,8 @@ export type TAllProjectCheckError =
 
 export const projectFileNames = {
     meta: 'projectMeta.json',
+    targetMeta: 'targetMeta.json',
+    targetBlocks: 'targetBlocks.json',
 } as const;
 
 export interface IVM {
@@ -419,3 +421,10 @@ export type viewportUpdateEvent =
           x: number;
           y: number;
       };
+
+export interface IProjectMetaJSON {
+    // 截至目前，1 为最新
+    projectSaveVersion: number;
+    meta: IProjectMeta;
+    folders: Record<TTargetMode, IFS[]>;
+}

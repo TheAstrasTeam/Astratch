@@ -9,6 +9,7 @@ import {
     type folderType,
     type IVM,
     allProjectCheckError,
+    projectFileNames,
 } from '../../types/vm';
 
 /**
@@ -39,7 +40,11 @@ export class ProjectManager implements IProjectManager {
                 result: 'Please load/create a project first!',
                 error: allProjectCheckError.NOTHING_SELECTED,
             };
-        if (!(await this.isEmpty(this.folderHandle)))
+        // 如果projectFileNames.meta存在则代表这是一个项目，因此不必要求为空
+        if (
+            !(await this.isEmpty(this.folderHandle)) &&
+            !(await this.getFile(this.folderHandle, projectFileNames.meta))
+        )
             return {
                 pass: false,
                 result: 'Please select a empty folder!',
