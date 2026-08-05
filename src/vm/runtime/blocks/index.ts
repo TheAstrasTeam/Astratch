@@ -262,9 +262,22 @@ class Blocks implements IBlocks {
 
             const nowTarget = this.vm.runtime.getTargetByID(this.vm.runtime.editingTargetID);
             const blocks = nowTarget?.blocks;
-            if (blocks)
+            if (blocks) {
                 this.Blockly.serialization.workspaces.load(blocks._workspace, this.workspaceSvg);
+                // 调整镜头
+                this.workspaceSvg.scrollX = -nowTarget.viewX;
+                this.workspaceSvg.scrollY = -nowTarget.viewY;
+                this.workspaceSvg.scale = nowTarget.viewScale;
+                const metrics = this.workspaceSvg.getMetrics();
+                this.workspaceSvg.translate(
+                    this.workspaceSvg.scrollX + metrics.absoluteLeft,
+                    this.workspaceSvg.scrollY + metrics.absoluteTop,
+                );
+                this.workspaceSvg.getGrid()?.update(this.workspaceSvg.scale);
+                this.workspaceSvg.scrollbar?.resize();
+            }
 
+            this.workspaceSvg.removeChangeListener(this.handleWorkspaceChange);
             this.workspaceSvg.addChangeListener(this.handleWorkspaceChange);
         } catch (Error) {
             Toast.create({

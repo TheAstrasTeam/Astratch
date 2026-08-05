@@ -71,8 +71,7 @@ const BlocklyWorkspace = ({ vm }: { vm: IVM }): React.ReactNode => {
             vm.off(events.SWITCH_TARGET, handleTargetChanged);
             vm.runtime.blocks.dispose();
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [vm, vm.on]);
 
     return (
         <div className={styles.root}>

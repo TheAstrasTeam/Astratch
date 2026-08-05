@@ -81,6 +81,9 @@ export interface ITarget {
      * 从属，模块或对象
      */
     mode: TTargetMode;
+    viewX: number;
+    viewY: number;
+    viewScale: number;
 }
 
 export const TargetModes = {
