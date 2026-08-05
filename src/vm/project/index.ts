@@ -91,6 +91,12 @@ export class ProjectManager implements IProjectManager {
         return fileHandle;
     }
 
+    async getFolder(path: folderType, name: string) {
+        if (!path) return false;
+        const folderHandle = await path.getDirectoryHandle(name);
+        return folderHandle;
+    }
+
     async removeFile(path: folderType, name: string) {
         if (!path) return false;
         await path.removeEntry(name, { recursive: true });

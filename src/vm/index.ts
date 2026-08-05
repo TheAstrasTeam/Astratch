@@ -12,12 +12,14 @@ import {
     type IEvent,
     type TEvents,
     projectFileNames,
-    type IProjectMeta,
     events,
     allProjectCheckError,
     type TTargetMode,
     type folderType,
     type IProjectMetaJSON,
+    type ITargetBlocks,
+    TargetModes,
+    type ITarget,
 } from '../types/vm';
 import { ProjectManager } from './project';
 import { t } from 'i18next';
@@ -214,13 +216,57 @@ export class VM implements IVM {
     }
 
     async loadProject() {
+        const loadTargets = async (folder: folderType) => {
+            const folderNames = (await this.projectManager.listAllFileName(folder)) || [];
+
+            for (const folderName of folderNames) {
+                const targetHandle = await this.projectManager.getFolder(folder, folderName);
+                // 这个东西不是一个文件夹，证明它不合法，跳过
+                if (!targetHandle) continue;
+
+                const targetBlocksHandle = await this.projectManager.getFile(
+                    targetHandle,
+                    projectFileNames.targetBlocks,
+                );
+                const targetMetaHandle = await this.projectManager.getFile(
+                    targetHandle,
+                    projectFileNames.targetMeta,
+                );
+
+                if (targetBlocksHandle && targetMetaHandle) {
+                    const targetBlocks = JSON.parse(
+                        await (await targetBlocksHandle.getFile()).text(),
+                    ) as ITargetBlocks;
+                    const targetMeta = JSON.parse(
+                        await (await targetMetaHandle.getFile()).text(),
+                    ) as Partial<ITarget>;
+
+                    const targetInfo = {
+                        ...targetMeta,
+                        blocks: targetBlocks,
+                    } as ITarget;
+
+                    this.runtime.targets.set(targetInfo.id, targetInfo);
+                }
+            }
+        };
+
         await this.selectProject();
         // 获取元文件句柄
         const metaFileHandle = await this.projectManager.getFile(
             this.projectManager.folderHandle,
             projectFileNames.meta,
         );
-        // TODO: 读取其它数据
+        const objectHandle = await this.projectManager.getFolder(
+            this.projectManager.folderHandle,
+            'objects',
+        );
+        if (objectHandle) await loadTargets(objectHandle);
+        const moduleHandle = await this.projectManager.getFolder(
+            this.projectManager.folderHandle,
+            'modules',
+        );
+        if (moduleHandle) await loadTargets(moduleHandle);
 
         // 元数据
         if (!metaFileHandle) return false;
@@ -229,12 +275,17 @@ export class VM implements IVM {
         const metaFileContent = await metaFile.text();
         if (!metaFileContent) return false;
         try {
-            const projectMeta = JSON.parse(metaFileContent) as Partial<IProjectMeta>;
-            this.runtime.settings.setProjectMeta(projectMeta);
+            const projectMeta = JSON.parse(metaFileContent) as IProjectMetaJSON;
+            this.runtime.settings.setProjectMeta(projectMeta.meta);
+            for (const mode of Object.values(TargetModes)) {
+                this.runtime.fs.set(mode, projectMeta.folders[mode]);
+            }
         } catch {
             return false;
         }
 
+        this.isEditingProject = true;
+        this.emit(events.CREATE_PROJECT);
         return true;
     }
 }

@@ -310,6 +310,13 @@ export interface IProjectManager {
      */
     getFile: (path: folderType, name: string) => Promise<FileSystemFileHandle | false>;
     /**
+     * 获取一个文件夹
+     * @param path 文件夹句柄
+     * @param name 文件夹名称
+     * @returns
+     */
+    getFolder: (path: folderType, name: string) => Promise<FileSystemDirectoryHandle | false>;
+    /**
      * 检查项目是否是可以保存的
      */
     checkProjectCanSave: () => Promise<{
