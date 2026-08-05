@@ -67,7 +67,9 @@ const MenuBar = ({ vm }: { vm: IVM }): React.ReactNode => {
             <div className={styles.menubarContentsLeft}>
                 <Logo className={styles.menubarContentLogo} />
                 <div className={styles.leftUl}>
-                    <button onMouseDown={openMenuByMouseDown(openFileMenu)}>{t('gui:menu.file')}</button>
+                    <button onMouseDown={openMenuByMouseDown(openFileMenu)}>
+                        {t('gui:menu.file')}
+                    </button>
                     <button>{t('gui:menu.edit')}</button>
                     <button>{t('gui:menu.run')}</button>
                     <button>{t('gui:menu.help')}</button>

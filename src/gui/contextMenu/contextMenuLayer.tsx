@@ -23,9 +23,12 @@ export function ContextMenuLayer() {
     const [menuState, toggleMenu] = useMenuState({ transition: true });
 
     // 按下记录：用于"按住拖到选项松手触发"
-    const pressRef = useRef<{ element: Element | null; inMenu: boolean; x: number; y: number } | null>(
-        null,
-    );
+    const pressRef = useRef<{
+        element: Element | null;
+        inMenu: boolean;
+        x: number;
+        y: number;
+    } | null>(null);
 
     useEffect(() => {
         toggleMenu(!!openMenuId);
