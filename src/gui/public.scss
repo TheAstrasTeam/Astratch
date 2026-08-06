@@ -115,6 +115,27 @@ span {
     --blockly-active-node-color: $ui-blockly-border;
     --blockly-active-tree-color: $ui-blockly-border;
     --blockly-selection-width: 1px;
+
+    // 积木样式
+    // 在Flyout中没法切换，所以排除
+
+    [class*='math_number']:not([class*='blocklyFlyout'] *),
+    [class*='operator_logic_boolean']:not([class*='blocklyFlyout'] *),
+    [class*='menu']:not([class*='blocklyFlyout'] *),
+    [class*='text']:not([class*='blocklyFlyout'] *) {
+        &:hover {
+            cursor: pointer !important;
+            & path {
+                stroke: $ui-blockly-border !important;
+                stroke-width: 3px;
+                stroke-opacity: 0.5;
+            }
+        }
+        & [class*='operator_logic_boolean']:active {
+            cursor: pointer !important;
+            filter: brightness(0.5);
+        }
+    }
 }
 
 // 关于Blockly下拉框，提示框地方
@@ -289,29 +310,5 @@ g.blocklyImageField[role='button'] {
     transition: outline-width 0.3s ease-in-out;
     &:hover {
         outline-width: 4px;
-    }
-}
-
-// 布尔积木
-// 在Flyout中没法切换，所以排除
-
-[class*='math_number'],
-[class*='operator_logic_boolean'] {
-    &:hover {
-        cursor: pointer !important;
-        & path {
-            stroke: $ui-blockly-border !important;
-            stroke-width: 3px;
-            stroke-opacity: 0.5;
-        }
-    }
-}
-[class*='blocklyFlyout'] [class*='math_number'],
-[class*='operator_logic_boolean'] {
-    &:hover {
-        cursor: unset !important;
-        & path {
-            stroke: none !important;
-        }
     }
 }
