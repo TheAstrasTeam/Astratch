@@ -45,6 +45,10 @@
 
 .target-panel {
     min-height: 100px;
+    transition: min-height 0.5s cubic-bezier(0, 1.6, 0.35, 1);
+    &:hover {
+        min-height: 150px;
+    }
     width: 100%;
     border-radius: 15px 15px 0 0;
     border: $border-width $ui-black-transparent solid;

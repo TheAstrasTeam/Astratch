@@ -7,7 +7,7 @@
 import {
     events,
     type IFS,
-    type IObjectInfo,
+    type IEntityInfo,
     type IRuntime,
     type ITarget,
     type ITargetMeta,
@@ -34,7 +34,7 @@ class Runtime implements IRuntime {
     targets: Map<string, ITarget>;
     DEFAULT_TARGETINFO: ITarget;
     editingTargetID: string;
-    DEFAULT_OBJECTINFO: IObjectInfo;
+    DEFAULT_ENTITYINFO: IEntityInfo;
     fs: Map<TTargetMode, IFS[]>;
 
     private updateView(data: viewportUpdateEvent) {
@@ -73,13 +73,13 @@ class Runtime implements IRuntime {
          */
         this.fs = new Map();
         // 初始化
-        this.fs.set('object', []);
+        this.fs.set('entity', []);
         this.fs.set('module', []);
 
         /**
          * 对于实体额外的info
          */
-        this.DEFAULT_OBJECTINFO = {
+        this.DEFAULT_ENTITYINFO = {
             size: 100,
             direction: 90,
             currentCostume: 0,
@@ -115,7 +115,7 @@ class Runtime implements IRuntime {
             },
             comments: {},
             parentID: null,
-            mode: 'object',
+            mode: 'entity',
             viewX: 0,
             viewY: 0,
             viewScale: 1,
@@ -143,10 +143,10 @@ class Runtime implements IRuntime {
             mode: meta.mode ?? this.DEFAULT_TARGETINFO.mode,
             id,
         };
-        if (meta.mode === 'object')
+        if (meta.mode === 'entity')
             finalMeta = {
                 ...finalMeta,
-                ...this.DEFAULT_OBJECTINFO,
+                ...this.DEFAULT_ENTITYINFO,
             };
         this.targets.set(id, finalMeta);
 

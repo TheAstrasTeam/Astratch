@@ -27,7 +27,7 @@ import ArrowIcon from '../../assets/arrow.svg?react';
 const TargetsPanel = ({ vm }: { vm: IVM }) => {
     const setInterface = useGUIStore(state => state.setInterface);
 
-    const [currentTargetTab, setCurrentTargetTab] = useState<TTargetMode>('object');
+    const [currentTargetTab, setCurrentTargetTab] = useState<TTargetMode>('entity');
 
     const handleSwitchTargetTab = (tab: TTargetMode) => {
         setCurrentTargetTab(tab);
@@ -42,7 +42,7 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
             if (isValidTargetName(result)) vm.runtime.createTarget({ name: result, parent, mode });
         };
         void modal.open(PromptModal, {
-            message: mode === 'object' ? t('gui:modal.ask.object') : t('gui:modal.ask.module'),
+            message: mode === 'entity' ? t('gui:modal.ask.entity') : t('gui:modal.ask.module'),
             defaultValue: '',
             callback: handleCreateObjectCallback,
         });
@@ -107,13 +107,13 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
                 <div className={styles.targetsTab}>
                     <button
                         className={classNames(styles.targetTab, {
-                            [styles.isEnable]: currentTargetTab === 'object',
+                            [styles.isEnable]: currentTargetTab === 'entity',
                         })}
                         onClick={() => {
-                            handleSwitchTargetTab('object');
+                            handleSwitchTargetTab('entity');
                         }}
                     >
-                        {t('gui:target.object')}
+                        {t('gui:target.entity')}
                     </button>
                     <button
                         className={classNames(styles.targetTab, {
@@ -127,10 +127,10 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
                     </button>
                 </div>
                 <div className={styles.targetsList}>
-                    {currentTargetTab === 'object' ? (
+                    {currentTargetTab === 'entity' ? (
                         <TargetsList
                             key={targetsVersion}
-                            mode='object'
+                            mode='entity'
                             vm={vm}
                             selected={selectedTargetID}
                             expandedFolders={expandedFolders}
@@ -155,7 +155,7 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
                 </div>
                 {selectedTargetID && selectedTarget && (
                     <div className={styles.targetPanel}>
-                        {selectedTarget.mode === 'object' && (
+                        {selectedTarget.mode === 'entity' && (
                             <div className={styles.targetPanelTop}>
                                 <div className={styles.targetPanelInfo}>
                                     <SizeIcon />
@@ -186,8 +186,8 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
                             <div className={styles.targetPanelRight}>
                                 <span className={styles.targetPanelTitle}>
                                     {selectedTarget.mode === 'module'
-                                        ? t('gui:module')
-                                        : t('gui:object')}
+                                        ? t('gui:target.module')
+                                        : t('gui:target.entity')}
                                 </span>
                                 <span className={styles.targetPanelContent}>
                                     {selectedTarget.name}

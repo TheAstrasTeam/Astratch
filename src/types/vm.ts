@@ -87,7 +87,7 @@ export interface ITarget {
 }
 
 export const TargetModes = {
-    OBJECT: 'object',
+    ENTITY: 'entity',
     MODULE: 'module',
 } as const;
 export type TTargetMode = (typeof TargetModes)[keyof typeof TargetModes];
@@ -105,7 +105,7 @@ export interface ITargetMeta {
     data?: ArrayBuffer;
 }
 
-export interface IObjectInfo {
+export interface IEntityInfo {
     size: number;
     direction: number;
     currentCostume: number;
@@ -157,7 +157,7 @@ export interface IRuntime {
     /**
      * 对于实体额外的info
      */
-    DEFAULT_OBJECTINFO: IObjectInfo;
+    DEFAULT_ENTITYINFO: IEntityInfo;
     /**
      * 默认target的信息
      */

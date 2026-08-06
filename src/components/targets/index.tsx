@@ -409,7 +409,7 @@ export const TargetsList = ({
                     if (onAdd) onAdd(mode, null);
                 }}
             >
-                {mode === 'object' ? t('gui:target.createObject') : t('gui:target.createModule')}
+                {mode === 'entity' ? t('gui:target.createObject') : t('gui:target.createModule')}
             </MenuItem>
             <MenuItem
                 onClick={() => {
@@ -425,9 +425,9 @@ export const TargetsList = ({
         <div className={styles.targetsList}>
             <div className={styles.bar}>
                 <input
-                    className={styles.objectSearch}
+                    className={styles.entitySearch}
                     placeholder={
-                        mode === 'object' ? t('gui:search.object.tip') : t('gui:search.module.tip')
+                        mode === 'entity' ? t('gui:search.entity.tip') : t('gui:search.module.tip')
                     }
                     value={searchContent}
                     onChange={e => {
@@ -436,7 +436,7 @@ export const TargetsList = ({
                 />
                 {onAdd && (
                     <button
-                        className={styles.objectAdd}
+                        className={styles.entityAdd}
                         onMouseDown={openMenuByMouseDown(openAddMenu)}
                         title={t('gui:target.create')}
                     >

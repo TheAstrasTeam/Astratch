@@ -145,12 +145,12 @@ export class VM implements IVM {
         // TODO: 资源
         await this.projectManager.createFolder(this.projectManager.folderHandle, 'assets');
 
-        const objectHandle = await this.projectManager.createFolder(
+        const entityHandle = await this.projectManager.createFolder(
             this.projectManager.folderHandle,
-            'objects',
+            'entitys',
         );
-        if (!objectHandle) sendError(t('fs.error.objectHandleLost'));
-        else await saveTargets('object', objectHandle);
+        if (!entityHandle) sendError(t('fs.error.entityHandleLost'));
+        else await saveTargets('entity', entityHandle);
 
         const moduleHandle = await this.projectManager.createFolder(
             this.projectManager.folderHandle,
@@ -159,14 +159,14 @@ export class VM implements IVM {
         if (!moduleHandle) sendError(t('fs.error.moduleHandleLost'));
         else await saveTargets('module', moduleHandle);
 
-        const objectsFolder = this.runtime.fs.get('object') ?? [];
+        const entitysFolder = this.runtime.fs.get('entity') ?? [];
         const modulesFolder = this.runtime.fs.get('module') ?? [];
 
         const projectMeta: IProjectMetaJSON = {
             projectSaveVersion: 1,
             meta: this.runtime.settings.projectMeta,
             folders: {
-                object: objectsFolder,
+                entity: entitysFolder,
                 module: modulesFolder,
             },
         };
@@ -208,7 +208,7 @@ export class VM implements IVM {
 
         this.runtime.createTarget({
             name: 'Astratch',
-            mode: 'object',
+            mode: 'entity',
         });
         await this.saveProject();
         // 进入编辑器
@@ -258,11 +258,11 @@ export class VM implements IVM {
             this.projectManager.folderHandle,
             projectFileNames.meta,
         );
-        const objectHandle = await this.projectManager.getFolder(
+        const entityHandle = await this.projectManager.getFolder(
             this.projectManager.folderHandle,
-            'objects',
+            'entitys',
         );
-        if (objectHandle) await loadTargets(objectHandle);
+        if (entityHandle) await loadTargets(entityHandle);
         const moduleHandle = await this.projectManager.getFolder(
             this.projectManager.folderHandle,
             'modules',
