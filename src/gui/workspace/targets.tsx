@@ -5,7 +5,7 @@
  */
 
 import classNames from 'classnames';
-import { events, type IVM, type TTargetMode } from '../../types/vm';
+import { events, type ITarget, type IVM, type TTargetMode } from '../../types/vm';
 import styles from './targets.module.scss';
 
 import { t } from 'i18next';
@@ -19,14 +19,17 @@ import { isValidTargetName, spawnRandomString } from '../../utils/ash-string';
 import { TargetsList } from '../../components/targets';
 import { useTargetsStore } from '../../stores/useTargetsStore';
 
-type targetTab = 'object' | 'module';
+import SpriteIcon from '../../assets/sprite.svg?react';
+import SizeIcon from '../../assets/magnifyingGlass.svg?react';
+import DirectionIcon from '../../assets/direction.svg?react';
+import ArrowIcon from '../../assets/arrow.svg?react';
 
 const TargetsPanel = ({ vm }: { vm: IVM }) => {
     const setInterface = useGUIStore(state => state.setInterface);
 
-    const [currentTargetTab, setCurrentTargetTab] = useState<targetTab>('object');
+    const [currentTargetTab, setCurrentTargetTab] = useState<TTargetMode>('object');
 
-    const handleSwitchTargetTab = (tab: targetTab) => {
+    const handleSwitchTargetTab = (tab: TTargetMode) => {
         setCurrentTargetTab(tab);
     };
 
@@ -66,6 +69,9 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
     };
 
     const [selectedTargetID, setSelectedTargetID] = useState(vm.runtime.editingTargetID);
+    const [selectedTarget, setSelectedTarget] = useState<ITarget | null>(
+        vm.runtime.targets.get(selectedTargetID) ?? null,
+    );
     // React Compiler 的自动 memo 会跳过 props 未变化的子组件渲染
     // 太坏了，害了AI花了很久才修复😭
     const [targetsVersion, setTargetsVersion] = useState(0);
@@ -78,6 +84,7 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
     useEffect(() => {
         const handleTargetSwitch = () => {
             setSelectedTargetID(() => vm.runtime.editingTargetID);
+            setSelectedTarget(vm.runtime.targets.get(vm.runtime.editingTargetID) ?? null);
             setTargetsVersion(v => v + 1);
         };
 
@@ -119,7 +126,7 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
                         {t('gui:target.module')}
                     </button>
                 </div>
-                <div>
+                <div className={styles.targetsList}>
                     {currentTargetTab === 'object' ? (
                         <TargetsList
                             key={targetsVersion}
@@ -146,6 +153,49 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
                         />
                     )}
                 </div>
+                {selectedTargetID && selectedTarget && (
+                    <div className={styles.targetPanel}>
+                        {selectedTarget.mode === 'object' && (
+                            <div className={styles.targetPanelTop}>
+                                <div className={styles.targetPanelInfo}>
+                                    <SizeIcon />
+                                    <span>{selectedTarget.size}</span>
+                                </div>
+                                <div className={styles.targetPanelInfo}>
+                                    <DirectionIcon
+                                        style={{
+                                            transform: `rotate(${String(selectedTarget.direction ?? 90)}deg)`,
+                                        }}
+                                    />
+                                    <span>{selectedTarget.direction}</span>
+                                </div>
+                                <div className={styles.targetPanelInfo}>
+                                    <ArrowIcon />
+                                    <span>{selectedTarget.x}</span>
+                                </div>
+                                <div className={styles.targetPanelInfo}>
+                                    <ArrowIcon className={styles.targetPanelInfoY} />
+                                    <span>{selectedTarget.y}</span>
+                                </div>
+                            </div>
+                        )}
+                        <div className={styles.targetPanelBottom}>
+                            <div className={styles.targetPanelLeft}>
+                                <SpriteIcon className={styles.targetPanelIcon} />
+                            </div>
+                            <div className={styles.targetPanelRight}>
+                                <span className={styles.targetPanelTitle}>
+                                    {selectedTarget.mode === 'module'
+                                        ? t('gui:module')
+                                        : t('gui:object')}
+                                </span>
+                                <span className={styles.targetPanelContent}>
+                                    {selectedTarget.name}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </>
         );
     else

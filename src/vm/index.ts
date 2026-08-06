@@ -208,6 +208,7 @@ export class VM implements IVM {
 
         this.runtime.createTarget({
             name: 'Astratch',
+            mode: 'object',
         });
         await this.saveProject();
         // 进入编辑器

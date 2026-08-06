@@ -135,14 +135,20 @@ class Runtime implements IRuntime {
     createTarget(meta: ITargetMeta, switchTo = true) {
         // TODO: 处理Data
         const id = meta.id ?? crypto.randomUUID();
-        this.targets.set(id, {
+        let finalMeta = {
             // 直接 this.DEFAULT_TARGETINFO 会造成浅拷贝
             ...structuredClone(this.DEFAULT_TARGETINFO),
             name: meta.name ?? this.DEFAULT_TARGETINFO.name,
             parentID: meta.parent ?? this.DEFAULT_TARGETINFO.parentID,
             mode: meta.mode ?? this.DEFAULT_TARGETINFO.mode,
             id,
-        });
+        };
+        if (meta.mode === 'object')
+            finalMeta = {
+                ...finalMeta,
+                ...this.DEFAULT_OBJECTINFO,
+            };
+        this.targets.set(id, finalMeta);
 
         this.vm.emit(events.UPDATE_PROJECT);
         this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
