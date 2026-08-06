@@ -4,13 +4,22 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { allBuiltInTabs, events, type IVM, type TallBuiltInTabs } from '../../types/vm';
+import {
+    allBuiltInTabs,
+    events,
+    type ITarget,
+    type IVM,
+    type TallBuiltInTabs,
+} from '../../types/vm';
 import styles from './index.module.scss';
 import BlocklyWorkspace from './Blockly/index';
 import { useEffect, useMemo, useState, type FunctionComponent, type SVGProps } from 'react';
 import classNames from 'classnames';
 
 import SpriteIcon from '../../assets/sprite.svg?react';
+import EmptyTip from '../../assets/empty.svg?react';
+import EmptyTip2 from '../../assets/empty2.svg?react';
+
 import { t } from 'i18next';
 import SelectBar from '../../components/workspace/selectBar';
 import { useGUIStore } from '../../stores/useGUIStore';
@@ -51,14 +60,25 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
     const nowGuiInterface = useGUIStore(state => state.guiInterface);
     const [, setTargetsRevision] = useState(0);
     const [tabSelected, setTabSelect] = useState<TallBuiltInTabs>(allBuiltInTabs.TARGETS);
+    const [selectedTarget, setSelectedTarget] = useState<ITarget | null>(
+        vm.runtime.targets.get(vm.runtime.editingTargetID) ?? null,
+    );
 
     useEffect(() => {
         const handleTargetsUpdate = () => {
             setTargetsRevision(revision => revision + 1);
+            setSelectedTarget(vm.runtime.targets.get(vm.runtime.editingTargetID) ?? null);
+        };
+        const handleSwitchTargetTab = () => {
+            setSelectedTarget(vm.runtime.targets.get(vm.runtime.editingTargetID) ?? null);
         };
 
         vm.off(events.UPDATE_TARGET_STRUCTURE, handleTargetsUpdate);
+        vm.off(events.SWITCH_TARGET, handleSwitchTargetTab);
+        vm.off(events.CREATE_PROJECT, handleSwitchTargetTab);
         vm.on(events.UPDATE_TARGET_STRUCTURE, handleTargetsUpdate);
+        vm.on(events.SWITCH_TARGET, handleSwitchTargetTab);
+        vm.on(events.CREATE_PROJECT, handleSwitchTargetTab);
         const unbindShortcutCommands = shortcutManager.bindCommands({
             [SHORTCUTS.SWITCH_TAB_TARGET.id]: () => {
                 setTabSelect(allBuiltInTabs.TARGETS);
@@ -72,6 +92,8 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
         });
         return () => {
             vm.off(events.UPDATE_TARGET_STRUCTURE, handleTargetsUpdate);
+            vm.off(events.SWITCH_TARGET, handleSwitchTargetTab);
+            vm.off(events.CREATE_PROJECT, handleSwitchTargetTab);
             unbindShortcutCommands();
         };
     }, [vm]);
@@ -89,13 +111,22 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
     );
 
     const renderEditorContent = () => {
+        const showEmptyTip = () => Math.random() < 0.5;
         if (nowGuiInterface === guiInterface.START) {
             return <Start vm={vm} />;
         }
         if (nowGuiInterface === guiInterface.CREATE_PROJECT) {
             return <CreateProject vm={vm} />;
         }
-        return <BlocklyWorkspace vm={vm} />;
+        // 编辑器
+        if (selectedTarget) return <BlocklyWorkspace vm={vm} />;
+        else
+            return (
+                <div className={styles.empty}>
+                    {showEmptyTip() ? <EmptyTip /> : <EmptyTip2 />}
+                    <h1>{t('gui:selectNothing')}</h1>
+                </div>
+            );
     };
     const renderToolBar = () => {
         if (tabSelected === allBuiltInTabs.TARGETS)

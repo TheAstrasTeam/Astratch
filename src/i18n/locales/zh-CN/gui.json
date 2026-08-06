@@ -131,5 +131,6 @@
     "err.moveTarget.parentUndefined": "不能将目标移动到未知的地方: {{id}}",
     "err.moveFolder.inSelf": "不能将文件夹移动到它自己的内部",
     "err.fs.alreadyExist": "文件夹已存在",
-    "err.fs.noExist": "文件夹不存在"
+    "err.fs.noExist": "文件夹不存在",
+    "selectNothing": "怎么什么都没有呢..."
 }
