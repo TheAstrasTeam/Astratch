@@ -81,6 +81,9 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
     const expandedFolders = useTargetsStore(state => state.expandedFolders);
     const toggleFolder = useTargetsStore(state => state.toggleFolder);
 
+    const [isOpenTargetPanel, setOpenTargetPanel] = useState<boolean>(false);
+    const [hasToggledTargetPanel, setHasToggledTargetPanel] = useState<boolean>(false);
+
     useEffect(() => {
         const handleTargetSwitch = () => {
             setSelectedTargetID(() => vm.runtime.editingTargetID);
@@ -100,6 +103,11 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
             vm.off(events.UPDATE_TARGET_STRUCTURE, handleTargetSwitch);
         };
     }, [vm]);
+
+    const handleTargetPanelClick = () => {
+        setHasToggledTargetPanel(true);
+        setOpenTargetPanel(!isOpenTargetPanel);
+    }
 
     if (vm.isEditingProject)
         return (
@@ -126,7 +134,12 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
                         {t('gui:target.module')}
                     </button>
                 </div>
-                <div className={styles.targetsList}>
+                <div
+                    className={classNames(styles.targetsList, {
+                        [styles.closeList]: isOpenTargetPanel,
+                        [styles.openList]: hasToggledTargetPanel && !isOpenTargetPanel,
+                    })}
+                >
                     {currentTargetTab === 'entity' ? (
                         <TargetsList
                             key={targetsVersion}
@@ -154,7 +167,9 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
                     )}
                 </div>
                 {selectedTargetID && selectedTarget && (
-                    <div className={styles.targetPanel}>
+                    <div className={classNames(styles.targetPanel, {
+                        [styles.isExpand]: isOpenTargetPanel
+                    })} onClick={handleTargetPanelClick}>
                         {selectedTarget.mode === 'entity' && (
                             <div className={styles.targetPanelTop}>
                                 <div className={styles.targetPanelInfo}>

@@ -41,17 +41,84 @@
     min-height: 0;
     overflow-x: hidden;
     overflow-y: auto;
+    transition:
+        filter 0.5s cubic-bezier(0, 1.6, 0.35, 1),
+        transform 0.5s cubic-bezier(0, 1.6, 0.35, 1);
+    &:has(~ .target-panel:active) {
+        filter: brightness(0.5);
+        transform: scale(0.9);
+    }
+    &.close-list {
+        overflow: hidden;
+        animation: targets-list-out 0.3s ease forwards;
+        transition:
+            filter 0.5s ease,
+            transform 0.5s ease;
+    }
+    &.open-list {
+        animation: targets-list-in 0.3s ease;
+    }
+}
+
+@keyframes targets-list-out {
+    from {
+        opacity: 1;
+        flex-grow: 1;
+        max-height: 999px;
+        filter: brightness(0.5);
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 0;
+        flex-grow: 0;
+        max-height: 0;
+        filter: brightness(0.5);
+        transform: scale(0.7);
+    }
+}
+
+@keyframes targets-list-in {
+    from {
+        opacity: 0;
+        flex-grow: 0;
+        max-height: 0;
+        filter: brightness(0.5);
+        transform: scale(0.7);
+    }
+    to {
+        opacity: 1;
+        flex-grow: 1;
+        max-height: 999px;
+        transform: scale(1);
+    }
 }
 
 .target-panel {
-    min-height: 100px;
-    transition: min-height 0.5s cubic-bezier(0, 1.6, 0.35, 1);
-    &:hover {
-        min-height: 150px;
+    &.is-expand {
+        justify-content: start;
+        min-height: 100%;
+        border-radius: none !important;
+        box-shadow: none !important;
+        border: none;
+        transition:
+            min-height 0.3s ease,
+            transform 0.3s ease;
     }
+    min-height: 100px;
+    transition:
+        min-height 0.5s cubic-bezier(0, 1.6, 0.35, 1),
+        transform 0.5s cubic-bezier(0, 1.6, 0.35, 1);
+    &:hover:not(.is-expand) {
+        min-height: 150px;
+        transform: perspective(1000px) rotateX(15deg);
+    }
+    &:active:not(.is-expand) {
+        min-height: 275px;
+    }
+
     width: 100%;
     border-radius: 15px 15px 0 0;
-    border: $border-width $ui-black-transparent solid;
+    border-top: $border-width $ui-black-transparent solid;
     box-shadow: 0px -3px 5px -2px $ui-white;
     display: flex;
     padding: 5px 0;
