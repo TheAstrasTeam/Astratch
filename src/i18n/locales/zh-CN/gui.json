@@ -7,7 +7,7 @@
     "welcome.text.5": "一起来做点什么吧！",
     "welcome.text.6": "嗨，{{name}}！",
     "welcome.text.7": "有什么灵感？",
-    "welcome.text.8": "准备把白纸变成绚烂的画了吗？",
+    "welcome.text.8": "准备好把白纸变成绚烂的画了吗？",
     "welcome.text.9": "让我们开始吧。",
     "start.createProject": "创建一个项目",
     "start.loadProject": "载入一个项目",
@@ -57,6 +57,10 @@
     "target.createFolder": "添加文件夹",
     "target.remove": "删除",
     "target.folderNameAsk": "输入文件夹的名称：",
+    "target.attr.x": "X 坐标",
+    "target.attr.y": "Y 坐标",
+    "target.attr.direction": "方向",
+    "target.attr.size": "大小",
     "remove.confirm": "确定要删除「{{name}}」吗？",
     "panel.notInProject": "你还不在一个项目内！为什么不",
     "search.tip": "搜索",
@@ -132,5 +136,7 @@
     "err.moveFolder.inSelf": "不能将文件夹移动到它自己的内部",
     "err.fs.alreadyExist": "文件夹已存在",
     "err.fs.noExist": "文件夹不存在",
-    "selectNothing": "怎么什么都没有呢..."
+    "selectNothing": "怎么什么都没有呢...",
+    "attribute": "属性",
+    "link": "链接"
 }

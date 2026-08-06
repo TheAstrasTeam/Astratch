@@ -1,0 +1,14 @@
+@use '../../gui/styles/color' as *;
+
+.hr-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    hr {
+        width: 90%;
+        margin: 15px;
+        border-color: $ui-black-transparent;
+
+        flex: 1;
+    }
+}

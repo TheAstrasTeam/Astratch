@@ -1,0 +1,47 @@
+.attributes {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    padding: 0 15px;
+}
+
+.attribute-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    gap: 6px;
+    width: 100%;
+
+    .icons {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .attribute-icon {
+        width: 15px;
+        height: 15px;
+        flex: 0 0 15px;
+        opacity: 0.5;
+
+        &.rotated {
+            transform: rotate(90deg);
+        }
+    }
+
+    .attribute-input {
+        min-width: 0;
+        margin: 0;
+        padding: 3px 5px;
+        text-align: left;
+    }
+
+    .attribute-button {
+        width: 24px;
+        height: 24px;
+        margin: 0;
+        padding: 0;
+        flex: 0 0 24px;
+        font-size: small;
+    }
+}
