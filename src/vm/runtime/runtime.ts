@@ -143,7 +143,7 @@ class Runtime implements IRuntime {
             mode: meta.mode ?? this.DEFAULT_TARGETINFO.mode,
             id,
         };
-        if (meta.mode === 'entity')
+        if (finalMeta.mode === 'entity')
             finalMeta = {
                 ...finalMeta,
                 ...this.DEFAULT_ENTITYINFO,
@@ -186,7 +186,7 @@ class Runtime implements IRuntime {
     getFolderParent(pos: TTargetMode, id: string) {
         const folder = this.fs.get(pos)?.find(folder => folder.id === id);
         if (folder) {
-            return this.fs.get(pos)?.find(folder => folder.id === folder.parentID) ?? null;
+            return this.fs.get(pos)?.find(item => item.id === folder.parentID) ?? null;
         } else return null;
     }
 
@@ -234,7 +234,9 @@ class Runtime implements IRuntime {
                 FS.filter(folder => folder.id !== id && !childrenIDs.includes(folder.id)),
             );
             this.targets.forEach(target => {
-                if (childrenIDs.includes(target.parentID ?? '')) this.removeTarget(target.id);
+                if (childrenIDs.includes(target.parentID ?? '') || target.parentID === id) {
+                    this.removeTarget(target.id);
+                }
             });
         }
         this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
