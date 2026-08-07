@@ -27,7 +27,7 @@
 
 `Astratch` 克隆&修改&使用了 [blockly-examples](https://github.com/RaspberryPiFoundation/blockly-samples) 其中的部分插件：
 
-- [Astratch Toolbox](./plugins/astratch-toolbox/)（基于 Continuous Toolbox 深度扩展）
+- [Continuous Toolbox](./plugins/astratch-toolbox/)（改名为了 Astratch Toolbox）
 - [field-angle](./plugins/field-angle/)
 - [field-colour-hsv-sliders](./plugins/field-colour-hsv-sliders/)
 - [field-colour](./plugins/field-colour/)
