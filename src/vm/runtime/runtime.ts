@@ -119,6 +119,7 @@ class Runtime implements IRuntime {
             viewX: 0,
             viewY: 0,
             viewScale: 1,
+            links: [],
         };
 
         /**
@@ -153,6 +154,7 @@ class Runtime implements IRuntime {
         this.vm.emit(events.UPDATE_PROJECT);
         this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
         if (switchTo) this.switchTarget(id);
+        return id;
     }
 
     switchTarget(id: string) {
@@ -320,6 +322,26 @@ class Runtime implements IRuntime {
             this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
             return true;
         } else return false;
+    }
+
+    linkTarget(selectedTargetID: string, linkTargetID: string) {
+        if (selectedTargetID === linkTargetID) {
+            sendError(i18next.t('gui:error.link.linkSelf'), 'warn');
+            return false;
+        }
+        const selectedTarget = this.getTargetByID(selectedTargetID);
+        const linkTarget = this.getTargetByID(linkTargetID);
+        if (!(selectedTarget && linkTarget)) {
+            sendError(i18next.t('gui:error.link.undefined'), 'warn');
+            return false;
+        }
+        if (linkTarget.mode === 'entity') {
+            sendError(i18next.t('gui:error.link.tryToLinkEntity'), 'warn');
+            return false;
+        }
+
+        selectedTarget.links.push(linkTargetID);
+        return true;
     }
 }
 

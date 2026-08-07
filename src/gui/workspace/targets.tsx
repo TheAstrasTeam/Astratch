@@ -25,6 +25,8 @@ import SizeIcon from '../../assets/magnifyingGlass.svg?react';
 import DirectionIcon from '../../assets/direction.svg?react';
 import ArrowIcon from '../../assets/arrow.svg?react';
 import ModuleIcon from '../../assets/module.svg?react';
+import BackIcon from '../../assets/back.svg?react';
+
 import Hr from '../../components/hr';
 
 const TargetsPanel = ({ vm }: { vm: IVM }) => {
@@ -226,7 +228,12 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
                             </>
                         ) : (
                             <div className={styles.targetInfoPanel}>
-                                <button onClick={handleTargetPanelBackClick}>back</button>
+                                <button
+                                    onClick={handleTargetPanelBackClick}
+                                    className={styles.back}
+                                >
+                                    <BackIcon />
+                                </button>
                                 <SpriteIcon className={styles.targetPanelIcon} />
                                 <span className={styles.title}>{selectedTarget.name}</span>
                                 {selectedTarget.mode === 'module' ? (
@@ -245,6 +252,9 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
                                     <TargetAttributes vm={vm} target={selectedTarget} />
                                 )}
                                 <Hr label={t('gui:link')} />
+                                {selectedTarget.links.map(moduleID => (
+                                    <div>{moduleID}</div>
+                                ))}
                             </div>
                         )}
                     </div>

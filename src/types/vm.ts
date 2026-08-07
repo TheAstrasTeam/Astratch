@@ -84,6 +84,10 @@ export interface ITarget {
     viewX: number;
     viewY: number;
     viewScale: number;
+    /**
+     * 链接的模块
+     */
+    links: string[];
 }
 
 export const TargetModes = {
@@ -163,9 +167,9 @@ export interface IRuntime {
      */
     DEFAULT_TARGETINFO: ITarget;
     /**
-     * 创建一个新的target
+     * 创建一个新的target，并返回他的ID
      */
-    createTarget: (meta: ITargetMeta) => void;
+    createTarget: (meta: ITargetMeta) => string;
     /**
      * 切换target
      */
@@ -264,6 +268,10 @@ export interface IRuntime {
      * 修改一个Folder的父id，并返回是否修改成功
      */
     moveFolder: (pos: TTargetMode, targetID: string, newParentID: string | null) => boolean;
+    /**
+     * 让目标引用一个模块，并返回是否引用成功
+     */
+    linkTarget: (selectedTargetID: string, linkTargetID: string) => boolean;
 }
 
 export type folderType = FileSystemDirectoryHandle | undefined;

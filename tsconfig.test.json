@@ -21,7 +21,7 @@
         "erasableSyntaxOnly": true,
         "noFallthroughCasesInSwitch": true,
 
-        "baseUrl": ".",
+        "baseUrl": "."
     },
     "include": ["tests", "vitest.config.ts"]
 }

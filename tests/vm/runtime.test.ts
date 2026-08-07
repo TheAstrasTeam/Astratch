@@ -146,6 +146,41 @@ describe('switchTarget', () => {
     });
 });
 
+describe('链接目标', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it('链接自己，应该报错然后返回false', () => {
+        const { runtime } = makeRuntime();
+        const id = runtime.createTarget({
+            mode: 'entity',
+            name: 'a',
+        });
+        expect(runtime.linkTarget(id, id)).toBe(false);
+    });
+    it('链接无效目标，应该报错然后返回false', () => {
+        const { runtime } = makeRuntime();
+        const id = runtime.createTarget({
+            mode: 'entity',
+            name: 'a',
+        });
+        expect(runtime.linkTarget(id, 'test')).toBe(false);
+    });
+    it('链接实体，应该报错然后返回false', () => {
+        const { runtime } = makeRuntime();
+        const id = runtime.createTarget({
+            mode: 'entity',
+            name: 'a',
+        });
+        const id2 = runtime.createTarget({
+            mode: 'entity',
+            name: 'b',
+        });
+        expect(runtime.linkTarget(id, id2)).toBe(false);
+    });
+});
+
 describe('target读写', () => {
     beforeEach(() => {
         vi.clearAllMocks();

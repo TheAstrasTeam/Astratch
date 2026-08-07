@@ -82,6 +82,7 @@ input:not([class*='blocklyHtmlInput']):not([class*='fieldColourSlider']) {
     border-radius: 3px;
     padding: 5px;
     transition: border 0.1s ease;
+    height: auto;
     &:hover {
         border: 1px $ui-black-transparent solid;
     }
