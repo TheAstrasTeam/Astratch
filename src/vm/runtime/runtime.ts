@@ -6,7 +6,7 @@
 
 import {
     events,
-    type IFS,
+    type IFolder,
     type IEntityInfo,
     type IRuntime,
     type ITarget,
@@ -35,7 +35,7 @@ class Runtime implements IRuntime {
     DEFAULT_TARGETINFO: ITarget;
     editingTargetID: string;
     DEFAULT_ENTITYINFO: IEntityInfo;
-    fs: Map<TTargetMode, IFS[]>;
+    folders: Map<TTargetMode, IFolder[]>;
 
     private updateView(data: viewportUpdateEvent) {
         const target = this.targets.get(this.editingTargetID);
@@ -71,10 +71,10 @@ class Runtime implements IRuntime {
         /**
          * 文件夹系统
          */
-        this.fs = new Map();
+        this.folders = new Map();
         // 初始化
-        this.fs.set('entity', []);
-        this.fs.set('module', []);
+        this.folders.set('entity', []);
+        this.folders.set('module', []);
 
         /**
          * 对于实体额外的info
@@ -174,41 +174,41 @@ class Runtime implements IRuntime {
         this.vm.emit(events.UPDATE_PROJECT);
     }
 
-    getFolderByID(id: string, pos: TTargetMode) {
-        return this.fs.get(pos)?.find(folder => folder.id === id) ?? null;
+    getFolderByID(mode: TTargetMode, id: string) {
+        return this.folders.get(mode)?.find(folder => folder.id === id) ?? null;
     }
 
-    addFolder(pos: TTargetMode, meta: IFS) {
-        if (this.fs.get(pos)?.find(folder => folder.id === meta.id))
+    addFolder(mode: TTargetMode, meta: IFolder) {
+        if (this.folders.get(mode)?.find(folder => folder.id === meta.id))
             sendError(i18next.t('err.fs.alreadyExist'));
-        this.fs.get(pos)?.push(meta);
+        this.folders.get(mode)?.push(meta);
         this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
     }
 
-    getFolderParent(pos: TTargetMode, id: string) {
-        const folder = this.fs.get(pos)?.find(folder => folder.id === id);
+    getFolderParent(mode: TTargetMode, id: string) {
+        const folder = this.folders.get(mode)?.find(folder => folder.id === id);
         if (folder) {
-            return this.fs.get(pos)?.find(item => item.id === folder.parentID) ?? null;
+            return this.folders.get(mode)?.find(item => item.id === folder.parentID) ?? null;
         } else return null;
     }
 
-    setFolderName(pos: TTargetMode, id: string, name: string) {
-        const folder = this.fs.get(pos)?.find(folder => folder.id === id);
+    setFolderName(mode: TTargetMode, id: string, name: string) {
+        const folder = this.folders.get(mode)?.find(folder => folder.id === id);
         if (folder) folder.name = name;
         else sendError(i18next.t('err.fs.noExist'));
         this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
     }
 
-    setFolderColor(pos: TTargetMode, id: string, color: string) {
-        const folder = this.fs.get(pos)?.find(folder => folder.id === id);
+    setFolderColor(mode: TTargetMode, id: string, color: string) {
+        const folder = this.folders.get(mode)?.find(folder => folder.id === id);
         if (folder) folder.color = color;
         else sendError(i18next.t('err.fs.noExist'));
         this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
     }
 
-    getFolderChildren(pos: TTargetMode, id: string | null) {
-        const result: IFS[] = [];
-        this.fs.get(pos)?.forEach(folder => {
+    getFolderChildren(mode: TTargetMode, id: string | null) {
+        const result: IFolder[] = [];
+        this.folders.get(mode)?.forEach(folder => {
             if (folder.parentID === id) {
                 result.push(folder);
             }
@@ -216,24 +216,24 @@ class Runtime implements IRuntime {
         return result;
     }
 
-    getFolderDescendants(pos: TTargetMode, id: string | null) {
-        const result: IFS[] = [];
-        this.fs.get(pos)?.forEach(folder => {
+    getFolderDescendants(mode: TTargetMode, id: string | null) {
+        const result: IFolder[] = [];
+        this.folders.get(mode)?.forEach(folder => {
             if (folder.parentID === id) {
                 result.push(folder);
-                result.push(...this.getFolderDescendants(pos, folder.id));
+                result.push(...this.getFolderDescendants(mode, folder.id));
             }
         });
         return result;
     }
 
-    removeFolderFolder(pos: TTargetMode, id: string) {
-        const FS = this.fs.get(pos);
-        if (FS) {
-            const childrenIDs = this.getFolderDescendants(pos, id).map(folder => folder.id);
-            this.fs.set(
-                pos,
-                FS.filter(folder => folder.id !== id && !childrenIDs.includes(folder.id)),
+    removeFolder(mode: TTargetMode, id: string) {
+        const folders = this.folders.get(mode);
+        if (folders) {
+            const childrenIDs = this.getFolderDescendants(mode, id).map(folder => folder.id);
+            this.folders.set(
+                mode,
+                folders.filter(folder => folder.id !== id && !childrenIDs.includes(folder.id)),
             );
             this.targets.forEach(target => {
                 if (childrenIDs.includes(target.parentID ?? '') || target.parentID === id) {
@@ -244,7 +244,7 @@ class Runtime implements IRuntime {
         this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
     }
 
-    generateTargetsTree(pos: TTargetMode) {
+    generateTargetsTree(mode: TTargetMode) {
         const collectFoldersAndTargets = (id: string | null, mode: TTargetMode) => {
             const result: TTargetTree = [];
             this.getFolderChildren(mode, id).forEach(folder => {
@@ -264,10 +264,10 @@ class Runtime implements IRuntime {
         // 先加入顶层，因为 `collectFoldersAndTargets` 并不处理最顶层的元素
         // 它只处理子元素
         this.targets.forEach(target => {
-            if (target.parentID === null && target.mode === pos)
+            if (target.parentID === null && target.mode === mode)
                 result.push({ ...target, type: 'target' });
         });
-        result.push(...collectFoldersAndTargets(null, pos));
+        result.push(...collectFoldersAndTargets(null, mode));
         return result;
     }
 
@@ -280,10 +280,10 @@ class Runtime implements IRuntime {
         return false;
     }
 
-    moveTarget(pos: TTargetMode, targetID: string, newParentID: string | null) {
+    moveTarget(mode: TTargetMode, targetID: string, newParentID: string | null) {
         const target = this.targets.get(targetID);
         if (!target) return false;
-        if (newParentID && !this.getFolderByID(newParentID, pos)) {
+        if (newParentID && !this.getFolderByID(mode, newParentID)) {
             sendError(`Not found folder "${newParentID}".`, 'warn');
             return false;
         }
@@ -292,10 +292,10 @@ class Runtime implements IRuntime {
         return true;
     }
 
-    moveFolder(pos: TTargetMode, folderID: string, newParentID: string | null) {
-        const folder = this.getFolderByID(folderID, pos);
+    moveFolder(mode: TTargetMode, folderID: string, newParentID: string | null) {
+        const folder = this.getFolderByID(mode, folderID);
         if (newParentID)
-            if (!this.getFolderByID(newParentID, pos)) {
+            if (!this.getFolderByID(mode, newParentID)) {
                 sendError(
                     i18next.t('gui:err.moveTarget.parentUndefined', {
                         id: newParentID,
@@ -310,7 +310,7 @@ class Runtime implements IRuntime {
                 return false;
             }
             if (
-                this.getFolderDescendants(pos, folderID).findIndex(
+                this.getFolderDescendants(mode, folderID).findIndex(
                     folder => folder.id === newParentID,
                 ) !== -1 &&
                 newParentID !== null

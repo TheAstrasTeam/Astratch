@@ -136,6 +136,9 @@
     "err.moveFolder.inSelf": "不能将文件夹移动到它自己的内部",
     "err.fs.alreadyExist": "文件夹已存在",
     "err.fs.noExist": "文件夹不存在",
+    "err.fs.cannotFoundTargets": "找不到目标文件夹",
+    "err.fs.entityHandleLost": "实体文件夹句柄丢失",
+    "err.fs.moduleHandleLost": "模块文件夹句柄丢失",
     "selectNothing": "怎么什么都没有呢...",
     "attribute": "属性",
     "link": "链接"

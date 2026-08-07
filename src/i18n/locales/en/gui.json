@@ -134,5 +134,8 @@
     "err.moveTarget.parentUndefined": "Cannot move target to an unknown location: {{id}}",
     "err.moveFolder.inSelf": "Cannot move a folder into itself",
     "err.fs.alreadyExist": "Folder already exists",
-    "err.fs.noExist": "Folder does not exist"
+    "err.fs.noExist": "Folder does not exist",
+    "err.fs.cannotFoundTargets": "Cannot find the target folder",
+    "err.fs.entityHandleLost": "Entity folder handle lost",
+    "err.fs.moduleHandleLost": "Module folder handle lost"
 }

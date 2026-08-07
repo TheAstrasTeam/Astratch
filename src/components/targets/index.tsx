@@ -112,8 +112,8 @@ const GenerateFoldersAndTargets = ({
      * 搜索时强制展开所有文件夹
      */
     forceExpand?: boolean;
-    onAdd?: (pos: TTargetMode, parent?: string | null) => void;
-    onAddFolder?: (pos: TTargetMode, parent?: string | null) => void;
+    onAdd?: (mode: TTargetMode, parent?: string | null) => void;
+    onAddFolder?: (mode: TTargetMode, parent?: string | null) => void;
     onItemMouseDown: (e: ReactMouseEvent<HTMLElement>, item: IDragItem) => void;
     dropFolderId: string | null;
     draggingItemId: string | null;
@@ -124,7 +124,7 @@ const GenerateFoldersAndTargets = ({
         e.stopPropagation();
         const handleRemove = (result: boolean) => {
             if (!result) return;
-            if (target.type === 'folder') vm.runtime.removeFolderFolder(mode, target.id);
+            if (target.type === 'folder') vm.runtime.removeFolder(mode, target.id);
             else vm.runtime.removeTarget(target.id);
         };
         void modal.open(ConfirmModal, {
@@ -274,8 +274,8 @@ export const TargetsList = ({
     expandedFolders: Set<string>;
     toggleFolder: (id: string) => void;
     onSwitch: (id: string) => void;
-    onAdd?: (pos: TTargetMode, parent?: string | null) => void;
-    onAddFolder?: (pos: TTargetMode, parent?: string | null) => void;
+    onAdd?: (mode: TTargetMode, parent?: string | null) => void;
+    onAddFolder?: (mode: TTargetMode, parent?: string | null) => void;
 }) => {
     const [searchContent, setSearchContent] = useState('');
     const isSearching = searchContent.trim() !== '';
@@ -367,7 +367,7 @@ export const TargetsList = ({
             const moveTo = (newParentID: string | null) => {
                 const currentParent =
                     d.item.type === 'folder'
-                        ? (vm.runtime.getFolderByID(d.item.id, mode)?.parentID ?? null)
+                        ? (vm.runtime.getFolderByID(mode, d.item.id)?.parentID ?? null)
                         : (vm.runtime.getTargetByID(d.item.id)?.parentID ?? null);
                 if (newParentID === currentParent) return;
                 if (d.item.type === 'folder') vm.runtime.moveFolder(mode, d.item.id, newParentID);

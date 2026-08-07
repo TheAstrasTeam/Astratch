@@ -6,7 +6,7 @@
 
 import {
     type IProjectManager,
-    type folderType,
+    type DirectoryHandle,
     type IVM,
     allProjectCheckError,
     projectFileNames,
@@ -61,7 +61,7 @@ export class ProjectManager implements IProjectManager {
         }
     }
 
-    async isEmpty(path: folderType) {
+    async isEmpty(path: DirectoryHandle) {
         if (!path) return false;
         try {
             const entries = await path.values().next();
@@ -71,12 +71,12 @@ export class ProjectManager implements IProjectManager {
         }
     }
 
-    async createFolder(path: folderType, name: string) {
+    async createFolder(path: DirectoryHandle, name: string) {
         if (!path) return false;
         return await path.getDirectoryHandle(name, { create: true });
     }
 
-    async createFile(path: folderType, name: string, content: string) {
+    async createFile(path: DirectoryHandle, name: string, content: string) {
         if (!path) return false;
         const fileHandle = await path.getFileHandle(name, { create: true });
         const fileWrite = await fileHandle.createWritable();
@@ -85,25 +85,25 @@ export class ProjectManager implements IProjectManager {
         return fileHandle;
     }
 
-    async getFile(path: folderType, name: string) {
+    async getFile(path: DirectoryHandle, name: string) {
         if (!path) return false;
         const fileHandle = await path.getFileHandle(name);
         return fileHandle;
     }
 
-    async getFolder(path: folderType, name: string) {
+    async getFolder(path: DirectoryHandle, name: string) {
         if (!path) return false;
         const folderHandle = await path.getDirectoryHandle(name);
         return folderHandle;
     }
 
-    async removeFile(path: folderType, name: string) {
+    async removeFile(path: DirectoryHandle, name: string) {
         if (!path) return false;
         await path.removeEntry(name, { recursive: true });
         return true;
     }
 
-    async listAllFileName(path: folderType) {
+    async listAllFileName(path: DirectoryHandle) {
         if (!path) return false;
         const result = [];
         for await (const entry of path.values()) {

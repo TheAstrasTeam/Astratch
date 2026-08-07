@@ -9,7 +9,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import Runtime from '../../src/vm/runtime/runtime';
 import { events } from '../../src/types/vm';
 import { sendError } from '../../src/utils/debug';
-import type { IVM, IFS, TTargetTreeNode } from '../../src/types/vm';
+import type { IVM, IFolder, TTargetTreeNode } from '../../src/types/vm';
 import type { IWorkspaceState } from '../../src/types/blocks';
 
 // Runtime 依赖 Blockly 工作区管理，测试只关心数据逻辑，直接替换为桩类
@@ -50,7 +50,7 @@ function makeRuntime() {
     return { runtime, vm, handlers };
 }
 
-function makeFolder(id: string, parentID: string | null = null, name = id): IFS {
+function makeFolder(id: string, parentID: string | null = null, name = id): IFolder {
     return { id, name, color: '#000000', parentID };
 }
 
@@ -220,13 +220,13 @@ describe('文件夹操作', () => {
         it('应该将文件夹添加到对应模式并发出事件', () => {
             const { runtime, vm } = makeRuntime();
             runtime.addFolder('entity', makeFolder('f1', null, '角色'));
-            expect(runtime.fs.get('entity')).toHaveLength(1);
-            expect(runtime.fs.get('entity')?.[0]).toMatchObject({
+            expect(runtime.folders.get('entity')).toHaveLength(1);
+            expect(runtime.folders.get('entity')?.[0]).toMatchObject({
                 id: 'f1',
                 name: '角色',
                 parentID: null,
             });
-            expect(runtime.fs.get('module')).toHaveLength(0);
+            expect(runtime.folders.get('module')).toHaveLength(0);
             expect(vi.mocked(vm.emit)).toHaveBeenCalledWith(events.UPDATE_TARGET_STRUCTURE);
         });
 
@@ -236,7 +236,7 @@ describe('文件夹操作', () => {
             expect(() => {
                 runtime.addFolder('entity', makeFolder('f1'));
             }).toThrow();
-            expect(runtime.fs.get('entity')).toHaveLength(1);
+            expect(runtime.folders.get('entity')).toHaveLength(1);
             expect(sendError).toHaveBeenCalled();
         });
     });
@@ -253,8 +253,8 @@ describe('文件夹操作', () => {
         });
 
         it('getFolderByID应该返回文件夹或null', () => {
-            expect(runtime.getFolderByID('f2', 'entity')?.id).toBe('f2');
-            expect(runtime.getFolderByID('missing', 'entity')).toBeNull();
+            expect(runtime.getFolderByID('entity', 'f2')?.id).toBe('f2');
+            expect(runtime.getFolderByID('entity', 'missing')).toBeNull();
         });
 
         it('getFolderParent应该返回父文件夹', () => {
@@ -296,7 +296,7 @@ describe('文件夹操作', () => {
             const { runtime, vm } = makeRuntime();
             runtime.addFolder('entity', makeFolder('f1'));
             runtime.setFolderName('entity', 'f1', '新名字');
-            expect(runtime.getFolderByID('f1', 'entity')?.name).toBe('新名字');
+            expect(runtime.getFolderByID('entity', 'f1')?.name).toBe('新名字');
             expect(vi.mocked(vm.emit)).toHaveBeenCalledWith(events.UPDATE_TARGET_STRUCTURE);
         });
 
@@ -304,7 +304,7 @@ describe('文件夹操作', () => {
             const { runtime } = makeRuntime();
             runtime.addFolder('entity', makeFolder('f1'));
             runtime.setFolderColor('entity', 'f1', '#ff0000');
-            expect(runtime.getFolderByID('f1', 'entity')?.color).toBe('#ff0000');
+            expect(runtime.getFolderByID('entity', 'f1')?.color).toBe('#ff0000');
         });
 
         it('不存在的文件夹应该报错', () => {
@@ -319,7 +319,7 @@ describe('文件夹操作', () => {
         });
     });
 
-    describe('removeFolderFolder', () => {
+    describe('removeFolder', () => {
         it('应该级联删除文件夹及其中的target', () => {
             const { runtime } = makeRuntime();
             runtime.addFolder('entity', makeFolder('f1'));
@@ -331,9 +331,9 @@ describe('文件夹操作', () => {
             runtime.createTarget({ id: 't3' });
             runtime.createTarget({ id: 't4', parent: 'f4' });
 
-            runtime.removeFolderFolder('entity', 'f2');
+            runtime.removeFolder('entity', 'f2');
 
-            expect(runtime.fs.get('entity')?.map(f => f.id)).toEqual(['f1', 'f4']);
+            expect(runtime.folders.get('entity')?.map(f => f.id)).toEqual(['f1', 'f4']);
             expect(runtime.getTargetByID('t1')).toBeUndefined();
             expect(runtime.getTargetByID('t2')).toBeUndefined();
             expect(runtime.getTargetByID('t3')).toBeDefined();
@@ -344,8 +344,8 @@ describe('文件夹操作', () => {
             const { runtime } = makeRuntime();
             runtime.addFolder('entity', makeFolder('f1'));
             runtime.createTarget({ id: 't1' });
-            runtime.removeFolderFolder('entity', 'missing');
-            expect(runtime.fs.get('entity')?.map(f => f.id)).toEqual(['f1']);
+            runtime.removeFolder('entity', 'missing');
+            expect(runtime.folders.get('entity')?.map(f => f.id)).toEqual(['f1']);
             expect(runtime.getTargetByID('t1')).toBeDefined();
         });
     });
@@ -469,31 +469,31 @@ describe('moveFolder', () => {
 
     it('应该移动文件夹到另一个文件夹下', () => {
         expect(runtime.moveFolder('entity', 'f3', 'f4')).toBe(true);
-        expect(runtime.getFolderByID('f3', 'entity')?.parentID).toBe('f4');
+        expect(runtime.getFolderByID('entity', 'f3')?.parentID).toBe('f4');
     });
 
     it('移动到顶层(null)成功', () => {
         expect(runtime.moveFolder('entity', 'f2', null)).toBe(true);
-        expect(runtime.getFolderByID('f2', 'entity')?.parentID).toBeNull();
+        expect(runtime.getFolderByID('entity', 'f2')?.parentID).toBeNull();
     });
 
     it('移入自身应该拒绝', () => {
         expect(runtime.moveFolder('entity', 'f1', 'f1')).toBe(false);
-        expect(runtime.getFolderByID('f1', 'entity')?.parentID).toBeNull();
+        expect(runtime.getFolderByID('entity', 'f1')?.parentID).toBeNull();
         expect(sendError).toHaveBeenCalled();
     });
 
     it('移入自身后代应该拒绝', () => {
         expect(runtime.moveFolder('entity', 'f1', 'f3')).toBe(false);
         expect(runtime.moveFolder('entity', 'f2', 'f3')).toBe(false);
-        expect(runtime.getFolderByID('f1', 'entity')?.parentID).toBeNull();
-        expect(runtime.getFolderByID('f2', 'entity')?.parentID).toBe('f1');
+        expect(runtime.getFolderByID('entity', 'f1')?.parentID).toBeNull();
+        expect(runtime.getFolderByID('entity', 'f2')?.parentID).toBe('f1');
         expect(sendError).toHaveBeenCalled();
     });
 
     it('目标父文件夹不存在时返回false', () => {
         expect(runtime.moveFolder('entity', 'f2', 'missing')).toBe(false);
-        expect(runtime.getFolderByID('f2', 'entity')?.parentID).toBe('f1');
+        expect(runtime.getFolderByID('entity', 'f2')?.parentID).toBe('f1');
         expect(sendError).toHaveBeenCalled();
     });
 

@@ -15,7 +15,7 @@ import {
     events,
     allProjectCheckError,
     type TTargetMode,
-    type folderType,
+    type DirectoryHandle,
     type IProjectMetaJSON,
     type ITargetBlocks,
     TargetModes,
@@ -96,7 +96,7 @@ export class VM implements IVM {
     }
 
     async saveProject() {
-        const saveTargets = async (mode: TTargetMode, folder: folderType) => {
+        const saveTargets = async (mode: TTargetMode, folder: DirectoryHandle) => {
             // 存储所有文件名，这用来判断是否是已存在target名称
             const allTargetNames: string[] = [];
             const targets = new Map(
@@ -131,7 +131,7 @@ export class VM implements IVM {
                 }
             }
             const targetNames = await this.projectManager.listAllFileName(folder);
-            if (!targetNames) sendError(t('fs.error.cannotFoundTargets'));
+            if (!targetNames) sendError(t('err.fs.cannotFoundTargets'));
             else
                 // 删除不应有的target
                 for (const targetName of targetNames)
@@ -149,18 +149,18 @@ export class VM implements IVM {
             this.projectManager.folderHandle,
             'entitys',
         );
-        if (!entityHandle) sendError(t('fs.error.entityHandleLost'));
+        if (!entityHandle) sendError(t('err.fs.entityHandleLost'));
         else await saveTargets('entity', entityHandle);
 
         const moduleHandle = await this.projectManager.createFolder(
             this.projectManager.folderHandle,
             'modules',
         );
-        if (!moduleHandle) sendError(t('fs.error.moduleHandleLost'));
+        if (!moduleHandle) sendError(t('err.fs.moduleHandleLost'));
         else await saveTargets('module', moduleHandle);
 
-        const entitysFolder = this.runtime.fs.get('entity') ?? [];
-        const modulesFolder = this.runtime.fs.get('module') ?? [];
+        const entitysFolder = this.runtime.folders.get('entity') ?? [];
+        const modulesFolder = this.runtime.folders.get('module') ?? [];
 
         const projectMeta: IProjectMetaJSON = {
             projectSaveVersion: 1,
@@ -217,7 +217,7 @@ export class VM implements IVM {
     }
 
     async loadProject() {
-        const loadTargets = async (folder: folderType) => {
+        const loadTargets = async (folder: DirectoryHandle) => {
             const folderNames = (await this.projectManager.listAllFileName(folder)) || [];
 
             for (const folderName of folderNames) {
@@ -279,7 +279,7 @@ export class VM implements IVM {
             const projectMeta = JSON.parse(metaFileContent) as IProjectMetaJSON;
             this.runtime.settings.setProjectMeta(projectMeta.meta);
             for (const mode of Object.values(TargetModes)) {
-                this.runtime.fs.set(mode, projectMeta.folders[mode]);
+                this.runtime.folders.set(mode, projectMeta.folders[mode]);
             }
         } catch {
             return false;

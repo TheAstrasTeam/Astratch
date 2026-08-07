@@ -119,7 +119,7 @@ export interface IEntityInfo {
     y: number;
 }
 
-export interface IFS {
+export interface IFolder {
     name: string;
     id: string;
     color: string;
@@ -157,7 +157,7 @@ export interface IRuntime {
      * 文件夹系统，存储整个项目的目录
      * ASH 原生支持文件夹，来管理项目
      */
-    fs: Map<TTargetMode, IFS[]>;
+    folders: Map<TTargetMode, IFolder[]>;
     /**
      * 对于实体额外的info
      */
@@ -192,70 +192,70 @@ export interface IRuntime {
 
     /**
      * 根据id获取文件夹
+     * @param mode "entity" | "module"
      * @param id
-     * @param pos "object" | "module"
      * @returns
      */
-    getFolderByID: (id: string, pos: TTargetMode) => IFS | null;
+    getFolderByID: (mode: TTargetMode, id: string) => IFolder | null;
     /**
      * 添加一个新的文件夹
-     * @param pos "object" | "module"
+     * @param mode "entity" | "module"
      * @param meta
      * @returns
      */
-    addFolder: (pos: TTargetMode, meta: IFS) => void;
+    addFolder: (mode: TTargetMode, meta: IFolder) => void;
     /**
      * 获取父文件夹（如果有，否则返回 null）
-     * @param pos "object" | "module"
+     * @param mode "entity" | "module"
      * @param id
      * @returns
      */
-    getFolderParent: (pos: TTargetMode, id: string) => IFS | null;
+    getFolderParent: (mode: TTargetMode, id: string) => IFolder | null;
     /**
      * 重设文件夹的名称
-     * @param pos "object" | "module"
+     * @param mode "entity" | "module"
      * @param id
      * @param name
      * @returns
      */
-    setFolderName: (pos: TTargetMode, id: string, name: string) => void;
+    setFolderName: (mode: TTargetMode, id: string, name: string) => void;
     /**
      * 删除文件夹
-     * @param pos "object" | "module"
+     * @param mode "entity" | "module"
      * @param id
      * @returns
      */
-    removeFolderFolder: (pos: TTargetMode, id: string) => void;
+    removeFolder: (mode: TTargetMode, id: string) => void;
     /**
      * 重设文件夹的颜色
-     * @param pos "object" | "module"
+     * @param mode "entity" | "module"
      * @param id
      * @param color
      * @returns
      */
-    setFolderColor: (pos: TTargetMode, id: string, color: string) => void;
+    setFolderColor: (mode: TTargetMode, id: string, color: string) => void;
     /**
      * 获取文件夹的所有子项
      * 只会获取第一层
-     * @param pos "object" | "module"
+     * @param mode "entity" | "module"
      * @param id
      * @returns
      */
-    getFolderChildren: (pos: TTargetMode, id: string | null) => IFS[];
+    getFolderChildren: (mode: TTargetMode, id: string | null) => IFolder[];
     /**
      * 获取文件夹的所有子项
      * 会获取依赖它的所有文件夹及其子文件夹
-     * @param pos "object" | "module"
+     * @param mode "entity" | "module"
      * @param id
      * @returns
      */
-    getFolderDescendants: (pos: TTargetMode, id: string | null) => IFS[];
+    getFolderDescendants: (mode: TTargetMode, id: string | null) => IFolder[];
     /**
      * 生成此界面的文件树，以树形式输出项目结构（包括targets和文件夹）
-     * @param pos "object" | "module"
+     * @param mode "entity" | "module"
      * @returns
      */
-    generateTargetsTree: (pos: TTargetMode) => TTargetTree;
+    generateTargetsTree: (mode: TTargetMode) => TTargetTree;
     /**
      * 删除一个 Target，并返回是否成功删除
      */
@@ -263,18 +263,18 @@ export interface IRuntime {
     /**
      * 修改一个Target的父id，并返回是否修改成功
      */
-    moveTarget: (pos: TTargetMode, targetID: string, newParentID: string | null) => boolean;
+    moveTarget: (mode: TTargetMode, targetID: string, newParentID: string | null) => boolean;
     /**
      * 修改一个Folder的父id，并返回是否修改成功
      */
-    moveFolder: (pos: TTargetMode, targetID: string, newParentID: string | null) => boolean;
+    moveFolder: (mode: TTargetMode, folderID: string, newParentID: string | null) => boolean;
     /**
      * 让目标引用一个模块，并返回是否引用成功
      */
     linkTarget: (selectedTargetID: string, linkTargetID: string) => boolean;
 }
 
-export type folderType = FileSystemDirectoryHandle | undefined;
+export type DirectoryHandle = FileSystemDirectoryHandle | undefined;
 
 export interface IProjectManager {
     /**
@@ -292,7 +292,10 @@ export interface IProjectManager {
      * @param name 文件夹的名称
      * @returns 这个文件夹的对应句柄，如果错误则返回 false
      */
-    createFolder: (path: folderType, name: string) => Promise<FileSystemDirectoryHandle | false>;
+    createFolder: (
+        path: DirectoryHandle,
+        name: string,
+    ) => Promise<FileSystemDirectoryHandle | false>;
     /**
      * 创建个文件
      * @param path 文件的句柄
@@ -301,7 +304,7 @@ export interface IProjectManager {
      * @returns 这个文件对应句柄，如果错误则返回 false
      */
     createFile: (
-        path: folderType,
+        path: DirectoryHandle,
         name: string,
         content: string,
     ) => Promise<FileSystemFileHandle | false>;
@@ -309,21 +312,21 @@ export interface IProjectManager {
      * 返回这个文件夹内是不是空的
      * @returns 是否有文件
      */
-    isEmpty: (path: folderType) => Promise<boolean>;
+    isEmpty: (path: DirectoryHandle) => Promise<boolean>;
     /**
      * 获取一个文件
      * @param path 文件夹句柄
      * @param name 文件名称
      * @returns
      */
-    getFile: (path: folderType, name: string) => Promise<FileSystemFileHandle | false>;
+    getFile: (path: DirectoryHandle, name: string) => Promise<FileSystemFileHandle | false>;
     /**
      * 获取一个文件夹
      * @param path 文件夹句柄
      * @param name 文件夹名称
      * @returns
      */
-    getFolder: (path: folderType, name: string) => Promise<FileSystemDirectoryHandle | false>;
+    getFolder: (path: DirectoryHandle, name: string) => Promise<FileSystemDirectoryHandle | false>;
     /**
      * 检查项目是否是可以保存的
      */
@@ -338,13 +341,13 @@ export interface IProjectManager {
      * @param name 文件名称
      * @returns
      */
-    removeFile: (path: folderType, name: string) => Promise<boolean>;
+    removeFile: (path: DirectoryHandle, name: string) => Promise<boolean>;
     /**
      * 列出所有文件/文件夹
      * @param path 路径句柄
      * @returns
      */
-    listAllFileName: (path: folderType) => Promise<string[] | false>;
+    listAllFileName: (path: DirectoryHandle) => Promise<string[] | false>;
 }
 
 export const allProjectCheckError = {
@@ -441,5 +444,5 @@ export interface IProjectMetaJSON {
     // 截至目前，1 为最新
     projectSaveVersion: number;
     meta: IProjectMeta;
-    folders: Record<TTargetMode, IFS[]>;
+    folders: Record<TTargetMode, IFolder[]>;
 }
