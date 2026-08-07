@@ -67,7 +67,7 @@ export class ProjectManager implements IProjectManager {
             const entries = await path.values().next();
             return !!entries.done;
         } catch {
-            return true;
+            return false;
         }
     }
 
@@ -87,20 +87,30 @@ export class ProjectManager implements IProjectManager {
 
     async getFile(path: DirectoryHandle, name: string) {
         if (!path) return false;
-        const fileHandle = await path.getFileHandle(name);
-        return fileHandle;
+        try {
+            return await path.getFileHandle(name);
+        } catch {
+            return false;
+        }
     }
 
     async getFolder(path: DirectoryHandle, name: string) {
         if (!path) return false;
-        const folderHandle = await path.getDirectoryHandle(name);
-        return folderHandle;
+        try {
+            return await path.getDirectoryHandle(name);
+        } catch {
+            return false;
+        }
     }
 
     async removeFile(path: DirectoryHandle, name: string) {
         if (!path) return false;
-        await path.removeEntry(name, { recursive: true });
-        return true;
+        try {
+            await path.removeEntry(name, { recursive: true });
+            return true;
+        } catch {
+            return false;
+        }
     }
 
     async listAllFileName(path: DirectoryHandle) {
