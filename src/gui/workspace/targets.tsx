@@ -91,8 +91,9 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
 
     useEffect(() => {
         const handleTargetSwitch = () => {
+            const target = vm.runtime.targets.get(vm.runtime.editingTargetID) ?? null;
             setSelectedTargetID(() => vm.runtime.editingTargetID);
-            setSelectedTarget(vm.runtime.targets.get(vm.runtime.editingTargetID) ?? null);
+            setSelectedTarget(target ? {...target} : null);
             setTargetsVersion(v => v + 1);
         };
 

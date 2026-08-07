@@ -11,6 +11,7 @@ import {
     allProjectCheckError,
     projectFileNames,
 } from '../../types/vm';
+import { t } from 'i18next';
 
 /**
  * 与文件系统互动
@@ -31,13 +32,13 @@ export class ProjectManager implements IProjectManager {
         if (!this.isAPIAvailable)
             return {
                 pass: false,
-                result: 'API is unavailable',
+                result: t('err.project.apiUnavailable'),
                 error: allProjectCheckError.API_UNDEFINED,
             };
         if (!this.folderHandle)
             return {
                 pass: false,
-                result: 'Please load/create a project first!',
+                result: t('err.project.nothingSelected'),
                 error: allProjectCheckError.NOTHING_SELECTED,
             };
         // 如果projectFileNames.meta存在则代表这是一个项目，因此不必要求为空
@@ -47,7 +48,7 @@ export class ProjectManager implements IProjectManager {
         )
             return {
                 pass: false,
-                result: 'Please select a empty folder!',
+                result: t('err.project.folderNotEmpty'),
                 error: allProjectCheckError.FOLDER_NOT_EMPTY,
             };
         return { pass: true };

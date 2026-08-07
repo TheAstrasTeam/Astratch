@@ -22,7 +22,7 @@ import type { IWorkspaceState } from '../../types/blocks';
 import Blocks from './blocks';
 import * as Blockly from 'blockly';
 import { sendError } from '../../utils/debug';
-import i18next from 'i18next';
+import { t } from 'i18next';
 
 /**
  * 运行时，管理关于项目的东西
@@ -180,7 +180,7 @@ class Runtime implements IRuntime {
 
     addFolder(mode: TTargetMode, meta: IFolder) {
         if (this.folders.get(mode)?.find(folder => folder.id === meta.id))
-            sendError(i18next.t('err.fs.alreadyExist'));
+            sendError(t('err.fs.alreadyExist'));
         this.folders.get(mode)?.push(meta);
         this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
     }
@@ -195,14 +195,14 @@ class Runtime implements IRuntime {
     setFolderName(mode: TTargetMode, id: string, name: string) {
         const folder = this.folders.get(mode)?.find(folder => folder.id === id);
         if (folder) folder.name = name;
-        else sendError(i18next.t('err.fs.noExist'));
+        else sendError(t('err.fs.noExist'));
         this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
     }
 
     setFolderColor(mode: TTargetMode, id: string, color: string) {
         const folder = this.folders.get(mode)?.find(folder => folder.id === id);
         if (folder) folder.color = color;
-        else sendError(i18next.t('err.fs.noExist'));
+        else sendError(t('err.fs.noExist'));
         this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
     }
 
@@ -281,10 +281,10 @@ class Runtime implements IRuntime {
     }
 
     moveTarget(mode: TTargetMode, targetID: string, newParentID: string | null) {
-        const target = this.targets.get(targetID);
+        const target = this.getTargetByID(targetID);
         if (!target) return false;
         if (newParentID && !this.getFolderByID(mode, newParentID)) {
-            sendError(`Not found folder "${newParentID}".`, 'warn');
+            sendError(t('gui:err.moveTarget.folderNotFound', { id: newParentID }), 'warn');
             return false;
         }
         target.parentID = newParentID;
@@ -297,7 +297,7 @@ class Runtime implements IRuntime {
         if (newParentID)
             if (!this.getFolderByID(mode, newParentID)) {
                 sendError(
-                    i18next.t('gui:err.moveTarget.parentUndefined', {
+                    t('gui:err.moveTarget.parentUndefined', {
                         id: newParentID,
                     }),
                     'warn',
@@ -306,7 +306,7 @@ class Runtime implements IRuntime {
             }
         if (folder) {
             if (folder.id === newParentID) {
-                sendError(i18next.t('gui:err.moveFolder.inSelf'), 'warn');
+                sendError(t('gui:err.moveFolder.inSelf'), 'warn');
                 return false;
             }
             if (
@@ -315,7 +315,7 @@ class Runtime implements IRuntime {
                 ) !== -1 &&
                 newParentID !== null
             ) {
-                sendError(i18next.t('gui:err.moveFolder.inSelf'), 'warn');
+                sendError(t('gui:err.moveFolder.inSelf'), 'warn');
                 return false;
             }
             folder.parentID = newParentID;
@@ -326,21 +326,47 @@ class Runtime implements IRuntime {
 
     linkTarget(selectedTargetID: string, linkTargetID: string) {
         if (selectedTargetID === linkTargetID) {
-            sendError(i18next.t('gui:error.link.linkSelf'), 'warn');
+            sendError(t('gui:error.link.linkSelf'), 'warn');
             return false;
         }
         const selectedTarget = this.getTargetByID(selectedTargetID);
         const linkTarget = this.getTargetByID(linkTargetID);
         if (!(selectedTarget && linkTarget)) {
-            sendError(i18next.t('gui:error.link.undefined'), 'warn');
+            sendError(t('gui:error.link.undefined'), 'warn');
             return false;
         }
         if (linkTarget.mode === 'entity') {
-            sendError(i18next.t('gui:error.link.tryToLinkEntity'), 'warn');
+            sendError(t('gui:error.link.tryToLinkEntity'), 'warn');
             return false;
         }
 
         selectedTarget.links.push(linkTargetID);
+        // 这没有修改结构
+        this.vm.emit(events.UPDATE_PROJECT);
+        return true;
+    }
+
+    renameTarget(targetID: string, newName: string) {
+        const target = this.getTargetByID(targetID);
+        if (!target) {
+            sendError(t('gui:error.target.undefined'), 'warn');
+            return false;
+        }
+
+        target.name = newName;
+        this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
+        return true;
+    }
+
+    renameFolder(mode: TTargetMode, folderID: string, newName: string) {
+        const folder = this.getFolderByID(mode, folderID);
+        if (!folder) {
+            sendError(t('gui:error.target.undefined'), 'warn');
+            return false;
+        }
+
+        folder.name = newName;
+        this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
         return true;
     }
 }

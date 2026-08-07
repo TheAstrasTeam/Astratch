@@ -272,6 +272,14 @@ export interface IRuntime {
      * 让目标引用一个模块，并返回是否引用成功
      */
     linkTarget: (selectedTargetID: string, linkTargetID: string) => boolean;
+    /**
+     * 重命名一个目标，并返回是否删除成功
+     */
+    renameTarget: (targetID: string, newName: string) => boolean;
+    /**
+     * 重命名一个文件夹，并返回是否删除成功
+     */
+    renameFolder: (mode: TTargetMode, folderID: string, newName: string) => boolean;
 }
 
 export type DirectoryHandle = FileSystemDirectoryHandle | undefined;
