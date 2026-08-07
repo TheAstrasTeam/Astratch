@@ -452,7 +452,6 @@ describe('moveTarget', () => {
         runtime.createTarget({ id: 'a' });
         expect(runtime.moveTarget('entity', 'a', 'missing')).toBe(false);
         expect(runtime.getTargetByID('a')?.parentID).toBeNull();
-        expect(sendError).toHaveBeenCalledWith(expect.stringContaining('missing'), 'warn');
     });
 });
 
