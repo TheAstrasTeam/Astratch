@@ -164,7 +164,7 @@ export function initControlBlocks(blockly: typeof Blockly) {
                     input.name === 'ADD_ELSE_IF' ||
                     input.name === 'ADD_ELSE',
             );
-            if (this.isInFlyout) return;
+            if (this.isInsertionMarker()) return;
 
             for (let i = 0; i < this.elseIfCount; i++) {
                 this.appendValueInput(`ELSE_IF_CONDITION_${i.toString()}`)
@@ -290,7 +290,13 @@ export function initControlBlocks(blockly: typeof Blockly) {
             }
         },
         ensureCountBlock(this: RepeatBlock) {
-            if (this.isCreatingCount || this.isInFlyout || this.isDeadOrDying()) return;
+            if (
+                this.isCreatingCount ||
+                this.isInFlyout ||
+                this.isDeadOrDying() ||
+                this.isInsertionMarker()
+            )
+                return;
 
             const connection = this.getInput('COUNT')?.connection as ScopedSourceConnection | null;
             if (!connection) return;
@@ -460,7 +466,13 @@ export function initControlBlocks(blockly: typeof Blockly) {
             }
         },
         ensureItemBlock(this: ForEachBlock) {
-            if (this.isCreatingItem || this.isInFlyout || this.isDeadOrDying()) return;
+            if (
+                this.isCreatingItem ||
+                this.isInFlyout ||
+                this.isDeadOrDying() ||
+                this.isInsertionMarker()
+            )
+                return;
 
             const connection = this.getInput('ITEM_NAME')
                 ?.connection as LoopItemSourceConnection | null;
