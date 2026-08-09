@@ -93,7 +93,7 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
         const handleTargetSwitch = () => {
             const target = vm.runtime.targets.get(vm.runtime.editingTargetID) ?? null;
             setSelectedTargetID(() => vm.runtime.editingTargetID);
-            setSelectedTarget(target ? {...target} : null);
+            setSelectedTarget(target ? { ...target } : null);
             setTargetsVersion(v => v + 1);
         };
 

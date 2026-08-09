@@ -544,40 +544,6 @@ export function initMenuBlocks(blockly: typeof Blockly, vm: IVM) {
         },
     } as Blockly.Block;
 
-    blockly.Blocks[OPCODES.FUNCTION_BRANCH_MENU] = {
-        init(this: Blockly.Block) {
-            this.jsonInit({
-                message0: '%1',
-                args0: [
-                    {
-                        type: 'field_dropdown_with_block',
-                        name: 'ASH_BLOCKMENU',
-                        options: [['', '_EMPTY_']],
-                    },
-                ],
-                output: 'String',
-                colour: BlocksColor.function.primary,
-            });
-        },
-    } as Blockly.Block;
-
-    blockly.Blocks[OPCODES.FUNCTION_PARAMETER_MENU] = {
-        init(this: Blockly.Block) {
-            this.jsonInit({
-                message0: '%1',
-                args0: [
-                    {
-                        type: 'field_dropdown_with_block',
-                        name: 'ASH_BLOCKMENU',
-                        options: [['', '_EMPTY_']],
-                    },
-                ],
-                output: 'String',
-                colour: BlocksColor.function.primary,
-            });
-        },
-    } as Blockly.Block;
-
     blockly.Blocks[OPCODES.KEY_MENU] = {
         init(this: Blockly.Block) {
             this.jsonInit({

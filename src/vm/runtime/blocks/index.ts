@@ -17,7 +17,7 @@ import * as En from 'blockly/msg/en';
 import * as ZhHans from 'blockly/msg/zh-hans';
 import getToolbox from '../../../lib/BlocklyAdapter/toolbox';
 import { initBlocks } from '../../../lib/BlocklyAdapter/blocks';
-import { AshConnectionChecker } from '../../../../plugins/cBlockWrap';
+import { AshConnectionChecker } from '../../../lib/BlocklyAdapter/connectionRules';
 import { getBlocklyComponentStyles } from '../../../lib/Theme/guiThemeManager';
 import { events, type IVM, type viewportUpdateEvent } from '../../../types/vm';
 import { getBlocklyI18nByI18next } from '../../../utils/ash-i18n';

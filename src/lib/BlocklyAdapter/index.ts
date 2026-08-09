@@ -16,7 +16,7 @@ import { dropdownWithInput } from '../../../plugins/fieldDropdown';
 import { FieldAngle } from '../../../plugins/field-angle/src';
 import { FieldColourHsvSliders } from '../../../plugins/field-colour-hsv-sliders/src';
 import { registerScratchComment, ScratchCommentBubble } from '../../../plugins/scratch-comment';
-import { installCBlockWrap } from '../../../plugins/cBlockWrap';
+import { installCBlockWrap } from './cBlockWrap';
 import { modal } from '../../components/Modal/modal';
 import { AlertModal } from '../../components/modal_alert';
 import { ConfirmModal } from '../../components/modal_confirm';

@@ -4,11 +4,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
 import * as Blockly from 'blockly/core';
 import { t } from 'i18next';
 import { BlocksColor, OPCODES } from '../../../types/blocks';
 import { connections, hatConnections, returnConnections } from './helpers';
+import {
+    scopedSourceBlock,
+    scopedSourceHost,
+    type IScopedSourceBlock,
+    type IScopedSourceHost,
+} from './scopedSource';
 
 /**
  * 注册事件类积木
@@ -30,27 +35,12 @@ export function initEventBlocks(blockly: typeof Blockly) {
         },
     } as Blockly.Block;
 
-    interface ScopedSourceConnection extends Blockly.Connection {
-        isScopedSourceSlot?: boolean;
-        allowScopedSource?: boolean;
-    }
-
-    interface BroadcastDataBlock extends Blockly.Block {
-        ownerId?: string;
-        updateLabel(name: string): void;
-        saveExtraState(): { ownerId?: string };
-        loadExtraState(state: { ownerId?: string }): void;
-    }
-
-    interface BroadcastListenBlock extends Blockly.Block {
-        isCreatingData: boolean;
-        ensureDataBlock(): void;
-        onchange(event: Blockly.Events.Abstract): void;
-    }
-
     blockly.Blocks[OPCODES.EVENT_BROADCAST_LISTEN] = {
-        init(this: BroadcastListenBlock) {
-            this.isCreatingData = false;
+        ...scopedSourceHost({
+            sourceType: OPCODES.EVENT_BROADCAST_DATA,
+            slots: () => [{ inputName: 'DATA', defaultName: t('blocks:event.broadcast.data') }],
+        }),
+        init(this: IScopedSourceHost) {
             this.jsonInit({
                 ...hatConnections,
                 message0: t('blocks:event.broadcast.listen'),
@@ -61,81 +51,16 @@ export function initEventBlocks(blockly: typeof Blockly) {
                 ],
             });
 
-            const dataConnection = this.getInput('DATA')
-                ?.connection as ScopedSourceConnection | null;
-            if (dataConnection) {
-                dataConnection.isScopedSourceSlot = true;
-                dataConnection.allowScopedSource = true;
-            }
-            queueMicrotask(() => {
-                if (dataConnection) dataConnection.allowScopedSource = false;
-                this.ensureDataBlock();
-            });
+            this.initScopedHost();
         },
-        onchange(this: BroadcastListenBlock, event: Blockly.Events.Abstract) {
-            if (
-                event.type === Blockly.Events.BLOCK_CREATE ||
-                event.type === Blockly.Events.BLOCK_MOVE ||
-                event.type === Blockly.Events.BLOCK_DELETE ||
-                event.type === Blockly.Events.FINISHED_LOADING
-            ) {
-                this.ensureDataBlock();
-            }
-        },
-        ensureDataBlock(this: BroadcastListenBlock) {
-            if (this.isCreatingData || this.isInFlyout || this.isDeadOrDying()) return;
+    } as IScopedSourceHost;
 
-            const connection = this.getInput('DATA')?.connection as ScopedSourceConnection | null;
-            if (!connection) return;
-
-            const current = connection.targetBlock() as BroadcastDataBlock | null;
-            if (current?.type === OPCODES.EVENT_BROADCAST_DATA) {
-                connection.allowScopedSource = false;
-                current.ownerId = this.id;
-                current.updateLabel(t('blocks:event.broadcast.data'));
-                return;
-            }
-
-            connection.allowScopedSource = false;
-            this.isCreatingData = true;
-            try {
-                if (current) connection.disconnect();
-                const data = this.workspace.newBlock(
-                    OPCODES.EVENT_BROADCAST_DATA,
-                ) as BroadcastDataBlock;
-                data.ownerId = this.id;
-                data.updateLabel(t('blocks:event.broadcast.data'));
-                if (this.workspace.rendered) (data as unknown as Blockly.BlockSvg).initSvg();
-                if (!data.outputConnection) return;
-                connection.allowScopedSource = true;
-                try {
-                    connection.connect(data.outputConnection);
-                } finally {
-                    connection.allowScopedSource = false;
-                }
-                if (this.workspace.rendered) (data as unknown as Blockly.BlockSvg).render();
-            } finally {
-                this.isCreatingData = false;
-            }
-        },
-    } as BroadcastListenBlock;
-
-    blockly.Blocks[OPCODES.EVENT_BROADCAST_DATA] = {
-        init(this: BroadcastDataBlock) {
-            this.appendDummyInput().appendField(t('blocks:event.broadcast.data'), 'NAME');
-            this.setOutput(true);
-            this.setColour(BlocksColor.event.secondary);
-        },
-        updateLabel(this: BroadcastDataBlock, name: string) {
-            this.getField('NAME')?.setValue(name);
-        },
-        saveExtraState(this: BroadcastDataBlock) {
-            return { ownerId: this.ownerId };
-        },
-        loadExtraState(this: BroadcastDataBlock, state: { ownerId?: string }) {
-            this.ownerId = state.ownerId;
-        },
-    } as BroadcastDataBlock;
+    // 广播数据不支持改名（名称由广播频道语义固定），故不传 openRenamePrompt。
+    blockly.Blocks[OPCODES.EVENT_BROADCAST_DATA] = scopedSourceBlock({
+        colour: BlocksColor.event.secondary,
+        defaultLabel: () => t('blocks:event.broadcast.data'),
+        hostTypes: [OPCODES.EVENT_BROADCAST_LISTEN],
+    }) as IScopedSourceBlock;
 
     // - 生命周期
     blockly.Blocks[OPCODES.EVENT_LIFECYCLE_ONSTART] = {

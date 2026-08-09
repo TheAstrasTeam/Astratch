@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
 import * as Blockly from 'blockly/core';
 import { t } from 'i18next';
 import { BlocksColor, OPCODES } from '../../../types/blocks';
@@ -22,6 +21,12 @@ import {
     MutationConnectionStore,
     removeMutationInputs,
 } from './mutation';
+import {
+    scopedSourceBlock,
+    scopedSourceHost,
+    type IScopedSourceBlock,
+    type IScopedSourceHost,
+} from './scopedSource';
 
 /**
  * 注册控制类积木
@@ -229,33 +234,12 @@ export function initControlBlocks(blockly: typeof Blockly) {
         },
     } as Blockly.Block;
 
-    interface ScopedSourceConnection extends Blockly.Connection {
-        isScopedSourceSlot?: boolean;
-        allowScopedSource?: boolean;
-    }
-
-    interface RepeatCountBlock extends Blockly.Block {
-        ownerId?: string;
-        updateLabel(name: string): void;
-        saveExtraState(): { ownerId?: string };
-        loadExtraState(state: { ownerId?: string }): void;
-    }
-
-    interface RepeatBlock extends Blockly.Block {
-        isCreatingCount: boolean;
-        countName: string;
-        ensureCountBlock(): void;
-        updateCountLabels(): void;
-        renameCount(name: string): void;
-        onchange(event: Blockly.Events.Abstract): void;
-        saveExtraState(): { countName: string };
-        loadExtraState(state: { countName?: string }): void;
-    }
-
     blockly.Blocks[OPCODES.CONTROL_LOOP_REPEAT] = {
-        init(this: RepeatBlock) {
-            this.isCreatingCount = false;
-            this.countName = t('blocks:control.loop.count');
+        ...scopedSourceHost({
+            sourceType: OPCODES.CONTROL_LOOP_REPEAT_COUNT,
+            slots: () => [{ inputName: 'COUNT', defaultName: t('blocks:control.loop.count') }],
+        }),
+        init(this: IScopedSourceHost) {
             this.jsonInit({
                 ...connections,
                 message0: t('blocks:control.loop.repeat'),
@@ -268,167 +252,30 @@ export function initControlBlocks(blockly: typeof Blockly) {
                 args1: [{ type: 'input_statement', name: 'DO', check: 'Action' }],
             });
 
-            const countConnection = this.getInput('COUNT')
-                ?.connection as ScopedSourceConnection | null;
-            if (countConnection) {
-                countConnection.isScopedSourceSlot = true;
-                countConnection.allowScopedSource = true;
-            }
-            queueMicrotask(() => {
-                if (countConnection) countConnection.allowScopedSource = false;
-                this.ensureCountBlock();
-            });
+            this.initScopedHost();
         },
-        onchange(this: RepeatBlock, event: Blockly.Events.Abstract) {
-            if (
-                event.type === Blockly.Events.BLOCK_CREATE ||
-                event.type === Blockly.Events.BLOCK_MOVE ||
-                event.type === Blockly.Events.BLOCK_DELETE ||
-                event.type === Blockly.Events.FINISHED_LOADING
-            ) {
-                this.ensureCountBlock();
-            }
-        },
-        ensureCountBlock(this: RepeatBlock) {
-            if (
-                this.isCreatingCount ||
-                this.isInFlyout ||
-                this.isDeadOrDying() ||
-                this.isInsertionMarker()
-            )
-                return;
+    } as IScopedSourceHost;
 
-            const connection = this.getInput('COUNT')?.connection as ScopedSourceConnection | null;
-            if (!connection) return;
-
-            const current = connection.targetBlock() as RepeatCountBlock | null;
-            if (current?.type === OPCODES.CONTROL_LOOP_REPEAT_COUNT) {
-                connection.allowScopedSource = false;
-                current.ownerId = this.id;
-                current.updateLabel(this.countName);
-                return;
-            }
-
-            connection.allowScopedSource = false;
-            this.isCreatingCount = true;
-            try {
-                if (current) connection.disconnect();
-                const count = this.workspace.newBlock(
-                    OPCODES.CONTROL_LOOP_REPEAT_COUNT,
-                ) as RepeatCountBlock;
-                count.ownerId = this.id;
-                count.updateLabel(this.countName);
-                if (this.workspace.rendered) (count as unknown as Blockly.BlockSvg).initSvg();
-                if (!count.outputConnection) return;
-                connection.allowScopedSource = true;
-                try {
-                    connection.connect(count.outputConnection);
-                } finally {
-                    connection.allowScopedSource = false;
-                }
-                if (this.workspace.rendered) (count as unknown as Blockly.BlockSvg).render();
-            } finally {
-                this.isCreatingCount = false;
-            }
-        },
-        updateCountLabels(this: RepeatBlock) {
-            for (const block of this.workspace.getAllBlocks(false)) {
-                const count = block as unknown as RepeatCountBlock;
-                if (count.type === OPCODES.CONTROL_LOOP_REPEAT_COUNT && count.ownerId === this.id) {
-                    count.updateLabel(this.countName);
-                }
-            }
-        },
-        renameCount(this: RepeatBlock, name: string) {
-            const nextName = name.trim();
-            if (!nextName || nextName === this.countName || this.isDeadOrDying()) return;
-            const oldState = JSON.stringify(this.saveExtraState());
-            this.countName = nextName;
-            this.updateCountLabels();
-            const newState = JSON.stringify(this.saveExtraState());
-            Blockly.Events.fire(
-                new Blockly.Events.BlockChange(this, 'mutation', null, oldState, newState),
-            );
-        },
-        saveExtraState(this: RepeatBlock) {
-            return { countName: this.countName };
-        },
-        loadExtraState(this: RepeatBlock, state: { countName?: string }) {
-            this.countName = state.countName ?? t('blocks:control.loop.count');
-            this.updateCountLabels();
-        },
-    } as RepeatBlock;
-
-    blockly.Blocks[OPCODES.CONTROL_LOOP_REPEAT_COUNT] = {
-        init(this: RepeatCountBlock) {
-            this.appendDummyInput().appendField(t('blocks:control.loop.count'), 'NAME');
-            this.setOutput(true, 'Number');
-            this.setColour(BlocksColor.control.tertiary);
-        },
-        updateLabel(this: RepeatCountBlock, name: string) {
-            this.getField('NAME')?.setValue(name);
-        },
-        onchange(this: RepeatCountBlock, event: Blockly.Events.Abstract) {
-            if (event.type !== Blockly.Events.CLICK) return;
-            const click = event as Blockly.Events.Click;
-            if (click.targetType !== Blockly.Events.ClickTarget.BLOCK || click.blockId !== this.id)
-                return;
-            const owner = this.ownerId
-                ? (this.workspace.getBlockById(this.ownerId) as RepeatBlock | null)
-                : null;
-            if (owner?.type !== OPCODES.CONTROL_LOOP_REPEAT) return;
-            const message = owner.countName;
+    blockly.Blocks[OPCODES.CONTROL_LOOP_REPEAT_COUNT] = scopedSourceBlock({
+        colour: BlocksColor.control.tertiary,
+        output: 'Number',
+        defaultLabel: () => t('blocks:control.loop.count'),
+        hostTypes: [OPCODES.CONTROL_LOOP_REPEAT],
+        openRenamePrompt: ({ currentName, commit }) => {
             void modal.open(PromptModal, {
-                message: t('blocks:rename.repeatCount.prompt', { message }),
-                defaultValue: message,
-                callback: result => {
-                    owner.renameCount(result);
-                },
+                message: t('blocks:rename.repeatCount.prompt', { message: currentName }),
+                defaultValue: currentName,
+                callback: commit,
             });
         },
-        saveExtraState(this: RepeatCountBlock) {
-            return { ownerId: this.ownerId };
-        },
-        loadExtraState(this: RepeatCountBlock, state: { ownerId?: string }) {
-            this.ownerId = state.ownerId;
-        },
-    } as RepeatCountBlock;
+    }) as IScopedSourceBlock;
 
-    interface ForEachItemState {
-        ownerId?: string;
-    }
-
-    interface ForEachState {
-        itemName?: string;
-    }
-
-    interface LoopItemSourceConnection extends Blockly.Connection {
-        isLoopItemSourceSlot?: boolean;
-        allowLoopItemSource?: boolean;
-    }
-
-    interface ForEachItemBlock extends Blockly.Block {
-        ownerId?: string;
-        updateLabel(name: string): void;
-        onchange(event: Blockly.Events.Abstract): void;
-        saveExtraState(): ForEachItemState;
-        loadExtraState(state: ForEachItemState): void;
-    }
-
-    interface ForEachBlock extends Blockly.Block {
-        isCreatingItem: boolean;
-        itemName: string;
-        ensureItemBlock(): void;
-        updateItemLabels(): void;
-        renameItem(name: string): void;
-        onchange(event: Blockly.Events.Abstract): void;
-        saveExtraState(): ForEachState;
-        loadExtraState(state: ForEachState): void;
-    }
     blockly.Blocks[OPCODES.CONTROL_LOOP_FOREACH] = {
-        init(this: ForEachBlock) {
-            this.isCreatingItem = false;
-            this.itemName = t('blocks:control.loop.item');
+        ...scopedSourceHost({
+            sourceType: OPCODES.CONTROL_LOOP_FOREACH_ITEM,
+            slots: () => [{ inputName: 'ITEM_NAME', defaultName: t('blocks:control.loop.item') }],
+        }),
+        init(this: IScopedSourceHost) {
             this.jsonInit({
                 ...connections,
                 message0: t('blocks:control.loop.forEach'),
@@ -441,163 +288,22 @@ export function initControlBlocks(blockly: typeof Blockly) {
                 args1: [{ type: 'input_statement', name: 'DO', check: 'Action' }],
             });
 
-            const itemSourceConnection = this.getInput('ITEM_NAME')
-                ?.connection as LoopItemSourceConnection | null;
-            if (itemSourceConnection) {
-                itemSourceConnection.isLoopItemSourceSlot = true;
-                // 同步反序列化会紧接着恢复子积木，完成后由 ensureItemBlock 锁定。
-                itemSourceConnection.allowLoopItemSource = true;
-            }
+            this.initScopedHost();
+        },
+    } as IScopedSourceHost;
 
-            // 非工具箱途径创建积木时，也要补上可拖出的“项”。
-            queueMicrotask(() => {
-                if (itemSourceConnection) itemSourceConnection.allowLoopItemSource = false;
-                this.ensureItemBlock();
+    blockly.Blocks[OPCODES.CONTROL_LOOP_FOREACH_ITEM] = scopedSourceBlock({
+        colour: BlocksColor.control.tertiary,
+        defaultLabel: () => t('blocks:control.loop.item'),
+        hostTypes: [OPCODES.CONTROL_LOOP_FOREACH],
+        openRenamePrompt: ({ currentName, commit }) => {
+            void modal.open(PromptModal, {
+                message: t('blocks:rename.foreachItem.prompt', { message: currentName }),
+                defaultValue: currentName,
+                callback: commit,
             });
         },
-        onchange(this: ForEachBlock, event: Blockly.Events.Abstract) {
-            if (
-                event.type === Blockly.Events.BLOCK_CREATE ||
-                event.type === Blockly.Events.BLOCK_MOVE ||
-                event.type === Blockly.Events.BLOCK_DELETE ||
-                event.type === Blockly.Events.FINISHED_LOADING
-            ) {
-                this.ensureItemBlock();
-            }
-        },
-        ensureItemBlock(this: ForEachBlock) {
-            if (
-                this.isCreatingItem ||
-                this.isInFlyout ||
-                this.isDeadOrDying() ||
-                this.isInsertionMarker()
-            )
-                return;
-
-            const connection = this.getInput('ITEM_NAME')
-                ?.connection as LoopItemSourceConnection | null;
-            if (!connection) return;
-
-            const current = connection.targetBlock() as ForEachItemBlock | null;
-            if (current?.type === OPCODES.CONTROL_LOOP_FOREACH_ITEM) {
-                connection.allowLoopItemSource = false;
-                const previousOwnerId = current.ownerId;
-                current.ownerId = this.id;
-                current.updateLabel(this.itemName);
-
-                // 复制整个循环时，将其中引用旧循环的“项”一并改绑到新循环。
-                if (previousOwnerId && previousOwnerId !== this.id) {
-                    for (const block of this.getDescendants(false)) {
-                        const item = block as unknown as ForEachItemBlock;
-                        if (
-                            item.type === OPCODES.CONTROL_LOOP_FOREACH_ITEM &&
-                            item.ownerId === previousOwnerId
-                        ) {
-                            item.ownerId = this.id;
-                            item.updateLabel(this.itemName);
-                        }
-                    }
-                }
-                return;
-            }
-
-            connection.allowLoopItemSource = false;
-            this.isCreatingItem = true;
-            try {
-                if (current) connection.disconnect();
-
-                const item = this.workspace.newBlock(
-                    OPCODES.CONTROL_LOOP_FOREACH_ITEM,
-                ) as ForEachItemBlock;
-                item.ownerId = this.id;
-                item.updateLabel(this.itemName);
-
-                if (this.workspace.rendered) (item as unknown as Blockly.BlockSvg).initSvg();
-                if (!item.outputConnection) return;
-                connection.allowLoopItemSource = true;
-                try {
-                    connection.connect(item.outputConnection);
-                } finally {
-                    connection.allowLoopItemSource = false;
-                }
-                if (this.workspace.rendered) (item as unknown as Blockly.BlockSvg).render();
-            } finally {
-                this.isCreatingItem = false;
-            }
-        },
-        updateItemLabels(this: ForEachBlock) {
-            for (const block of this.workspace.getAllBlocks(false)) {
-                const item = block as unknown as ForEachItemBlock;
-                if (item.type === OPCODES.CONTROL_LOOP_FOREACH_ITEM && item.ownerId === this.id) {
-                    item.updateLabel(this.itemName);
-                }
-            }
-        },
-        renameItem(this: ForEachBlock, name: string) {
-            const nextName = name.trim();
-            if (!nextName || nextName === this.itemName || this.isDeadOrDying()) return;
-
-            const oldState = JSON.stringify(this.saveExtraState());
-            this.itemName = nextName;
-            this.updateItemLabels();
-            const newState = JSON.stringify(this.saveExtraState());
-            Blockly.Events.fire(
-                new Blockly.Events.BlockChange(this, 'mutation', null, oldState, newState),
-            );
-        },
-        saveExtraState(this: ForEachBlock) {
-            return { itemName: this.itemName };
-        },
-        loadExtraState(this: ForEachBlock, state: ForEachState) {
-            this.itemName = state.itemName ?? t('blocks:control.loop.item');
-            this.updateItemLabels();
-        },
-    } as ForEachBlock;
-
-    blockly.Blocks[OPCODES.CONTROL_LOOP_FOREACH_ITEM] = {
-        init(this: ForEachItemBlock) {
-            this.appendDummyInput().appendField(t('blocks:control.loop.item'), 'NAME');
-            this.setOutput(true);
-            this.setColour(BlocksColor.control.tertiary);
-        },
-        onchange(this: ForEachItemBlock, event: Blockly.Events.Abstract) {
-            if (event.type === Blockly.Events.CLICK) {
-                // 检测有没有点击“项”积木
-                if (
-                    (event as Blockly.Events.Click).targetType !==
-                        Blockly.Events.ClickTarget.BLOCK ||
-                    (event as Blockly.Events.Click).blockId !== this.id
-                )
-                    return;
-
-                const owner = this.ownerId
-                    ? (this.workspace.getBlockById(this.ownerId) as ForEachBlock | null)
-                    : null;
-                if (owner?.type !== OPCODES.CONTROL_LOOP_FOREACH) return;
-
-                const message = owner.itemName;
-                const callback = (result: string) => {
-                    owner.renameItem(result);
-                };
-                void modal.open(PromptModal, {
-                    message: t('blocks:rename.foreachItem.prompt', {
-                        message,
-                    }),
-                    defaultValue: message,
-                    callback,
-                });
-            }
-        },
-        updateLabel(this: ForEachItemBlock, name: string) {
-            this.getField('NAME')?.setValue(name);
-        },
-        saveExtraState(this: ForEachItemBlock) {
-            return { ownerId: this.ownerId };
-        },
-        loadExtraState(this: ForEachItemBlock, state: ForEachItemState) {
-            this.ownerId = state.ownerId;
-        },
-    } as ForEachItemBlock;
+    }) as IScopedSourceBlock;
 
     // - 匹配
     blockly.Blocks[OPCODES.CONTROL_MATCH_MATCH] = {

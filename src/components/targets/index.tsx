@@ -13,7 +13,7 @@ import ExpandIcon from '../../assets/chevronRight.svg?react';
 import RemoveIcon from '../../assets/remove.svg?react';
 import AddIcon from '../../assets/add.svg?react';
 import FolderIcon from '../../assets/addFolder.svg?react';
-import RenameIcon from '../../assets/rename.svg?react'
+import RenameIcon from '../../assets/rename.svg?react';
 
 import { modal } from '../Modal/modal';
 import { ConfirmModal } from '../modal_confirm';
@@ -156,7 +156,7 @@ const GenerateFoldersAndTargets = ({
             defaultValue: target.name,
             callback: handleRename,
         });
-    }
+    };
 
     if (target.type === 'target') {
         return (

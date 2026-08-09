@@ -219,6 +219,7 @@
     "control.loop.forEach": "遍历数组 %1 的每一项 %2",
     "control.loop.item": "项",
     "rename.foreachItem.prompt": "将“{{message}}”重命名为",
+    "rename.functionParam.prompt": "将“{{message}}”重命名为",
     "control.match.match": "匹配 %1",
     "control.match.case": "若是 %1",
     "control.match.default": "默认",
@@ -276,7 +277,7 @@
     "function.execute": "执行函数",
     "function.return": "返回 %1",
     "function.inline": "行内函数",
-    "function.runBranch": "运行标签为 %1 的分支",
+    "function.param": "参数",
     "function.setDataValue": "将参数 %1 设为 %2",
 
     "debug.log": "以 %1 输出 %2",

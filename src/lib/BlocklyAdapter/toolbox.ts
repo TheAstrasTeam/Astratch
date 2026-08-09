@@ -1205,15 +1205,8 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     {
                         gap: 12,
                         kind: 'block',
-                        type: OPCODES.FUNCTION_RUNBRANCH,
-                        inputs: { BRANCH: menu(OPCODES.FUNCTION_BRANCH_MENU) },
-                    },
-                    {
-                        gap: 12,
-                        kind: 'block',
                         type: OPCODES.FUNCTION_SETDATAVALUE,
                         inputs: {
-                            NAME: menu(OPCODES.FUNCTION_PARAMETER_MENU),
                             VALUE: txt(t('blocks:example.data')),
                         },
                     },

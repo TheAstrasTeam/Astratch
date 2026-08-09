@@ -21,7 +21,7 @@
         "erasableSyntaxOnly": true,
         "noFallthroughCasesInSwitch": true
     },
-    "include": ["src", "plugins/cBlockWrap.ts", "plugins/fieldDropdown.ts"],
+    "include": ["src", "plugins/fieldDropdown.ts"],
     "exclude": ["plugins/**/*", "plugins/fieldDropdown.ts"],
     "skipLibCheck": true
 }

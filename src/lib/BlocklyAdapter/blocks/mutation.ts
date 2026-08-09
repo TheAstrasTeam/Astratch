@@ -112,6 +112,18 @@ export function createMinusField(args: { removeIndex: number }): Blockly.FieldIm
 }
 
 /**
+ * 按稳定 key 删除的减号按钮。
+ *
+ * 索引版（{@link createMinusField}）在删中间项后会让后续项编号左移，
+ * 依赖 input 名称认亲的积木（如函数参数）不能用索引，必须用不变的 key。
+ */
+export function createMinusFieldByKey(args: { removeKey: string }): Blockly.FieldImage {
+    return createMutationButton(minusImage, block => {
+        (block as unknown as { minusByKey: (key: string) => void }).minusByKey(args.removeKey);
+    });
+}
+
+/**
  * 创建会产生 mutation 撤销事件的按钮。
  * FieldImage 回调位于 Blockly 的 pointerup 手势中，结构更新必须延后执行。
  */

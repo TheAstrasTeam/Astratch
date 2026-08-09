@@ -36,8 +36,6 @@ const OPCODES = {
     SCIENTIFIC_FUNCTION_MENU: 'scientific_function_menu',
     DATA_NAME_MENU: 'data_name_menu',
     DATA_COMPUTE_MENU: 'data_compute_menu',
-    FUNCTION_BRANCH_MENU: 'function_branch_menu',
-    FUNCTION_PARAMETER_MENU: 'function_parameter_menu',
     KEY_MENU: 'key_menu',
     MOUSE_KEY_MENU: 'mouse_key_menu',
     KEY_ISPRESS_MENU: 'key_isPress_menu',
@@ -213,7 +211,8 @@ const OPCODES = {
     FUNCTION_EXECUTE: 'function_execute',
     FUNCTION_RETURN: 'function_return',
     FUNCTION_INLINE: 'function_inline',
-    FUNCTION_RUNBRANCH: 'function_runBranch',
+    FUNCTION_PARAM: 'function_param',
+    FUNCTION_ARG_HINT: 'function_arg_hint',
     FUNCTION_SETDATAVALUE: 'function_setDataValue',
 
     // 调试
