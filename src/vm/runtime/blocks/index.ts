@@ -118,6 +118,11 @@ class Blocks implements IBlocks {
         void this.restartWorkspace();
     };
 
+    private handleVariableCreated = (data: { targetID: string }) => {
+        if (data.targetID === this.vm.runtime.editingTargetID)
+            this.workspaceSvg?.refreshToolboxSelection();
+    };
+
     constructor(BlocklySelf: typeof Blockly, vm: IVM) {
         this.vm = vm;
         this._DOM = null;
@@ -259,12 +264,18 @@ class Blocks implements IBlocks {
                     continuousToolbox.refreshFlyoutContents();
                 }
                 this.vm.on(events.UPDATE_THEME, this.handleThemeUpdate);
+                this.vm.on(events.CREATE_DATA, data => {
+                    this.handleVariableCreated(data as {
+                        targetID: string
+                    });
+                });
             }
 
             const nowTarget = this.vm.runtime.getTargetByID(this.vm.runtime.editingTargetID);
             const blocks = nowTarget?.blocks;
             if (blocks) {
                 this.Blockly.serialization.workspaces.load(blocks._workspace, this.workspaceSvg);
+                this.workspaceSvg.refreshToolboxSelection();
                 // 调整镜头
                 this.workspaceSvg.scrollX = -nowTarget.viewX;
                 this.workspaceSvg.scrollY = -nowTarget.viewY;

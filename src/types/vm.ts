@@ -97,7 +97,7 @@ export interface ITarget {
     /**
      * 数据
      */
-    data: Map<string, IVariable>
+    data: Map<string, IVariable>;
 }
 
 export interface IVariable {
@@ -475,6 +475,7 @@ export const events = {
     UPDATE_THEME: 'update_theme',
     VIEWPORT_VIEW: 'viewport_view',
     UPDATE_TARGET_STRUCTURE: 'update_target_structure',
+    CREATE_DATA: 'create_data',
 } as const;
 
 export type TEvents = (typeof events)[keyof typeof events];

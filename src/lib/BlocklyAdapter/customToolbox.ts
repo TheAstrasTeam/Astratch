@@ -22,6 +22,12 @@ export function setDataCategory(_blockly: typeof Blockly, vm: IVM): IRegisterCat
             text: t('blocks:data.createTip'),
             callbackkey: OPCODES.HANDLE_CREATE_DATA,
         });
+        vm.runtime.targets.get(vm.runtime.editingTargetID)?.data.forEach(data => {
+            items.push({
+                kind: 'label',
+                text: data.name
+            })
+        })
         const basicItems: Blockly.utils.toolbox.FlyoutItemInfo[] = [
             {
                 gap: 12,

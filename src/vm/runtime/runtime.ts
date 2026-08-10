@@ -390,6 +390,9 @@ class Runtime implements IRuntime {
             isConst,
         });
         this.vm.emit(events.UPDATE_PROJECT);
+        this.vm.emit(events.CREATE_DATA, {
+            targetID
+        })
         return id;
     }
 }
