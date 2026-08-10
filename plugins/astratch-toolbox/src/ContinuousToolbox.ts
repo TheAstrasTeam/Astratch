@@ -160,6 +160,17 @@ export class ContinuousToolbox extends Blockly.Toolbox {
     }
 
     /**
+     * 立即重建 flyout 内容，不经过防抖。
+     *
+     * 动态分类（custom）的回调只能在 workspace 存在后才注册，
+     * 而 inject 时 toolbox 已经拼好了内容——那时回调还不存在，
+     * 动态分类拿到的是空数组。注册完调用本方法即可补上。
+     */
+    refreshFlyoutContents() {
+        this.getFlyout().show(this.getInitialFlyoutContents());
+    }
+
+    /**
      * Updates the flyout's contents if it is visible.
      */
     override refreshSelection() {

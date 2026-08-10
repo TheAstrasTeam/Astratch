@@ -4,13 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// 来自 Cyberexplorer 的积木箱配置
 import * as Blockly from 'blockly/core';
 import { BlocksColor, OPCODES } from '../../types/blocks';
 import { t } from 'i18next';
 import i18nReady from '../../i18n';
 
-const num = (v: string | number) => ({
+export const num = (v: string | number) => ({
     shadow: {
         type: OPCODES.math_number,
         fields: { NUM: v },
@@ -22,7 +21,7 @@ const num = (v: string | number) => ({
 //         fields: { NUM: v },
 //     },
 // });
-const numWhole = (v: string | number) => ({
+export const numWhole = (v: string | number) => ({
     shadow: {
         type: OPCODES.math_whole_number,
         fields: {
@@ -38,13 +37,13 @@ const numWhole = (v: string | number) => ({
 //         },
 //     },
 // });
-const numAngle = (v: string | number) => ({
+export const numAngle = (v: string | number) => ({
     shadow: {
         type: OPCODES.math_angle,
         fields: { NUM: v },
     },
 });
-const txt = (v: string) => ({
+export const txt = (v: string) => ({
     shadow: {
         type: OPCODES.text,
         fields: {
@@ -60,19 +59,19 @@ const txt = (v: string) => ({
 //         },
 //     },
 // });
-const menu = (type: string) => ({
+export const menu = (type: string) => ({
     shadow: {
         type,
     },
 });
-const bool = (value = true) => ({
+export const bool = (value = true) => ({
     shadow: {
         type: OPCODES.OPERATOR_LOGIC_BOOLEAN,
         extraState: { value },
     },
 });
 
-const sep = (gap = 36) => ({ kind: 'sep', gap });
+export const sep = (gap = 36) => ({ kind: 'sep', gap });
 
 const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
     await i18nReady;
@@ -917,33 +916,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                         kind: 'category',
                         name: t('blocks:category.variable'),
                         colour: BlocksColor.data.primary,
-                        contents: [
-                            {
-                                gap: 12,
-                                kind: 'block',
-                                type: OPCODES.DATA_VARIABLE_SET,
-                                inputs: {
-                                    NAME: menu(OPCODES.DATA_NAME_MENU),
-                                    VALUE: txt(t('blocks:example.value')),
-                                },
-                            },
-                            {
-                                gap: 12,
-                                kind: 'block',
-                                type: OPCODES.DATA_VARIABLE_ADD,
-                                inputs: { NAME: menu(OPCODES.DATA_NAME_MENU), VALUE: num(1) },
-                            },
-                            {
-                                gap: 12,
-                                kind: 'block',
-                                type: OPCODES.DATA_VARIABLE_COMPUTE,
-                                inputs: {
-                                    NAME: menu(OPCODES.DATA_NAME_MENU),
-                                    OPERATOR: menu(OPCODES.DATA_COMPUTE_MENU),
-                                    VALUE: num(1),
-                                },
-                            },
-                        ],
+                        custom: OPCODES.DATA_CATEGORY,
                     },
                     {
                         kind: 'category',

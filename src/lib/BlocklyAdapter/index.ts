@@ -38,6 +38,7 @@ import type { IVM } from '../../types/vm';
 import { registerAstratchRenderer } from './renderer';
 import { initBlocks } from './blocks';
 import getToolbox from './toolbox';
+import { setDataCategory } from './customToolbox';
 
 const IS_MAC = getPlatfrom() === ALL_PLATFORMS.MAC;
 
@@ -297,6 +298,12 @@ export interface IBlocklySetup {
     toolbox: BlocklyType.utils.toolbox.ToolboxDefinition;
     /** 撤销全局注册（目前只解绑快捷键监听）。 */
     teardown(): void;
+    readonly registerCategory: ({
+        CUSTOM: string;
+        FUNCTION: (
+            workspace: BlocklyType.WorkspaceSvg,
+        ) => BlocklyType.utils.toolbox.FlyoutDefinition;
+    }[]);
 }
 
 /**
@@ -325,10 +332,11 @@ export function setupBlockly(blockly: typeof BlocklyType, vm: IVM): Promise<IBlo
 
         initBlocks(blockly, vm);
         registerAstratchToolbox(i18next.t);
+        const dataCategory = setDataCategory(blockly, vm)
 
         const toolbox = await getToolbox();
 
-        return { toolbox, teardown };
+        return { toolbox, teardown, registerCategory: [dataCategory] };
     })();
 
     return setupPromise;

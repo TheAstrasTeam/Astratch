@@ -186,8 +186,6 @@ class Blocks implements IBlocks {
     }
 
     async init(): Promise<void> {
-        // 渲染器、积木、工具箱、快捷键等全局注册都在适配层完成，
-        // 内部有缓存，重复调用不会重复注册。
         const { toolbox } = await setupBlockly(this.Blockly, this.vm);
         this.toolbox = toolbox;
         this.workspaceConfig.toolbox = toolbox;
@@ -243,6 +241,21 @@ class Blocks implements IBlocks {
                 this._DOM = DOM;
                 await this.init();
                 this.workspaceSvg = this.Blockly.inject(DOM, this.workspaceConfig);
+                const { registerCategory } = await setupBlockly(this.Blockly, this.vm);
+                registerCategory.forEach(category => {
+                    this.workspaceSvg?.registerToolboxCategoryCallback(
+                        category.CUSTOM,
+                        category.FUNCTION,
+                    );
+                });
+                // inject 时 toolbox 已经把各分类内容拼好了，那时回调还没注册，
+                // 动态分类只能拿到空数组。注册完必须重建一次内容。
+                // 这里不用 refreshSelection()：它带 100ms 防抖，会晚于后续的
+                // 积木加载与镜头调整，白白多一次重建。
+                const toolbox = this.workspaceSvg.getToolbox();
+                if (toolbox instanceof AstratchToolbox.ContinuousToolbox) {
+                    toolbox.refreshFlyoutContents();
+                }
                 this.vm.on(events.UPDATE_THEME, this.handleThemeUpdate);
             }
 

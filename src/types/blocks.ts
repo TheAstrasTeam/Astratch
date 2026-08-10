@@ -235,6 +235,9 @@ const OPCODES = {
     procedures_return: 'procedures_return',
     argument_reporter_string_number: 'argument_reporter_string_number',
     argument_reporter_boolean: 'argument_reporter_boolean',
+
+    // 特殊
+    DATA_CATEGORY: 'data_category',
 } as const;
 
 type TOpcodeValue = (typeof OPCODES)[keyof typeof OPCODES];
