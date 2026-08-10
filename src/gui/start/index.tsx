@@ -35,6 +35,15 @@ const Start = ({ vm }: { vm: IVM }): React.ReactNode => {
         // 开始创建项目
         setInterface(guiInterface.CREATE_PROJECT);
     };
+    const gotoEditor = () => {
+        vm.runtime.createTarget({
+            name: 'test',
+            mode: 'entity',
+        });
+        // eslint-disable-next-line react-hooks/immutability
+        vm.isEditingProject = true;
+        setInterface(guiInterface.EDITOR);
+    };
     return (
         <div className={styles.start}>
             <img
@@ -59,12 +68,7 @@ const Start = ({ vm }: { vm: IVM }): React.ReactNode => {
             {debug && (
                 <>
                     <h4>DEBUG TOOLS</h4>
-                    <button
-                        className={styles.button}
-                        onClick={() => {
-                            setInterface(guiInterface.EDITOR);
-                        }}
-                    >
+                    <button className={styles.button} onClick={gotoEditor}>
                         <DebugIcon />
                         DEBUG: 跳转到编辑器
                     </button>
