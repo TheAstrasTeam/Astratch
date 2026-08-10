@@ -292,18 +292,22 @@ function installBlocklyPatches(blockly: typeof BlocklyType): () => void {
 /** 已完成的初始化，保证全局注册只做一次。 */
 let setupPromise: Promise<IBlocklySetup> | null = null;
 
+export interface IRegisterCategory {
+    CUSTOM: string;
+    CALLBACK: {
+        ID: string;
+        FUNCTION: () => void;
+    }[];
+    FUNCTION: (workspace: BlocklyType.WorkspaceSvg) => BlocklyType.utils.toolbox.FlyoutDefinition;
+};
+
 /** {@link setupBlockly} 的产物。 */
 export interface IBlocklySetup {
     /** 编译好的工具箱定义，可直接塞进 `Blockly.inject` 的配置。 */
     toolbox: BlocklyType.utils.toolbox.ToolboxDefinition;
     /** 撤销全局注册（目前只解绑快捷键监听）。 */
     teardown(): void;
-    readonly registerCategory: ({
-        CUSTOM: string;
-        FUNCTION: (
-            workspace: BlocklyType.WorkspaceSvg,
-        ) => BlocklyType.utils.toolbox.FlyoutDefinition;
-    }[]);
+    registerCategory: IRegisterCategory[];
 }
 
 /**
@@ -323,6 +327,9 @@ export function setupBlockly(blockly: typeof BlocklyType, vm: IVM): Promise<IBlo
 
         blockly.config.snapRadius = SNAP_RADIUS;
         blockly.config.connectingSnapRadius = SNAP_RADIUS;
+        blockly.FlyoutButton.TEXT_MARGIN_X = 16;
+        blockly.FlyoutButton.TEXT_MARGIN_Y = 10;
+        blockly.FlyoutButton.BORDER_RADIUS = 12;
 
         const teardown = installBlocklyPatches(blockly);
 
@@ -332,7 +339,7 @@ export function setupBlockly(blockly: typeof BlocklyType, vm: IVM): Promise<IBlo
 
         initBlocks(blockly, vm);
         registerAstratchToolbox(i18next.t);
-        const dataCategory = setDataCategory(blockly, vm)
+        const dataCategory = setDataCategory(blockly, vm);
 
         const toolbox = await getToolbox();
 

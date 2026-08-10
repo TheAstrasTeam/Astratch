@@ -90,7 +90,7 @@
         "yscroll",
         "YSCROLL"
     ],
-    "commentTranslate.source": "Bing",
+    "commentTranslate.source": "Google",
 
     "files.watcherExclude": {
         "**/node_modules/**": true,

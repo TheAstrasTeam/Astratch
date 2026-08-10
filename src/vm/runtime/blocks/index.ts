@@ -247,14 +247,16 @@ class Blocks implements IBlocks {
                         category.CUSTOM,
                         category.FUNCTION,
                     );
+                    category.CALLBACK.forEach(callback => {
+                        this.workspaceSvg?.registerButtonCallback(callback.ID, callback.FUNCTION);
+                    });
                 });
-                // inject 时 toolbox 已经把各分类内容拼好了，那时回调还没注册，
-                // 动态分类只能拿到空数组。注册完必须重建一次内容。
-                // 这里不用 refreshSelection()：它带 100ms 防抖，会晚于后续的
-                // 积木加载与镜头调整，白白多一次重建。
                 const toolbox = this.workspaceSvg.getToolbox();
                 if (toolbox instanceof AstratchToolbox.ContinuousToolbox) {
-                    toolbox.refreshFlyoutContents();
+                    const continuousToolbox = toolbox as unknown as {
+                        refreshFlyoutContents: () => void;
+                    };
+                    continuousToolbox.refreshFlyoutContents();
                 }
                 this.vm.on(events.UPDATE_THEME, this.handleThemeUpdate);
             }

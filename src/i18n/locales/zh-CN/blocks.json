@@ -238,6 +238,8 @@
     "operator.logic.ternary": "如果 %1 则返回 %2，否则返回 %3",
     "operator.scientific.func": "%1 %2",
 
+    "data.createTip": "创建一个数据",
+    "data.createTip2": "它在此处共享：",
     "data.variable.set": "将数据 %1 设为 %2",
     "data.variable.add": "将数据 %1 增加 %2",
     "data.variable.compute": "将数据 %1 %2 %3",

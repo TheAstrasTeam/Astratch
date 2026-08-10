@@ -28,6 +28,7 @@
 @mixin control-base {
     border: 0;
     background-color: $ui-tertiary;
+    fill: $ui-tertiary;
     color: $text-primary;
     border-radius: 5px;
     margin: 5px;
@@ -41,6 +42,27 @@ body {
     color: $text-primary;
 }
 
+.blocklyFlyoutButton {
+    display: flex;
+    stroke: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    & .blocklyText {
+        font:
+            normal 13pt 'Segoe UI',
+            Tahoma,
+            Geneva,
+            Verdana,
+            sans-serif !important;
+    }
+    & .blocklyFlyoutButtonBackground {
+        display: none;
+    }
+    & .blocklyFlyoutButtonShadow {
+        @include control-base();
+    }
+}
 button {
     @include control-base;
     padding: var(--button-padding);
@@ -49,10 +71,16 @@ button {
     align-items: center;
     justify-content: center;
 }
-button:hover:not(:disabled) {
+button:hover:not(:disabled),
+.blocklyFlyoutButton:hover {
     border: $ui-black-transparent 1px solid;
+    &.blocklyFlyoutButton .blocklyFlyoutButtonShadow {
+        stroke: $ui-black-transparent;
+        stroke-width: 1px;
+    }
 }
-button:active:not(:disabled) {
+button:active:not(:disabled),
+.blocklyFlyoutButton:active {
     filter: $active-button;
 }
 button:disabled {

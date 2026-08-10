@@ -8,12 +8,21 @@ import type { IVM } from '../../types/vm';
 import { OPCODES } from './blocks/helpers';
 import { menu, num, txt } from './toolbox';
 import { t } from 'i18next';
+import type { IRegisterCategory } from '.';
+import { modal } from '../../components/Modal/modal';
+import { CreateDataModal } from '../../components/modal_createData';
 
-export function setDataCategory(_blockly: typeof Blockly, _vm: IVM) {
+export function setDataCategory(_blockly: typeof Blockly, vm: IVM): IRegisterCategory {
     const createDataCategory = (
         _workspace: Blockly.WorkspaceSvg,
     ): Blockly.utils.toolbox.FlyoutDefinition => {
-        return [
+        const items: Blockly.utils.toolbox.FlyoutItemInfo[] = [];
+        items.push({
+            kind: 'button',
+            text: t('blocks:data.createTip'),
+            callbackkey: OPCODES.HANDLE_CREATE_DATA,
+        });
+        const basicItems: Blockly.utils.toolbox.FlyoutItemInfo[] = [
             {
                 gap: 12,
                 kind: 'block',
@@ -40,9 +49,22 @@ export function setDataCategory(_blockly: typeof Blockly, _vm: IVM) {
                 },
             },
         ];
+        basicItems.forEach(item => items.push(item));
+        return items;
+    };
+    const handleCreateData = () => {
+        void modal.open(CreateDataModal, {
+            vm,
+        })
     };
     return {
         CUSTOM: OPCODES.DATA_CATEGORY,
+        CALLBACK: [
+            {
+                ID: OPCODES.HANDLE_CREATE_DATA,
+                FUNCTION: handleCreateData
+            },
+        ],
         FUNCTION: createDataCategory,
     };
 }

@@ -7,6 +7,12 @@
 import type { IBlocks, IWorkspaceState } from './blocks';
 import * as Blockly from 'blockly/core';
 
+export const DATA_VISIBILITY = {
+    PUBLIC: 'public',
+    PRIVATE: 'private',
+} as const;
+export type TDATA_VISIBILITY = (typeof DATA_VISIBILITY)[keyof typeof DATA_VISIBILITY];
+
 export const targets = {
     ASH: 'ash',
     SCRATCH: 'scratch',
@@ -88,6 +94,27 @@ export interface ITarget {
      * 链接的模块
      */
     links: string[];
+    /**
+     * 数据
+     */
+    data: Map<string, IVariable>
+}
+
+export interface IVariable {
+    name: string;
+    id: string;
+    data: unknown;
+    // TODO: 类型系统
+    type?: unknown;
+    /**
+     * 是否是私有
+     * 如果是，则它为“单个脚本共享”，否则为“整个目标共享”
+     */
+    isPrivate: boolean;
+    /**
+     * 是否是常量
+     */
+    isConst: boolean;
 }
 
 export const TargetModes = {
@@ -280,6 +307,22 @@ export interface IRuntime {
      * 重命名一个文件夹，并返回是否删除成功
      */
     renameFolder: (mode: TTargetMode, folderID: string, newName: string) => boolean;
+    /**
+     * 为目标创建一个数据
+     * @param targetID 目标ID
+     * @param name 名称
+     * @param data 数据
+     * @param isPrivate 是否是私有的
+     * @param isConst 是否是常量
+     * @returns
+     */
+    createData: (
+        targetID: string,
+        name: string,
+        data: unknown,
+        isPrivate?: boolean,
+        isConst?: boolean,
+    ) => string;
 }
 
 export type DirectoryHandle = FileSystemDirectoryHandle | undefined;

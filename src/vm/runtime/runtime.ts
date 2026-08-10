@@ -23,6 +23,7 @@ import Blocks from './blocks';
 import * as Blockly from 'blockly';
 import { sendError } from '../../utils/debug';
 import { t } from 'i18next';
+import { spawnRandomString } from '../../utils/ash-string';
 
 /**
  * 运行时，管理关于项目的东西
@@ -120,6 +121,7 @@ class Runtime implements IRuntime {
             viewY: 0,
             viewScale: 1,
             links: [],
+            data: new Map(),
         };
 
         /**
@@ -284,7 +286,7 @@ class Runtime implements IRuntime {
         const target = this.getTargetByID(targetID);
         if (!target) return false;
         if (newParentID && !this.getFolderByID(mode, newParentID)) {
-            sendError(t('gui:err.moveTarget.folderNotFound', { id: newParentID }), 'warn');
+            sendError(t('vm:err.moveTarget.folderNotFound', { id: newParentID }), 'warn');
             return false;
         }
         target.parentID = newParentID;
@@ -297,7 +299,7 @@ class Runtime implements IRuntime {
         if (newParentID)
             if (!this.getFolderByID(mode, newParentID)) {
                 sendError(
-                    t('gui:err.moveTarget.parentUndefined', {
+                    t('vm:err.moveTarget.parentUndefined', {
                         id: newParentID,
                     }),
                     'warn',
@@ -306,7 +308,7 @@ class Runtime implements IRuntime {
             }
         if (folder) {
             if (folder.id === newParentID) {
-                sendError(t('gui:err.moveFolder.inSelf'), 'warn');
+                sendError(t('vm:err.moveFolder.inSelf'), 'warn');
                 return false;
             }
             if (
@@ -315,7 +317,7 @@ class Runtime implements IRuntime {
                 ) !== -1 &&
                 newParentID !== null
             ) {
-                sendError(t('gui:err.moveFolder.inSelf'), 'warn');
+                sendError(t('vm:err.moveFolder.inSelf'), 'warn');
                 return false;
             }
             folder.parentID = newParentID;
@@ -326,17 +328,17 @@ class Runtime implements IRuntime {
 
     linkTarget(selectedTargetID: string, linkTargetID: string) {
         if (selectedTargetID === linkTargetID) {
-            sendError(t('gui:error.link.linkSelf'), 'warn');
+            sendError(t('vm:err.link.linkSelf'), 'warn');
             return false;
         }
         const selectedTarget = this.getTargetByID(selectedTargetID);
         const linkTarget = this.getTargetByID(linkTargetID);
         if (!(selectedTarget && linkTarget)) {
-            sendError(t('gui:error.link.undefined'), 'warn');
+            sendError(t('vm:err.link.undefined'), 'warn');
             return false;
         }
         if (linkTarget.mode === 'entity') {
-            sendError(t('gui:error.link.tryToLinkEntity'), 'warn');
+            sendError(t('vm:err.link.tryToLinkEntity'), 'warn');
             return false;
         }
 
@@ -349,7 +351,7 @@ class Runtime implements IRuntime {
     renameTarget(targetID: string, newName: string) {
         const target = this.getTargetByID(targetID);
         if (!target) {
-            sendError(t('gui:error.target.undefined'), 'warn');
+            sendError(t('vm:err.target.undefined'), 'warn');
             return false;
         }
 
@@ -361,13 +363,34 @@ class Runtime implements IRuntime {
     renameFolder(mode: TTargetMode, folderID: string, newName: string) {
         const folder = this.getFolderByID(mode, folderID);
         if (!folder) {
-            sendError(t('gui:error.target.undefined'), 'warn');
+            sendError(t('vm:err.target.undefined'), 'warn');
             return false;
         }
 
         folder.name = newName;
         this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
         return true;
+    }
+
+    createData(targetID: string, name: string, data: unknown, isPrivate = false, isConst = false) {
+        const target = this.getTargetByID(targetID);
+        if (!target) {
+            sendError(t('vm:err.target.undefined'));
+            return '';
+        }
+        target.data.forEach(variable => {
+            if (variable.name === name) sendError(t('vm:err.variable.nameExisting'));
+        });
+        const id = spawnRandomString();
+        target.data.set(id, {
+            id,
+            name,
+            data,
+            isPrivate,
+            isConst,
+        });
+        this.vm.emit(events.UPDATE_PROJECT);
+        return id;
     }
 }
 
