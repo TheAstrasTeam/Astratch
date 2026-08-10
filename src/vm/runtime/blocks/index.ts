@@ -4,26 +4,19 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-    SNAP_RADIUS,
-    type IBlocks,
-    type IWorkspaceState,
-    type Language,
-} from '../../../types/blocks';
+import { type IBlocks, type IWorkspaceState, type Language } from '../../../types/blocks';
 import * as Blockly from 'blockly';
 // 导入两个插件试试
 import * as AstratchToolbox from '../../../../plugins/astratch-toolbox/src';
 import * as En from 'blockly/msg/en';
 import * as ZhHans from 'blockly/msg/zh-hans';
-import getToolbox from '../../../lib/BlocklyAdapter/toolbox';
-import { initBlocks } from '../../../lib/BlocklyAdapter/blocks';
+import { setupBlockly } from '../../../lib/BlocklyAdapter';
 import { AshConnectionChecker } from '../../../lib/BlocklyAdapter/connectionRules';
 import { getBlocklyComponentStyles } from '../../../lib/Theme/guiThemeManager';
 import { events, type IVM, type viewportUpdateEvent } from '../../../types/vm';
 import { getBlocklyI18nByI18next } from '../../../utils/ash-i18n';
 import i18next from 'i18next';
 import { replaceChineseI18n } from '../../../lib/BlocklyAdapter/i18n';
-import { registerAstratchRenderer } from '../../../lib/BlocklyAdapter/renderer';
 import { Toast } from '../../../lib/ToastManager';
 import { spawnRandomString } from '../../../utils/ash-string';
 
@@ -126,7 +119,6 @@ class Blocks implements IBlocks {
     };
 
     constructor(BlocklySelf: typeof Blockly, vm: IVM) {
-        registerAstratchRenderer();
         this.vm = vm;
         this._DOM = null;
         this.workspaceSvg = null;
@@ -194,23 +186,17 @@ class Blocks implements IBlocks {
     }
 
     async init(): Promise<void> {
-        // 初始化积木区
-        this.toolbox = await getToolbox();
-        this.workspaceConfig.toolbox = this.toolbox;
+        // 渲染器、积木、工具箱、快捷键等全局注册都在适配层完成，
+        // 内部有缓存，重复调用不会重复注册。
+        const { toolbox } = await setupBlockly(this.Blockly, this.vm);
+        this.toolbox = toolbox;
+        this.workspaceConfig.toolbox = toolbox;
 
-        this.Blockly.config.snapRadius = SNAP_RADIUS;
-        this.Blockly.config.connectingSnapRadius = SNAP_RADIUS;
-
+        // 主题跟随 GUI 换肤，每次建工作区都要重新取。
         this.theme.componentStyles = {
             ...getBlocklyComponentStyles(),
             flyoutOpacity: 0.5,
         };
-
-        // 在创建工作区前注册 Astratch Toolbox
-        AstratchToolbox.registerAstratchToolbox(i18next.t);
-
-        // 定义积木
-        initBlocks(this.Blockly, this.vm);
     }
 
     /**

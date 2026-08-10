@@ -30,6 +30,14 @@ import {
     installContextMenuPatch,
     setContextMenuHandler,
 } from '../../../plugins/context-menu-patch';
+import { registerAstratchToolbox } from '../../../plugins/astratch-toolbox/src';
+import i18next from 'i18next';
+import i18nReady from '../../i18n';
+import { SNAP_RADIUS } from '../../types/blocks';
+import type { IVM } from '../../types/vm';
+import { registerAstratchRenderer } from './renderer';
+import { initBlocks } from './blocks';
+import getToolbox from './toolbox';
 
 const IS_MAC = getPlatfrom() === ALL_PLATFORMS.MAC;
 
@@ -148,7 +156,13 @@ export const collectOptions = (focusedNode: Blockly.IFocusableNode | null, e: Ev
     return options;
 };
 
-export function setupBlocklyAdapter(blockly: typeof BlocklyType): () => void {
+/**
+ * 安装所有对 Blockly 全局对象的改造。
+ *
+ * 仅供 {@link setupBlockly} 内部调用——这些都是进程级的一次性注册，
+ * 重复执行会重复绑定快捷键监听。
+ */
+function installBlocklyPatches(blockly: typeof BlocklyType): () => void {
     const registry = blockly.ShortcutRegistry.registry;
     let unsubscribe: (() => void) | null = null;
 
@@ -272,4 +286,50 @@ export function setupBlocklyAdapter(blockly: typeof BlocklyType): () => void {
             unsubscribe = null;
         }
     };
+}
+
+/** 已完成的初始化，保证全局注册只做一次。 */
+let setupPromise: Promise<IBlocklySetup> | null = null;
+
+/** {@link setupBlockly} 的产物。 */
+export interface IBlocklySetup {
+    /** 编译好的工具箱定义，可直接塞进 `Blockly.inject` 的配置。 */
+    toolbox: BlocklyType.utils.toolbox.ToolboxDefinition;
+    /** 撤销全局注册（目前只解绑快捷键监听）。 */
+    teardown(): void;
+}
+
+/**
+ * Blockly 适配层的唯一入口。
+ *
+ * 把散落各处的一次性全局注册收拢到一处：
+ * 渲染器、积木定义、工具箱、快捷键、自定义字段、弹窗与右键菜单接管。
+ *
+ * 这些都是**进程级**的注册，与工作区实例无关，因此只做一次。
+ * 工作区本身的创建／销毁仍由 `vm/runtime/blocks` 负责。
+ *
+ * 重复调用会返回同一个 Promise，可以安全地在多处 await。
+ */
+export function setupBlockly(blockly: typeof BlocklyType, vm: IVM): Promise<IBlocklySetup> {
+    setupPromise ??= (async () => {
+        registerAstratchRenderer();
+
+        blockly.config.snapRadius = SNAP_RADIUS;
+        blockly.config.connectingSnapRadius = SNAP_RADIUS;
+
+        const teardown = installBlocklyPatches(blockly);
+
+        // 积木与工具箱的文案都取自 i18n，必须等它就绪。
+        // getToolbox 内部也会 await，这里显式等一次让顺序更清楚。
+        await i18nReady;
+
+        initBlocks(blockly, vm);
+        registerAstratchToolbox(i18next.t);
+
+        const toolbox = await getToolbox();
+
+        return { toolbox, teardown };
+    })();
+
+    return setupPromise;
 }

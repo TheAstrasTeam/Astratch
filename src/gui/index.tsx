@@ -18,12 +18,10 @@ import Loading from './loading';
 import MenuBar from './menubar';
 import { ContextMenuLayer } from './contextMenu';
 import { shortcutManager } from '../lib/ShortcutManager';
-import { setupBlocklyAdapter } from '../lib/BlocklyAdapter';
 import { SHORTCUTS } from '../types/lib';
 import { useEffect, useState } from 'react';
 import { guiInterface } from '../types/gui';
 import { selectProjectThenJump } from '../utils/ash-gui';
-import * as Blockly from 'blockly';
 
 const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
     // 多数 GUI 组件直接调用 i18next.t；以 language 作为 key 可让整棵界面重新计算文本。
@@ -43,8 +41,6 @@ const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
     }, []);
 
     useEffect(() => {
-        const teardownBlocklyAdapter = setupBlocklyAdapter(Blockly);
-
         const unbindShortcutCommands = shortcutManager.bindCommands({
             [SHORTCUTS.SAVE_PROJECT.id]: () => vm.saveProject(),
             [SHORTCUTS.NEW_PROJECT.id]: () => {
@@ -55,7 +51,6 @@ const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
 
         return () => {
             unbindShortcutCommands();
-            teardownBlocklyAdapter();
         };
     }, [vm, setInterface]);
 
