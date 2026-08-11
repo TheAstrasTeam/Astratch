@@ -388,8 +388,6 @@ export function initFunctionBlocks(blockly: typeof Blockly) {
                 this.appendDummyInput('ADD').appendField(createPlusField());
             }
 
-            
-
             const order: string[] = ['FUNCTION'];
             this.removeInput('ENDROW', true);
             this.appendEndRowInput('ENDROW');
@@ -401,7 +399,6 @@ export function initFunctionBlocks(blockly: typeof Blockly) {
             if (!this.autoSync) order.push('ADD');
 
             for (const name of order) this.moveInputBefore(name, null);
-            
         },
 
         saveExtraState(this: IFunctionCallerBlock) {

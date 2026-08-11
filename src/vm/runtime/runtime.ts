@@ -16,7 +16,6 @@ import {
     type TTargetTree,
     type IVMSettings,
     type TViewportUpdateEvent,
-    type IDataCreatedEvent,
 } from '../../types/vm';
 import Settings from './settings/index';
 import type { IWorkspaceState } from '../../types/blocks';

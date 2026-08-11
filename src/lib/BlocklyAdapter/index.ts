@@ -299,7 +299,7 @@ export interface IRegisterCategory {
         FUNCTION: () => void;
     }[];
     FUNCTION: (workspace: BlocklyType.WorkspaceSvg) => BlocklyType.utils.toolbox.FlyoutDefinition;
-};
+}
 
 /** {@link setupBlockly} 的产物。 */
 export interface IBlocklySetup {

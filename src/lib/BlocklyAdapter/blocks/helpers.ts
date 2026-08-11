@@ -7,7 +7,7 @@
 import * as Blockly from 'blockly/core';
 import { t } from 'i18next';
 import { BlocksColor, OPCODES } from '../../../types/blocks';
-import { events, type IVM } from '../../../types/vm';
+import { type IVM } from '../../../types/vm';
 import { dropdownWithInput } from '../../../../plugins/fieldDropdown';
 
 /**

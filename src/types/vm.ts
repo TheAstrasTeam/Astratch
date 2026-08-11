@@ -523,9 +523,9 @@ export type TViewportUpdateEvent =
       };
 
 export interface IDataCreatedEvent {
-    targetID: string,
-    dataID: string
-};
+    targetID: string;
+    dataID: string;
+}
 
 export interface IProjectMetaJSON {
     // 截至目前，1 为最新

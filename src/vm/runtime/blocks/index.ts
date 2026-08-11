@@ -13,7 +13,12 @@ import * as ZhHans from 'blockly/msg/zh-hans';
 import { setupBlockly } from '../../../lib/BlocklyAdapter';
 import { AshConnectionChecker } from '../../../lib/BlocklyAdapter/connectionRules';
 import { getBlocklyComponentStyles } from '../../../lib/Theme/guiThemeManager';
-import { events, type IDataCreatedEvent, type IVM, type TViewportUpdateEvent } from '../../../types/vm';
+import {
+    events,
+    type IDataCreatedEvent,
+    type IVM,
+    type TViewportUpdateEvent,
+} from '../../../types/vm';
 import { getBlocklyI18nByI18next } from '../../../utils/ash-i18n';
 import i18next from 'i18next';
 import { replaceChineseI18n } from '../../../lib/BlocklyAdapter/i18n';
