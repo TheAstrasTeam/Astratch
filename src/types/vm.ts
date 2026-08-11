@@ -274,37 +274,60 @@ export interface IRuntime {
      * 会获取依赖它的所有文件夹及其子文件夹
      * @param mode "entity" | "module"
      * @param id
-     * @returns
+     * @returns 文件夹的所有子项
      */
     getFolderDescendants: (mode: TTargetMode, id: string | null) => IFolder[];
     /**
      * 生成此界面的文件树，以树形式输出项目结构（包括targets和文件夹）
      * @param mode "entity" | "module"
-     * @returns
+     * @returns 树形式的项目结构
      */
     generateTargetsTree: (mode: TTargetMode) => TTargetTree;
     /**
-     * 删除一个 Target，并返回是否成功删除
+     * 删除一个目标
+     * @param id 目标的id
+     * @returns 是否成功删除
      */
     removeTarget: (id: string) => boolean;
     /**
-     * 修改一个Target的父id，并返回是否修改成功
+     * 修改一个目标的父id
+     * @param mode "entity" | "module"
+     * @param targetID 要修改父id的目标id
+     * @param newParentID 新的父id
+     * @returns 是否修改成功
      */
     moveTarget: (mode: TTargetMode, targetID: string, newParentID: string | null) => boolean;
     /**
-     * 修改一个Folder的父id，并返回是否修改成功
+     * 修改一个文件夹的父id
+     * @param mode "entity" | "module"
+     * @param folderID 要修改父id的文件夹id
+     * @param newParentID 新的父id
+     * @returns 是否修改成功
      */
     moveFolder: (mode: TTargetMode, folderID: string, newParentID: string | null) => boolean;
     /**
      * 让目标引用一个模块，并返回是否引用成功
      */
-    linkTarget: (selectedTargetID: string, linkTargetID: string) => boolean;
     /**
-     * 重命名一个目标，并返回是否删除成功
+     * 链接目标
+     * @param targetID 要被链接的目标id
+     * @param linkTargetID 链接到的目标id
+     * @returns 是否链接成功
+     */
+    linkTarget: (targetID: string, linkTargetID: string) => boolean;
+    /**
+     * 重命名一个目标
+     * @param targetID 要被改名的目标id
+     * @param newName 新名字
+     * @returns 是否重命名成功
      */
     renameTarget: (targetID: string, newName: string) => boolean;
     /**
-     * 重命名一个文件夹，并返回是否删除成功
+     * 重命名一个文件夹
+     * @param mode "entity" | "module"
+     * @param folderID 要被改名的目标id
+     * @param newName 新名字
+     * @returns 是否重命名成功
      */
     renameFolder: (mode: TTargetMode, folderID: string, newName: string) => boolean;
     /**
@@ -314,7 +337,7 @@ export interface IRuntime {
      * @param data 数据
      * @param isPrivate 是否是私有的
      * @param isConst 是否是常量
-     * @returns
+     * @returns 数据的ID
      */
     createData: (
         targetID: string,
@@ -323,6 +346,13 @@ export interface IRuntime {
         isPrivate?: boolean,
         isConst?: boolean,
     ) => string;
+    /**
+     * 获取数据
+     * @param targetID 目标ID
+     * @param dataID 数据ID
+     * @returns 数据，如果获取失败则为`null`
+     */
+    getData: (targetID: string, dataID: string) => IVariable | null;
 }
 
 export type DirectoryHandle = FileSystemDirectoryHandle | undefined;

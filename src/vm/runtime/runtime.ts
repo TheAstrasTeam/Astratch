@@ -326,12 +326,12 @@ class Runtime implements IRuntime {
         } else return false;
     }
 
-    linkTarget(selectedTargetID: string, linkTargetID: string) {
-        if (selectedTargetID === linkTargetID) {
+    linkTarget(targetID: string, linkTargetID: string) {
+        if (targetID === linkTargetID) {
             sendError(t('vm:err.link.linkSelf'), 'warn');
             return false;
         }
-        const selectedTarget = this.getTargetByID(selectedTargetID);
+        const selectedTarget = this.getTargetByID(targetID);
         const linkTarget = this.getTargetByID(linkTargetID);
         if (!(selectedTarget && linkTarget)) {
             sendError(t('vm:err.link.undefined'), 'warn');
@@ -378,8 +378,8 @@ class Runtime implements IRuntime {
             sendError(t('vm:err.target.undefined'));
             return '';
         }
-        target.data.forEach(variable => {
-            if (variable.name === name) sendError(t('vm:err.variable.nameExisting'));
+        target.data.forEach(targetData => {
+            if (targetData.name === name) sendError(t('vm:err.variable.nameExisting'));
         });
         const id = spawnRandomString();
         target.data.set(id, {
@@ -391,9 +391,23 @@ class Runtime implements IRuntime {
         });
         this.vm.emit(events.UPDATE_PROJECT);
         this.vm.emit(events.CREATE_DATA, {
-            targetID
-        })
+            targetID,
+        });
         return id;
+    }
+
+    getData(targetID: string, dataID: string) {
+        const target = this.getTargetByID(targetID);
+        if (!target) {
+            sendError(t('vm:err.target.undefined'), 'warn');
+            return null;
+        }
+        const data = target.data.get(dataID);
+        if (!data) {
+            sendError(t('vm:err.variable.undefined'), 'warn');
+            return null;
+        }
+        return data;
     }
 }
 

@@ -236,6 +236,9 @@ const OPCODES = {
     argument_reporter_string_number: 'argument_reporter_string_number',
     argument_reporter_boolean: 'argument_reporter_boolean',
 
+    // 数据
+    DATA_REFERENCE: 'data_reference',
+
     // 特殊
     DATA_CATEGORY: 'data_category',
     HANDLE_CREATE_DATA: 'handle_create_data',
