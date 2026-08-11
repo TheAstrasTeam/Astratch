@@ -76,12 +76,13 @@ class Blocks implements IBlocks {
         const update = () => {
             if (!this.workspaceSvg) return;
             try {
-                this.vm.runtime.setTargetBlock(
-                    this.vm.runtime.editingTargetID,
-                    this.Blockly.serialization.workspaces.save(
-                        this.workspaceSvg,
-                    ) as IWorkspaceState,
-                );
+                this.vm.runtime
+                    .getEditingTarget()
+                    ?.setBlocks(
+                        this.Blockly.serialization.workspaces.save(
+                            this.workspaceSvg,
+                        ) as IWorkspaceState,
+                    );
             } catch (error) {
                 Toast.create({
                     id: `Workspace_save_Error${spawnRandomString()}`,

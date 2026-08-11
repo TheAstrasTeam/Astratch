@@ -95,7 +95,7 @@ export function createEntitiesMenu(vm: IVM) {
 }
 
 export const refreshDataMenu = (block: Blockly.Block, latestDataID: string, vm: IVM) => {
-    const id = vm.runtime.getData(vm.runtime.editingTargetID, latestDataID)?.id;
+    const id = vm.runtime.getEditingTarget()?.getData(latestDataID)?.id;
     if (id) {
         (block.getField('NAME') as dropdownWithInput).getOptions(false);
         block.setFieldValue(id, 'NAME');

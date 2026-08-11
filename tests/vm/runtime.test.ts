@@ -1,4 +1,4 @@
-// 此文件由AI生成
+﻿// 此文件由AI生成
 /**
  * @license
  * Copyright 2026 AstrasTeam
@@ -7,10 +7,10 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import Runtime from '../../src/vm/runtime/runtime';
+import Folder from '../../src/vm/runtime/folder';
 import { events } from '../../src/types/vm';
 import { sendError } from '../../src/utils/debug';
 import type { IVM, IFolder, TTargetTreeNode } from '../../src/types/vm';
-import type { IWorkspaceState } from '../../src/types/blocks';
 
 // Runtime 依赖 Blockly 工作区管理，测试只关心数据逻辑，直接替换为桩类
 vi.mock('../../src/vm/runtime/blocks', () => ({
@@ -51,7 +51,7 @@ function makeRuntime() {
 }
 
 function makeFolder(id: string, parentID: string | null = null, name = id): IFolder {
-    return { id, name, color: '#000000', parentID };
+    return Folder.fromJSON({ id, name, color: '#000000', parentID }, vi.fn());
 }
 
 describe('createTarget', () => {
@@ -192,22 +192,24 @@ describe('target读写', () => {
         expect(runtime.getTargetByID('a')?.id).toBe('a');
         expect(runtime.getTargetByID('missing')).toBeUndefined();
     });
+});
 
-    it('setTargetBlock应该更新工作区状态并发出UPDATE_PROJECT事件', () => {
-        const { runtime, vm } = makeRuntime();
-        runtime.createTarget({ id: 'a' });
-        const state: IWorkspaceState = { blocks: { languageVersion: 0, blocks: [] } };
-        runtime.setTargetBlock('a', state);
-        expect(runtime.getTargetByID('a')?.blocks._workspace).toBe(state);
-        expect(vi.mocked(vm.emit)).toHaveBeenCalledWith(events.UPDATE_PROJECT);
+describe('getEditingTarget', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
     });
 
-    it('setTargetBlock在target不存在时应该抛出错误', () => {
+    it('应该返回当前编辑中的target', () => {
         const { runtime } = makeRuntime();
-        const state: IWorkspaceState = { blocks: { languageVersion: 0, blocks: [] } };
-        expect(() => {
-            runtime.setTargetBlock('missing', state);
-        }).toThrow('Not found target "missing" in project.');
+        runtime.createTarget({ id: 'a' });
+        runtime.createTarget({ id: 'b' });
+        runtime.switchTarget('a');
+        expect(runtime.getEditingTarget()?.id).toBe('a');
+    });
+
+    it('没有编辑目标时返回undefined', () => {
+        const { runtime } = makeRuntime();
+        expect(runtime.getEditingTarget()).toBeUndefined();
     });
 });
 
@@ -288,34 +290,6 @@ describe('文件夹操作', () => {
                     .map(f => f.id)
                     .sort(),
             ).toEqual(['f1', 'f2', 'f3', 'f4', 'f5']);
-        });
-    });
-
-    describe('setFolderName/setFolderColor', () => {
-        it('应该重命名文件夹并发出事件', () => {
-            const { runtime, vm } = makeRuntime();
-            runtime.addFolder('entity', makeFolder('f1'));
-            runtime.setFolderName('entity', 'f1', '新名字');
-            expect(runtime.getFolderByID('entity', 'f1')?.name).toBe('新名字');
-            expect(vi.mocked(vm.emit)).toHaveBeenCalledWith(events.UPDATE_TARGET_STRUCTURE);
-        });
-
-        it('应该修改文件夹颜色', () => {
-            const { runtime } = makeRuntime();
-            runtime.addFolder('entity', makeFolder('f1'));
-            runtime.setFolderColor('entity', 'f1', '#ff0000');
-            expect(runtime.getFolderByID('entity', 'f1')?.color).toBe('#ff0000');
-        });
-
-        it('不存在的文件夹应该报错', () => {
-            const { runtime } = makeRuntime();
-            expect(() => {
-                runtime.setFolderName('entity', 'missing', 'x');
-            }).toThrow();
-            expect(() => {
-                runtime.setFolderColor('entity', 'missing', '#fff');
-            }).toThrow();
-            expect(sendError).toHaveBeenCalled();
         });
     });
 

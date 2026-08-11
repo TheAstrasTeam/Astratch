@@ -14,42 +14,44 @@ import {
     type IVM,
     type TTargetMode,
     type TTargetTree,
+    type TTargetTreeNode,
     type IVMSettings,
+    type TEmit,
+    type TEvents,
+    type TFolderInfo,
+    type TTargetInfo,
     type TViewportUpdateEvent,
 } from '../../types/vm';
 import Settings from './settings/index';
-import type { IWorkspaceState } from '../../types/blocks';
 import Blocks from './blocks';
 import * as Blockly from 'blockly';
 import { sendError } from '../../utils/debug';
 import { t } from 'i18next';
-import { spawnRandomString } from '../../utils/ash-string';
+import Target from './target';
+import Folder from './folder';
 
 /**
  * 运行时，管理关于项目的东西
+ *
+ * 只做编排：集合存储、跨目标/文件夹的校验、事件分发；
+ * 单个目标/文件夹自身的交互由 Target / Folder 结构体负责
  */
 class Runtime implements IRuntime {
     vm: IVM;
     blocks: Blocks;
     settings: IVMSettings;
     targets: Map<string, ITarget>;
-    DEFAULT_TARGETINFO: ITarget;
+    DEFAULT_TARGETINFO: TTargetInfo;
     editingTargetID: string;
     DEFAULT_ENTITYINFO: IEntityInfo;
     folders: Map<TTargetMode, IFolder[]>;
 
+    private emit: TEmit = (id: TEvents, data?: object) => {
+        this.vm.emit(id, data);
+    };
+
     private updateView(data: TViewportUpdateEvent) {
-        const target = this.targets.get(this.editingTargetID);
-        if (data.changed === 'position') {
-            if (target) {
-                target.viewX = data.x;
-                target.viewY = data.y;
-            }
-        } else {
-            if (target) {
-                target.viewScale = data.scale;
-            }
-        }
+        this.getEditingTarget()?.setViewport(data);
     }
 
     constructor(vm: IVM) {
@@ -137,26 +139,18 @@ class Runtime implements IRuntime {
 
     createTarget(meta: ITargetMeta, switchTo = true) {
         // TODO: 处理Data
-        const id = meta.id ?? crypto.randomUUID();
-        let finalMeta = {
-            // 直接 this.DEFAULT_TARGETINFO 会造成浅拷贝
-            ...structuredClone(this.DEFAULT_TARGETINFO),
-            name: meta.name ?? this.DEFAULT_TARGETINFO.name,
-            parentID: meta.parent ?? this.DEFAULT_TARGETINFO.parentID,
-            mode: meta.mode ?? this.DEFAULT_TARGETINFO.mode,
-            id,
-        };
-        if (finalMeta.mode === 'entity')
-            finalMeta = {
-                ...finalMeta,
-                ...this.DEFAULT_ENTITYINFO,
-            };
-        this.targets.set(id, finalMeta);
+        const target = Target.fromMeta(
+            meta,
+            this.DEFAULT_TARGETINFO,
+            this.DEFAULT_ENTITYINFO,
+            this.emit,
+        );
+        this.targets.set(target.id, target);
 
         this.vm.emit(events.UPDATE_PROJECT);
         this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
-        if (switchTo) this.switchTarget(id);
-        return id;
+        if (switchTo) this.switchTarget(target.id);
+        return target.id;
     }
 
     switchTarget(id: string) {
@@ -168,22 +162,18 @@ class Runtime implements IRuntime {
         return this.targets.get(id);
     }
 
-    setTargetBlock(targetID: string, state: IWorkspaceState) {
-        const target = this.getTargetByID(targetID);
-        if (!target) throw new Error(`Not found target "${targetID}" in project.`);
-
-        target.blocks._workspace = state;
-        this.vm.emit(events.UPDATE_PROJECT);
+    getEditingTarget() {
+        return this.getTargetByID(this.editingTargetID);
     }
 
     getFolderByID(mode: TTargetMode, id: string) {
         return this.folders.get(mode)?.find(folder => folder.id === id) ?? null;
     }
 
-    addFolder(mode: TTargetMode, meta: IFolder) {
+    addFolder(mode: TTargetMode, meta: TFolderInfo) {
         if (this.folders.get(mode)?.find(folder => folder.id === meta.id))
             sendError(t('err.fs.alreadyExist'));
-        this.folders.get(mode)?.push(meta);
+        this.folders.get(mode)?.push(Folder.fromJSON(meta, this.emit));
         this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
     }
 
@@ -192,20 +182,6 @@ class Runtime implements IRuntime {
         if (folder) {
             return this.folders.get(mode)?.find(item => item.id === folder.parentID) ?? null;
         } else return null;
-    }
-
-    setFolderName(mode: TTargetMode, id: string, name: string) {
-        const folder = this.folders.get(mode)?.find(folder => folder.id === id);
-        if (folder) folder.name = name;
-        else sendError(t('err.fs.noExist'));
-        this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
-    }
-
-    setFolderColor(mode: TTargetMode, id: string, color: string) {
-        const folder = this.folders.get(mode)?.find(folder => folder.id === id);
-        if (folder) folder.color = color;
-        else sendError(t('err.fs.noExist'));
-        this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
     }
 
     getFolderChildren(mode: TTargetMode, id: string | null) {
@@ -250,24 +226,21 @@ class Runtime implements IRuntime {
         const collectFoldersAndTargets = (id: string | null, mode: TTargetMode) => {
             const result: TTargetTree = [];
             this.getFolderChildren(mode, id).forEach(folder => {
-                const targets: (ITarget & { type: string })[] = [];
+                const targets: (ITarget & { type: 'target' })[] = [];
                 this.targets.forEach(target => {
-                    if (target.parentID === folder.id) targets.push({ ...target, type: 'target' });
+                    if (target.parentID === folder.id) targets.push(target.cloneAsNode());
                 });
-                result.push({
-                    ...folder,
-                    children: [...collectFoldersAndTargets(folder.id, mode), ...targets],
-                    type: 'folder',
-                });
+                const folderNode = folder.cloneAsNode() as TTargetTreeNode;
+                folderNode.children = [...collectFoldersAndTargets(folder.id, mode), ...targets];
+                result.push(folderNode);
             });
             return result;
         };
-        const result = [];
+        const result: TTargetTree = [];
         // 先加入顶层，因为 `collectFoldersAndTargets` 并不处理最顶层的元素
         // 它只处理子元素
         this.targets.forEach(target => {
-            if (target.parentID === null && target.mode === mode)
-                result.push({ ...target, type: 'target' });
+            if (target.parentID === null && target.mode === mode) result.push(target.cloneAsNode());
         });
         result.push(...collectFoldersAndTargets(null, mode));
         return result;
@@ -289,8 +262,7 @@ class Runtime implements IRuntime {
             sendError(t('vm:err.moveTarget.folderNotFound', { id: newParentID }), 'warn');
             return false;
         }
-        target.parentID = newParentID;
-        this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
+        target.setParent(newParentID);
         return true;
     }
 
@@ -320,8 +292,7 @@ class Runtime implements IRuntime {
                 sendError(t('vm:err.moveFolder.inSelf'), 'warn');
                 return false;
             }
-            folder.parentID = newParentID;
-            this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
+            folder.setParent(newParentID);
             return true;
         } else return false;
     }
@@ -342,73 +313,8 @@ class Runtime implements IRuntime {
             return false;
         }
 
-        selectedTarget.links.push(linkTargetID);
-        // 这没有修改结构
-        this.vm.emit(events.UPDATE_PROJECT);
+        selectedTarget.addLink(linkTargetID);
         return true;
-    }
-
-    renameTarget(targetID: string, newName: string) {
-        const target = this.getTargetByID(targetID);
-        if (!target) {
-            sendError(t('vm:err.target.undefined'), 'warn');
-            return false;
-        }
-
-        target.name = newName;
-        this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
-        return true;
-    }
-
-    renameFolder(mode: TTargetMode, folderID: string, newName: string) {
-        const folder = this.getFolderByID(mode, folderID);
-        if (!folder) {
-            sendError(t('vm:err.target.undefined'), 'warn');
-            return false;
-        }
-
-        folder.name = newName;
-        this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
-        return true;
-    }
-
-    createData(targetID: string, name: string, data: unknown, isPrivate = false, isConst = false) {
-        const target = this.getTargetByID(targetID);
-        if (!target) {
-            sendError(t('vm:err.target.undefined'));
-            return '';
-        }
-        target.data.forEach(targetData => {
-            if (targetData.name === name) sendError(t('vm:err.variable.nameExisting'));
-        });
-        const id = spawnRandomString();
-        target.data.set(id, {
-            id,
-            name,
-            data,
-            isPrivate,
-            isConst,
-        });
-        this.vm.emit(events.UPDATE_PROJECT);
-        this.vm.emit(events.CREATE_DATA, {
-            targetID,
-            dataID: id,
-        });
-        return id;
-    }
-
-    getData(targetID: string, dataID: string) {
-        const target = this.getTargetByID(targetID);
-        if (!target) {
-            sendError(t('vm:err.target.undefined'), 'warn');
-            return null;
-        }
-        const data = target.data.get(dataID);
-        if (!data) {
-            sendError(t('vm:err.variable.undefined'), 'warn');
-            return null;
-        }
-        return data;
     }
 }
 

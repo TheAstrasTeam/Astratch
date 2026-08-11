@@ -98,7 +98,66 @@ export interface ITarget {
      * 数据
      */
     data: Map<string, IVariable>;
+    /**
+     * 重命名目标
+     */
+    rename: (name: string) => void;
+    /**
+     * 设置父文件夹
+     */
+    setParent: (parentID: string | null) => void;
+    /**
+     * 链接一个模块，自链接会失败并返回false
+     */
+    addLink: (linkTargetID: string) => boolean;
+    /**
+     * 解除与模块的链接
+     */
+    removeLink: (linkTargetID: string) => void;
+    /**
+     * 设置目标的所有块
+     * @param state 块的AST
+     */
+    setBlocks: (state: IWorkspaceState) => void;
+    /**
+     * 更新视口（位置/缩放）
+     */
+    setViewport: (data: TViewportUpdateEvent) => void;
+    /**
+     * 创建一个数据，名字重复会警告但仍会创建
+     * @returns 数据的ID
+     */
+    createData: (name: string, data: unknown, isPrivate?: boolean, isConst?: boolean) => string;
+    /**
+     * 获取数据，不存在则返回null
+     */
+    getData: (dataID: string) => IVariable | null;
+    /**
+     * 生成一个带原型（方法）的树节点副本
+     */
+    cloneAsNode: () => ITarget & { type: 'target' };
+    /**
+     * 序列化为纯字段对象（不含blocks）
+     */
+    toJSON: () => TTargetInfo;
 }
+
+/**
+ * 纯字段的目标结构（用于默认值模板与序列化）
+ */
+export type TTargetInfo = Omit<
+    ITarget,
+    | 'rename'
+    | 'setParent'
+    | 'addLink'
+    | 'removeLink'
+    | 'setBlocks'
+    | 'setViewport'
+    | 'createData'
+    | 'getData'
+    | 'cloneAsNode'
+    | 'toJSON'
+>;
 
 export interface IVariable {
     name: string;
@@ -154,16 +213,35 @@ export interface IFolder {
      * 父ID，若为null则为根目录
      */
     parentID: string | null;
+    /**
+     * 重命名文件夹
+     */
+    rename: (name: string) => void;
+    /**
+     * 设置文件夹颜色
+     */
+    setColor: (color: string) => void;
+    /**
+     * 设置父文件夹
+     */
+    setParent: (parentID: string | null) => void;
+    /**
+     * 生成一个带原型（方法）的树节点副本
+     */
+    cloneAsNode: () => IFolder & { type: 'folder' };
 }
 
-export interface TTargetTreeNode {
-    children: (TTargetTreeNode | (ITarget & { type: string }))[];
-    type: 'folder' | 'target';
-    id: string;
-    name: string;
+/**
+ * 纯字段的文件夹结构（用于默认值模板与序列化）
+ */
+export type TFolderInfo = Omit<IFolder, 'rename' | 'setColor' | 'setParent' | 'cloneAsNode'>;
+
+export interface TTargetTreeNode extends IFolder {
+    children: TTargetTree;
+    type: 'folder';
 }
 
-export type TTargetTree = (TTargetTreeNode | (ITarget & { type: string }))[];
+export type TTargetTree = (TTargetTreeNode | (ITarget & { type: 'target' }))[];
 
 export interface IRuntime {
     /**
@@ -192,7 +270,7 @@ export interface IRuntime {
     /**
      * 默认target的信息
      */
-    DEFAULT_TARGETINFO: ITarget;
+    DEFAULT_TARGETINFO: TTargetInfo;
     /**
      * 创建一个新的target，并返回他的ID
      */
@@ -206,16 +284,13 @@ export interface IRuntime {
      */
     editingTargetID: string;
     /**
-     * 设置一个target的所有块
-     * @param targetID 目标的ID
-     * @param blocks 块的AST
-     * @returns
-     */
-    setTargetBlock: (targetID: string, blocks: IWorkspaceState) => void;
-    /**
      * 通过ID获取这个target
      */
     getTargetByID: (id: string) => ITarget | undefined;
+    /**
+     * 获取当前编辑中的目标
+     */
+    getEditingTarget: () => ITarget | undefined;
 
     /**
      * 根据id获取文件夹
@@ -230,7 +305,7 @@ export interface IRuntime {
      * @param meta
      * @returns
      */
-    addFolder: (mode: TTargetMode, meta: IFolder) => void;
+    addFolder: (mode: TTargetMode, meta: TFolderInfo) => void;
     /**
      * 获取父文件夹（如果有，否则返回 null）
      * @param mode "entity" | "module"
@@ -239,28 +314,12 @@ export interface IRuntime {
      */
     getFolderParent: (mode: TTargetMode, id: string) => IFolder | null;
     /**
-     * 重设文件夹的名称
-     * @param mode "entity" | "module"
-     * @param id
-     * @param name
-     * @returns
-     */
-    setFolderName: (mode: TTargetMode, id: string, name: string) => void;
-    /**
      * 删除文件夹
      * @param mode "entity" | "module"
      * @param id
      * @returns
      */
     removeFolder: (mode: TTargetMode, id: string) => void;
-    /**
-     * 重设文件夹的颜色
-     * @param mode "entity" | "module"
-     * @param id
-     * @param color
-     * @returns
-     */
-    setFolderColor: (mode: TTargetMode, id: string, color: string) => void;
     /**
      * 获取文件夹的所有子项
      * 只会获取第一层
@@ -315,45 +374,12 @@ export interface IRuntime {
      * @returns 是否链接成功
      */
     linkTarget: (targetID: string, linkTargetID: string) => boolean;
-    /**
-     * 重命名一个目标
-     * @param targetID 要被改名的目标id
-     * @param newName 新名字
-     * @returns 是否重命名成功
-     */
-    renameTarget: (targetID: string, newName: string) => boolean;
-    /**
-     * 重命名一个文件夹
-     * @param mode "entity" | "module"
-     * @param folderID 要被改名的目标id
-     * @param newName 新名字
-     * @returns 是否重命名成功
-     */
-    renameFolder: (mode: TTargetMode, folderID: string, newName: string) => boolean;
-    /**
-     * 为目标创建一个数据
-     * @param targetID 目标ID
-     * @param name 名称
-     * @param data 数据
-     * @param isPrivate 是否是私有的
-     * @param isConst 是否是常量
-     * @returns 数据的ID
-     */
-    createData: (
-        targetID: string,
-        name: string,
-        data: unknown,
-        isPrivate?: boolean,
-        isConst?: boolean,
-    ) => string;
-    /**
-     * 获取数据
-     * @param targetID 目标ID
-     * @param dataID 数据ID
-     * @returns 数据，如果获取失败则为`null`
-     */
-    getData: (targetID: string, dataID: string) => IVariable | null;
 }
+
+/**
+ * 事件发送函数（结构体方法用它发事件，绑定 VM 的 emit）
+ */
+export type TEmit = (id: TEvents, data?: object) => void;
 
 export type DirectoryHandle = FileSystemDirectoryHandle | undefined;
 

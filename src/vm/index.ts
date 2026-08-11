@@ -5,6 +5,8 @@
  */
 
 import Runtime from './runtime/runtime';
+import Target from './runtime/target';
+import Folder from './runtime/folder';
 import {
     type IVM,
     type IRuntime,
@@ -115,13 +117,10 @@ export class VM implements IVM {
                 // 向对应的target存储meta.json和blocks.json
                 // hmm，事实上它们是存一起的，不过这里会分开
                 if (spriteHandle) {
-                    const targetExpectBlocks = Object.fromEntries(
-                        Object.entries(target).filter(targetInfo => targetInfo[0] !== 'blocks'),
-                    );
                     await this.projectManager.createFile(
                         spriteHandle,
                         projectFileNames.targetMeta,
-                        JSON.stringify(targetExpectBlocks),
+                        JSON.stringify(target.toJSON()),
                     );
                     await this.projectManager.createFile(
                         spriteHandle,
@@ -217,6 +216,7 @@ export class VM implements IVM {
     }
 
     async loadProject() {
+        const emit = this.emit.bind(this);
         const loadTargets = async (folder: DirectoryHandle) => {
             const folderNames = (await this.projectManager.listAllFileName(folder)) || [];
 
@@ -247,7 +247,7 @@ export class VM implements IVM {
                         blocks: targetBlocks,
                     } as ITarget;
 
-                    this.runtime.targets.set(targetInfo.id, targetInfo);
+                    this.runtime.targets.set(targetInfo.id, Target.fromJSON(targetInfo, emit));
                 }
             }
         };
@@ -279,7 +279,10 @@ export class VM implements IVM {
             const projectMeta = JSON.parse(metaFileContent) as IProjectMetaJSON;
             this.runtime.settings.setProjectMeta(projectMeta.meta);
             for (const mode of Object.values(TargetModes)) {
-                this.runtime.folders.set(mode, projectMeta.folders[mode]);
+                this.runtime.folders.set(
+                    mode,
+                    projectMeta.folders[mode].map(folder => Folder.fromJSON(folder, emit)),
+                );
             }
         } catch {
             return false;

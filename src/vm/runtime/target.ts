@@ -1,0 +1,172 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import {
+    events,
+    type IEntityInfo,
+    type ITarget,
+    type ITargetMeta,
+    type IVariable,
+    type TEmit,
+    type TTargetInfo,
+    type TTargetMode,
+    type TViewportUpdateEvent,
+} from '../../types/vm';
+import type { IWorkspaceState } from '../../types/blocks';
+import { spawnRandomString } from '../../utils/ash-string';
+import { sendError } from '../../utils/debug';
+import { t } from 'i18next';
+
+/**
+ * 目标
+ */
+class Target implements ITarget {
+    name: string;
+    id: string;
+    blocks: ITarget['blocks'];
+    comments: ITarget['comments'];
+    size?: number;
+    direction?: number;
+    currentCostume?: number;
+    effects?: ITarget['effects'];
+    volume?: number;
+    x?: number;
+    y?: number;
+    parentID: string | null;
+    mode: TTargetMode;
+    viewX: number;
+    viewY: number;
+    viewScale: number;
+    links: string[];
+    data: Map<string, IVariable>;
+
+    private emit: TEmit;
+
+    constructor(emit: TEmit) {
+        this.emit = emit;
+        this.name = '';
+        this.id = '';
+        this.blocks = {
+            _workspace: {
+                blocks: {
+                    languageVersion: 0,
+                    blocks: [],
+                },
+            },
+            _script: [],
+        };
+        this.comments = {};
+        this.parentID = null;
+        this.mode = 'entity';
+        this.viewX = 0;
+        this.viewY = 0;
+        this.viewScale = 1;
+        this.links = [];
+        this.data = new Map();
+    }
+
+    rename(name: string) {
+        this.name = name;
+        this.emit(events.UPDATE_TARGET_STRUCTURE);
+    }
+
+    setParent(parentID: string | null) {
+        this.parentID = parentID;
+        this.emit(events.UPDATE_TARGET_STRUCTURE);
+    }
+
+    addLink(linkTargetID: string): boolean {
+        if (linkTargetID === this.id) {
+            sendError(t('vm:err.link.linkSelf'), 'warn');
+            return false;
+        }
+        this.links.push(linkTargetID);
+        this.emit(events.UPDATE_PROJECT);
+        return true;
+    }
+
+    removeLink(linkTargetID: string) {
+        this.links = this.links.filter(id => id !== linkTargetID);
+        this.emit(events.UPDATE_PROJECT);
+    }
+
+    setBlocks(state: IWorkspaceState) {
+        this.blocks._workspace = state;
+        this.emit(events.UPDATE_PROJECT);
+    }
+
+    setViewport(data: TViewportUpdateEvent) {
+        if (data.changed === 'position') {
+            this.viewX = data.x;
+            this.viewY = data.y;
+        } else {
+            this.viewScale = data.scale;
+        }
+    }
+
+    createData(name: string, data: unknown, isPrivate = false, isConst = false): string {
+        this.data.forEach(targetData => {
+            if (targetData.name === name) sendError(t('vm:err.variable.nameExisting'));
+        });
+        const id = spawnRandomString();
+        this.data.set(id, {
+            id,
+            name,
+            data,
+            isPrivate,
+            isConst,
+        });
+        this.emit(events.UPDATE_PROJECT);
+        this.emit(events.CREATE_DATA, {
+            targetID: this.id,
+            dataID: id,
+        });
+        return id;
+    }
+
+    getData(dataID: string) {
+        return this.data.get(dataID) ?? null;
+    }
+
+    cloneAsNode() {
+        return Object.assign(Object.create(Target.prototype), this, {
+            type: 'target',
+        }) as ITarget & { type: 'target' };
+    }
+
+    toJSON() {
+        return Object.fromEntries(
+            Object.entries(this).filter(([key]) => key !== 'blocks'),
+        ) as TTargetInfo;
+    }
+
+    static fromMeta(
+        meta: ITargetMeta,
+        defaults: TTargetInfo,
+        entityInfo: IEntityInfo,
+        emit: TEmit,
+    ): Target {
+        const id = meta.id ?? crypto.randomUUID();
+        const mode = meta.mode ?? defaults.mode;
+        const target = new Target(emit);
+        Object.assign(target, structuredClone(defaults), {
+            id,
+            name: meta.name ?? defaults.name,
+            parentID: meta.parent ?? defaults.parentID,
+            mode,
+        });
+        if (mode === 'entity') Object.assign(target, structuredClone(entityInfo));
+        return target;
+    }
+
+    static fromJSON(json: TTargetInfo, emit: TEmit): Target {
+        const target = new Target(emit);
+        Object.assign(target, json);
+        return target;
+    }
+}
+
+export default Target;

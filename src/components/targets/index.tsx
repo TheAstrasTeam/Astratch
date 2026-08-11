@@ -51,7 +51,10 @@ const filterTargetsTree = (targets: TTargetTree, query: string): TTargetTree => 
             // 文件夹节点
             const children = filterTargetsTree(node.children, q);
             if (children.length > 0 || node.name.toLowerCase().includes(q)) {
-                result.push({ ...node, children });
+                // 保留原型，避免过滤后树节点丢失方法
+                const copy = node.cloneAsNode() as TTargetTreeNode;
+                copy.children = children;
+                result.push(copy);
             }
         } else if (node.name.toLowerCase().includes(q)) {
             // 目标节点
@@ -104,7 +107,7 @@ const GenerateFoldersAndTargets = ({
     dropFolderId,
     draggingItemId,
 }: {
-    target: TTargetTreeNode;
+    target: TTargetTree[number];
     expandedFolders: Set<string>;
     toggleFolder: (id: string) => void;
     selected: string;
@@ -148,8 +151,8 @@ const GenerateFoldersAndTargets = ({
         e.stopPropagation();
         const handleRename = (result: string) => {
             if (!result) return;
-            if (target.type === 'folder') vm.runtime.renameFolder(mode, target.id, result);
-            else vm.runtime.renameTarget(target.id, result);
+            if (target.type === 'folder') vm.runtime.getFolderByID(mode, target.id)?.rename(result);
+            else vm.runtime.getTargetByID(target.id)?.rename(result);
         };
         void modal.open(PromptModal, {
             message: t('gui:rename.tip', { name: target.name }),
@@ -270,7 +273,7 @@ const GenerateFoldersAndTargets = ({
                     target.children.map(child => (
                         <GenerateFoldersAndTargets
                             key={child.id}
-                            target={child as TTargetTreeNode}
+                            target={child}
                             expandedFolders={expandedFolders}
                             toggleFolder={toggleFolder}
                             selected={selected}
@@ -487,7 +490,7 @@ export const TargetsList = ({
                 {tree.map(target => (
                     <GenerateFoldersAndTargets
                         key={target.id}
-                        target={target as TTargetTreeNode}
+                        target={target}
                         expandedFolders={expandedFolders}
                         toggleFolder={toggleFolder}
                         selected={selected}

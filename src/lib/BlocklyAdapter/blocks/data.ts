@@ -46,7 +46,7 @@ export function initDataBlocks(blockly: typeof Blockly, vm: IVM) {
             });
         },
         syncLabel(this: IDataGetBlock) {
-            const variable = vm.runtime.getData(vm.runtime.editingTargetID, this.dataId);
+            const variable = vm.runtime.getEditingTarget()?.getData(this.dataId);
             this.setFieldValue(variable?.name ?? t('blocks:data.missing'), 'NAME');
         },
         saveExtraState(this: IDataGetBlock) {
