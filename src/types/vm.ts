@@ -510,7 +510,7 @@ export const events = {
 
 export type TEvents = (typeof events)[keyof typeof events];
 
-export type viewportUpdateEvent =
+export type TViewportUpdateEvent =
     | {
           changed: 'scale';
           oldScale: number;
@@ -521,6 +521,11 @@ export type viewportUpdateEvent =
           x: number;
           y: number;
       };
+
+export interface IDataCreatedEvent {
+    targetID: string,
+    dataID: string
+};
 
 export interface IProjectMetaJSON {
     // 截至目前，1 为最新

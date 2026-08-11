@@ -168,6 +168,7 @@ const OPCODES = {
 
     // 数据
     // - 变量
+    DATA_VARIABLE_GET: 'data_variable_get',
     DATA_VARIABLE_SET: 'data_variable_set',
     DATA_VARIABLE_ADD: 'data_variable_add',
     DATA_VARIABLE_COMPUTE: 'data_variable_compute',

@@ -24,17 +24,20 @@ export function setDataCategory(_blockly: typeof Blockly, vm: IVM): IRegisterCat
         });
         vm.runtime.targets.get(vm.runtime.editingTargetID)?.data.forEach(data => {
             items.push({
-                kind: 'label',
-                text: data.name
-            })
-        })
+                gap: 12,
+                kind: 'block',
+                type: OPCODES.DATA_VARIABLE_GET,
+                extraState: { dataId: data.id },
+            });
+        });
+
         const basicItems: Blockly.utils.toolbox.FlyoutItemInfo[] = [
+            { kind: 'sep', gap: 16 },
             {
                 gap: 12,
                 kind: 'block',
                 type: OPCODES.DATA_VARIABLE_SET,
                 inputs: {
-                    NAME: menu(OPCODES.DATA_NAME_MENU),
                     VALUE: txt(t('blocks:example.value')),
                 },
             },
@@ -42,14 +45,13 @@ export function setDataCategory(_blockly: typeof Blockly, vm: IVM): IRegisterCat
                 gap: 12,
                 kind: 'block',
                 type: OPCODES.DATA_VARIABLE_ADD,
-                inputs: { NAME: menu(OPCODES.DATA_NAME_MENU), VALUE: num(1) },
+                inputs: { VALUE: num(1) },
             },
             {
                 gap: 12,
                 kind: 'block',
                 type: OPCODES.DATA_VARIABLE_COMPUTE,
                 inputs: {
-                    NAME: menu(OPCODES.DATA_NAME_MENU),
                     OPERATOR: menu(OPCODES.DATA_COMPUTE_MENU),
                     VALUE: num(1),
                 },
@@ -61,14 +63,14 @@ export function setDataCategory(_blockly: typeof Blockly, vm: IVM): IRegisterCat
     const handleCreateData = () => {
         void modal.open(CreateDataModal, {
             vm,
-        })
+        });
     };
     return {
         CUSTOM: OPCODES.DATA_CATEGORY,
         CALLBACK: [
             {
                 ID: OPCODES.HANDLE_CREATE_DATA,
-                FUNCTION: handleCreateData
+                FUNCTION: handleCreateData,
             },
         ],
         FUNCTION: createDataCategory,

@@ -7,7 +7,8 @@
 import * as Blockly from 'blockly/core';
 import { t } from 'i18next';
 import { BlocksColor, OPCODES } from '../../../types/blocks';
-import { connections, returnConnections } from './helpers';
+import { connections, createDataMenu, refreshDataMenu, returnConnections } from './helpers';
+import { events, type IDataCreatedEvent, type IVM } from '../../../types/vm';
 import {
     createMinusField,
     createPlusField,
@@ -19,50 +20,122 @@ import {
  * 注册数据类积木
  * 涵盖：变量、字符串、数组、对象、类型
  */
-export function initDataBlocks(blockly: typeof Blockly) {
+export function initDataBlocks(blockly: typeof Blockly, vm: IVM) {
     // - 变量
+    // 每个数据都是一个独立积木：id 存在积木自己身上（extraState），
+    // 标签只负责显示名字。这样改名不会断链，也不必在菜单里堆一长串选项。
+    interface IDataGetBlock extends Blockly.Block {
+        dataId: string;
+        /** 从 VM 重读名字并刷新标签。 */
+        syncLabel(): void;
+    }
+
+    interface IDataBlock extends Blockly.Block {
+        _onCreateData: (Data: unknown) => void;
+    }
+
+    blockly.Blocks[OPCODES.DATA_VARIABLE_GET] = {
+        init(this: IDataGetBlock) {
+            this.dataId = '';
+            this.jsonInit({
+                ...returnConnections,
+                message0: '%1',
+                colour: BlocksColor.data.primary,
+                output: null,
+                args0: [{ type: 'field_label_serializable', name: 'NAME', text: '' }],
+            });
+        },
+        syncLabel(this: IDataGetBlock) {
+            const variable = vm.runtime.getData(vm.runtime.editingTargetID, this.dataId);
+            this.setFieldValue(variable?.name ?? t('blocks:data.missing'), 'NAME');
+        },
+        saveExtraState(this: IDataGetBlock) {
+            return { dataId: this.dataId };
+        },
+        loadExtraState(this: IDataGetBlock, state: { dataId?: string }) {
+            this.dataId = state.dataId ?? '';
+            this.syncLabel();
+        },
+    } as IDataGetBlock;
+
     blockly.Blocks[OPCODES.DATA_VARIABLE_SET] = {
-        init(this: Blockly.Block) {
+        init(this: IDataBlock) {
             this.jsonInit({
                 ...connections,
                 message0: t('blocks:data.variable.set'),
                 colour: BlocksColor.data.primary,
                 args0: [
-                    { type: 'input_value', name: 'NAME', check: 'String' },
+                    { type: 'input_dummy', name: 'NAME_HOLDER' },
                     { type: 'input_value', name: 'VALUE' },
                 ],
             });
+            this.getInput('NAME_HOLDER')?.appendField(createDataMenu(vm), 'NAME');
+
+            if (this.isInFlyout) {
+                const handler = (Data: unknown) => {
+                    refreshDataMenu(this, (Data as IDataCreatedEvent).dataID, vm);
+                };
+                vm.on(events.CREATE_DATA, handler);
+                this._onCreateData = handler;
+            }
         },
-    } as Blockly.Block;
+        destroy(this: IDataBlock) {
+            if (this.isInFlyout) vm.off(events.CREATE_DATA, this._onCreateData);
+        },
+    } as IDataBlock;
 
     blockly.Blocks[OPCODES.DATA_VARIABLE_ADD] = {
-        init(this: Blockly.Block) {
+        init(this: IDataBlock) {
             this.jsonInit({
                 ...connections,
                 message0: t('blocks:data.variable.add'),
                 colour: BlocksColor.data.primary,
                 args0: [
-                    { type: 'input_value', name: 'NAME', check: 'String' },
+                    { type: 'input_dummy', name: 'NAME_HOLDER' },
                     { type: 'input_value', name: 'VALUE', check: 'Number' },
                 ],
             });
+            this.getInput('NAME_HOLDER')?.appendField(createDataMenu(vm), 'NAME');
+
+            if (this.isInFlyout) {
+                const handler = (Data: unknown) => {
+                    refreshDataMenu(this, (Data as IDataCreatedEvent).dataID, vm);
+                };
+                vm.on(events.CREATE_DATA, handler);
+                this._onCreateData = handler;
+            }
         },
-    } as Blockly.Block;
+        destroy(this: IDataBlock) {
+            if (this.isInFlyout) vm.off(events.CREATE_DATA, this._onCreateData);
+        },
+    } as IDataBlock;
 
     blockly.Blocks[OPCODES.DATA_VARIABLE_COMPUTE] = {
-        init(this: Blockly.Block) {
+        init(this: IDataBlock) {
             this.jsonInit({
                 ...connections,
                 message0: t('blocks:data.variable.compute'),
                 colour: BlocksColor.data.primary,
                 args0: [
-                    { type: 'input_value', name: 'NAME', check: 'String' },
+                    { type: 'input_dummy', name: 'NAME_HOLDER' },
                     { type: 'input_value', name: 'OPERATOR', check: 'String' },
                     { type: 'input_value', name: 'VALUE', check: 'Number' },
                 ],
             });
+            this.getInput('NAME_HOLDER')?.appendField(createDataMenu(vm), 'NAME');
+
+            if (this.isInFlyout) {
+                const handler = (Data: unknown) => {
+                    refreshDataMenu(this, (Data as IDataCreatedEvent).dataID, vm);
+                };
+                vm.on(events.CREATE_DATA, handler);
+                this._onCreateData = handler;
+            }
         },
-    } as Blockly.Block;
+        destroy(this: IDataBlock) {
+            if (this.isInFlyout) vm.off(events.CREATE_DATA, this._onCreateData);
+        },
+    } as IDataBlock;
 
     // - 字符串
 

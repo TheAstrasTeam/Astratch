@@ -7,7 +7,7 @@
 import * as Blockly from 'blockly/core';
 import { t } from 'i18next';
 import { BlocksColor, OPCODES } from '../../../types/blocks';
-import type { IVM } from '../../../types/vm';
+import { events, type IVM } from '../../../types/vm';
 import { dropdownWithInput } from '../../../../plugins/fieldDropdown';
 
 /**
@@ -91,6 +91,30 @@ export function createEntitiesMenu(vm: IVM) {
             directionList.push([target.name, target.id]);
         });
         return directionList;
+    });
+}
+
+export const refreshDataMenu = (block: Blockly.Block, latestDataID: string, vm: IVM) => {
+    const id = vm.runtime.getData(vm.runtime.editingTargetID, latestDataID)?.id;
+    if (id) {
+        (block.getField('NAME') as dropdownWithInput).getOptions(false);
+        block.setFieldValue(id, 'NAME');
+    }
+};
+
+/**
+ * 创建一个"变量选择菜单"字段
+ *
+ * 选项形如 [显示名, id]：存的是 id，所以变量改名后已有积木不会认错亲。
+ */
+export function createDataMenu(vm: IVM) {
+    return new dropdownWithInput(() => {
+        const options: Blockly.MenuOption[] = [];
+        vm.runtime.targets.get(vm.runtime.editingTargetID)?.data.forEach(data => {
+            options.push([data.name, data.id]);
+        });
+        if (options.length === 0) options.push(['', '']);
+        return options;
     });
 }
 

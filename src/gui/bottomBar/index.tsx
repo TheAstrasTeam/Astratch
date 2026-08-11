@@ -5,7 +5,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
-import { events, type IVM, type viewportUpdateEvent } from '../../types/vm';
+import { events, type IVM, type TViewportUpdateEvent } from '../../types/vm';
 import styles from './index.module.scss';
 import { t } from 'i18next';
 import { ToastLayer } from '../../components/toastLayer';
@@ -28,7 +28,7 @@ export const BottomBar = ({ vm }: { vm: IVM }): React.ReactNode => {
         scale: '1',
     });
     useEffect(() => {
-        const handleViewportUpdate = (data: viewportUpdateEvent) => {
+        const handleViewportUpdate = (data: TViewportUpdateEvent) => {
             if (data.changed === 'scale') {
                 setOverlayText(prev => ({ ...prev, scale: data.scale.toFixed(2) }));
             } else {

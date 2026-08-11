@@ -13,7 +13,7 @@ import * as ZhHans from 'blockly/msg/zh-hans';
 import { setupBlockly } from '../../../lib/BlocklyAdapter';
 import { AshConnectionChecker } from '../../../lib/BlocklyAdapter/connectionRules';
 import { getBlocklyComponentStyles } from '../../../lib/Theme/guiThemeManager';
-import { events, type IVM, type viewportUpdateEvent } from '../../../types/vm';
+import { events, type IDataCreatedEvent, type IVM, type TViewportUpdateEvent } from '../../../types/vm';
 import { getBlocklyI18nByI18next } from '../../../utils/ash-i18n';
 import i18next from 'i18next';
 import { replaceChineseI18n } from '../../../lib/BlocklyAdapter/i18n';
@@ -87,7 +87,7 @@ class Blocks implements IBlocks {
         };
         const getInfoOfViewportUpdate = (
             event: Blockly.Events.ViewportChange,
-        ): viewportUpdateEvent => {
+        ): TViewportUpdateEvent => {
             // 常理来说是不会出现位置大小
             // 都更改的事件，所以暂不处理
             if (event.oldScale !== event.scale)
@@ -265,9 +265,7 @@ class Blocks implements IBlocks {
                 }
                 this.vm.on(events.UPDATE_THEME, this.handleThemeUpdate);
                 this.vm.on(events.CREATE_DATA, data => {
-                    this.handleVariableCreated(data as {
-                        targetID: string
-                    });
+                    this.handleVariableCreated(data as IDataCreatedEvent);
                 });
             }
 

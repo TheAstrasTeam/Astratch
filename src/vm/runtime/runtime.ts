@@ -15,7 +15,8 @@ import {
     type TTargetMode,
     type TTargetTree,
     type IVMSettings,
-    type viewportUpdateEvent,
+    type TViewportUpdateEvent,
+    type IDataCreatedEvent,
 } from '../../types/vm';
 import Settings from './settings/index';
 import type { IWorkspaceState } from '../../types/blocks';
@@ -38,7 +39,7 @@ class Runtime implements IRuntime {
     DEFAULT_ENTITYINFO: IEntityInfo;
     folders: Map<TTargetMode, IFolder[]>;
 
-    private updateView(data: viewportUpdateEvent) {
+    private updateView(data: TViewportUpdateEvent) {
         const target = this.targets.get(this.editingTargetID);
         if (data.changed === 'position') {
             if (target) {
@@ -130,7 +131,7 @@ class Runtime implements IRuntime {
         this.editingTargetID = '';
 
         // 监听视口更改并将其更新到target meta
-        // VIEWPORT_VIEW 发来的数据总会为 viewportUpdateEvent
+        // VIEWPORT_VIEW 发来的数据总会为 TViewportUpdateEvent
         // 但是我太懒了所以类型总是object，所以直接as了
         this.vm.on(events.VIEWPORT_VIEW, this.updateView.bind(this) as (data: object) => void);
     }
@@ -392,6 +393,7 @@ class Runtime implements IRuntime {
         this.vm.emit(events.UPDATE_PROJECT);
         this.vm.emit(events.CREATE_DATA, {
             targetID,
+            dataID: id,
         });
         return id;
     }

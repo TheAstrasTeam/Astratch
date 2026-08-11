@@ -44,6 +44,7 @@ const blocklyTheme: Blockly.Theme.ComponentStyle = {
     scrollbarColour: '#555555',
     insertionMarkerColour: '#ffffff',
     cursorColour: '#000000',
+    selectedGlowColour: 'var(--looks-secondary)',
 } as const;
 
 export default {
