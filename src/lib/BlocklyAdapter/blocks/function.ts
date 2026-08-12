@@ -355,6 +355,25 @@ export function initFunctionBlocks(blockly: typeof Blockly) {
                 if (id !== null && !wanted.has(id)) this.removeInput(input.name, true);
             }
 
+            const order: string[] = [];
+            for (const arg of this.args) {
+                order.push(`${ARG_INPUT_PREFIX}${arg.id}`);
+                if (!this.autoSync) order.push(`${ARG_REMOVE_PREFIX}${arg.id}`);
+            }
+            if (this.autoSync) this.removeInput('ADD', true);
+            else if (!this.getInput('ADD')) {
+                this.appendDummyInput('ADD').appendField(createPlusField());
+            }
+            if (!this.autoSync) order.push('ADD');
+            if (this.args.length > 0) {
+                this.removeInput('ENDROW', true);
+                this.appendEndRowInput('ENDROW');
+                order.push('ENDROW');
+            } else {
+                this.removeInput('ENDROW', true);
+            }
+            order.push('FUNCTION');
+
             for (const arg of this.args) {
                 const inputName = `${ARG_INPUT_PREFIX}${arg.id}`;
                 if (!this.getInput(inputName)) {
@@ -382,22 +401,6 @@ export function initFunctionBlocks(blockly: typeof Blockly) {
                     );
                 }
             }
-
-            if (this.autoSync) this.removeInput('ADD', true);
-            else if (!this.getInput('ADD')) {
-                this.appendDummyInput('ADD').appendField(createPlusField());
-            }
-
-            const order: string[] = ['FUNCTION'];
-            this.removeInput('ENDROW', true);
-            this.appendEndRowInput('ENDROW');
-            order.push('ENDROW');
-            for (const arg of this.args) {
-                order.push(`${ARG_INPUT_PREFIX}${arg.id}`);
-                if (!this.autoSync) order.push(`${ARG_REMOVE_PREFIX}${arg.id}`);
-            }
-            if (!this.autoSync) order.push('ADD');
-
             for (const name of order) this.moveInputBefore(name, null);
         },
 

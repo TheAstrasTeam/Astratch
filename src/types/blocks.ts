@@ -243,6 +243,7 @@ const OPCODES = {
     // 特殊
     DATA_CATEGORY: 'data_category',
     HANDLE_CREATE_DATA: 'handle_create_data',
+    FUNCTION_CATEGORY: 'function_category',
 } as const;
 
 type TOpcodeValue = (typeof OPCODES)[keyof typeof OPCODES];

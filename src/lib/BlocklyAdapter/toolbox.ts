@@ -1153,37 +1153,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                 kind: 'category',
                 id: 'function',
                 name: t('blocks:category.function'),
-                contents: [
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODES.FUNCTION_CALL,
-                    },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODES.FUNCTION_EXECUTE,
-                    },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODES.FUNCTION_RETURN,
-                        inputs: { VALUE: txt(t('blocks:example.value')) },
-                    },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODES.FUNCTION_INLINE,
-                    },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODES.FUNCTION_SETDATAVALUE,
-                        inputs: {
-                            VALUE: txt(t('blocks:example.data')),
-                        },
-                    },
-                ],
+                custom: OPCODES.FUNCTION_CATEGORY,
             },
             {
                 kind: 'category',

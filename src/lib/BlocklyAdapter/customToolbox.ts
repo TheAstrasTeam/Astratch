@@ -76,3 +76,49 @@ export function setDataCategory(_blockly: typeof Blockly, vm: IVM): IRegisterCat
         FUNCTION: createDataCategory,
     };
 }
+
+export function setFunctionCategory(_blockly: typeof Blockly, vm: IVM): IRegisterCategory {
+    const createFunctionCategory = (
+        _workspace: Blockly.WorkspaceSvg,
+    ): Blockly.utils.toolbox.FlyoutDefinition => {
+        const items: Blockly.utils.toolbox.FlyoutItemInfo[] = [];
+        const basicItems: Blockly.utils.toolbox.FlyoutItemInfo[]  = [
+            {
+                gap: 12,
+                kind: 'block',
+                type: OPCODES.FUNCTION_CALL,
+            },
+            {
+                gap: 12,
+                kind: 'block',
+                type: OPCODES.FUNCTION_EXECUTE,
+            },
+            {
+                gap: 12,
+                kind: 'block',
+                type: OPCODES.FUNCTION_RETURN,
+                inputs: { VALUE: txt(t('blocks:example.value')) },
+            },
+            {
+                gap: 12,
+                kind: 'block',
+                type: OPCODES.FUNCTION_INLINE,
+            },
+            {
+                gap: 12,
+                kind: 'block',
+                type: OPCODES.FUNCTION_SETDATAVALUE,
+                inputs: {
+                    VALUE: txt(t('blocks:example.data')),
+                },
+            },
+        ];
+        basicItems.forEach(item => items.push(item));
+        return items
+    };
+    return {
+        CUSTOM: OPCODES.FUNCTION_CATEGORY,
+        CALLBACK: [],
+        FUNCTION: createFunctionCategory
+    }
+}

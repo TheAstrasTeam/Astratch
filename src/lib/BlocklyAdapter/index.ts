@@ -38,7 +38,7 @@ import type { IVM } from '../../types/vm';
 import { registerAstratchRenderer } from './renderer';
 import { initBlocks } from './blocks';
 import getToolbox from './toolbox';
-import { setDataCategory } from './customToolbox';
+import { setDataCategory, setFunctionCategory } from './customToolbox';
 
 const IS_MAC = getPlatfrom() === ALL_PLATFORMS.MAC;
 
@@ -339,11 +339,10 @@ export function setupBlockly(blockly: typeof BlocklyType, vm: IVM): Promise<IBlo
 
         initBlocks(blockly, vm);
         registerAstratchToolbox(i18next.t);
-        const dataCategory = setDataCategory(blockly, vm);
 
         const toolbox = await getToolbox();
 
-        return { toolbox, teardown, registerCategory: [dataCategory] };
+        return { toolbox, teardown, registerCategory: [setDataCategory(blockly, vm), setFunctionCategory(blockly, vm)] };
     })();
 
     return setupPromise;
