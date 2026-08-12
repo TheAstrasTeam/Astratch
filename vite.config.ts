@@ -51,8 +51,9 @@ export default defineConfig({
         babel({ presets: [reactCompilerPreset()] }),
         pageReload([
             // Blockly 工作区不兼容 HMR，相关文件变更时直接刷新页面
-            '/src/vm/blocks/**/*',
+            '/src/vm/runtime/blocks/**/*',
             '/src/gui/blocks/**/*',
+            '/src/lib/BlocklyAdapter/**/*',
         ]),
     ],
     css: {
