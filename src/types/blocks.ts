@@ -18,6 +18,7 @@ const OPCODES = {
     IMAGES_STRETCH_MENU: 'images_stretch_menu',
     IMAGES_IMAGES_ADDORSET_MENU: 'images_images_addOrSet_menu',
     IMAGES_GRID_MENU: 'images_grid_menu',
+    IMAGES_GRID_MENU_TWO: 'images_grid_menu_two',
     IMAGES_GRID_SIZE_MENU: 'images_grid_size_menu',
     EFFECTS_MENU: 'effects_menu',
     EFFECTS_ADDORSET_MENU: 'effects_addOrSet_menu',

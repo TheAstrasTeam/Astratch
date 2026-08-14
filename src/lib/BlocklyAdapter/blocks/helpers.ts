@@ -83,9 +83,12 @@ export function clearRegisteredBlocks(blockly: typeof Blockly) {
  *
  * 使用 dropdownWithInput（field_dropdown_with_block）以与原 JSON 定义保持一致
  */
-export function createEntitiesMenu(vm: IVM) {
+export function createEntitiesMenu(vm: IVM, customTypes: Blockly.MenuOption[] = []) {
     return new dropdownWithInput(() => {
-        const directionList: Blockly.MenuOption[] = [[t('blocks:menu.mousePoint'), '_MOUSE_']];
+        const directionList: Blockly.MenuOption[] = [
+            [t('blocks:menu.mousePoint'), '_MOUSE_'],
+            ...customTypes,
+        ];
         vm.runtime.targets.forEach(target => {
             if (target.id === vm.runtime.editingTargetID) return;
             directionList.push([target.name, target.id]);

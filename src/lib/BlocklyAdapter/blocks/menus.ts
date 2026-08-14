@@ -123,7 +123,7 @@ export function initMenuBlocks(blockly: typeof Blockly, vm: IVM) {
     // 动态：实体选择菜单
     blockly.Blocks[OPCODES.DIRECTION_SETFACE_MENU] = {
         init(this: Blockly.Block) {
-            this.appendDummyInput().appendField(createEntitiesMenu(vm), 'ASH_BLOCKMENU');
+            this.appendDummyInput().appendField(createEntitiesMenu(vm,[[t('blocks:menu.stageCenter'), '_STAGECENTER_']]), 'ASH_BLOCKMENU');
             this.setOutput(true, 'String');
             this.setColour(BlocksColor.direction.primary);
         },
@@ -200,6 +200,26 @@ export function initMenuBlocks(blockly: typeof Blockly, vm: IVM) {
                         name: 'ASH_BLOCKMENU',
                         options: [
                             ['%%', '_SET_'],
+                            [t('blocks:menu.unit'), '_UNIT_'],
+                        ],
+                    },
+                ],
+                output: 'String',
+                colour: BlocksColor.Images.primary,
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.IMAGES_GRID_MENU_TWO] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                message0: '%1',
+                args0: [
+                    {
+                        type: 'field_dropdown_with_block',
+                        name: 'ASH_BLOCKMENU',
+                        options: [
+                            [t('blocks:menu.pers'), '_SET_'],
                             [t('blocks:menu.unit'), '_UNIT_'],
                         ],
                     },
@@ -612,7 +632,7 @@ export function initMenuBlocks(blockly: typeof Blockly, vm: IVM) {
                         name: 'ASH_BLOCKMENU',
                         options: [
                             [t('blocks:menu.pressDown'), '_PRESSDOWN_'],
-                            [t('blocks:menu.pressIn'), '_PRESSIN_'],
+                            // [t('blocks:menu.pressIn'), '_PRESSIN_'],
                             [t('blocks:menu.pressUp'), '_PRESSUP_'],
                         ],
                     },

@@ -279,8 +279,8 @@ export function initEventBlocks(blockly: typeof Blockly) {
                 message0: t('blocks:event.input.whenMouseButton'),
                 colour: BlocksColor.event.tertiary,
                 args0: [
-                    { type: 'input_value', name: 'BUTTON' },
                     { type: 'input_value', name: 'ACTION' },
+                    { type: 'input_value', name: 'BUTTON' },
                 ],
             });
         },

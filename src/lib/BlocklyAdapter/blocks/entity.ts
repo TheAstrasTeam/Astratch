@@ -192,16 +192,16 @@ export function initEntityBlocks(blockly: typeof Blockly) {
         },
     } as Blockly.Block;
 
-    blockly.Blocks[OPCODES.ENTITY_APPEARANCE_IMAGES_SETGRID] = {
-        init(this: Blockly.Block) {
-            this.jsonInit({
-                ...connections,
-                message0: t('blocks:entity.appearance.images.setGrid'),
-                args0: [{ type: 'input_value', name: 'POS' }],
-                colour: BlocksColor.Images.primary,
-            });
-        },
-    } as Blockly.Block;
+    // blockly.Blocks[OPCODES.ENTITY_APPEARANCE_IMAGES_SETGRID] = {
+    //     init(this: Blockly.Block) {
+    //         this.jsonInit({
+    //             ...connections,
+    //             message0: t('blocks:entity.appearance.images.setGrid'),
+    //             args0: [{ type: 'input_value', name: 'POS' }],
+    //             colour: BlocksColor.Images.primary,
+    //         });
+    //     },
+    // } as Blockly.Block;
 
     blockly.Blocks[OPCODES.ENTITY_APPEARANCE_IMAGES_SETGRIDDISTANCE] = {
         init(this: Blockly.Block) {

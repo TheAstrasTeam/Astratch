@@ -228,12 +228,12 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                         },
                                     },
                                     sep(),
-                                    {
-                                        gap: 12,
-                                        kind: 'block',
-                                        type: OPCODES.ENTITY_APPEARANCE_IMAGES_SETGRID,
-                                        inputs: { POS: menu(OPCODES.IMAGES_GRID_SIZE_MENU) },
-                                    },
+                                    // {
+                                    //     gap: 12,
+                                    //     kind: 'block',
+                                    //     type: OPCODES.ENTITY_APPEARANCE_IMAGES_SETGRID,
+                                    //     inputs: { POS: menu(OPCODES.IMAGES_GRID_SIZE_MENU) },
+                                    // },
                                     {
                                         gap: 12,
                                         kind: 'block',
@@ -618,11 +618,11 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                 type: OPCODES.EVENT_INPUT_GETMOUSEPOSITION,
                                 inputs: { AXIS: txt('x') },
                             },
-                            {
-                                gap: 12,
-                                kind: 'block',
-                                type: OPCODES.EVENT_INPUT_ISMOUSETOUCHING,
-                            },
+                            // {
+                            //     gap: 12,
+                            //     kind: 'block',
+                            //     type: OPCODES.EVENT_INPUT_ISMOUSETOUCHING,
+                            // },
                             {
                                 gap: 12,
                                 kind: 'block',
@@ -666,8 +666,8 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                 kind: 'block',
                                 type: OPCODES.EVENT_INPUT_WHENMOUSEBUTTON,
                                 inputs: {
-                                    BUTTON: menu(OPCODES.MOUSE_KEY_MENU),
                                     ACTION: menu(OPCODES.KEY_ISPRESS_MENU),
+                                    BUTTON: menu(OPCODES.MOUSE_KEY_MENU),
                                 },
                             },
                             {
@@ -733,6 +733,24 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                 type: OPCODES.CONTROL_CONDITION_IF,
                                 inputs: { CONDITION: bool(false) },
                             },
+                            sep(),
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODES.CONTROL_MATCH_MATCH,
+                                inputs: { VALUE: txt(t('blocks:example.value')) },
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODES.CONTROL_MATCH_CASE,
+                                inputs: { VALUE: txt(t('blocks:example.case')) },
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODES.CONTROL_MATCH_DEFAULT,
+                            },
                         ],
                     },
                     {
@@ -766,30 +784,6 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                         },
                                     },
                                 },
-                            },
-                        ],
-                    },
-                    {
-                        kind: 'category',
-                        name: t('blocks:category.match'),
-                        colour: BlocksColor.control.secondary,
-                        contents: [
-                            {
-                                gap: 12,
-                                kind: 'block',
-                                type: OPCODES.CONTROL_MATCH_MATCH,
-                                inputs: { VALUE: txt(t('blocks:example.value')) },
-                            },
-                            {
-                                gap: 12,
-                                kind: 'block',
-                                type: OPCODES.CONTROL_MATCH_CASE,
-                                inputs: { VALUE: txt(t('blocks:example.case')) },
-                            },
-                            {
-                                gap: 12,
-                                kind: 'block',
-                                type: OPCODES.CONTROL_MATCH_DEFAULT,
                             },
                         ],
                     },
@@ -838,6 +832,16 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                 kind: 'block',
                                 type: OPCODES.OPERATOR_MATH_CLAMP,
                                 inputs: { VALUE: num(0), MIN: num(0), MAX: num(100) },
+                            },
+                            sep(),
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODES.OPERATOR_SCIENTIFIC_FUNC,
+                                inputs: {
+                                    FUNCTION: menu(OPCODES.SCIENTIFIC_FUNCTION_MENU),
+                                    VALUE: num(0),
+                                },
                             },
                         ],
                     },
@@ -889,22 +893,13 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             },
                         ],
                     },
-                    {
-                        kind: 'category',
-                        name: t('blocks:category.scientific'),
-                        colour: BlocksColor.operator.tertiary,
-                        contents: [
-                            {
-                                gap: 12,
-                                kind: 'block',
-                                type: OPCODES.OPERATOR_SCIENTIFIC_FUNC,
-                                inputs: {
-                                    FUNCTION: menu(OPCODES.SCIENTIFIC_FUNCTION_MENU),
-                                    VALUE: num(0),
-                                },
-                            },
-                        ],
-                    },
+                    // {
+                    //     kind: 'category',
+                    //     name: t('blocks:category.scientific'),
+                    //     colour: BlocksColor.operator.tertiary,
+                    //     contents: [
+                    //     ],
+                    // },
                 ],
             },
             {
