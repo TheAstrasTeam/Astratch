@@ -215,6 +215,8 @@ const OPCODES = {
     FUNCTION_PARAM: 'function_param',
     FUNCTION_ARG_HINT: 'function_arg_hint',
     FUNCTION_SETDATAVALUE: 'function_setDataValue',
+    FUNCTION_VALUE: 'function_value',
+    FUNCTION_VALUE_ID: 'function_value_id',
 
     // 调试
     DEBUG_LOG: 'debug_log',
@@ -244,6 +246,7 @@ const OPCODES = {
     DATA_CATEGORY: 'data_category',
     HANDLE_CREATE_DATA: 'handle_create_data',
     FUNCTION_CATEGORY: 'function_category',
+    HANDLE_CREATE_FUNCTION: 'handle_create_function',
 } as const;
 
 type TOpcodeValue = (typeof OPCODES)[keyof typeof OPCODES];
@@ -404,6 +407,25 @@ export interface IBlocksConfig {
 }
 
 export { OPCODES, BlocksColor };
+
+export type TFunctionReturnField =
+    'dropdown' | 'boolean' | 'array' | 'object' | 'string' | 'number' | 'function' | null;
+
+export interface TPreviewFunctionData {
+    type: 'text' | TFunctionReturnField;
+    /** 文本片段要展示的文字，或值槽位对应的参数 id。 */
+    text?: string;
+}
+export interface IFunctionValueBlock extends Blockly.Block {
+    /** 要渲染的字段数据（文本段 + 返回字段占位）。 */
+    previewData: TPreviewFunctionData[];
+    /** 是否处于创建编辑模式：为 true 时渲染左右移动按钮。 */
+    editMode: boolean;
+    /** 按 previewData 重建积木形状。 */
+    updateShape(): void;
+    /** 把第 index 项与相邻项交换（delta 为 -1 或 1），用于左右移动按钮。 */
+    moveField(index: number, delta: number): void;
+}
 
 export type Language = Record<string, string>;
 

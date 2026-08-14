@@ -17,6 +17,8 @@ import light from './gui/light';
 
 import blue from './accent/blue';
 import pink from './accent/pink';
+import { BlocksColor } from '../../types/blocks';
+import { flattenObject } from '../../utils/ash-data';
 
 const DEFAULT_BLOCKLY_SPRITES_STYLE_ID = 'blockly_sprites_style';
 
@@ -48,6 +50,18 @@ const applyGuiTheme = (): void => {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     const accents = guiAccentMap[themeAccent] ?? guiAccentMap[DEFAULT_GUIACCENT];
 
+    const style = document.createElement('style');
+    style.className = 'ash-style';
+    style.textContent = ':root{';
+    const setPropertyForStyle = (name: string, value: string | null) => {
+        style.textContent += `${name}: ${String(value)};`;
+    };
+
+    // 积木的颜色
+    Object.entries(flattenObject(BlocksColor)).forEach(color => {
+        setPropertyForStyle(`--blockly_${color[0]}`, color[1] as string);
+    });
+
     Object.entries(theme).forEach(css => {
         if (css[0] === 'color-scheme') {
             document.documentElement.style.colorScheme = css[1];
@@ -74,13 +88,15 @@ const applyGuiTheme = (): void => {
                     style.remove();
                 });
             }
-        } else document.documentElement.style.setProperty(`--${css[0]}`, css[1]);
+        } else setPropertyForStyle(`--${css[0]}`, css[1]);
     });
     Object.entries(accents).forEach(color => {
         Object.entries(color[1]).forEach(css => {
-            document.documentElement.style.setProperty(`--${css[0]}`, css[1]);
+            setPropertyForStyle(`--${css[0]}`, css[1]);
         });
     });
+    style.textContent += '}';
+    document.head.appendChild(style);
 };
 
 const getBlocklyComponentStyles = (): Blockly.Theme.ComponentStyle => {

@@ -6,6 +6,7 @@
 
 import * as Blockly from 'blockly/core';
 import { BlocksColor, OPCODES } from '../../../types/blocks';
+import { StringInputField } from '../fields/stringInput';
 
 /**
  * 注册基础 reporter 积木（数字、文本、颜色等）
@@ -69,12 +70,9 @@ export function initPrimitiveBlocks(blockly: typeof Blockly) {
 
     blockly.Blocks[OPCODES.text] = {
         init(this: Blockly.Block) {
-            this.jsonInit({
-                message0: '%1',
-                args0: [{ type: 'field_input', name: 'TEXT' }],
-                output: 'String',
-                colour: BlocksColor.textField,
-            });
+            this.setOutput(true, 'String');
+            this.setColour(BlocksColor.textField);
+            this.appendDummyInput('VALUE').appendField(new StringInputField(''), 'TEXT');
         },
     } as Blockly.Block;
 

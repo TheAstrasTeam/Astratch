@@ -7,7 +7,7 @@
 // 关于调试的文件
 
 import { Toast } from '../lib/ToastManager';
-import { spawnRandomString } from './ash-string';
+import { spawnRandomString } from './ash-data';
 
 export const debug = true;
 

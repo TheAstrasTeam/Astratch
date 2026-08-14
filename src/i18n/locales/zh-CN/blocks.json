@@ -276,6 +276,7 @@
     "data.type.cast": "将 %1 转换为 %2",
     "data.type.null": "空值",
 
+    "function.createTip": "创建一个函数",
     "function.definition": "创建函数 %1",
     "function.call": "调用函数",
     "function.execute": "执行函数",
@@ -283,6 +284,7 @@
     "function.inline": "行内函数",
     "function.param": "参数",
     "function.setDataValue": "将参数 %1 设为 %2",
+    "function.value": "函数值",
 
     "debug.log": "以 %1 输出 %2",
     "debug.crash": "崩溃并报错 %1",

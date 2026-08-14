@@ -23,7 +23,7 @@ import { getBlocklyI18nByI18next } from '../../../utils/ash-i18n';
 import i18next from 'i18next';
 import { replaceChineseI18n } from '../../../lib/BlocklyAdapter/i18n';
 import { Toast } from '../../../lib/ToastManager';
-import { spawnRandomString } from '../../../utils/ash-string';
+import { spawnRandomString } from '../../../utils/ash-data';
 
 /**
  * 用于便捷的管理WebGPU或Blockly工作区

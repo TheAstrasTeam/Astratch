@@ -1,5 +1,6 @@
 ﻿{
     "utils.collapseOther": "Collapse other categories",
     "utils.searchBlocks": "Search blocks",
-    "utils.noSearchResults": "No matching blocks found"
+    "utils.noSearchResults": "No matching blocks found",
+    "function.value": "Function Value"
 }

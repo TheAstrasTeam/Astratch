@@ -135,5 +135,7 @@
     "attribute": "属性",
     "link": "链接",
     "data.forPublic": "整个目标",
-    "data.forSelf": "单个脚本"
+    "data.forSelf": "单个脚本",
+    "createFunction.title": "创建一个函数",
+    "createFunction.description": "奇怪的是，你竟然在到处看Modal标题"
 }

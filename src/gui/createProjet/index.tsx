@@ -20,7 +20,7 @@ import compatibleExtension from '../../assets/compatibleExtension.svg';
 import { t } from 'i18next';
 import Title from '../../components/title';
 import SubTitle from '../../components/subTitle';
-import { toID } from '../../utils/ash-string';
+import { toID } from '../../utils/ash-data';
 import { useSettings } from '../../settings/SettingsRegistry';
 import { useGUIStore } from '../../stores/useGUIStore';
 import { guiInterface } from '../../types/gui';

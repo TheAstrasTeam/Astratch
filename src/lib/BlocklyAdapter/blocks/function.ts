@@ -8,7 +8,12 @@
 
 import * as Blockly from 'blockly/core';
 import { t } from 'i18next';
-import { BlocksColor, OPCODES } from '../../../types/blocks';
+import {
+    BlocksColor,
+    OPCODES,
+    type IFunctionValueBlock,
+    type TFunctionReturnField,
+} from '../../../types/blocks';
 import { connections, endConnections, returnConnections } from './helpers';
 import { modal } from '../../../components/Modal/modal';
 import { PromptModal } from '../../../components/modal_prompt';
@@ -19,9 +24,21 @@ import {
     type IDynamicScopedHost,
     type IScopedSourceBlock,
 } from './scopedSource';
+import moveLeftImage from '../../../assets/blocks/moveLeft.svg';
+import moveRightImage from '../../../assets/blocks/moveRight.svg';
 
 /** 参数插槽的 input 名前缀，后接稳定 id。 */
 const PARAM_INPUT_PREFIX = 'PARAM_';
+
+// 此文件由AI生成
+/** 值槽位类型 → 连接 check 名称；check 决定插槽轮廓的形状。 */
+const slotCheckByType: Partial<Record<Exclude<TFunctionReturnField, null>, string>> = {
+    array: 'Array',
+    object: 'Object',
+    boolean: 'Boolean',
+    number: 'Number',
+    string: 'String',
+};
 /**
  * 参数减号按钮的 input 名前缀。
  *
@@ -175,6 +192,128 @@ export function initFunctionBlocks(blockly: typeof Blockly) {
             });
         },
     } as Blockly.Block;
+
+    /**
+     * zelos 会把只有一个文本输入框的积木渲染为整个只有文本输入框
+     * 说白了，这会导致积木变成白色，所以禁用了它
+     */
+    // @ts-expect-error 扩展它是有必要的
+    class FunctionValueTextField extends Blockly.FieldTextInput {
+        override isFullBlockField(): boolean {
+            return false;
+        }
+
+        protected override initView() {
+            super.initView();
+            const root = this.getSvgRoot();
+            if (root) Blockly.utils.dom.addClass(root, 'ashFunctionValueText');
+        }
+    }
+
+    // 此函数由AI生成
+    /**
+     * 创建函数编辑模式下的左右移动按钮。
+     *
+     * 点击后把 previewData 里第 index 项与相邻项交换并重建形状。
+     * 与 mutation.ts 的按钮同机制：FieldImage 回调发生在 pointerup 手势中，
+     * 结构更新放到微任务里执行。
+     */
+    function createMoveField(direction: 'left' | 'right', index: number): Blockly.FieldImage {
+        const image = direction === 'left' ? moveLeftImage : moveRightImage;
+        return new Blockly.FieldImage(image, 15, 15, undefined, field => {
+            const block = field.getSourceBlock() as IFunctionValueBlock | null;
+            if (!block || block.isInFlyout) return;
+
+            queueMicrotask(() => {
+                if (block.isDeadOrDying()) return;
+                block.moveField(index, direction === 'left' ? -1 : 1);
+            });
+        });
+    }
+
+    /** 值槽位的影子块：只有一个文字输入框（输入参数 id）。 */
+    blockly.Blocks[OPCODES.FUNCTION_VALUE_ID] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                message0: '%1',
+                args0: [{ type: 'field_input', name: 'ID', spellcheck: false }],
+                output: null,
+                colour: BlocksColor.textField,
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.FUNCTION_VALUE] = {
+        init(this: IFunctionValueBlock) {
+            this.editMode = false;
+            this.jsonInit({
+                ...returnConnections,
+                colour: BlocksColor.function.primary,
+                output: 'Function',
+            });
+        },
+        moveField(this: IFunctionValueBlock, index: number, delta: number) {
+            const target = index + delta;
+            if (target < 0 || target >= this.previewData.length) return;
+
+            // 原地交换：外部（创建弹窗）可能持有同一数组引用，换新数组会断开同步。
+            const next = [...this.previewData];
+            [next[index], next[target]] = [next[target], next[index]];
+            this.previewData.splice(0, this.previewData.length, ...next);
+            this.updateShape();
+        },
+        updateShape() {
+            for (const input of [...this.inputList]) {
+                this.removeInput(input.name, true);
+            }
+
+            this.previewData.forEach((fieldData, index) => {
+                if (this.editMode) {
+                    this.appendDummyInput(`BTN_MOVE_LEFT_${String(index)}`).appendField(
+                        createMoveField('left', index),
+                    );
+                }
+
+                const inputID = `ARG${String(index)}`;
+                if (fieldData.type === 'text') {
+                    const textInput = new FunctionValueTextField(
+                        fieldData.text ?? '',
+                        value => {
+                            fieldData.text = value;
+                            return value;
+                        },
+                        {
+                            spellcheck: false,
+                        },
+                    );
+                    this.appendDummyInput(inputID).appendField(textInput, `TEXT_${String(index)}`);
+                } else {
+                    const input = this.appendValueInput(inputID);
+                    if (fieldData.type !== 'dropdown' && fieldData.type !== null) {
+                        const check = slotCheckByType[fieldData.type];
+                        if (check) input.setCheck(check);
+                    }
+                    input.connection?.setShadowState({
+                        type: OPCODES.FUNCTION_VALUE_ID,
+                        fields: { ID: fieldData.text ?? '' },
+                    });
+                    const shadowText = input.connection
+                        ?.targetBlock()
+                        ?.getField('ID') as Blockly.FieldTextInput | null;
+                    shadowText?.setValidator((value: string) => {
+                        fieldData.text = value;
+                        return value;
+                    });
+                }
+
+                if (this.editMode) {
+                    this.appendDummyInput(`BTN_MOVE_RIGHT_${String(index)}`).appendField(
+                        createMoveField('right', index),
+                    );
+                }
+            });
+        },
+    } as IFunctionValueBlock;
 
     // ── 行内函数 ──────────────────────────────────────────────
     // 形如 `行内函数 (a)⊖ (b)⊖ ⊕ { ... }`，

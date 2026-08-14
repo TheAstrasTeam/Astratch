@@ -1129,14 +1129,12 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                 gap: 12,
                                 kind: 'block',
                                 type: OPCODES.DATA_TYPE_TYPEOF,
-                                inputs: { VALUE: txt(t('blocks:example.value')) },
                             },
                             {
                                 gap: 12,
                                 kind: 'block',
                                 type: OPCODES.DATA_TYPE_CAST,
                                 inputs: {
-                                    VALUE: txt(t('blocks:example.value')),
                                     TYPE: txt(t('blocks:example.string')),
                                 },
                             },

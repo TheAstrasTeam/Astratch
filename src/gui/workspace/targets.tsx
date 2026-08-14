@@ -15,7 +15,7 @@ import { modal } from '../../components/Modal/modal';
 import { PromptModal } from '../../components/modal_prompt';
 import { useEffect, useState } from 'react';
 
-import { isValidTargetName, spawnRandomString } from '../../utils/ash-string';
+import { isValidTargetName, spawnRandomString } from '../../utils/ash-data';
 import { TargetsList } from '../../components/targets';
 import { TargetAttributes } from '../../components/targetAttributes';
 import { useTargetsStore } from '../../stores/useTargetsStore';

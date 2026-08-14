@@ -16,7 +16,7 @@ import {
     type TViewportUpdateEvent,
 } from '../../types/vm';
 import type { IWorkspaceState } from '../../types/blocks';
-import { spawnRandomString } from '../../utils/ash-string';
+import { spawnRandomString } from '../../utils/ash-data';
 import { sendError } from '../../utils/debug';
 import { t } from 'i18next';
 

@@ -11,6 +11,7 @@ import { t } from 'i18next';
 import type { IRegisterCategory } from '.';
 import { modal } from '../../components/Modal/modal';
 import { CreateDataModal } from '../../components/modal_createData';
+import { CreateFunctionModal } from '../../components/modal_createFunction';
 
 export function setDataCategory(_blockly: typeof Blockly, vm: IVM): IRegisterCategory {
     const createDataCategory = (
@@ -82,7 +83,12 @@ export function setFunctionCategory(_blockly: typeof Blockly, vm: IVM): IRegiste
         _workspace: Blockly.WorkspaceSvg,
     ): Blockly.utils.toolbox.FlyoutDefinition => {
         const items: Blockly.utils.toolbox.FlyoutItemInfo[] = [];
-        const basicItems: Blockly.utils.toolbox.FlyoutItemInfo[]  = [
+        items.push({
+            kind: 'button',
+            text: t('blocks:function.createTip'),
+            callbackkey: OPCODES.HANDLE_CREATE_FUNCTION,
+        });
+        const basicItems: Blockly.utils.toolbox.FlyoutItemInfo[] = [
             {
                 gap: 12,
                 kind: 'block',
@@ -114,11 +120,21 @@ export function setFunctionCategory(_blockly: typeof Blockly, vm: IVM): IRegiste
             },
         ];
         basicItems.forEach(item => items.push(item));
-        return items
+        return items;
+    };
+    const handleCreateFunction = () => {
+        void modal.open(CreateFunctionModal, {
+            vm,
+        });
     };
     return {
         CUSTOM: OPCODES.FUNCTION_CATEGORY,
-        CALLBACK: [],
-        FUNCTION: createFunctionCategory
-    }
+        CALLBACK: [
+            {
+                ID: OPCODES.HANDLE_CREATE_FUNCTION,
+                FUNCTION: handleCreateFunction,
+            },
+        ],
+        FUNCTION: createFunctionCategory,
+    };
 }

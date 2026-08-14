@@ -342,3 +342,25 @@ g.blocklyImageField[role='button'] {
         outline-width: 4px;
     }
 }
+
+[class*='ashFunctionValueText'] {
+    & rect {
+        fill: var(--blockly_function_tertiary) !important;
+    }
+    & text {
+        fill: var(--blockly_text) !important;
+    }
+}
+
+.ashStringInputQuotes {
+    fill-opacity: 0.1;
+}
+
+.ashFunctionSlotHint {
+    fill: none;
+    stroke: var(--blockly_text) !important;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-opacity: 0.2;
+    stroke-width: 2.15;
+}

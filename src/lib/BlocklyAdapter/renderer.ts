@@ -10,12 +10,14 @@ const ARRAY_SHAPE_TYPE = 6;
 const OBJECT_SHAPE_TYPE = 7;
 const MATCH_NOTCH_TYPE = 8;
 const FUNCTION_SHAPE_TYPE = 9;
+const STRING_SHAPE_TYPE = 10;
 const MATCH_BRANCH_CHECK = 'MatchBranch';
 
 class AstratchConstantProvider extends Blockly.zelos.ConstantProvider {
     arrayShape: Blockly.blockRendering.DynamicShape | null = null;
     objectShape: Blockly.blockRendering.DynamicShape | null = null;
     functionShape: Blockly.blockRendering.DynamicShape | null = null;
+    stringShape: Blockly.blockRendering.DynamicShape | null = null;
     matchNotch: Blockly.blockRendering.Notch | null = null;
 
     constructor() {
@@ -28,8 +30,14 @@ class AstratchConstantProvider extends Blockly.zelos.ConstantProvider {
             ARRAY_SHAPE_TYPE,
             OBJECT_SHAPE_TYPE,
             FUNCTION_SHAPE_TYPE,
+            STRING_SHAPE_TYPE,
         ];
-        const customValueShapeTypes = [ARRAY_SHAPE_TYPE, OBJECT_SHAPE_TYPE, FUNCTION_SHAPE_TYPE];
+        const customValueShapeTypes = [
+            ARRAY_SHAPE_TYPE,
+            OBJECT_SHAPE_TYPE,
+            FUNCTION_SHAPE_TYPE,
+            STRING_SHAPE_TYPE,
+        ];
         const padding = 2 * this.GRID_UNIT;
 
         for (const row of Object.values(this.SHAPE_IN_SHAPE_PADDING)) {
@@ -50,6 +58,7 @@ class AstratchConstantProvider extends Blockly.zelos.ConstantProvider {
         this.arrayShape = this.makeArrayShape();
         this.objectShape = this.makeObjectShape();
         this.functionShape = this.makeFunctionShape();
+        this.stringShape = this.makeStringShape();
         this.matchNotch = this.makeMatchNotch();
     }
 
@@ -116,11 +125,58 @@ class AstratchConstantProvider extends Blockly.zelos.ConstantProvider {
         };
     }
 
+    private makeStringShape(): Blockly.blockRendering.DynamicShape {
+        // 此函数由AI生成
+        // 圆角矩形：固定浅弧，与 Number 的圆形、Function 的括号形区分。
+        const maxRadius = 1.5 * this.GRID_UNIT;
+
+        const radiusFor = (height: number): number => Math.min(maxRadius, height / 2);
+
+        const makePath = (height: number, up: boolean, right: boolean) => {
+            const radius = radiusFor(height);
+            const straightHeight = height - radius * 2;
+            const sweep = right === up ? '0' : '1';
+            return (
+                Blockly.utils.svgPaths.arc(
+                    'a',
+                    `0 0,${sweep}`,
+                    radius,
+                    Blockly.utils.svgPaths.point((right ? 1 : -1) * radius, (up ? -1 : 1) * radius),
+                ) +
+                Blockly.utils.svgPaths.lineOnAxis('v', (up ? -1 : 1) * straightHeight) +
+                Blockly.utils.svgPaths.arc(
+                    'a',
+                    `0 0,${sweep}`,
+                    radius,
+                    Blockly.utils.svgPaths.point((right ? -1 : 1) * radius, (up ? -1 : 1) * radius),
+                )
+            );
+        };
+
+        return {
+            type: STRING_SHAPE_TYPE,
+            isDynamic: true,
+            width: height => radiusFor(height),
+            height: height => height,
+            connectionOffsetY: height => height / 2,
+            connectionOffsetX: connectionWidth => -connectionWidth,
+            pathDown: height => makePath(height, false, false),
+            pathUp: height => makePath(height, true, false),
+            pathRightDown: height => makePath(height, false, true),
+            pathRightUp: height => makePath(height, true, true),
+        };
+    }
+
     private makeFunctionShape(): Blockly.blockRendering.DynamicShape {
         const maxRadius = 6 * this.GRID_UNIT;
 
+        // 括号形：两端为接近半圆的明显圆弧，中间保留一段硬直切，
+        // 与胶囊（圆弧直接相接）和圆角矩形（浅弧）区分开。
+        const radiusFor = (height: number): number =>
+            Math.max(this.GRID_UNIT, Math.min(height / 2 - this.GRID_UNIT, maxRadius));
+
         const makePath = (height: number, up: boolean, right: boolean) => {
-            const radius = Math.min(height / 2, maxRadius);
+            const radius = radiusFor(height);
             const straightHeight = height - radius * 2;
             const sweep = right === up ? '0' : '1';
             return (
@@ -143,7 +199,7 @@ class AstratchConstantProvider extends Blockly.zelos.ConstantProvider {
         return {
             type: FUNCTION_SHAPE_TYPE,
             isDynamic: true,
-            width: height => Math.min(height / 2, maxRadius),
+            width: height => radiusFor(height),
             height: height => height,
             connectionOffsetY: height => height / 2,
             connectionOffsetX: connectionWidth => -connectionWidth,
@@ -198,6 +254,8 @@ class AstratchConstantProvider extends Blockly.zelos.ConstantProvider {
                 return this.objectShape as unknown as Blockly.blockRendering.DynamicShape;
             if (checks?.includes('Function'))
                 return this.functionShape as unknown as Blockly.blockRendering.DynamicShape;
+            if (checks?.includes('String'))
+                return this.stringShape as unknown as Blockly.blockRendering.DynamicShape;
         }
 
         if (
@@ -217,6 +275,47 @@ class AstratchConstantProvider extends Blockly.zelos.ConstantProvider {
 class AstratchRenderer extends Blockly.zelos.Renderer {
     protected override makeConstants_() {
         return new AstratchConstantProvider();
+    }
+
+    protected override makeDrawer_(block: Blockly.BlockSvg, info: Blockly.zelos.RenderInfo) {
+        return new AstratchDrawer(block, info);
+    }
+}
+
+/** 为所有空 Function 插槽绘制不依赖字体的 SVG 函数提示。 */
+class AstratchDrawer extends Blockly.zelos.Drawer {
+    override draw() {
+        this.block_.getSvgRoot().querySelectorAll('[data-ash-function-hint]').forEach(node => {
+            node.remove();
+        });
+        super.draw();
+    }
+
+    override drawInlineInput_(input: Blockly.blockRendering.InlineInput) {
+        super.drawInlineInput_(input);
+
+        if (input.connectedBlock || this.info_.isInsertionMarker) return;
+        if (!input.input.connection?.getCheck()?.includes('Function')) return;
+
+        const innerWidth = input.width - input.connectionWidth * 2;
+        const iconScale = Math.max(0.62, Math.min(0.82, input.height / 34));
+        const iconWidth = 17 * iconScale;
+        const iconHeight = 24 * iconScale;
+        const x = input.xPos + input.connectionWidth + (innerWidth - iconWidth) / 2;
+        const y = input.centerline - iconHeight / 2;
+        const hint = Blockly.utils.dom.createSvgElement(
+            'path',
+            {
+                'data-ash-function-hint': input.input.name,
+                class: 'ashFunctionSlotHint',
+                d: 'M15.5 3.2C13.2 1.4 10.2 2.2 9.2 5.2C7.9 9.1 7.8 14.8 6.3 19.1C5.5 21.3 4.2 22.5 2.2 22.2M4.8 10.4H13.2',
+                transform: `translate(${String(x)} ${String(y)}) scale(${String(iconScale)})`,
+                'pointer-events': 'none',
+                'aria-hidden': 'true',
+            },
+            this.block_.getSvgRoot(),
+        );
+        hint.setAttribute('focusable', 'false');
     }
 }
 

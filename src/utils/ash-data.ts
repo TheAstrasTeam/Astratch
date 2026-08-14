@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// 有关字符串的适用函数
+// 有关数据的通用函数
 
 /**
  * 生成一个符合`abc.def`之类的id字符串
@@ -38,3 +38,21 @@ export const isValidTargetName = (string: string) => {
 export const spawnRandomString = () => {
     return crypto.randomUUID();
 };
+
+/**
+ * 扁平化object
+ * @param obj 
+ */
+export const flattenObject = (obj: Record<string, unknown>, prefix = '', result: Record<string, unknown> = {}) => {
+    for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            const newKey = prefix ? `${prefix}_${key}` : key;
+            if (obj[key] && typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
+                flattenObject(obj[key] as Record<string, unknown>, newKey, result);
+            } else {
+                result[newKey] = obj[key];
+            }
+        }
+    }
+    return result;
+}
