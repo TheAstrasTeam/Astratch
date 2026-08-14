@@ -36,6 +36,7 @@
     "category.object": "对象",
     "category.type": "类型",
     "category.function": "函数",
+    "category.canvas": "画布",
     "category.debug": "调试",
 
     "menu.set": "设为",
@@ -297,6 +298,10 @@
     "function.setDataValue": "将参数 %1 设为 %2",
     "function.value": "函数值",
     "function.defaultTitle": "函数名称",
+
+    "canvas.color": "设置绘制颜色为 %1",
+    "canvas.line": "绘制从 %1 %2 到 %3 %4 的直线",
+    "canvas.circle": "绘制圆心 %1 %2 半径 %3 的圆形",
 
     "debug.log": "以 %1 输出 %2",
     "debug.crash": "停止全部并报错 %1",

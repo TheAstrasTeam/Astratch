@@ -237,10 +237,13 @@ span {
     &.function::before {
         background-image: url('../assets/function.svg');
     }
+    &.canvas::before {
+        background-image: url('../assets/canvas.svg');
+    }
     &.debug::before {
         background-image: url('../assets/debug.svg');
     }
-    &:is(.entity, .audio, .resources, .events, .control, .operator, .data, .function, .debug) {
+    &:is(.entity, .audio, .resources, .events, .control, .operator, .data, .function, .canvas, .debug) {
         &::before {
             content: '';
             width: 14px;

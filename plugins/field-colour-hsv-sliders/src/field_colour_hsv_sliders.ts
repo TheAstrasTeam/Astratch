@@ -251,6 +251,25 @@ export class FieldColourHsvSliders extends FieldColour {
     private dropdownContainer: HTMLDivElement | null = null;
 
     /**
+     * Zelos 下 FIELD_COLOUR_FULL_BLOCK=true，full-block 色块宽度被硬编码为 0，
+     * 导致 colour_picker 这类简单 reporter 块只按最小宽度渲染。
+     * 这里让 full-block 也读取 FIELD_COLOUR_DEFAULT_WIDTH 来撑开块宽。
+     *
+     * @override
+     */
+    protected override updateSize_(margin?: number) {
+        const constants = this.getConstants();
+        if (!constants) return;
+        if (this.isFullBlockField()) {
+            this.size_.width = constants.FIELD_COLOUR_DEFAULT_WIDTH;
+            this.size_.height = constants.FIELD_TEXT_HEIGHT;
+            this.positionBorderRect_();
+            return;
+        }
+        super.updateSize_(margin);
+    }
+
+    /**
      * Zelos 渲染器会错误的将 borderRect_ 改为不显示，这破坏了坐标的检测
      * 因此需要重写这个方法
      *

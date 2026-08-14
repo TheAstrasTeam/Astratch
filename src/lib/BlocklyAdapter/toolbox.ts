@@ -15,12 +15,14 @@ export const num = (v: string | number) => ({
         fields: { NUM: v },
     },
 });
+
 // const _numPos = (v: string | number) => ({
 //     shadow: {
 //         type: OPCODES.math_positive_number,
 //         fields: { NUM: v },
 //     },
 // });
+
 export const numWhole = (v: string | number) => ({
     shadow: {
         type: OPCODES.math_whole_number,
@@ -29,6 +31,7 @@ export const numWhole = (v: string | number) => ({
         },
     },
 });
+
 // const _numInt = (v: string | number) => ({
 //     shadow: {
 //         type: OPCODES.math_integer,
@@ -37,12 +40,14 @@ export const numWhole = (v: string | number) => ({
 //         },
 //     },
 // });
+
 export const numAngle = (v: string | number) => ({
     shadow: {
         type: OPCODES.math_angle,
         fields: { NUM: v },
     },
 });
+
 export const txt = (v: string) => ({
     shadow: {
         type: OPCODES.text,
@@ -51,19 +56,22 @@ export const txt = (v: string) => ({
         },
     },
 });
-// const _colour = (v = '#ff0000') => ({
-//     shadow: {
-//         type: OPCODES.colour_picker,
-//         fields: {
-//             COLOUR: v,
-//         },
-//     },
-// });
+
+export const colour = (v = '#ff0000') => ({
+    shadow: {
+        type: OPCODES.colour_picker,
+        fields: {
+            COLOUR: v,
+        },
+    },
+});
+
 export const menu = (type: string) => ({
     shadow: {
         type,
     },
 });
+
 export const bool = (value = true) => ({
     shadow: {
         type: OPCODES.OPERATOR_LOGIC_BOOLEAN,
@@ -1152,6 +1160,32 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                 id: 'function',
                 name: t('blocks:category.function'),
                 custom: OPCODES.FUNCTION_CATEGORY,
+            },
+            {
+                kind: 'category',
+                id: 'canvas',
+                name: t('blocks:category.canvas'),
+                contents: [
+                    {
+                        gap: 12,
+                        kind: 'block',
+                        type: OPCODES.CANVAS_COLOR,
+                        inputs: {
+                            COLOR: colour(),
+                        }
+                    },
+                    {
+                        gap: 12,
+                        kind: 'block',
+                        type: OPCODES.CANVAS_LINE,
+                        inputs: {
+                            X1: num(-100),
+                            Y1: num(100),
+                            X2: num(100),
+                            Y2: num(-100),
+                        }
+                    }
+                ]
             },
             {
                 kind: 'category',

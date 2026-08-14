@@ -17,6 +17,7 @@ import { initControlBlocks } from './control';
 import { initOperatorBlocks } from './operator';
 import { initDataBlocks } from './data';
 import { initFunctionBlocks } from './function';
+import { initCanvasBlocks } from './canvas';
 import { initDebugBlocks } from './debug';
 
 export { connections, hatConnections, endConnections, returnConnections } from './helpers';
@@ -41,5 +42,6 @@ export const initBlocks = (blockly: typeof Blockly, vm: IVM) => {
     initOperatorBlocks(blockly);
     initDataBlocks(blockly, vm);
     initFunctionBlocks(blockly);
+    initCanvasBlocks(blockly)
     initDebugBlocks(blockly);
 };

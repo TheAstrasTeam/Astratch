@@ -222,6 +222,10 @@ const OPCODES = {
     FUNCTION_VALUE: 'function_value',
     FUNCTION_VALUE_ID: 'function_value_id',
 
+    // 画布
+    CANVAS_COLOR: "canvas_color",
+    CANVAS_LINE: "canvas_line",
+
     // 调试
     DEBUG_LOG: 'debug_log',
     DEBUG_CRASH: 'debug_crash',
@@ -345,6 +349,12 @@ const BlocksColor = {
         secondary: '#E65570',
         tertiary: '#CC4560',
         quaternary: '#CC4550',
+    },
+    canvas: {
+        primary: '#0fbd8c',
+        secondary: '#0ca378',
+        tertiary: '#137458',
+        quaternary: '#0a644b',
     },
     debug: {
         primary: '#A0A0A0',
