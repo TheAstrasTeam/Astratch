@@ -215,9 +215,6 @@ span {
 
     &.entity::before {
         background-image: url('../assets/sprite.svg');
-        // 这个图标比其它的略大
-        width: 12px !important;
-        height: 12px !important;
     }
     &.audio::before {
         background-image: url('../assets/sound.svg');
