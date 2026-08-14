@@ -19,6 +19,7 @@
  *
  * 由 AstrasTeam 修改于 2026/8/14:
  * - 增加 .astratchContinuousFlyout 的 hover overflow 规则，悬停时显示完整积木
+ * - 设置滚动条粗细为 8px，改为浅灰色、背景透明
  */
 
 /**
@@ -96,6 +97,9 @@ function registerAstratchToolboxShortcuts() {
 export function registerAstratchToolbox(options: i18n['t']) {
     setContinuousToolboxControlTranslator(options);
     registerAstratchToolboxShortcuts();
+
+    // 更细的滚动条（默认约 11px，改为 8px），在 inject 创建滚动条前设置
+    Blockly.Scrollbar.scrollbarThickness = 8;
 
     Blockly.registry.register(
         Blockly.registry.Type.TOOLBOX_ITEM,
@@ -189,6 +193,12 @@ export function registerAstratchToolbox(options: i18n['t']) {
     }
     .astratchContinuousFlyout:hover {
         overflow: visible;
+    }
+    .astratchContinuousFlyout .blocklyScrollbarHandle {
+        fill: #bcbcbc;
+    }
+    .astratchContinuousFlyout .blocklyScrollbarBackground {
+        fill: transparent;
     }
   `);
 }

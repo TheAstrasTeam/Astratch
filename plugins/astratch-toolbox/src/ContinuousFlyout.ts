@@ -18,6 +18,7 @@
  * - 增加 MAX_FLYOUT_WIDTH 常量，限制 flyout 最大宽度（by AI）
  * - 在 reflowInternal_ 中对 width_ 封顶，防止积木变宽导致 flyout 跟着变宽
  * - 为 svgGroup 增加 astratchContinuousFlyout 类，配合 CSS 实现悬停显示完整积木
+ * - 在 position() 中将背景路径覆盖为直角矩形，去掉默认圆角，更像 Scratch 的工具箱 flyout
  */
 
 /**
@@ -206,6 +207,13 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
 
     override position() {
         super.position();
+
+        // 将 flyout 背景改为直角矩形，去掉 Blockly 默认的圆角
+        if (this.svgBackground_) {
+            const w = this.width_;
+            const h = this.height_;
+            this.svgBackground_.setAttribute('d', `M 0,0 h ${w} v ${h} h ${-w} z`);
+        }
 
         const verticalScrollbar = this.getWorkspace().scrollbar?.vScroll;
         if (verticalScrollbar) {
