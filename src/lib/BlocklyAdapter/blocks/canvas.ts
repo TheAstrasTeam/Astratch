@@ -23,7 +23,7 @@ export function initCanvasBlocks(blockly: typeof Blockly) {
         },
     } as Blockly.Block;
 
-        blockly.Blocks[OPCODES.CANVAS_LINE] = {
+    blockly.Blocks[OPCODES.CANVAS_LINE] = {
         init(this: Blockly.Block) {
             this.jsonInit({
                 ...connections,
@@ -33,6 +33,21 @@ export function initCanvasBlocks(blockly: typeof Blockly) {
                     {type: 'input_value', name: 'Y1', check: 'Number'},
                     {type: 'input_value', name: 'X2', check: 'Number'},
                     {type: 'input_value', name: 'Y2', check: 'Number'},
+                ],
+                colour: BlocksColor.canvas.primary,
+            });
+        },
+    } as Blockly.Block;
+    
+    blockly.Blocks[OPCODES.CANVAS_CIRCLE] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...connections,
+                message0: t('blocks:canvas.circle'),
+                args0: [
+                    {type: 'input_value', name: 'X1', check: 'Number'},
+                    {type: 'input_value', name: 'Y1', check: 'Number'},
+                    {type: 'input_value', name: 'RADIUS', check: 'Number'},
                 ],
                 colour: BlocksColor.canvas.primary,
             });

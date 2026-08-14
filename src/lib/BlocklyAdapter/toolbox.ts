@@ -1184,7 +1184,17 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             X2: num(100),
                             Y2: num(-100),
                         }
-                    }
+                    },
+                    {
+                        gap: 12,
+                        kind: 'block',
+                        type: OPCODES.CANVAS_CIRCLE,
+                        inputs: {
+                            X1: num(-100),
+                            Y1: num(100),
+                            RADIUS: num(5),
+                        }
+                    },
                 ]
             },
             {

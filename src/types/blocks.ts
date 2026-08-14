@@ -225,6 +225,7 @@ const OPCODES = {
     // 画布
     CANVAS_COLOR: "canvas_color",
     CANVAS_LINE: "canvas_line",
+    CANVAS_CIRCLE: "canvas_circlr",
 
     // 调试
     DEBUG_LOG: 'debug_log',
