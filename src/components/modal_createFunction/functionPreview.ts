@@ -72,21 +72,24 @@ const addFieldForFunctionPreview = (data: TPreviewFunctionData) => {
     previewFunctionData.push(data);
     previewBlock.updateShape();
     disablePreviewContextMenu();
-    requestAnimationFrame(() => {
-        previewWorkspace?.centerOnBlock(previewBlockId);
-        if (!previewBlock) return;
-        if (data.type === 'text') {
-            // 文本片段：焦点在积木自己的字段上。
-            previewBlock.getField(`TEXT_${String(index)}`)?.showEditor();
-        } else {
-            // 值槽位：焦点在插槽里的影子块字段上。
-            previewBlock
-                .getInput(`ARG${String(index)}`)
-                ?.connection?.targetBlock()
-                ?.getField('ID')
-                ?.showEditor();
-        }
-    });
+    setTimeout(() => {
+        const workspace = previewWorkspace;
+        const block = previewBlock;
+        if (!workspace || !block) return;
+
+        Blockly.common.svgResize(workspace);
+        workspace.centerOnBlock(previewBlockId);
+
+        const field =
+            data.type === 'text'
+                ? block.getField(`TEXT_${String(index)}`)
+                : block
+                      .getInput(`ARG${String(index)}`)
+                      ?.connection?.targetBlock()
+                      ?.getField('ID');
+
+        field?.showEditor();
+    }, 200);
 };
 
 export {
