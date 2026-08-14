@@ -285,9 +285,9 @@ class AstratchRenderer extends Blockly.zelos.Renderer {
 /** 为所有空 Function 插槽绘制不依赖字体的 SVG 函数提示。 */
 class AstratchDrawer extends Blockly.zelos.Drawer {
     override draw() {
-        this.block_.getSvgRoot().querySelectorAll('[data-ash-function-hint]').forEach(node => {
-            node.remove();
-        });
+        for (const child of Array.from(this.block_.getSvgRoot().children)) {
+            if (child.hasAttribute('data-ash-function-hint')) child.remove();
+        }
         super.draw();
     }
 
