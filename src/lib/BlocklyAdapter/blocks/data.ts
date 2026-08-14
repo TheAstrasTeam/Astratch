@@ -198,6 +198,10 @@ export function initDataBlocks(blockly: typeof Blockly, vm: IVM) {
 
             if (this.isInFlyout) return;
 
+            this.appendDummyInput('ADD')
+                .setAlign(Blockly.inputs.Align.LEFT)
+                .appendField(createPlusField(), 'ADD');
+
             if (this.itemCount > 0) {
                 for (let i = 0; i < this.itemCount; i++) {
                     this.appendValueInput(`DATA${i.toString()}`)
@@ -213,13 +217,6 @@ export function initDataBlocks(blockly: typeof Blockly, vm: IVM) {
                             'MINUS',
                         );
                 }
-
-                this.appendEndRowInput('END_ROW_BUTTONS');
-                this.appendDummyInput('ADD')
-                    .setAlign(Blockly.inputs.Align.LEFT)
-                    .appendField(createPlusField(), 'ADD');
-            } else {
-                this.appendDummyInput('SUB').appendField(createPlusField(), 'ADD');
             }
 
             this.connectionStore_.clear();
