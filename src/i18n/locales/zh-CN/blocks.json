@@ -285,6 +285,7 @@
     "function.param": "参数",
     "function.setDataValue": "将参数 %1 设为 %2",
     "function.value": "函数值",
+    "function.defaultTitle": "函数名称",
 
     "debug.log": "以 %1 输出 %2",
     "debug.crash": "崩溃并报错 %1",

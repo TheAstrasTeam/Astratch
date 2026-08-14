@@ -5,6 +5,7 @@
  */
 import * as Blockly from 'blockly';
 import { OPCODES, type IFunctionValueBlock, type TPreviewFunctionData } from '../../types/blocks';
+import { t } from 'i18next';
 
 const previewBlockId = 'preview-function';
 let previewFunctionData: TPreviewFunctionData[] = [];
@@ -33,6 +34,10 @@ const setupWorkspace = (workspace: Blockly.WorkspaceSvg) => {
     disablePreviewContextMenu();
     requestAnimationFrame(() => {
         previewWorkspace?.centerOnBlock(previewBlockId);
+        addFieldForFunctionPreview({
+            type: 'text',
+            text: t('blocks:function.defaultTitle'),
+        });
     });
 };
 
