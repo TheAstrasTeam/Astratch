@@ -255,7 +255,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                         kind: 'block',
                                         type: OPCODES.ENTITY_APPEARANCE_IMAGES_GETGRIDDISTANCE,
                                         inputs: {
-                                            UNIT: menu(OPCODES.IMAGES_GRID_MENU),
+                                            UNIT: menu(OPCODES.IMAGES_GRID_MENU_TWO),
                                             POS: menu(OPCODES.IMAGES_STRETCH_MENU),
                                         },
                                     },
@@ -643,6 +643,11 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             {
                                 gap: 12,
                                 kind: 'block',
+                                type: OPCODES.EVENT_INPUT_GETALLKEYPRESSED,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
                                 type: OPCODES.EVENT_INPUT_GETLOUDNESS,
                             },
                             {
@@ -675,8 +680,8 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                 kind: 'block',
                                 type: OPCODES.EVENT_INPUT_WHENKEYPRESSED,
                                 inputs: {
-                                    KEY: menu(OPCODES.KEY_MENU),
                                     ACTION: menu(OPCODES.KEY_ISPRESS_MENU),
+                                    KEY: menu(OPCODES.KEY_MENU),
                                 },
                             },
                         ],
@@ -1092,7 +1097,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                 gap: 12,
                                 kind: 'block',
                                 type: OPCODES.DATA_OBJECT_GETALL,
-                                inputs: { KIND: txt(t('blocks:example.key')) },
+                                inputs: { KIND: menu(OPCODES.DATA_OBJECT_TYPE_MENU) },
                             },
                             {
                                 gap: 12,
@@ -1158,7 +1163,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                         kind: 'block',
                         type: OPCODES.DEBUG_LOG,
                         inputs: {
-                            LEVEL: txt(t('blocks:example.log')),
+                            LEVEL: menu(OPCODES.DEBUG_LOG_TYPE_MENU),
                             MESSAGE: txt(t('blocks:example.message')),
                         },
                     },

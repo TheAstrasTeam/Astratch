@@ -563,6 +563,26 @@ export function initMenuBlocks(blockly: typeof Blockly, vm: IVM) {
             });
         },
     } as Blockly.Block;
+    
+    blockly.Blocks[OPCODES.DATA_OBJECT_TYPE_MENU] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                message0: '%1',
+                args0: [
+                    {
+                        type: 'field_dropdown_with_block',
+                        name: 'ASH_BLOCKMENU',
+                        options: [
+                            [t('blocks:menu.key'), '_KEY_'],
+                            [t('blocks:menu.value'), '_VALUE_'],
+                        ],
+                    },
+                ],
+                output: 'String',
+                colour: BlocksColor.data.primary,
+            });
+        },
+    } as Blockly.Block;
 
     blockly.Blocks[OPCODES.KEY_MENU] = {
         init(this: Blockly.Block) {
@@ -642,4 +662,25 @@ export function initMenuBlocks(blockly: typeof Blockly, vm: IVM) {
             });
         },
     } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.DEBUG_LOG_TYPE_MENU] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                message0: '%1',
+                args0: [
+                    {
+                        type: 'field_dropdown_with_block',
+                        name: 'ASH_BLOCKMENU',
+                        options: [
+                            [t('blocks:menu.log'), '_LOG_'],
+                            [t('blocks:menu.warn'), '_WARN_'],
+                            [t('blocks:menu.err'), '_ERROR_'],
+                        ],
+                    },
+                ],
+                output: 'String',
+                colour: BlocksColor.debug.secondary,
+            })
+        }
+    }
 }

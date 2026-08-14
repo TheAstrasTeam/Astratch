@@ -37,9 +37,11 @@ const OPCODES = {
     SCIENTIFIC_FUNCTION_MENU: 'scientific_function_menu',
     DATA_NAME_MENU: 'data_name_menu',
     DATA_COMPUTE_MENU: 'data_compute_menu',
+    DATA_OBJECT_TYPE_MENU: 'data_object_type_menu',
     KEY_MENU: 'key_menu',
     MOUSE_KEY_MENU: 'mouse_key_menu',
     KEY_ISPRESS_MENU: 'key_isPress_menu',
+    DEBUG_LOG_TYPE_MENU: 'debug_log_type_menu',
     // 实体
     // - 变换
     // - - 位置
@@ -124,6 +126,7 @@ const OPCODES = {
     EVENT_INPUT_ISMOUSEBUTTONPRESSED: 'event_input_isMouseButtonPressed',
     EVENT_INPUT_ISKEYPRESSED: 'event_input_isKeyPressed',
     EVENT_INPUT_GETLASTKEYPRESSED: 'event_input_getLastKeyPressed',
+    EVENT_INPUT_GETALLKEYPRESSED: 'event_input_getAllKeyPressed',
     EVENT_INPUT_GETLOUDNESS: 'event_input_getLoudness',
     EVENT_INPUT_GETFREQUENCYSPECTRUM: 'event_input_getFrequencySpectrum',
     EVENT_INPUT_WHENMOUSEHOVER: 'event_input_whenMouseHover',

@@ -66,9 +66,19 @@ export function initEventBlocks(blockly: typeof Blockly) {
     blockly.Blocks[OPCODES.EVENT_LIFECYCLE_ONSTART] = {
         init(this: Blockly.Block) {
             this.jsonInit({
-                ...hatConnections,
+                ...hatConnections,                
                 message0: t('blocks:event.lifecycle.onStart'),
                 colour: BlocksColor.event.primary,
+                args0: [
+                    {
+                        "type": "field_image",
+                        "src": "..\\..\\assets\\start.svg",
+                        "width": 20,
+                        "height": 20,
+                        "alt": "*",
+                        "flipRtl": false
+                    },
+                ],
             });
         },
     } as Blockly.Block;
@@ -79,6 +89,16 @@ export function initEventBlocks(blockly: typeof Blockly) {
                 ...hatConnections,
                 message0: t('blocks:event.lifecycle.onStop'),
                 colour: BlocksColor.event.primary,
+                args0: [
+                    {
+                        "type": "field_image",
+                        "src": "..\\..\\assets\\stop.svg",
+                        "width": 22,
+                        "height": 20,
+                        "alt": "*",
+                        "flipRtl": false
+                    },
+                ],
             });
         },
     } as Blockly.Block;
@@ -225,6 +245,18 @@ export function initEventBlocks(blockly: typeof Blockly) {
                 message0: t('blocks:event.input.getLastKeyPressed'),
                 colour: BlocksColor.event.tertiary,
                 output: 'String',
+            });
+        },
+    } as Blockly.Block;
+
+    
+    blockly.Blocks[OPCODES.EVENT_INPUT_GETALLKEYPRESSED] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:event_imput_getAllKeyPressed'),
+                colour: BlocksColor.event.tertiary,
+                output: 'Array',
             });
         },
     } as Blockly.Block;
