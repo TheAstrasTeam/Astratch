@@ -13,6 +13,11 @@
  * - 将 if (this.scrollTarget) 改为 if (this.scrollTarget !== undefined)
  * - 在 flyout 顶部增加积木搜索框（by AI）
  * - 更新 Astratch Toolbox 注册入口的错误提示
+ *
+ * 由 AstrasTeam 修改于 2026/8/14:
+ * - 增加 MAX_FLYOUT_WIDTH 常量，限制 flyout 最大宽度（by AI）
+ * - 在 reflowInternal_ 中对 width_ 封顶，防止积木变宽导致 flyout 跟着变宽
+ * - 为 svgGroup 增加 astratchContinuousFlyout 类，配合 CSS 实现悬停显示完整积木
  */
 
 /**
@@ -47,6 +52,12 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
      * Flyout的缩放
      */
     FLYOUT_SCALE = 0.7;
+
+    /**
+     * Flyout 的最大宽度（像素），防止积木变宽导致 flyout 跟着变宽。
+     */
+    MAX_FLYOUT_WIDTH = 256;
+    // 根据可观测检测，Scratch原本的宽度就是256px
 
     /**
      * Target scroll position, used to smoothly scroll to a given category
@@ -113,6 +124,8 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
         tagName: string | Blockly.utils.Svg<SVGSVGElement> | Blockly.utils.Svg<SVGGElement>,
     ): SVGElement {
         const svgGroup = super.createDom(tagName);
+        // 标记连续 flyout，配合 CSS 在悬停时显示被裁剪的完整积木
+        svgGroup.classList.add('astratchContinuousFlyout');
         this.searchForeignObject = Blockly.utils.dom.createSvgElement(
             Blockly.utils.Svg.FOREIGNOBJECT,
             {
@@ -166,9 +179,17 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
         }
     }
 
-    /** 搜索结果变化时保持 flyout 原有宽度。 */
+    /** 限制 flyout 最大宽度，并在搜索结果变化时保持 flyout 原有宽度。 */
     protected override reflowInternal_() {
         super.reflowInternal_();
+
+        // 封顶：积木再宽也不能撑大 flyout，超出的部分由 flyout 视口裁剪
+        if (this.width_ > this.MAX_FLYOUT_WIDTH) {
+            this.width_ = this.MAX_FLYOUT_WIDTH;
+            this.position();
+            this.targetWorkspace.resizeContents();
+            this.targetWorkspace.recordDragTargets();
+        }
 
         if (!this.isSearchMode()) {
             this.normalFlyoutWidth = this.width_;

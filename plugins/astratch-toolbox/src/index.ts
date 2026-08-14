@@ -16,6 +16,9 @@
  * - 支持配置 Astratch Toolbox 按钮的翻译函数
  * - 将工具箱快捷键注册移到插件注册阶段，避免重复注册
  * - 将插件入口更名为 Astratch Toolbox
+ *
+ * 由 AstrasTeam 修改于 2026/8/14:
+ * - 增加 .astratchContinuousFlyout 的 hover overflow 规则，悬停时显示完整积木
  */
 
 /**
@@ -180,6 +183,12 @@ export function registerAstratchToolbox(options: i18n['t']) {
         height: 28px;
         border-radius: 999px !important;
         padding-left: 10px !important;
+    }
+    .astratchContinuousFlyout {
+        overflow: hidden;
+    }
+    .astratchContinuousFlyout:hover {
+        overflow: visible;
     }
   `);
 }
