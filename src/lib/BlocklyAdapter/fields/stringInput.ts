@@ -58,8 +58,6 @@ export class StringInputField extends Blockly.FieldTextInput {
 
     protected override widgetCreate_(): HTMLInputElement | HTMLTextAreaElement {
         const editor = super.widgetCreate_();
-        // @ts-expect-error 这个方法存在但不在ts文档里
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
         const scale = this.getSourceBlock()?.workspace.getAbsoluteScale() ?? 1;
         const radius = `${String(this.getBorderRadius() * scale)}px`;
 
