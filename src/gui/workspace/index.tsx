@@ -17,6 +17,8 @@ import { useEffect, useMemo, useState, type FunctionComponent, type SVGProps } f
 import classNames from 'classnames';
 
 import SpriteIcon from '../../assets/sprite.svg?react';
+import AddonsIcon from '../../assets/addons.svg?react';
+import DebuggerIcon from '../../assets/debugger.svg?react';
 import EmptyTip from '../../assets/empty.svg?react';
 import EmptyTip2 from '../../assets/empty2.svg?react';
 
@@ -150,13 +152,13 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
                     <TabButton
                         selected={tabSelected}
                         id={allBuiltInTabs.ADDONS}
-                        ICON={SpriteIcon}
+                        ICON={AddonsIcon}
                         callback={setTabSelect}
                     />
                     <TabButton
                         selected={tabSelected}
                         id={allBuiltInTabs.DEBUG}
-                        ICON={SpriteIcon}
+                        ICON={DebuggerIcon}
                         callback={setTabSelect}
                     />
                 </div>
