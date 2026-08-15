@@ -23,9 +23,9 @@ export const PromptModal = ({
     const { closeSelf } = useModalInstance();
 
     const handleButtonClick = useCallback(
-        async (result: string, close: unknown = null) => {
+        async (result: string) => {
             if (callback) callback(result);
-            await closeSelf(close);
+            await closeSelf();
         },
         [callback, closeSelf],
     );
@@ -44,9 +44,7 @@ export const PromptModal = ({
     return (
         <Modal
             fullScreen={false}
-            close={async result => {
-                await handleButtonClick(nowValue, result);
-            }}
+            close={closeSelf}
             title={t('gui:prompt.title')}
             description={t('gui:prompt.description')}
         >

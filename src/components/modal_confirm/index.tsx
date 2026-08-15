@@ -18,17 +18,15 @@ export const ConfirmModal = ({
 }) => {
     const { closeSelf } = useModalInstance();
 
-    const handleButtonClick = async (result: boolean, close: unknown = null) => {
+    const handleButtonClick = async (result: boolean) => {
         if (callback) callback(result);
-        await closeSelf(close);
+        await closeSelf();
     };
 
     return (
         <Modal
             fullScreen={false}
-            close={async result => {
-                await handleButtonClick(false, result);
-            }}
+            close={closeSelf}
             title={t('gui:confirm.title')}
             description={t('gui:confirm.description')}
         >

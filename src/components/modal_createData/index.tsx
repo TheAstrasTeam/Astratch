@@ -18,11 +18,11 @@ export const CreateDataModal = ({ vm, addID }: { vm: IVM; addID?: string }) => {
     const { closeSelf } = useModalInstance();
 
     const handleButtonClick = useCallback(
-        async (close: unknown = null) => {
-            if (close && nowValue.trim()) vm.runtime
+        async () => {
+            if (nowValue.trim()) vm.runtime
                 .getTargetByID(AddID)
                 ?.createData(nowValue, null, nowMode === DATA_VISIBILITY.PRIVATE, false);
-            await closeSelf(close);
+            await closeSelf();
         },
         [AddID, closeSelf, nowMode, nowValue, vm.runtime],
     );
@@ -34,7 +34,7 @@ export const CreateDataModal = ({ vm, addID }: { vm: IVM; addID?: string }) => {
     useEffect(() => {
         const handleEnterClick = (e: KeyboardEvent) => {
             if (e.key !== 'Enter' || e.isComposing) return;
-            void handleButtonClick(nowValue);
+            void handleButtonClick();
         };
         document.addEventListener('keydown', handleEnterClick);
         return () => {
@@ -45,8 +45,8 @@ export const CreateDataModal = ({ vm, addID }: { vm: IVM; addID?: string }) => {
     return (
         <Modal
             fullScreen={false}
-            close={async result => {
-                await handleButtonClick(result);
+            close={async () => {
+                await closeSelf();
             }}
             title={t('gui:prompt.title')}
             description={t('gui:prompt.description')}
@@ -72,7 +72,7 @@ export const CreateDataModal = ({ vm, addID }: { vm: IVM; addID?: string }) => {
                 <div className={styles.buttons}>
                     <button
                         onClick={() => {
-                            void handleButtonClick(nowValue);
+                            void handleButtonClick();
                         }}
                     >
                         {t('gui:button.done')}

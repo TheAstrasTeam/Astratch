@@ -42,23 +42,23 @@ export const AddFieldModal = ({ callback }: { callback?: (result: TFunctionRetur
     const { closeSelf } = useModalInstance();
 
     const handleButtonClick = useCallback(
-        async (close: unknown = null, result: TFunctionReturnField) => {
+        async (result: TFunctionReturnField) => {
             if (callback) callback(result);
-            await closeSelf(close);
+            await closeSelf();
         },
         [callback, closeSelf],
     );
 
     const handleSelectorClicked = (result: TFunctionReturnField) => {
-        void handleButtonClick(null, result);
+        void handleButtonClick(result);
     };
 
     return (
         <Modal
             fullScreen={false}
             onFullScreen={resizePreviewWorkspace}
-            close={async result => {
-                await handleButtonClick(result, null);
+            close={async () => {
+                await handleButtonClick(null);
             }}
             title={t('gui:createFunction.addField.title')}
             description={t('gui:createFunction.addField.description')}

@@ -18,15 +18,15 @@ export const AlertModal = ({
 }) => {
     const { closeSelf } = useModalInstance();
 
-    const handleButtonClick = async (result: unknown = null) => {
+    const handleButtonClick = async () => {
         if (callback) callback();
-        await closeSelf(result);
+        await closeSelf();
     };
 
     return (
         <Modal
             fullScreen={false}
-            close={handleButtonClick}
+            close={closeSelf}
             title={t('gui:alert.title')}
             description={t('gui:alert.description')}
         >

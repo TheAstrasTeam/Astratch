@@ -23,7 +23,7 @@ export const Modal = ({
 }: {
     fullScreen?: boolean;
     onFullScreen?: (isFullScreen: boolean) => void;
-    close?: (result?: unknown) => Promise<void>;
+    close?: () => Promise<void>;
     children?: React.ReactNode;
     title?: string;
     description?: string;
