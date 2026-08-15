@@ -156,7 +156,7 @@ class Blocks implements IBlocks {
         });
         this.workspaceConfig = {
             toolbox: this.toolbox,
-            media: '/assets/blockly-media',
+            media: import.meta.env.BASE_URL + 'assets/blockly-media',
             scrollbars: true,
             // 折叠积木
             // 这玩意会导致注释无法正常工作

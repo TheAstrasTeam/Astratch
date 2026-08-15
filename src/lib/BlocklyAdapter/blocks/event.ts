@@ -6,6 +6,8 @@
 
 import * as Blockly from 'blockly/core';
 import { t } from 'i18next';
+import startIcon from '../../../assets/start.svg';
+import stopIcon from '../../../assets/stop.svg';
 import { BlocksColor, OPCODES } from '../../../types/blocks';
 import { connections, hatConnections, returnConnections } from './helpers';
 import {
@@ -72,7 +74,7 @@ export function initEventBlocks(blockly: typeof Blockly) {
                 args0: [
                     {
                         type: 'field_image',
-                        src: '..\\..\\assets\\start.svg',
+                        src: startIcon,
                         width: 20,
                         height: 20,
                         alt: '*',
@@ -92,7 +94,7 @@ export function initEventBlocks(blockly: typeof Blockly) {
                 args0: [
                     {
                         type: 'field_image',
-                        src: '..\\..\\assets\\stop.svg',
+                        src: stopIcon,
                         width: 22,
                         height: 20,
                         alt: '*',
