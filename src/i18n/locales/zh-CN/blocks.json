@@ -37,6 +37,7 @@
     "category.type": "类型",
     "category.function": "函数",
     "category.canvas": "画布",
+    "category.canvas.pen": "基础画笔",
     "category.debug": "调试",
 
     "menu.set": "设为",

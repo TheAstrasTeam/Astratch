@@ -224,11 +224,27 @@ const OPCODES = {
     FUNCTION_VALUE_ID: 'function_value_id',
 
     // 画布
+    CANVAS_CLEANALL: 'canvas_cleanAll',
     CANVAS_COLOR: 'canvas_color',
     CANVAS_POINT: 'canvas_point',
     CANVAS_LINESET: 'canvas_lineSet',
     CANVAS_LINE: 'canvas_line',
+    CANVAS_FILL: 'canvas_fill',
     CANVAS_CIRCLE: 'canvas_circlr',
+    CANVAS_RECTANGLE: 'canvas_rectangle',
+    CANVAS_TRIANGLE: 'canvas_triangle',
+    CANVAS_STAMP: 'canvas_stamp',
+    CANVAS_STAMPPLUS: 'canvas_stampPlus',
+    CANVAS_TEXT: 'canvas_text',
+
+    CANVAS_RECTANGLEDATA: 'canvas_rectangleData',
+    CANVAS_TRIANGLEDATA: "canvas_triangleData",
+    CANVAS_CIRCLEDATA: 'canvas_circledata',
+    CANVAS_IMPORTDATA: 'canvas_importData',
+    CANVAS_DATAEXIST: 'canvas_dataExist',
+    CANVAS_DATALIST: 'canvas_dataList',
+    CANVAS_RENDERALL: 'canvas_renderAll',
+    CANVAS_DELLIST: 'canvas_delList',
 
     // 调试
     DEBUG_LOG: 'debug_log',

@@ -1167,51 +1167,82 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                 name: t('blocks:category.canvas'),
                 contents: [
                     {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODES.CANVAS_COLOR,
-                        inputs: {
-                            COLOR: colour(),
-                        },
-                    },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODES.CANVAS_POINT,
-                        inputs: {
-                            X: num(0),
-                            Y: num(0),
-                        },
-                    },
-                    sep(),
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODES.CANVAS_LINESET,
-                        inputs: {
-                            TYPE: menu(OPCODES.CANVAS_LINESET_MENU),
-                        },
-                    },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODES.CANVAS_LINE,
-                        inputs: {
-                            X1: num(-100),
-                            Y1: num(100),
-                            X2: num(100),
-                            Y2: num(-100),
-                        },
-                    },
-                    {
-                        gap: 12,
-                        kind: 'block',
-                        type: OPCODES.CANVAS_CIRCLE,
-                        inputs: {
-                            X1: num(-100),
-                            Y1: num(100),
-                            RADIUS: num(5),
-                        },
+                        kind: 'category',
+                        name: t('blocks:category.canvas.pen'),
+                        colour: BlocksColor.data.primary,
+                        contents: [
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODES.CANVAS_COLOR,
+                                inputs: {
+                                    COLOR: colour(),
+                                },
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODES.CANVAS_POINT,
+                                inputs: {
+                                    X: num(0),
+                                    Y: num(0),
+                                },
+                            },
+                            sep(),
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODES.CANVAS_LINESET,
+                                inputs: {
+                                    TYPE: menu(OPCODES.CANVAS_LINESET_MENU),
+                                },
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODES.CANVAS_LINE,
+                                inputs: {
+                                    X1: num(-100),
+                                    Y1: num(100),
+                                    X2: num(100),
+                                    Y2: num(-100),
+                                },
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODES.CANVAS_CIRCLE,
+                                inputs: {
+                                    X: num(-100),
+                                    Y: num(100),
+                                    RADIUS: num(5),
+                                },
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODES.CANVAS_RECTANGLE,
+                                inputs: {
+                                    X1: num(-100),
+                                    Y1: num(100),
+                                    X2: num(100),
+                                    Y2: num(-100),
+                                },
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODES.CANVAS_TRIANGLE,
+                                inputs: {
+                                    X1: num(-100),
+                                    Y1: num(100),
+                                    X2: num(100),
+                                    Y2: num(-100),
+                                    X3: num(100),
+                                    Y3: num(0),
+                                },
+                            },
+                        ]
                     },
                 ],
             },
