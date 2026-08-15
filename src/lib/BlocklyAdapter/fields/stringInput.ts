@@ -58,7 +58,8 @@ export class StringInputField extends Blockly.FieldTextInput {
 
     protected override widgetCreate_(): HTMLInputElement | HTMLTextAreaElement {
         const editor = super.widgetCreate_();
-        const scale = this.getSourceBlock()?.workspace.getAbsoluteScale() ?? 1;
+        const workspace = this.getSourceBlock()?.workspace as Blockly.WorkspaceSvg | undefined;
+        const scale = workspace?.getAbsoluteScale() ?? 1;
         const radius = `${String(this.getBorderRadius() * scale)}px`;
 
         editor.style.borderRadius = radius;
