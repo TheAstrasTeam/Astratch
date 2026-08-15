@@ -9,12 +9,7 @@
 
 import * as Blockly from 'blockly/core';
 import { t } from 'i18next';
-import {
-    BlocksColor,
-    OPCODES,
-    type IFunctionValueBlock,
-    type TFunctionReturnField,
-} from '../../../types/blocks';
+import { BlocksColor, OPCODES, type IFunctionValueBlock } from '../../../types/blocks';
 import { connections, endConnections, returnConnections } from './helpers';
 import { modal } from '../../../components/Modal/modal';
 import { PromptModal } from '../../../components/modal_prompt';
