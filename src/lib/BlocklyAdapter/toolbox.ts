@@ -1232,15 +1232,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                             {
                                 gap: 12,
                                 kind: 'block',
-                                type: OPCODES.CANVAS_TRIANGLE,
-                                inputs: {
-                                    X1: num(-100),
-                                    Y1: num(100),
-                                    X2: num(100),
-                                    Y2: num(-100),
-                                    X3: num(100),
-                                    Y3: num(0),
-                                },
+                                type: OPCODES.CANVAS_POLYGON,
                             },
                             sep(),
                             {

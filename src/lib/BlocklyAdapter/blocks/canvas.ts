@@ -7,7 +7,13 @@
 import * as Blockly from 'blockly/core';
 import { t } from 'i18next';
 import { BlocksColor, OPCODES } from '../../../types/blocks';
-import { connections } from './helpers';
+import { connections, isInFlyoutInsteadOfTrashCan } from './helpers';
+import {
+    createMinusField,
+    createPlusField,
+    MutationConnectionStore,
+    removeMutationInputs,
+} from './mutation';
 
 export function initCanvasBlocks(blockly: typeof Blockly) {
     // 基础内容
@@ -94,23 +100,106 @@ export function initCanvasBlocks(blockly: typeof Blockly) {
         },
     } as Blockly.Block;
 
-    blockly.Blocks[OPCODES.CANVAS_TRIANGLE] = {
-        init(this: Blockly.Block) {
+    interface ICanvas_polygon extends Blockly.Block {
+        itemCount: number;
+        connectionStore_: MutationConnectionStore;
+        plus: () => void;
+        minus: (index?: number) => void;
+        updateShape: () => void;
+        saveConnections_: () => void;
+        restoreConnection_: (inputName: string, defaultText: string) => void;
+    }
+    blockly.Blocks[OPCODES.CANVAS_POLYGON] = {
+        init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:canvas.triangle'),
-                args0: [
-                    { type: 'input_value', name: 'X1', check: 'Number' },
-                    { type: 'input_value', name: 'Y1', check: 'Number' },
-                    { type: 'input_value', name: 'X2', check: 'Number' },
-                    { type: 'input_value', name: 'Y2', check: 'Number' },
-                    { type: 'input_value', name: 'X3', check: 'Number' },
-                    { type: 'input_value', name: 'Y3', check: 'Number' },
-                ],
+                // message0: t('blocks:canvas.triangle'),
+                // args0: [
+                //     { type: 'input_value', name: 'X1', check: 'Number' },
+                //     { type: 'input_value', name: 'Y1', check: 'Number' },
+                //     { type: 'input_value', name: 'X2', check: 'Number' },
+                //     { type: 'input_value', name: 'Y2', check: 'Number' },
+                //     { type: 'input_value', name: 'X3', check: 'Number' },
+                //     { type: 'input_value', name: 'Y3', check: 'Number' },
+                // ],
                 colour: BlocksColor.canvas.primary,
             });
+            this.itemCount = 3;
+            this.connectionStore_ = new MutationConnectionStore();
+            this.updateShape();
         },
-    } as Blockly.Block;
+        plus() {
+            this.saveConnections_();
+            this.itemCount++;
+            this.updateShape();
+        },
+        minus(index?: number) {
+            if (this.itemCount === 0) return;
+            this.saveConnections_();
+            const removeIdx = index ?? this.itemCount - 1;
+            this.connectionStore_.removeIndex(this.itemCount, removeIdx, i => [
+                `POINT${i.toString()}_X`,
+                `POINT${i.toString()}_Y`,
+            ]);
+            this.itemCount--;
+            this.updateShape();
+        },
+        saveConnections_() {
+            this.connectionStore_.capture(
+                this,
+                Array.from({ length: this.itemCount }, (_, i) => [
+                    `POINT${i.toString()}_X`,
+                    `POINT${i.toString()}_Y`,
+                ]).flat(),
+            );
+        },
+        restoreConnection_(inputName: string, defaultText: string) {
+            this.connectionStore_.restore(this, inputName, {
+                type: 'text',
+                fields: { TEXT: defaultText },
+            });
+        },
+        updateShape() {
+            removeMutationInputs(this, () => true);
+
+            if (isInFlyoutInsteadOfTrashCan(this)) {
+                this.appendDummyInput('TITLE').appendField(t('blocks:canvas.polygon.title.flyout'));
+                return;
+            }
+            this.appendDummyInput('TITLE').appendField(t('blocks:canvas.polygon.title'));
+            this.appendEndRowInput('END_ROW');
+            for (let i = 0; i < this.itemCount; i++) {
+                this.appendDummyInput(`POINT${String(i)}_TITLE`).appendField('    (');
+
+                this.appendValueInput(`POINT${String(i)}_X`).setAlign(Blockly.inputs.Align.RIGHT);
+                this.restoreConnection_(`POINT${i.toString()}_X`, '10086');
+
+                this.appendDummyInput(`POINT${String(i)}_TITLE_SPLIT`).appendField(',');
+
+                this.appendValueInput(`POINT${String(i)}_Y`).setAlign(Blockly.inputs.Align.RIGHT);
+                this.restoreConnection_(`POINT${i.toString()}_Y`, '10086');
+
+                this.appendDummyInput(`POINT${String(i)}_TITLE_END`).appendField(
+                    i + 1 === this.itemCount ? ')' : '),',
+                );
+
+                if (this.itemCount > 3)
+                    this.appendDummyInput('SUB')
+                        .setAlign(Blockly.inputs.Align.RIGHT)
+                        .appendField(
+                            createMinusField({
+                                removeIndex: i,
+                            }),
+                            'MINUS',
+                        );
+                this.appendEndRowInput(`END_ROW_VALUE${String(i)}`);
+            }
+            this.appendDummyInput(`TITLE_END`).appendField(t('blocks:canvas.polygon.end'));
+            this.appendDummyInput('ADD')
+                .setAlign(Blockly.inputs.Align.RIGHT)
+                .appendField(createPlusField(), 'ADD');
+        },
+    } as ICanvas_polygon;
 
     blockly.Blocks[OPCODES.CANVAS_STAMP] = {
         init(this: Blockly.Block) {

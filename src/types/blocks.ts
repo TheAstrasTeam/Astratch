@@ -233,7 +233,7 @@ const OPCODES = {
     CANVAS_FILL: 'canvas_fill',
     CANVAS_CIRCLE: 'canvas_circlr',
     CANVAS_RECTANGLE: 'canvas_rectangle',
-    CANVAS_TRIANGLE: 'canvas_triangle',
+    CANVAS_POLYGON: 'canvas_polygon',
     CANVAS_STAMP: 'canvas_stamp',
     CANVAS_STAMPPLUS: 'canvas_stampPlus',
     CANVAS_TEXT: 'canvas_text',

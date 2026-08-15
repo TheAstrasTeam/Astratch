@@ -129,4 +129,13 @@ export function createStaticMenu(options: Blockly.MenuOption[]) {
     return new dropdownWithInput(options);
 }
 
-export { BlocksColor, OPCODES };
+const isInFlyoutInsteadOfTrashCan = (block: Blockly.Block): boolean => {
+    const ws = block.workspace as Blockly.WorkspaceSvg;
+    const mainWs = ws.targetWorkspace;
+
+    if (mainWs?.getFlyout()?.getWorkspace() === ws) return true;
+    if (mainWs?.trashcan?.flyout?.getWorkspace() === ws) return false;
+    return false;
+} 
+
+export { BlocksColor, OPCODES, isInFlyoutInsteadOfTrashCan };
