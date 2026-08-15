@@ -43,3 +43,9 @@ pnpm install
 ```bash
 pnpm dev # Run `pnpm run` to see more commands
 ```
+
+## Submit
+
+About Submit，You need：
+- Use Conventional Commits：`feat:` / `fix:` / `chore:` / `docs:` / `refactor:` / `test:` / `ci:` 等。
+- It is best to submit commits in **English** rather than other languages.

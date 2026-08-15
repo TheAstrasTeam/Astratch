@@ -65,4 +65,4 @@ Astratch 是一个基于 TypeScript 6 + React 19 + zustand 技术栈编写的“
 ## 提交
 
 - 使用 Conventional Commits：`feat:` / `fix:` / `chore:` / `docs:` / `refactor:` / `test:` / `ci:` 等
-- 语言不限，中文即可
+- 语言不限，建议英文
