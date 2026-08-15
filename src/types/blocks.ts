@@ -241,7 +241,8 @@ const OPCODES = {
 
     // 删除了一些定义，因为 KOSHINO 想做，所以删了。
     // KOSHINO 是正确的😋
-    // 退出开发 999 天💥
+    // 为什么非要把某些不必要功能做成常用功能？必须所有东西都用户自适应吗？
+    // 还是说不想做 TW 的插件“在右键菜单中切换”💥
     CANVAS_IMPORTDATA: 'canvas_importData',
     CANVAS_DATAEXIST: 'canvas_dataExist',
     CANVAS_DATALIST: 'canvas_dataList',
