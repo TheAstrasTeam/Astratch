@@ -7,7 +7,7 @@
 import * as Blockly from 'blockly/core';
 import { t } from 'i18next';
 import { BlocksColor, OPCODES } from '../../../types/blocks';
-import { connections, endConnections, hatConnections, returnConnections } from './helpers';
+import { connections, endConnections, hatConnections, isInFlyoutInsteadOfTrashCan, returnConnections } from './helpers';
 import {
     createMinusField,
     createPlusField,
@@ -385,13 +385,13 @@ export function initEntityBlocks(blockly: typeof Blockly) {
 
             this.appendDummyInput('CONTENT').appendField(
                 t(
-                    this.isInFlyout || !this.itemCount
+                    isInFlyoutInsteadOfTrashCan(this) || !this.itemCount
                         ? 'blocks:entity.lifecycle.clone.noData'
                         : 'blocks:entity.lifecycle.clone.haveData',
                 ),
             );
 
-            if (this.isInFlyout) return;
+            if (isInFlyoutInsteadOfTrashCan(this))  return;
 
             if (this.itemCount) {
                 for (let i = 0; i < this.itemCount; i++) {

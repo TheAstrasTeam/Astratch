@@ -31,6 +31,7 @@
 
 import * as Blockly from 'blockly/core';
 import type { AshConnection } from '../connectionRules';
+import { isInFlyoutInsteadOfTrashCan } from './helpers';
 
 /** 源积木上显示名字的字段名。 */
 const NAME_FIELD = 'NAME';
@@ -207,7 +208,7 @@ export function scopedSourceHost(options: IScopedSourceHostOptions) {
         ensureScopedBlocks(this: IScopedSourceHost): void {
             if (
                 this.isFillingScopedSlots ||
-                this.isInFlyout ||
+                isInFlyoutInsteadOfTrashCan(this) ||
                 this.isDeadOrDying() ||
                 this.isInsertionMarker()
             )

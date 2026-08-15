@@ -7,7 +7,7 @@
 import * as Blockly from 'blockly/core';
 import { t } from 'i18next';
 import { BlocksColor, OPCODES } from '../../../types/blocks';
-import { returnConnections } from './helpers';
+import { isInFlyoutInsteadOfTrashCan, returnConnections } from './helpers';
 
 import enable from '../../../assets/blocks/enable.svg';
 import unable from '../../../assets/blocks/unable.svg';
@@ -195,7 +195,7 @@ export function initOperatorBlocks(blockly: typeof Blockly) {
         },
         onchange(this: BooleanBlock, event: Blockly.Events.Abstract) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-            if (event.type === Blockly.Events.CLICK && !this.isInFlyout) {
+            if (event.type === Blockly.Events.CLICK && !isInFlyoutInsteadOfTrashCan(this)) {
                 const clickEvent = event as Blockly.Events.Click;
                 if (
                     clickEvent.targetType === Blockly.Events.ClickTarget.BLOCK &&

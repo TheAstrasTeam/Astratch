@@ -7,7 +7,7 @@
 import * as Blockly from 'blockly/core';
 import { t } from 'i18next';
 import { BlocksColor, OPCODES } from '../../../types/blocks';
-import { connections, createDataMenu, refreshDataMenu, returnConnections } from './helpers';
+import { connections, createDataMenu, isInFlyoutInsteadOfTrashCan, refreshDataMenu, returnConnections } from './helpers';
 import { events, type IDataCreatedEvent, type IVM } from '../../../types/vm';
 import {
     createMinusField,
@@ -193,10 +193,14 @@ export function initDataBlocks(blockly: typeof Blockly, vm: IVM) {
             removeMutationInputs(this, () => true);
 
             this.appendDummyInput('CONTENT').appendField(
-                t(this.isInFlyout ? 'blocks:data.string.joinText' : 'blocks:data.string.join'),
+                t(
+                    isInFlyoutInsteadOfTrashCan(this)
+                        ? 'blocks:data.string.joinText'
+                        : 'blocks:data.string.join',
+                ),
             );
 
-            if (this.isInFlyout) return;
+            if (isInFlyoutInsteadOfTrashCan(this)) return;
 
             this.appendDummyInput('ADD')
                 .setAlign(Blockly.inputs.Align.LEFT)
