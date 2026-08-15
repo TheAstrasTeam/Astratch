@@ -1286,7 +1286,9 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                         kind: 'category',
                         name: t('blocks:category.canvas.render'),
                         colour: BlocksColor.canvas.secondary,
-                        contents: [],
+                        contents: [
+                            // TODO: KOSHINO想做，给了。
+                        ],
                     },
                 ],
             },

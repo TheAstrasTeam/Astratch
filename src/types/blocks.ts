@@ -239,9 +239,9 @@ const OPCODES = {
     CANVAS_TEXT: 'canvas_text',
     CANVAS_TEXTFONT: 'canvas_textFont',
 
-    CANVAS_RECTANGLEDATA: 'canvas_rectangleData',
-    CANVAS_TRIANGLEDATA: 'canvas_triangleData',
-    CANVAS_CIRCLEDATA: 'canvas_circledata',
+    // 删除了一些定义，因为 KOSHINO 想做，所以删了。
+    // KOSHINO 是正确的😋
+    // 退出开发 999 天💥
     CANVAS_IMPORTDATA: 'canvas_importData',
     CANVAS_DATAEXIST: 'canvas_dataExist',
     CANVAS_DATALIST: 'canvas_dataList',

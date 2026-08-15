@@ -317,15 +317,11 @@
     "canvas.fill": "设置填充模式为 %1",
     "canvas.circle": "绘制圆心 %1 %2 半径 %3 的圆形",
     "canvas.rectangle": "绘制以 %1 %2 和 %3 %4 为对角顶点的矩形",
-    "canvas.triangle": "绘制以 %1 %2 %3 %4 和 %5 %6 为顶点的三角形",
+    "canvas.triangle": "绘制以 %1 %2 ， %3 %4 和 %5 %6 为顶点的三角形",
     "canvas.stamp": "拓印自己",
     "canvas.stampPlus": "将图像 %1 拓印到 %2 %3 大小 %4 角度 %5",
     "canvas.text": "绘制文本 %1 于坐标 %2 %3 对齐模式 %4",
     "canvas.textFont": "设置文本字体为 %1",
-
-    "canvas.rectangleData": "定义三角形 %1 %2 %3 %4 %5 %6 颜色 %7 填充 &8",
-    "canvas.triangleData": "定义矩形 %1 %2 %3 %4 颜色 %5 填充 &6",
-    "canvas.circleData": "定义圆形圆心 %1 %2 半径 %3 颜色 %4 填充 &5",
 
     "canvas.importData": "将 %1 作为 %2 加入渲染队列",
     "canvas.dataExist": "存在名为 %1 的数据？",

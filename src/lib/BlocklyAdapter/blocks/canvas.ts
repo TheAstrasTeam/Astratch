@@ -165,4 +165,7 @@ export function initCanvasBlocks(blockly: typeof Blockly) {
             });
         },
     } as Blockly.Block;
+
+    // 高级渲染
+    // TODO: KOSHINO 想做，给了。
 }
