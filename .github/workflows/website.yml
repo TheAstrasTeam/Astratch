@@ -1,0 +1,58 @@
+name: Deploy to website
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit-title:
+        description: Commit Title
+        required: false
+        default: 'deploy: A new online version of Astratch'
+      commit-message:
+        description: Commit Body
+        required: false
+        default: 'Check [Astratch](https://github.com/TheAstrasTeam/Astratch)'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+        - name: Checkout Astratch
+          uses: actions/checkout@v4
+
+        - name: Setup Node
+          uses: actions/setup-node@v4
+          with:
+              node-version: '24'
+
+        - name: Setup pnpm
+          uses: pnpm/action-setup@v3
+          with:
+              version: 9
+
+        - name: Install Dependencies
+          run: pnpm install --frozen-lockfile
+
+        - name: Build Astratch
+          run: pnpm build --base=/editor/
+
+        - name: Deploy to astrasnext.github.io
+          env:
+              DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+          run: |
+              set -euo pipefail
+              git clone --depth 1 "https://x-access-token:${DEPLOY_TOKEN}@github.com/TheAstrasTeam/astrasnext.github.io.git" deploy-site
+              cd deploy-site
+              git config user.name "github-actions[bot]"
+              git config user.email "github-actions[bot]@users.noreply.github.com"
+
+              # 只更新 editor/ 子目录，根目录（首页、CNAME 等）不受影响
+              mkdir -p editor
+              find editor -mindepth 1 -exec rm -rf {} +
+
+              # 复制构建产物到 editor/
+              cp -r ../dist/. editor/
+
+              git add -A
+              # 无改动时跳过提交，避免空 commit
+              git diff --cached --quiet || git commit -m "${{ github.event.inputs.commit-title }}" -m "${{ github.event.inputs.commit-message }}"
+              git push origin main
