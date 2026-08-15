@@ -1242,7 +1242,31 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                     Y3: num(0),
                                 },
                             },
+                            sep(),
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODES.CANVAS_STAMP,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODES.CANVAS_STAMPPLUS,
+                                inputs: {
+                                    IMG: txt(t('blocks:example.resource')),
+                                    X: num(100),
+                                    Y: num(-100),
+                                    SIZE: num(50),
+                                    ANGLE: numAngle(90)
+                                },
+                            },
                         ]
+                    },
+                    {
+                        kind: 'category',
+                        name: t('blocks:category.canvas.render'),
+                        colour: BlocksColor.data.primary,
+                        contents: []
                     },
                 ],
             },

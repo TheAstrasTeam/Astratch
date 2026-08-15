@@ -236,9 +236,10 @@ const OPCODES = {
     CANVAS_STAMP: 'canvas_stamp',
     CANVAS_STAMPPLUS: 'canvas_stampPlus',
     CANVAS_TEXT: 'canvas_text',
+    CANVAS_TEXTFONT: 'canvas_textFont',
 
     CANVAS_RECTANGLEDATA: 'canvas_rectangleData',
-    CANVAS_TRIANGLEDATA: "canvas_triangleData",
+    CANVAS_TRIANGLEDATA: 'canvas_triangleData',
     CANVAS_CIRCLEDATA: 'canvas_circledata',
     CANVAS_IMPORTDATA: 'canvas_importData',
     CANVAS_DATAEXIST: 'canvas_dataExist',
