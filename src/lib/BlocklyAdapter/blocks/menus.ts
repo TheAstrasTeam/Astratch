@@ -123,7 +123,10 @@ export function initMenuBlocks(blockly: typeof Blockly, vm: IVM) {
     // 动态：实体选择菜单
     blockly.Blocks[OPCODES.DIRECTION_SETFACE_MENU] = {
         init(this: Blockly.Block) {
-            this.appendDummyInput().appendField(createEntitiesMenu(vm,[[t('blocks:menu.stageCenter'), '_STAGECENTER_']]), 'ASH_BLOCKMENU');
+            this.appendDummyInput().appendField(
+                createEntitiesMenu(vm, [[t('blocks:menu.stageCenter'), '_STAGECENTER_']]),
+                'ASH_BLOCKMENU',
+            );
             this.setOutput(true, 'String');
             this.setColour(BlocksColor.direction.primary);
         },
@@ -563,7 +566,7 @@ export function initMenuBlocks(blockly: typeof Blockly, vm: IVM) {
             });
         },
     } as Blockly.Block;
-    
+
     blockly.Blocks[OPCODES.DATA_OBJECT_TYPE_MENU] = {
         init(this: Blockly.Block) {
             this.jsonInit({
@@ -680,7 +683,27 @@ export function initMenuBlocks(blockly: typeof Blockly, vm: IVM) {
                 ],
                 output: 'String',
                 colour: BlocksColor.debug.secondary,
-            })
-        }
-    }
+            });
+        },
+    };
+
+    blockly.Blocks[OPCODES.CANVAS_LINESET_MENU] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                message0: '%1',
+                args0: [
+                    {
+                        type: 'field_dropdown_with_block',
+                        name: 'ASH_BLOCKMENU',
+                        options: [
+                            [t('blocks:menu.rightAngel'), '_RIGHTANGLE_'],
+                            [t('blocks:menu.roundedAngle'), '_ROUNDEDANGLE_'],
+                        ],
+                    },
+                ],
+                output: 'String',
+                colour: BlocksColor.canvas.secondary,
+            });
+        },
+    };
 }

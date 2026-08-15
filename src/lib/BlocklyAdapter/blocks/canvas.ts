@@ -23,6 +23,31 @@ export function initCanvasBlocks(blockly: typeof Blockly) {
         },
     } as Blockly.Block;
 
+    blockly.Blocks[OPCODES.CANVAS_POINT] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...connections,
+                message0: t('blocks:canvas.point'),
+                args0: [
+                    {type: 'input_value', name: 'X', check: 'Number'},
+                    {type: 'input_value', name: 'Y', chekc: 'Number'}
+                ],
+                colour: BlocksColor.canvas.primary,
+            })
+        }
+    }
+
+    blockly.Blocks[OPCODES.CANVAS_LINESET] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...connections,
+                message0: t('blocks:canvas.lineset'),
+                args0: [{type: 'input_value', name: 'TYPE'}],
+                colour: BlocksColor.canvas.primary,
+            });
+        },
+    } as Blockly.Block;
+
     blockly.Blocks[OPCODES.CANVAS_LINE] = {
         init(this: Blockly.Block) {
             this.jsonInit({

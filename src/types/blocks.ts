@@ -42,6 +42,7 @@ const OPCODES = {
     MOUSE_KEY_MENU: 'mouse_key_menu',
     KEY_ISPRESS_MENU: 'key_isPress_menu',
     DEBUG_LOG_TYPE_MENU: 'debug_log_type_menu',
+    CANVAS_LINESET_MENU: 'canvas_lineSet_menu',
     // 实体
     // - 变换
     // - - 位置
@@ -223,9 +224,11 @@ const OPCODES = {
     FUNCTION_VALUE_ID: 'function_value_id',
 
     // 画布
-    CANVAS_COLOR: "canvas_color",
-    CANVAS_LINE: "canvas_line",
-    CANVAS_CIRCLE: "canvas_circlr",
+    CANVAS_COLOR: 'canvas_color',
+    CANVAS_POINT: 'canvas_point',
+    CANVAS_LINESET: 'canvas_lineSet',
+    CANVAS_LINE: 'canvas_line',
+    CANVAS_CIRCLE: 'canvas_circlr',
 
     // 调试
     DEBUG_LOG: 'debug_log',

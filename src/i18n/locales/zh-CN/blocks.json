@@ -83,6 +83,9 @@
     "menu.unit": "单位",
     "menu.pers": "百分比",
 
+    "menu.rightAngel": "直角",
+    "menu.roundedAngle": "圆角",
+
     "menu.log": "日志",
     "menu.warn": "警告",
     "menu.err": "错误",
@@ -299,9 +302,28 @@
     "function.value": "函数值",
     "function.defaultTitle": "函数名称",
 
+    "canvas.cleanAll": "擦除全部",
     "canvas.color": "设置绘制颜色为 %1",
+    "canvas.point": "在 %1 %2 处画点",
+    "canvas.lineset": "设置直线端点为 %1",
     "canvas.line": "绘制从 %1 %2 到 %3 %4 的直线",
+    "canvas.fill": "设置填充模式为 %1",
     "canvas.circle": "绘制圆心 %1 %2 半径 %3 的圆形",
+    "canvas.rectangle": "绘制以 %1 %2 和 %3 %4 为对角顶点的矩形",
+    "canvas.triangle": "绘制以 %1 %2 %3 %4 和 %5 %6 为顶点的三角形",
+    "canvas.stamp": "拓印自己",
+    "canvas.stampPlus": "将图像 %1 拓印到 %2 %3 大小 %4 角度 %5",
+    "canvas.text": "绘制文本 %1 于 %2 %3",
+
+    "canvas.rectangleData": "定义三角形 %1 %2 %3 %4 %5 %6 颜色 %7 填充 &8",
+    "canvas.triangleData": "定义矩形 %1 %2 %3 %4 颜色 %5 填充 &6",
+    "canvas.circleData": "定义圆形圆心 %1 %2 半径 %3 颜色 %4 填充 &5",
+
+    "canvas.importData": "将 %1 作为 %2 加入渲染队列",
+    "canvas.dataExist": "存在名为 %1 的数据？",
+    "canvas.dataList": "渲染数据队列",
+    "canvas.renderAll": "绘制队列数据",
+    "canvas.delList": "清空渲染队列",
 
     "debug.log": "以 %1 输出 %2",
     "debug.crash": "停止全部并报错 %1",
