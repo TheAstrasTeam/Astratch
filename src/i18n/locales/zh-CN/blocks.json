@@ -155,7 +155,7 @@
     "entity.appearance.images.getGrid": "当前切图层数",
     "entity.appearance.images.getGridDistance": "以 %1 返回 %2 切图距离",
     "entity.appearance.visibility.set": "%1 实体",
-    "entity.appearance.visibility.get": "是否显示",
+    "entity.appearance.visibility.get": "是否显示？",
     "visibility.show": "显示",
     "visibility.hide": "隐藏",
 
@@ -188,7 +188,7 @@
 
     "resources.addFromUrl": "从 URL %1 加载资源，并命名为 %2",
     "resources.get": "获取资源 %1",
-    "resources.exists": "资源 %1 存在",
+    "resources.exists": "资源 %1 存在？",
     "resources.rename": "将资源 %1 重命名为 %2",
     "resources.delete": "删除资源 %1",
 
