@@ -41,9 +41,13 @@ export const spawnRandomString = () => {
 
 /**
  * 扁平化object
- * @param obj 
+ * @param obj
  */
-export const flattenObject = (obj: Record<string, unknown>, prefix = '', result: Record<string, unknown> = {}) => {
+export const flattenObject = (
+    obj: Record<string, unknown>,
+    prefix = '',
+    result: Record<string, unknown> = {},
+) => {
     for (const key in obj) {
         if (Object.prototype.hasOwnProperty.call(obj, key)) {
             const newKey = prefix ? `${prefix}_${key}` : key;
@@ -55,4 +59,4 @@ export const flattenObject = (obj: Record<string, unknown>, prefix = '', result:
         }
     }
     return result;
-}
+};

@@ -243,7 +243,18 @@ span {
     &.debug::before {
         background-image: url('../assets/debug.svg');
     }
-    &:is(.entity, .audio, .resources, .events, .control, .operator, .data, .function, .canvas, .debug) {
+    &:is(
+        .entity,
+        .audio,
+        .resources,
+        .events,
+        .control,
+        .operator,
+        .data,
+        .function,
+        .canvas,
+        .debug
+    ) {
         &::before {
             content: '';
             width: 14px;

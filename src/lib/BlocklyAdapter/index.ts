@@ -40,7 +40,7 @@ import { initBlocks } from './blocks';
 import getToolbox from './toolbox';
 import { setDataCategory, setFunctionCategory } from './customToolbox';
 
-import './apiDeclare'
+import './apiDeclare';
 
 const IS_MAC = getPlatfrom() === ALL_PLATFORMS.MAC;
 
@@ -344,7 +344,11 @@ export function setupBlockly(blockly: typeof BlocklyType, vm: IVM): Promise<IBlo
 
         const toolbox = await getToolbox();
 
-        return { toolbox, teardown, registerCategory: [setDataCategory(blockly, vm), setFunctionCategory(blockly, vm)] };
+        return {
+            toolbox,
+            teardown,
+            registerCategory: [setDataCategory(blockly, vm), setFunctionCategory(blockly, vm)],
+        };
     })();
 
     return setupPromise;

@@ -248,7 +248,7 @@ describe('Target.fromJSON', () => {
                 blocks: { _workspace: { blocks: { languageVersion: 0, blocks: [] } }, _script: [] },
                 comments: {},
                 viewX: 0,
-                viewY: 0
+                viewY: 0,
             },
             vi.fn(),
         );

@@ -280,15 +280,16 @@ export function initFunctionBlocks(blockly: typeof Blockly) {
                     this.appendDummyInput(inputID).appendField(textInput, `TEXT_${String(index)}`);
                 } else {
                     const input = this.appendValueInput(inputID);
-                    const checks = (Array.isArray(fieldData.type)
-                        ? fieldData.type
-                        : [fieldData.type]).map(type => {
-                            if(type) return type
+                    const checks = (
+                        Array.isArray(fieldData.type) ? fieldData.type : [fieldData.type]
+                    ).map(type => {
+                        if (type)
+                            return type
                                 .split('')
                                 .map((char, index) => (index ? char : char.toUpperCase()))
                                 .join('');
-                            return 'String';
-                        });
+                        return 'String';
+                    });
 
                     if (checks.length > 0) input.setCheck(checks);
                     input.connection?.setShadowState({

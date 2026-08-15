@@ -17,15 +17,13 @@ export const CreateDataModal = ({ vm, addID }: { vm: IVM; addID?: string }) => {
     const [AddID, _] = useState(() => addID ?? vm.runtime.editingTargetID);
     const { closeSelf } = useModalInstance();
 
-    const handleButtonClick = useCallback(
-        async () => {
-            if (nowValue.trim()) vm.runtime
+    const handleButtonClick = useCallback(async () => {
+        if (nowValue.trim())
+            vm.runtime
                 .getTargetByID(AddID)
                 ?.createData(nowValue, null, nowMode === DATA_VISIBILITY.PRIVATE, false);
-            await closeSelf();
-        },
-        [AddID, closeSelf, nowMode, nowValue, vm.runtime],
-    );
+        await closeSelf();
+    }, [AddID, closeSelf, nowMode, nowValue, vm.runtime]);
 
     const handleModeChanged = (e: ChangeEvent<HTMLSelectElement, HTMLSelectElement>) => {
         setMode(e.currentTarget.value as TDATA_VISIBILITY);

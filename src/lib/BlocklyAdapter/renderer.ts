@@ -241,10 +241,9 @@ class AstratchConstantProvider extends Blockly.zelos.ConstantProvider {
             checks = connection.targetConnection.getCheck();
         }
 
-        // 联合类型（check 数组含多种类型）不取任一成员形状，
-        // 统一渲染圆角空插槽，避免「按第一个类型」渲染产生误导。
+        // 若多类型列表则直接渲染默认的形状
         if (checks && checks.length > 1) {
-            return this.ROUNDED as unknown as Blockly.blockRendering.Shape;
+            return this.ROUNDED as unknown as Blockly.blockRendering.DynamicShape;
         }
 
         // 是的可恶的Blockly使用的东西让ASH有一百个报错，无奈忽略

@@ -24,9 +24,12 @@ describe('Folder.fromJSON', () => {
 
     it('缺失字段时使用默认值', () => {
         // @ts-expect-error 检测需要忽略
-        const folder = Folder.fromJSON({
-            id: 'f1',
-        }, vi.fn());
+        const folder = Folder.fromJSON(
+            {
+                id: 'f1',
+            },
+            vi.fn(),
+        );
         expect(folder.name).toBe('');
         expect(folder.color).toBe('#000000');
         expect(folder.parentID).toBeNull();
@@ -36,12 +39,15 @@ describe('Folder.fromJSON', () => {
 describe('Folder.rename', () => {
     it('应该更新名字并发出UPDATE_TARGET_STRUCTURE事件', () => {
         const emit = vi.fn();
-        const folder = Folder.fromJSON({
-            id: 'f1',
-            name: '',
-            color: '',
-            parentID: null
-        }, emit);
+        const folder = Folder.fromJSON(
+            {
+                id: 'f1',
+                name: '',
+                color: '',
+                parentID: null,
+            },
+            emit,
+        );
         folder.rename('新名字');
         expect(folder.name).toBe('新名字');
         expect(emit).toHaveBeenCalledWith(events.UPDATE_TARGET_STRUCTURE);
@@ -51,12 +57,15 @@ describe('Folder.rename', () => {
 describe('Folder.setColor', () => {
     it('应该更新颜色并发出事件', () => {
         const emit = vi.fn();
-        const folder = Folder.fromJSON({
-            id: 'f1',
-            name: '',
-            color: '',
-            parentID: null
-        }, emit);
+        const folder = Folder.fromJSON(
+            {
+                id: 'f1',
+                name: '',
+                color: '',
+                parentID: null,
+            },
+            emit,
+        );
         folder.setColor('#ff0000');
         expect(folder.color).toBe('#ff0000');
         expect(emit).toHaveBeenCalledWith(events.UPDATE_TARGET_STRUCTURE);
@@ -66,12 +75,15 @@ describe('Folder.setColor', () => {
 describe('Folder.setParent', () => {
     it('应该更新parentID并发出事件', () => {
         const emit = vi.fn();
-        const folder = Folder.fromJSON({
-            id: 'f1',
-            name: '',
-            color: '',
-            parentID: null
-        }, emit);
+        const folder = Folder.fromJSON(
+            {
+                id: 'f1',
+                name: '',
+                color: '',
+                parentID: null,
+            },
+            emit,
+        );
         folder.setParent('f2');
         expect(folder.parentID).toBe('f2');
         expect(emit).toHaveBeenCalledWith(events.UPDATE_TARGET_STRUCTURE);
@@ -80,11 +92,15 @@ describe('Folder.setParent', () => {
 
 describe('Folder.cloneAsNode', () => {
     it('应该保留原型（方法可用）并带type字段', () => {
-        const folder = Folder.fromJSON({
-            id: 'f1', name: '角色',
-            color: '',
-            parentID: null
-        }, vi.fn());
+        const folder = Folder.fromJSON(
+            {
+                id: 'f1',
+                name: '角色',
+                color: '',
+                parentID: null,
+            },
+            vi.fn(),
+        );
         const node = folder.cloneAsNode();
         expect(node).toBeInstanceOf(Folder);
         expect(node.type).toBe('folder');

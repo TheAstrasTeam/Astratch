@@ -66,17 +66,17 @@ export function initEventBlocks(blockly: typeof Blockly) {
     blockly.Blocks[OPCODES.EVENT_LIFECYCLE_ONSTART] = {
         init(this: Blockly.Block) {
             this.jsonInit({
-                ...hatConnections,                
+                ...hatConnections,
                 message0: t('blocks:event.lifecycle.onStart'),
                 colour: BlocksColor.event.primary,
                 args0: [
                     {
-                        "type": "field_image",
-                        "src": "..\\..\\assets\\start.svg",
-                        "width": 20,
-                        "height": 20,
-                        "alt": "*",
-                        "flipRtl": false
+                        type: 'field_image',
+                        src: '..\\..\\assets\\start.svg',
+                        width: 20,
+                        height: 20,
+                        alt: '*',
+                        flipRtl: false,
                     },
                 ],
             });
@@ -91,12 +91,12 @@ export function initEventBlocks(blockly: typeof Blockly) {
                 colour: BlocksColor.event.primary,
                 args0: [
                     {
-                        "type": "field_image",
-                        "src": "..\\..\\assets\\stop.svg",
-                        "width": 22,
-                        "height": 20,
-                        "alt": "*",
-                        "flipRtl": false
+                        type: 'field_image',
+                        src: '..\\..\\assets\\stop.svg',
+                        width: 22,
+                        height: 20,
+                        alt: '*',
+                        flipRtl: false,
                     },
                 ],
             });
@@ -249,7 +249,6 @@ export function initEventBlocks(blockly: typeof Blockly) {
         },
     } as Blockly.Block;
 
-    
     blockly.Blocks[OPCODES.EVENT_INPUT_GETALLKEYPRESSED] = {
         init(this: Blockly.Block) {
             this.jsonInit({

@@ -446,8 +446,7 @@ export { OPCODES, BlocksColor };
 export type TFunctionReturnField =
     'text' | 'dropdown' | 'boolean' | 'array' | 'object' | 'string' | 'number' | 'function' | null;
 
-export type TFunctionInputField =
-    'boolean' | 'array' | 'object' | 'string' | 'number' | 'function';
+export type TFunctionInputField = 'boolean' | 'array' | 'object' | 'string' | 'number' | 'function';
 
 export type TFunctionFieldType = TFunctionReturnField | TFunctionInputField[];
 

@@ -1257,16 +1257,16 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                     X: num(100),
                                     Y: num(-100),
                                     SIZE: num(50),
-                                    ANGLE: numAngle(90)
+                                    ANGLE: numAngle(90),
                                 },
                             },
-                        ]
+                        ],
                     },
                     {
                         kind: 'category',
                         name: t('blocks:category.canvas.render'),
                         colour: BlocksColor.data.primary,
-                        contents: []
+                        contents: [],
                     },
                 ],
             },
