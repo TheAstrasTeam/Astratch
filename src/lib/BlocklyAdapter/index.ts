@@ -40,8 +40,6 @@ import { initBlocks } from './blocks';
 import getToolbox from './toolbox';
 import { setDataCategory, setFunctionCategory } from './customToolbox';
 
-import './apiDeclare';
-
 const IS_MAC = getPlatfrom() === ALL_PLATFORMS.MAC;
 
 // mousetrap 修饰键名 → Blockly modifierKeys 枚举名
