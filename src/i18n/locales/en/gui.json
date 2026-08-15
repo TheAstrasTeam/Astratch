@@ -145,5 +145,18 @@
     "err.link.linkSelf": "Cannot link a target to itself",
     "err.link.undefined": "The linked target does not exist",
     "err.link.tryToLinkEntity": "Cannot link to an entity",
-    "err.target.undefined": "Target does not exist"
+    "err.target.undefined": "Target does not exist",
+    "createFunction.title": "Create a Function",
+    "createFunction.description": "Strangely, you are looking at the Modal title",
+    "createFunction.dropdown": "Dropdown",
+    "createFunction.input": "Input",
+    "createFunction.selectInputType": "Add an input parameter to the function, choose its type",
+    "createFunction.multiType": "Multi-type",
+    "createFunction.text": "Text",
+    "createFunction.boolean": "Boolean",
+    "createFunction.array": "Array",
+    "createFunction.object": "Object",
+    "createFunction.string": "String",
+    "createFunction.number": "Number",
+    "createFunction.function": "Function"
 }

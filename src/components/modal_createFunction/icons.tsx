@@ -225,7 +225,7 @@ const NumberIcon = ({ color = BlocksColor.function }: { color?: color }) => {
     );
 };
 
-const FunctionIcon = ({color = BlocksColor.function}: {color?: color}) => {
+const FunctionIcon = ({ color = BlocksColor.function }: { color?: color }) => {
     return (
         <svg
             xmlns='http://www.w3.org/2000/svg'
@@ -246,6 +246,55 @@ const FunctionIcon = ({color = BlocksColor.function}: {color?: color}) => {
             ></path>
         </svg>
     );
-}
+};
 
-export { DropDownIcon, BooleanIcon, ArrayIcon, ObjectIcon, StringIcon, NumberIcon, FunctionIcon };
+const TextIcon = ({ color = BlocksColor.function }: { color?: color }) => {
+    return (
+        <svg
+            xmlns='http://www.w3.org/2000/svg'
+            xmlnsXlink='http://www.w3.org/1999/xlink'
+            width='80'
+            height='48.01000213623047'
+            viewBox='0 0 80 48.01000213623047'
+            fill='none'
+        >
+            <g clip-path='url(#clip-path-0bcFSXRSir_Y09u4GwQCe)'>
+                <path d='M0 0L80 0L80 48L0 48L0 0Z' fill={color.primary}></path>
+                <path stroke={color.secondary} stroke-width='1' d='M0 0L80 0'></path>
+                <path stroke={color.secondary} stroke-width='1' d='M0 48L80 48'></path>
+                <path
+                    fill='#fff'
+                    d='M11.83 29.822L10.234 29.822L10.234 20.498L7 20.498L7 19L15.05 19L15.05 20.498L11.83 20.498L11.83 29.822Z'
+                ></path>
+                <path
+                    fill='#fff'
+                    d='M22.918 25.356C22.918 26.014 22.806 26.476 22.806 26.476L17.556 26.476C17.668 27.512 18.221 28.1 18.221 28.1C18.774 28.688 19.712 28.688 19.712 28.688C20.258 28.688 20.734 28.401 20.734 28.401C21.21 28.114 21.532 27.582 21.532 27.582L22.764 28.268C22.302 29.108 21.532 29.563 21.532 29.563C20.762 30.018 19.712 30.018 19.712 30.018C18.564 30.018 17.724 29.528 17.724 29.528C16.884 29.038 16.429 28.135 16.429 28.135C15.974 27.232 15.974 26.014 15.974 26.014C15.974 24.768 16.408 23.844 16.408 23.844C16.842 22.92 17.654 22.423 17.654 22.423C18.466 21.926 19.558 21.926 19.558 21.926C21.112 21.926 22.015 22.85 22.015 22.85C22.918 23.774 22.918 25.356 22.918 25.356ZM21.364 25.16C21.364 24.292 20.874 23.774 20.874 23.774C20.384 23.256 19.558 23.256 19.558 23.256C18.788 23.256 18.284 23.753 18.284 23.753C17.78 24.25 17.612 25.16 17.612 25.16L21.364 25.16Z'
+                ></path>
+                <path
+                    fill='#fff'
+                    d='M28.196 25.916L30.954 29.822L29.106 29.822L27.3 27.064L25.48 29.822L23.646 29.822L26.46 25.832L23.842 22.122L25.662 22.122L27.398 24.74L29.036 22.122L30.828 22.122L28.196 25.916Z'
+                ></path>
+                <path
+                    fill='#fff'
+                    d='M36.204 23.564L34.062 23.564L34.062 27.47C34.062 28.03 34.363 28.338 34.363 28.338C34.664 28.646 35.21 28.646 35.21 28.646C35.602 28.646 36.036 28.492 36.036 28.492L36.036 29.92C35.504 30.102 34.874 30.102 34.874 30.102C33.74 30.102 33.138 29.465 33.138 29.465C32.536 28.828 32.536 27.638 32.536 27.638L32.536 23.564L31.332 23.564L31.332 22.122L32.536 22.122L32.536 19.77L34.062 19.77L34.062 22.122L36.204 22.122L36.204 23.564Z'
+                ></path>
+            </g>
+            <defs>
+                <clipPath id='clip-path-0bcFSXRSir_Y09u4GwQCe'>
+                    <path d='M0 48.01L80 48.01L80 0L0 0L0 48.01Z' fill='white' />
+                </clipPath>
+            </defs>
+        </svg>
+    );
+};
+
+export {
+    DropDownIcon,
+    BooleanIcon,
+    ArrayIcon,
+    ObjectIcon,
+    StringIcon,
+    NumberIcon,
+    FunctionIcon,
+    TextIcon,
+};

@@ -9,16 +9,82 @@
     flex: 1;
 }
 .add-field-content {
-    min-width: 15vw;
-    min-height: 25vh;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    flex: 1;
+    padding: 5px 10px;
+}
+
+.big-selector {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: $ui-tertiary;
+    border-radius: 5px;
+    padding: 16px;
+    margin: 10px 0;
+    svg {
+        width: 80px;
+        height: auto;
+    }
+    &:hover {
+        background-color: $ui-black-transparent;
+    }
+    &:active {
+        filter: brightness(0.5);
+    }
+}
+
+.field-type-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
     flex: 1;
+}
+
+.field-type-multi {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    height: 35px;
+    & div {
+        display: flex;
+        align-content: center;
+        gap: 10px;
+    }
+}
+
+.field-type-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+}
+
+.selector-selected {
+    background-color: $ui-black-transparent;
+    outline: 2px solid $active-button;
+}
+
+.field-type-confirm {
+    align-self: flex-end;
+    padding: 5px 16px;
+    border-radius: 5px;
+    &:disabled {
+        opacity: 0.4;
+    }
 }
 
 .createPreview {
     display: flex;
     flex-direction: column;
+    min-height: 250px;
     flex: 1;
 }
 
@@ -50,13 +116,11 @@
     flex: 0;
     align-items: center;
     justify-content: left;
-    background-color: $ui-tertiary;
-    margin: 5px;
     padding: 5px;
     border-radius: 5px;
-    gap: 10px;
+    gap: 8px;
     svg {
-        width: 60px;
+        width: 40px;
         height: auto;
     }
     &:hover {
@@ -64,5 +128,8 @@
     }
     &:active {
         filter: brightness(0.5);
+    }
+    & span {
+        width: 100%;
     }
 }

@@ -137,5 +137,16 @@
     "data.forPublic": "整个目标",
     "data.forSelf": "单个脚本",
     "createFunction.title": "创建一个函数",
-    "createFunction.description": "奇怪的是，你竟然在到处看Modal标题"
+    "createFunction.description": "奇怪的是，你竟然在到处看Modal标题",
+    "createFunction.dropdown": "下拉选择",
+    "createFunction.input": "输入",
+    "createFunction.selectInputType": "为函数添加一个输入参数，选择它的类型",
+    "createFunction.multiType": "多类型",
+    "createFunction.text": "文本",
+    "createFunction.boolean": "布尔",
+    "createFunction.array": "数组",
+    "createFunction.object": "对象",
+    "createFunction.string": "字符串",
+    "createFunction.number": "数字",
+    "createFunction.function": "函数"
 }

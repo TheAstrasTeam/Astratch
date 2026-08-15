@@ -5,6 +5,7 @@
  */
 
 // 此文件由 AI 修改于 2026/8/10：为行内函数与调用积木加入参数
+// 此文件由AI修改于2026/8/15：联合类型直接参与 check 数组，槽位形状由 renderer 统一处理
 
 import * as Blockly from 'blockly/core';
 import { t } from 'i18next';
@@ -29,16 +30,6 @@ import moveRightImage from '../../../assets/blocks/moveRight.svg';
 
 /** 参数插槽的 input 名前缀，后接稳定 id。 */
 const PARAM_INPUT_PREFIX = 'PARAM_';
-
-// 此文件由AI生成
-/** 值槽位类型 → 连接 check 名称；check 决定插槽轮廓的形状。 */
-const slotCheckByType: Partial<Record<Exclude<TFunctionReturnField, null>, string>> = {
-    array: 'Array',
-    object: 'Object',
-    boolean: 'Boolean',
-    number: 'Number',
-    string: 'String',
-};
 /**
  * 参数减号按钮的 input 名前缀。
  *
@@ -289,10 +280,17 @@ export function initFunctionBlocks(blockly: typeof Blockly) {
                     this.appendDummyInput(inputID).appendField(textInput, `TEXT_${String(index)}`);
                 } else {
                     const input = this.appendValueInput(inputID);
-                    if (fieldData.type !== 'dropdown' && fieldData.type !== null) {
-                        const check = slotCheckByType[fieldData.type];
-                        if (check) input.setCheck(check);
-                    }
+                    const checks = (Array.isArray(fieldData.type)
+                        ? fieldData.type
+                        : [fieldData.type]).map(type => {
+                            if(type) return type
+                                .split('')
+                                .map((char, index) => (index ? char : char.toUpperCase()))
+                                .join('');
+                            return 'String';
+                        });
+
+                    if (checks.length > 0) input.setCheck(checks);
                     input.connection?.setShadowState({
                         type: OPCODES.FUNCTION_VALUE_ID,
                         fields: { ID: fieldData.text ?? '' },

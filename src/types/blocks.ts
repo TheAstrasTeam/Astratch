@@ -444,11 +444,15 @@ export interface IBlocksConfig {
 export { OPCODES, BlocksColor };
 
 export type TFunctionReturnField =
-    'dropdown' | 'boolean' | 'array' | 'object' | 'string' | 'number' | 'function' | null;
+    'text' | 'dropdown' | 'boolean' | 'array' | 'object' | 'string' | 'number' | 'function' | null;
+
+export type TFunctionInputField =
+    'boolean' | 'array' | 'object' | 'string' | 'number' | 'function';
+
+export type TFunctionFieldType = TFunctionReturnField | TFunctionInputField[];
 
 export interface TPreviewFunctionData {
-    type: 'text' | TFunctionReturnField;
-    /** 文本片段要展示的文字，或值槽位对应的参数 id。 */
+    type: TFunctionFieldType;
     text?: string;
 }
 export interface IFunctionValueBlock extends Blockly.Block {

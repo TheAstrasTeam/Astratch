@@ -6,14 +6,35 @@
 
 import { useModalInstance } from '@reactleaf/modal';
 import { Modal } from '../Modal/modalWindow';
+import { modal } from '../Modal/modal';
 import { t } from 'i18next';
 import styles from './index.module.scss';
 import { useCallback } from 'react';
 import { type IVM } from '../../types/vm';
 import { CreateFunctionWorkspace } from './blockWorkspace';
+import { FieldTypeModal } from './modal_fieldType';
 import { addFieldForFunctionPreview, resizePreviewWorkspace } from './functionPreview';
-import { modal } from '../Modal/modal';
-import { AddFieldModal } from './modal_addField';
+import { DropDownIcon, StringIcon, TextIcon } from './icons';
+import type { TFunctionFieldType } from '../../types/blocks';
+import type { JSX } from 'react/jsx-dev-runtime';
+
+// 此组件由AI生成：创建函数弹窗中的大号字段类型按钮
+const BigSelector = ({
+    icon,
+    label,
+    onClick,
+}: {
+    icon: JSX.Element;
+    label: string;
+    onClick: () => void;
+}) => {
+    return (
+        <div className={styles.bigSelector} onClick={onClick}>
+            {icon}
+            <span>{label}</span>
+        </div>
+    );
+};
 
 export const CreateFunctionModal = ({ vm, addID: _addID }: { vm: IVM; addID?: string }) => {
     const { closeSelf } = useModalInstance();
@@ -25,41 +46,54 @@ export const CreateFunctionModal = ({ vm, addID: _addID }: { vm: IVM; addID?: st
         [closeSelf],
     );
 
-    const handleAddFieldButtonClick = () => {
-        void modal.open(AddFieldModal, {
-            callback: (result) => {
-                addFieldForFunctionPreview({
-                    type: result
-                });
-            }
-        })
-    }
+    const handleAddFieldButtonClick = (result: TFunctionFieldType) => {
+        addFieldForFunctionPreview({
+            type: result,
+        });
+    };
 
     const handleAddText = () => {
         addFieldForFunctionPreview({
             type: 'text',
-            text: 'Hello World!'
+            text: 'Hello World!',
         });
-    }
+    };
 
     return (
         <Modal
             fullScreen={false}
             onFullScreen={resizePreviewWorkspace}
-            close={async result => {
-                await handleButtonClick(result);
+            close={async () => {
+                await handleButtonClick();
             }}
             title={t('gui:createFunction.title')}
             description={t('gui:createFunction.description')}
         >
             <div className={styles.content}>
                 <CreateFunctionWorkspace vm={vm} />
-                <button onClick={handleAddFieldButtonClick}>
-                    {t('gui:createFunction.addField')}
-                </button>
-                <button onClick={handleAddText}>
-                    {t('gui:createFunction.addText')}
-                </button>
+                <div className={styles.addFieldContent}>
+                    <BigSelector
+                        icon={<DropDownIcon />}
+                        label={t('gui:createFunction.dropdown')}
+                        onClick={() => {
+                            handleAddFieldButtonClick('dropdown');
+                        }}
+                    />
+                    <BigSelector
+                        icon={<StringIcon />}
+                        label={t('gui:createFunction.input')}
+                        onClick={() => {
+                            void modal.open(FieldTypeModal, {
+                                callback: handleAddFieldButtonClick,
+                            });
+                        }}
+                    />
+                    <BigSelector
+                        icon={<TextIcon />}
+                        label={t('gui:createFunction.text')}
+                        onClick={handleAddText}
+                    />
+                </div>
             </div>
         </Modal>
     );
