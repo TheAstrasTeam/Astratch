@@ -194,6 +194,9 @@ export function registerAstratchToolbox(options: i18n['t']) {
     .astratchContinuousFlyout:hover {
         overflow: visible;
     }
+    .injectionDiv:has(.blocklyFlyoutScrollbar:hover) .astratchContinuousFlyout {
+        overflow: visible;
+    }
     .astratchContinuousFlyout .blocklyScrollbarHandle {
         fill: #bcbcbc;
     }
