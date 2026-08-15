@@ -283,7 +283,7 @@ export function initControlBlocks(blockly: typeof Blockly) {
                 colour: BlocksColor.control.tertiary,
                 args0: [
                     { type: 'input_value', name: 'ARRAY', check: 'Array' },
-                    { type: 'input_value', name: 'ITEM_NAME', check: 'String' },
+                    { type: 'input_value', name: 'ITEM_NAME' },
                 ],
                 args1: [{ type: 'input_statement', name: 'DO', check: 'Action' }],
             });
@@ -294,7 +294,6 @@ export function initControlBlocks(blockly: typeof Blockly) {
 
     blockly.Blocks[OPCODES.CONTROL_LOOP_FOREACH_ITEM] = scopedSourceBlock({
         colour: BlocksColor.control.tertiary,
-        output: 'String',
         defaultLabel: () => t('blocks:control.loop.item'),
         hostTypes: [OPCODES.CONTROL_LOOP_FOREACH],
         openRenamePrompt: ({ currentName, commit }) => {
