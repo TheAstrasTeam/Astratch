@@ -154,4 +154,15 @@ export function initCanvasBlocks(blockly: typeof Blockly) {
             });
         },
     } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.CANVAS_TEXTFONT] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...connections,
+                message0: t('blocks:canvas.textFont'),
+                args0: [{ type: 'input_value', name: 'FONT', check: 'String' }],
+                colour: BlocksColor.canvas.primary,
+            });
+        },
+    } as Blockly.Block;
 }

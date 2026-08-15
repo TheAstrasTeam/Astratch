@@ -132,6 +132,8 @@
     "example.message": "消息",
     "example.error": "错误",
 
+    "example.textfont": "MiSans",
+
     "entity.transform.position.moveStep": "移动 %1 单位",
     "entity.transform.position.setPosition": "将 %1 坐标 %2 %3 单位",
     "entity.transform.position.getPosition": "当前 %1 坐标",

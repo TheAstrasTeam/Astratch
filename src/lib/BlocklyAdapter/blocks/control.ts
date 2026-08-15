@@ -294,6 +294,7 @@ export function initControlBlocks(blockly: typeof Blockly) {
 
     blockly.Blocks[OPCODES.CONTROL_LOOP_FOREACH_ITEM] = scopedSourceBlock({
         colour: BlocksColor.control.tertiary,
+        output: 'String',
         defaultLabel: () => t('blocks:control.loop.item'),
         hostTypes: [OPCODES.CONTROL_LOOP_FOREACH],
         openRenamePrompt: ({ currentName, commit }) => {

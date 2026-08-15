@@ -1169,7 +1169,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                     {
                         kind: 'category',
                         name: t('blocks:category.canvas.pen'),
-                        colour: BlocksColor.data.primary,
+                        colour: BlocksColor.canvas.primary,
                         contents: [
                             {
                                 gap: 12,
@@ -1272,12 +1272,20 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                     ALIGN: menu(OPCODES.TEXT_ALIGN_MENU),
                                 },
                             },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODES.CANVAS_TEXTFONT,
+                                inputs: {
+                                    FONT: txt(t('blocks:example.textfont')),
+                                },
+                            },
                         ],
                     },
                     {
                         kind: 'category',
                         name: t('blocks:category.canvas.render'),
-                        colour: BlocksColor.data.primary,
+                        colour: BlocksColor.canvas.secondary,
                         contents: [],
                     },
                 ],
