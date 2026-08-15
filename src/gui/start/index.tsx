@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { useState } from 'react';
 import styles from './index.module.scss';
 import { useSettings } from '../../settings/SettingsRegistry';
 import { guiInterface, guiThemes } from '../../types/gui';
@@ -21,16 +22,14 @@ import { debug } from '../../utils/debug';
 import { type IVM } from '../../types/vm';
 import { selectProjectThenJump } from '../../utils/ash-gui';
 
+// 通过此处获取一个句子😋
+import { getWelcomeText } from './welcome_text';
+
 const Start = ({ vm }: { vm: IVM }): React.ReactNode => {
     const themeMode = useSettings(state => state.guiThemeMode);
     const userName = useSettings(state => state.userName);
     const setInterface = useGUIStore(state => state.setInterface);
-    const spawnWelcomeText = () => {
-        // eslint-disable-next-line react-hooks/purity
-        return t(`gui:welcome.text.${Math.floor(Math.random() * 10).toString()}`, {
-            name: userName,
-        });
-    };
+    const [welcome] = useState(() => getWelcomeText(String(userName)));
     const handleCreateProject = () => {
         // 开始创建项目
         setInterface(guiInterface.CREATE_PROJECT);
@@ -50,7 +49,7 @@ const Start = ({ vm }: { vm: IVM }): React.ReactNode => {
                 src={themeMode === guiThemes.dark ? lightLogo : darkLogo}
                 className={styles.logo}
             />
-            <span className={styles.welcome}>{spawnWelcomeText()}</span>
+            <span className={styles.welcome}>{welcome}</span>
             <div style={{ marginTop: '32px' }} />
             <button className={styles.button} onClick={handleCreateProject}>
                 <AddIcon />
