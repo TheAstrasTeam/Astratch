@@ -19,7 +19,7 @@ export const CreateDataModal = ({ vm, addID }: { vm: IVM; addID?: string }) => {
 
     const handleButtonClick = useCallback(
         async (close: unknown = null) => {
-            vm.runtime
+            if (close && nowValue.trim()) vm.runtime
                 .getTargetByID(AddID)
                 ?.createData(nowValue, null, nowMode === DATA_VISIBILITY.PRIVATE, false);
             await closeSelf(close);
