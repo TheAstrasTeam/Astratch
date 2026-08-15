@@ -87,6 +87,9 @@
 
     "menu.rightAngel": "直角",
     "menu.roundedAngle": "圆角",
+    "menu.left": "靠左",
+    "menu.center": "居中",
+    "menu.right": "靠右",
 
     "menu.log": "日志",
     "menu.warn": "警告",

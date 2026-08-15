@@ -1260,6 +1260,18 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                     ANGLE: numAngle(90),
                                 },
                             },
+                            sep(),
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODES.CANVAS_TEXT,
+                                inputs: {
+                                    TXT: txt(t('blocks:example.text')),
+                                    X: num(100),
+                                    Y: num(-100),
+                                    ALIGN: menu(OPCODES.TEXT_ALIGN_MENU),
+                                },
+                            },
                         ],
                     },
                     {

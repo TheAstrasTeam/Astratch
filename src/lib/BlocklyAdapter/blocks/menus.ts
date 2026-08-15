@@ -706,4 +706,25 @@ export function initMenuBlocks(blockly: typeof Blockly, vm: IVM) {
             });
         },
     };
+
+    blockly.Blocks[OPCODES.TEXT_ALIGN_MENU] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                message0: '%1',
+                args0: [
+                    {
+                        type: 'field_dropdown_with_block',
+                        name: 'ASH_BLOCKMENU',
+                        options: [
+                            [t('blocks:menu.left'), '_LEFT_'],
+                            [t('blocks:menu.center'), '_CENTER_'],
+                            [t('blocks:menu.right'), '_RIGHT_'],
+                        ],
+                    },
+                ],
+                output: 'String',
+                colour: BlocksColor.canvas.secondary,
+            });
+        },
+    };
 }

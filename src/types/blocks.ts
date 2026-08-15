@@ -43,6 +43,7 @@ const OPCODES = {
     KEY_ISPRESS_MENU: 'key_isPress_menu',
     DEBUG_LOG_TYPE_MENU: 'debug_log_type_menu',
     CANVAS_LINESET_MENU: 'canvas_lineSet_menu',
+    TEXT_ALIGN_MENU: 'text_align_menu',
     // 实体
     // - 变换
     // - - 位置

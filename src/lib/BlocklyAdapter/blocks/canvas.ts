@@ -10,6 +10,7 @@ import { BlocksColor, OPCODES } from '../../../types/blocks';
 import { connections } from './helpers';
 
 export function initCanvasBlocks(blockly: typeof Blockly) {
+    // 基础内容
     blockly.Blocks[OPCODES.CANVAS_COLOR] = {
         init(this: Blockly.Block) {
             this.jsonInit({
@@ -132,6 +133,22 @@ export function initCanvasBlocks(blockly: typeof Blockly) {
                     { type: 'input_value', name: 'Y', check: 'Number' },
                     { type: 'input_value', name: 'SIZE', check: 'Number' },
                     { type: 'input_value', name: 'ANGLE' },
+                ],
+                colour: BlocksColor.canvas.primary,
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.CANVAS_TEXT] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...connections,
+                message0: t('blocks:canvas.text'),
+                args0: [
+                    { type: 'input_value', name: 'TXT', check: 'String' },
+                    { type: 'input_value', name: 'X', check: 'Number' },
+                    { type: 'input_value', name: 'Y', check: 'Number' },
+                    { type: 'input_value', name: 'ALIGN', check: 'String' },
                 ],
                 colour: BlocksColor.canvas.primary,
             });
