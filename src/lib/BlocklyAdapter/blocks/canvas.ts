@@ -7,7 +7,7 @@
 import * as Blockly from 'blockly/core';
 import { t } from 'i18next';
 import { BlocksColor, OPCODES } from '../../../types/blocks';
-import { connections, isInFlyoutInsteadOfTrashCan } from './helpers';
+import { connections, isInFlyoutInsteadOfTrashCan, returnConnections } from './helpers';
 import {
     createMinusField,
     createPlusField,
@@ -256,5 +256,60 @@ export function initCanvasBlocks(blockly: typeof Blockly) {
     } as Blockly.Block;
 
     // 高级渲染
-    // TODO: KOSHINO 想做，给了。
+    blockly.Blocks[OPCODES.CANVAS_IMPORTDATA] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...connections,
+                message0: t('blocks:canvas.importData'),
+                args0: [
+                    { type: 'input_value', name: 'DATA', check: 'Array' },
+                    { type: 'input_value', name: 'NAME', check: 'String' },
+                ],
+                colour: BlocksColor.canvas.primary,
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.CANVAS_DATAEXIST] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:canvas.dataExist'),
+                args0: [{ type: 'input_value', name: 'NAME', check: 'String' }],
+                output: 'Boolean',
+                colour: BlocksColor.canvas.primary,
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.CANVAS_DATALIST] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...returnConnections,
+                message0: t('blocks:canvas.dataList'),
+                output: 'Array',
+                colour: BlocksColor.canvas.primary,
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.CANVAS_RENDERALL] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...connections,
+                message0: t('blocks:canvas.renderAll'),
+                colour: BlocksColor.canvas.primary,
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.CANVAS_DELLIST] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...connections,
+                message0: t('blocks:canvas.delList'),
+                colour: BlocksColor.canvas.primary,
+            });
+        },
+    } as Blockly.Block;
 }

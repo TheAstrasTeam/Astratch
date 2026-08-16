@@ -1279,7 +1279,38 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                         name: t('blocks:category.canvas.render'),
                         colour: BlocksColor.canvas.secondary,
                         contents: [
-                            // TODO: KOSHINO想做，给了。
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODES.CANVAS_IMPORTDATA,
+                                inputs: {
+                                    NAME: txt(t('blocks:example.canvasData')),
+                                },
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODES.CANVAS_DATAEXIST,
+                                inputs: {
+                                    NAME: txt(t('blocks:example.canvasData')),
+                                },
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODES.CANVAS_DATALIST,
+                            },
+                            sep(),
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODES.CANVAS_RENDERALL,
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODES.CANVAS_DELLIST,
+                            },
                         ],
                     },
                 ],

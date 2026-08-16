@@ -331,6 +331,8 @@
     "canvas.renderAll": "绘制队列数据",
     "canvas.delList": "清空渲染队列",
 
+    "example.canvasData": "物体",
+
     "debug.log": "以 %1 输出 %2",
     "debug.crash": "停止全部并报错 %1",
     "debug.breakpoint": "断点"
