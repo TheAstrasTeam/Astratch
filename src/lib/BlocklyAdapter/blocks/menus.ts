@@ -598,7 +598,7 @@ export function initMenuBlocks(blockly: typeof Blockly, vm: IVM) {
                         options: [
                             [t('blocks:key.any'), 'Any'],
                             [t('blocks:key.space'), ' '],
-                            ['上', 'ArrowUp'],
+                            ['↑', 'ArrowUp'],
                             ['↓', 'ArrowDown'],
                             ['←', 'ArrowLeft'],
                             ['→', 'ArrowRight'],
@@ -617,7 +617,7 @@ export function initMenuBlocks(blockly: typeof Blockly, vm: IVM) {
                     },
                 ],
                 output: 'String',
-                colour: BlocksColor.control.secondary,
+                colour: BlocksColor.event.tertiary,
             });
         },
     } as Blockly.Block;
@@ -640,7 +640,7 @@ export function initMenuBlocks(blockly: typeof Blockly, vm: IVM) {
                     },
                 ],
                 output: 'String',
-                colour: BlocksColor.control.secondary,
+                colour: BlocksColor.event.tertiary,
             });
         },
     } as Blockly.Block;
@@ -661,7 +661,7 @@ export function initMenuBlocks(blockly: typeof Blockly, vm: IVM) {
                     },
                 ],
                 output: 'String',
-                colour: BlocksColor.control.secondary,
+                colour: BlocksColor.event.tertiary,
             });
         },
     } as Blockly.Block;
@@ -727,4 +727,24 @@ export function initMenuBlocks(blockly: typeof Blockly, vm: IVM) {
             });
         },
     };
+
+    blockly.Blocks[OPCODES.EVENT_POSITION_MENU] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                message0: '%1',
+                args0: [
+                    {
+                        type: 'field_dropdown_with_block',
+                        name: 'ASH_BLOCKMENU',
+                        options: [
+                            ['x', 'X'],
+                            ['y', 'Y'],
+                        ],
+                    },
+                ],
+                output: 'String',
+                colour: BlocksColor.event.tertiary,
+            });
+        },
+    } as Blockly.Block;
 }

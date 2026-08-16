@@ -44,6 +44,7 @@ const OPCODES = {
     DEBUG_LOG_TYPE_MENU: 'debug_log_type_menu',
     CANVAS_LINESET_MENU: 'canvas_lineSet_menu',
     TEXT_ALIGN_MENU: 'text_align_menu',
+    EVENT_POSITION_MENU: 'event_position_menu',
     // 实体
     // - 变换
     // - - 位置

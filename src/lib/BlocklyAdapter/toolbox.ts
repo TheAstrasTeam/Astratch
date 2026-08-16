@@ -624,7 +624,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                 gap: 12,
                                 kind: 'block',
                                 type: OPCODES.EVENT_INPUT_GETMOUSEPOSITION,
-                                inputs: { AXIS: txt('x') },
+                                inputs: { AXIS: menu(OPCODES.EVENT_POSITION_MENU) },
                             },
                             // {
                             //     gap: 12,
