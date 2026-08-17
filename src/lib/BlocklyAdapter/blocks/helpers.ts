@@ -7,7 +7,7 @@
 import * as Blockly from 'blockly/core';
 import { t } from 'i18next';
 import { BlocksColor, OPCODES } from '../../../types/blocks';
-import { type IVM } from '../../../types/vm';
+import { type IVM, type IVariable } from '../../../types/vm';
 import { dropdownWithInput } from '../../../../plugins/fieldDropdown';
 
 /**
@@ -106,6 +106,18 @@ export const refreshDataMenu = (block: Blockly.Block, latestDataID: string, vm: 
 };
 
 /**
+ * 获取当前编辑目标的变量列表
+ *
+ * data 在内存中恒为 Map，但为兼容旧版本项目（data 可能是 {}）返回空列表
+ */
+export function getEditingDataList(vm: IVM): IVariable[] {
+    const data = vm.runtime.targets.get(vm.runtime.editingTargetID)?.data;
+    if (data instanceof Map) return [...data.values()];
+    if (Array.isArray(data)) return data;
+    return [];
+}
+
+/**
  * 创建一个"变量选择菜单"字段
  *
  * 选项形如 [显示名, id]：存的是 id，所以变量改名后已有积木不会认错亲。
@@ -113,7 +125,7 @@ export const refreshDataMenu = (block: Blockly.Block, latestDataID: string, vm: 
 export function createDataMenu(vm: IVM) {
     return new dropdownWithInput(() => {
         const options: Blockly.MenuOption[] = [];
-        vm.runtime.targets.get(vm.runtime.editingTargetID)?.data.forEach(data => {
+        getEditingDataList(vm).forEach(data => {
             options.push([data.name, data.id]);
         });
         if (options.length === 0) options.push(['', '']);
@@ -136,6 +148,6 @@ const isInFlyoutInsteadOfTrashCan = (block: Blockly.Block): boolean => {
     if (mainWs?.getFlyout()?.getWorkspace() === ws) return true;
     if (mainWs?.trashcan?.flyout?.getWorkspace() === ws) return false;
     return false;
-} 
+};
 
 export { BlocksColor, OPCODES, isInFlyoutInsteadOfTrashCan };

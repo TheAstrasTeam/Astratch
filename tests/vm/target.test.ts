@@ -258,3 +258,51 @@ describe('Target.fromJSON', () => {
         expect('rename' in target).toBe(true);
     });
 });
+
+describe('Target 数据序列化', () => {
+    it('toJSON应该把data Map序列化为数组', () => {
+        const target = makeTarget();
+        const id = target.createData('变量', 1);
+        const json = target.toJSON();
+        expect(Array.isArray(json.data)).toBe(true);
+        expect(json.data).toHaveLength(1);
+        expect(json.data[0]).toMatchObject({ id, name: '变量', data: 1 });
+    });
+
+    it('data应该能通过 JSON 往返并还原为 Map', () => {
+        const target = makeTarget();
+        target.createData('变量', 1, true, false);
+        target.createData('常量', 2, false, true);
+        const roundTrip = Target.fromJSON(
+            JSON.parse(JSON.stringify(target.toJSON())) as TTargetInfo,
+            vi.fn(),
+        );
+        expect(roundTrip.data).toBeInstanceOf(Map);
+        expect(roundTrip.data.size).toBe(2);
+        expect([...roundTrip.data.values()]).toMatchObject([
+            { name: '变量', data: 1, isPrivate: true, isConst: false },
+            { name: '常量', data: 2, isPrivate: false, isConst: true },
+        ]);
+    });
+
+    it('fromJSON遇到旧版本的data({})应该还原为空Map而不报错', () => {
+        const target = Target.fromJSON(
+            {
+                name: 'legacy',
+                id: 't1',
+                mode: 'module',
+                parentID: null,
+                viewScale: 1,
+                links: [],
+                data: {} as unknown as Map<string, never>,
+                blocks: { _workspace: { blocks: { languageVersion: 0, blocks: [] } }, _script: [] },
+                comments: {},
+                viewX: 0,
+                viewY: 0,
+            },
+            vi.fn(),
+        );
+        expect(target.data).toBeInstanceOf(Map);
+        expect(target.data.size).toBe(0);
+    });
+});

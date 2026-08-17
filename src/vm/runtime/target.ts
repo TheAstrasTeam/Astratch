@@ -138,9 +138,10 @@ class Target implements ITarget {
     }
 
     toJSON() {
-        return Object.fromEntries(
-            Object.entries(this).filter(([key]) => key !== 'blocks'),
-        ) as TTargetInfo;
+        const json = Object.fromEntries(Object.entries(this).filter(([key]) => key !== 'blocks'));
+        // data 是 Map，JSON 序列化会变成 {} 导致数据丢失，这里存成数组
+        json.data = Array.from(this.data.values());
+        return json as TTargetInfo;
     }
 
     static fromMeta(
@@ -165,6 +166,17 @@ class Target implements ITarget {
     static fromJSON(json: TTargetInfo, emit: TEmit): Target {
         const target = new Target(emit);
         Object.assign(target, json);
+        // 保存时 data 以数组存储，这里还原为 Map；
+        // 兼容旧版本：可能是 Map，也可能是 JSON 序列化丢失后的 {}
+        const data: unknown = json.data;
+        if (data instanceof Map) {
+            target.data = data as Map<string, IVariable>;
+        } else if (Array.isArray(data)) {
+            const variables = data as IVariable[];
+            target.data = new Map(variables.map(variable => [variable.id, variable]));
+        } else {
+            target.data = new Map();
+        }
         return target;
     }
 }

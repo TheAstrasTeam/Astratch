@@ -5,7 +5,7 @@
  */
 import type * as Blockly from 'blockly/core';
 import type { IVM } from '../../types/vm';
-import { OPCODES } from './blocks/helpers';
+import { OPCODES, getEditingDataList } from './blocks/helpers';
 import { menu, num, txt } from './toolbox';
 import { t } from 'i18next';
 import type { IRegisterCategory } from '.';
@@ -23,7 +23,7 @@ export function setDataCategory(_blockly: typeof Blockly, vm: IVM): IRegisterCat
             text: t('blocks:data.createTip'),
             callbackkey: OPCODES.HANDLE_CREATE_DATA,
         });
-        vm.runtime.targets.get(vm.runtime.editingTargetID)?.data.forEach(data => {
+        getEditingDataList(vm).forEach(data => {
             items.push({
                 gap: 12,
                 kind: 'block',
