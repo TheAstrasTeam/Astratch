@@ -96,15 +96,22 @@ class ShortcutManager implements IShortcut {
     }
 
     formatHotKey(key: string): string {
-        switch (getPlatfrom()) {
-            case ALL_PLATFORMS.WIN:
-            case ALL_PLATFORMS.LINUX:
-                return key.replaceAll('mod', 'ctrl');
-            case ALL_PLATFORMS.MAC:
-                return key.replaceAll('mod', '⌘');
-            default:
-                return key;
-        }
+        const normalized = (() => {
+            switch (getPlatfrom()) {
+                case ALL_PLATFORMS.WIN:
+                case ALL_PLATFORMS.LINUX:
+                    return key.replaceAll('mod', 'ctrl');
+                case ALL_PLATFORMS.MAC:
+                    return key.replaceAll('mod', '⌘');
+                default:
+                    return key;
+            }
+        })();
+        // Ctrl+Shift+S 而不是 ctrl+shift+s
+        return normalized
+            .split('+')
+            .map(part => (part ? part.charAt(0).toUpperCase() + part.slice(1) : part))
+            .join('+');
     }
 
     setHotKey(id: ShortcutIds, hotKey: string): SetShortcutResult {

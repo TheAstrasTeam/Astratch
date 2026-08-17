@@ -12,7 +12,12 @@ import { MenuItem, MenuDivider } from '@szhsin/react-menu';
 import { useContextMenu } from '../contextMenu';
 import { AllContextMenu, guiInterface } from '../../types/gui';
 import { useGUIStore } from '../../stores/useGUIStore';
-import { openMenuByMouseDown, selectProjectThenJump } from '../../utils/ash-gui';
+import {
+    openMenuByMouseDown,
+    saveCurrentProject,
+    saveCurrentProjectAs,
+    selectProjectThenJump,
+} from '../../utils/ash-gui';
 import { shortcutManager } from '../../lib/ShortcutManager';
 import { SHORTCUTS } from '../../types/lib';
 import { modal } from '../../components/Modal/modal';
@@ -50,8 +55,32 @@ const MenuBar = ({ vm }: { vm: IVM }): React.ReactNode => {
                 />
             </MenuItem>
             <MenuDivider />
-            <MenuItem onClick={close}>{t('gui:menu.save')}</MenuItem>
-            <MenuItem onClick={close}>{t('gui:menu.saveAs')}</MenuItem>
+            <MenuItem
+                onClick={() => {
+                    void saveCurrentProject(vm);
+                    close();
+                }}
+            >
+                <MenuTextWithShortCut
+                    text={t('gui:menu.save')}
+                    shortcut={shortcutManager.formatHotKey(
+                        shortcutManager.getHotKey(SHORTCUTS.SAVE_PROJECT.id),
+                    )}
+                />
+            </MenuItem>
+            <MenuItem
+                onClick={() => {
+                    void saveCurrentProjectAs(vm);
+                    close();
+                }}
+            >
+                <MenuTextWithShortCut
+                    text={t('gui:menu.saveAs')}
+                    shortcut={shortcutManager.formatHotKey(
+                        shortcutManager.getHotKey(SHORTCUTS.SAVE_PROJECT_AS.id),
+                    )}
+                />
+            </MenuItem>
             <MenuDivider />
             <MenuItem onClick={handleOpenSettings}>{t('gui:menu.settings')}</MenuItem>
             <MenuItem onClick={close}>{t('gui:menu.exit')}</MenuItem>

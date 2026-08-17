@@ -483,6 +483,10 @@ export interface IVM {
      */
     saveProject: () => Promise<void>;
     /**
+     * 另存为：重新选择文件夹后保存项目
+     */
+    saveProjectAs: () => Promise<void>;
+    /**
      * 初始化项目
      */
     initProject: () => Promise<void>;

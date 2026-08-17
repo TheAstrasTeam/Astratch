@@ -26,6 +26,11 @@ export const SHORTCUTS = {
         defaultKey: 'mod+s',
         scope: 'global',
     },
+    SAVE_PROJECT_AS: {
+        id: 'project.saveAs',
+        defaultKey: 'mod+shift+s',
+        scope: 'global',
+    },
     OPEN_PROJECT: {
         id: 'project.open',
         defaultKey: 'mod+o',

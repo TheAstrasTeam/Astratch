@@ -177,6 +177,12 @@ export class VM implements IVM {
         );
     }
 
+    async saveProjectAs() {
+        // 重新选择文件夹，然后保存到新位置
+        await this.projectManager.selectFolder();
+        await this.saveProject();
+    }
+
     async initProject() {
         // TODO: 改进进入机制
         const checkResult = await this.projectManager.checkProjectCanSave();

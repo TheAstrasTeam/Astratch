@@ -21,7 +21,7 @@ import { shortcutManager } from '../lib/ShortcutManager';
 import { SHORTCUTS } from '../types/lib';
 import { useEffect, useState } from 'react';
 import { guiInterface } from '../types/gui';
-import { selectProjectThenJump } from '../utils/ash-gui';
+import { saveCurrentProject, saveCurrentProjectAs, selectProjectThenJump } from '../utils/ash-gui';
 
 const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
     // 多数 GUI 组件直接调用 i18next.t；以 language 作为 key 可让整棵界面重新计算文本。
@@ -42,7 +42,8 @@ const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
 
     useEffect(() => {
         const unbindShortcutCommands = shortcutManager.bindCommands({
-            [SHORTCUTS.SAVE_PROJECT.id]: () => vm.saveProject(),
+            [SHORTCUTS.SAVE_PROJECT.id]: () => saveCurrentProject(vm),
+            [SHORTCUTS.SAVE_PROJECT_AS.id]: () => saveCurrentProjectAs(vm),
             [SHORTCUTS.NEW_PROJECT.id]: () => {
                 setInterface(guiInterface.CREATE_PROJECT);
             },
