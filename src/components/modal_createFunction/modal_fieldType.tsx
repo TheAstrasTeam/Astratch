@@ -13,7 +13,7 @@ import styles from './index.module.scss';
 import { useState } from 'react';
 import classNames from 'classnames';
 import { ArrayIcon, BooleanIcon, FunctionIcon, NumberIcon, ObjectIcon, StringIcon } from './icons';
-import type { TFunctionFieldType, TFunctionInputField } from '../../types/blocks';
+import type { TFunctionFieldType, TFunctionInputField } from './functionPreview';
 import type { JSX } from 'react/jsx-dev-runtime';
 
 // 此常量由AI生成：可选择添加的字段类型

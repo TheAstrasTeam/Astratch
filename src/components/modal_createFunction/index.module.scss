@@ -133,3 +133,21 @@
         width: 100%;
     }
 }
+
+.set-block-color {
+    display: flex;
+    flex: 1;
+    padding: 10px;
+    justify-content: center;
+    gap: 5px;
+    & .set-block-color-button {
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        border-width: 2px;
+        border-style: solid;
+        &:hover {
+            outline: $text-primary 1px solid;
+        }
+    }
+}

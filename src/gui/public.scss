@@ -360,9 +360,6 @@ g.blocklyImageField[role='button'] {
 }
 
 [class*='ashFunctionValueText'] {
-    & rect {
-        fill: var(--blockly_function_tertiary) !important;
-    }
     & text {
         fill: var(--blockly_text) !important;
     }

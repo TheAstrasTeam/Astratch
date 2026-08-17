@@ -13,9 +13,10 @@ import { useCallback } from 'react';
 import { type IVM } from '../../types/vm';
 import { CreateFunctionWorkspace } from './blockWorkspace';
 import { FieldTypeModal } from './modal_fieldType';
-import { addFieldForFunctionPreview, resizePreviewWorkspace } from './functionPreview';
+import { addFieldForFunctionPreview, previewFunctionBlocksColorScheme, resizePreviewWorkspace, setPreviewBlockColor } from './functionPreview';
 import { DropDownIcon, StringIcon, TextIcon } from './icons';
-import type { TFunctionFieldType } from '../../types/blocks';
+import type { IBlockColor } from '../../types/blocks';
+import type { TFunctionFieldType } from './functionPreview';
 import type { JSX } from 'react/jsx-dev-runtime';
 
 // 此组件由AI生成：创建函数弹窗中的大号字段类型按钮
@@ -59,6 +60,10 @@ export const CreateFunctionModal = ({ vm, addID: _addID }: { vm: IVM; addID?: st
         });
     };
 
+    const handleSetBlockColor = (color: IBlockColor) => {
+        setPreviewBlockColor(color);
+    }
+
     return (
         <Modal
             fullScreen={false}
@@ -93,6 +98,24 @@ export const CreateFunctionModal = ({ vm, addID: _addID }: { vm: IVM; addID?: st
                         label={t('gui:createFunction.text')}
                         onClick={handleAddText}
                     />
+                </div>
+                <div className={styles.setBlockColor}>
+                    {previewFunctionBlocksColorScheme.map((color, index) => (
+                        <div
+                            className={styles.setBlockColorButton}
+                            key={index}
+                            style={{
+                                background: color.primary,
+                                borderColor: color.secondary,
+                            }}
+                            onClick={() => {
+                                handleSetBlockColor(color);
+                            }}
+                        />
+                    ))}
+                    <div
+                        className={styles.setBlockColorButton}
+                    ></div>
                 </div>
             </div>
         </Modal>

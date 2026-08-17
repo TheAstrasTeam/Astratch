@@ -4,11 +4,31 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import * as Blockly from 'blockly';
-import { OPCODES, type IFunctionValueBlock, type TPreviewFunctionData } from '../../types/blocks';
+import { BlocksColor, OPCODES, type IBlockColor } from '../../types/blocks';
 import { t } from 'i18next';
+
+export type TFunctionReturnField =
+    'text' | 'dropdown' | 'boolean' | 'array' | 'object' | 'string' | 'number' | 'function' | null;
+
+export type TFunctionInputField = 'boolean' | 'array' | 'object' | 'string' | 'number' | 'function';
+
+export type TFunctionFieldType = TFunctionReturnField | TFunctionInputField[];
+
+export interface TPreviewFunctionData {
+    type: TFunctionFieldType;
+    text?: string;
+}
+export interface IFunctionValueBlock extends Blockly.Block {
+    previewData: TPreviewFunctionData[];
+    colors: IBlockColor;
+    editMode: boolean;
+    updateShape(): void;
+    moveField(index: number, delta: number): void;
+}
 
 const previewBlockId = 'preview-function';
 let previewFunctionData: TPreviewFunctionData[] = [];
+let previewBlockColor: IBlockColor = BlocksColor.function;
 let previewBlock: IFunctionValueBlock | null = null;
 let previewWorkspace: Blockly.WorkspaceSvg | null = null;
 
@@ -28,6 +48,7 @@ const setupWorkspace = (workspace: Blockly.WorkspaceSvg) => {
     ) as IFunctionValueBlock;
     previewBlock.setMovable(false);
     previewBlock.previewData = previewFunctionData;
+    previewBlock.colors = previewBlockColor;
     previewBlock.editMode = true;
     previewBlock.setDeletable(false);
     previewBlock.updateShape();
@@ -92,12 +113,27 @@ const addFieldForFunctionPreview = (data: TPreviewFunctionData) => {
     }, 200);
 };
 
+const setPreviewBlockColor = (color: IBlockColor) => {
+    if(!previewBlock) return;
+    previewBlockColor = color;
+    previewBlock.colors = previewBlockColor;
+    console.log(previewBlockColor);
+    previewBlock.updateShape();
+}
+
+
+const previewFunctionBlocksColorScheme = [
+    ...(Object.values(BlocksColor).filter(color => typeof color === 'object'))
+]
+
 export {
     addFieldForFunctionPreview,
     disposePreviewWorkspace,
     resizePreviewWorkspace,
     setupWorkspace,
+    setPreviewBlockColor,
     previewWorkspace,
     previewFunctionData,
+    previewFunctionBlocksColorScheme,
     previewBlock,
 };
