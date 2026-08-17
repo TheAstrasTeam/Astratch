@@ -114,7 +114,15 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                         type: OPCODES.ENTITY_TRANSFORM_POSITION_SETPOSITION,
                                         inputs: {
                                             POSITION: menu(OPCODES.POSITION_MENU),
-                                            DO: menu(OPCODES.POSITION_ADDORSET_MENU),
+                                            UNIT: num(10),
+                                        },
+                                    },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODES.ENTITY_TRANSFORM_POSITION_ADDPOSITION,
+                                        inputs: {
+                                            POSITION: menu(OPCODES.POSITION_MENU),
                                             UNIT: num(10),
                                         },
                                     },
@@ -138,7 +146,14 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                         kind: 'block',
                                         type: OPCODES.ENTITY_TRANSFORM_SCALE_SETSCALE,
                                         inputs: {
-                                            DO: menu(OPCODES.SCALE_ADDORSET_MENU),
+                                            UNIT: num(10),
+                                        },
+                                    },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODES.ENTITY_TRANSFORM_SCALE_ADDSCALE,
+                                        inputs: {
                                             UNIT: num(10),
                                         },
                                     },
@@ -159,7 +174,14 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                         kind: 'block',
                                         type: OPCODES.ENTITY_TRANSFORM_DIRECTION_SETDIRECTION,
                                         inputs: {
-                                            DO: menu(OPCODES.DIRECTION_SETWHERE_MENU),
+                                            UNIT: numAngle(45),
+                                        },
+                                    },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODES.ENTITY_TRANSFORM_DIRECTION_ADDDIRECTION,
+                                        inputs: {
                                             UNIT: numAngle(45),
                                         },
                                     },
@@ -188,7 +210,15 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                         kind: 'block',
                                         type: OPCODES.ENTITY_TRANSFORM_LAYER_SETLAYER,
                                         inputs: {
-                                            DO: menu(OPCODES.LAYER_ADDORSET_MENU),
+                                            UNIT: num(1),
+                                        },
+                                    },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODES.ENTITY_TRANSFORM_LAYER_MOVELAYER,
+                                        inputs: {
+                                            MOVE: menu(OPCODES.LAYER_ADDORSET_MENU),
                                             UNIT: num(1),
                                         },
                                     },
@@ -223,7 +253,15 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                         type: OPCODES.ENTITY_APPEARANCE_IMAGES_SETSTRETCH,
                                         inputs: {
                                             POS: menu(OPCODES.IMAGES_STRETCH_MENU),
-                                            SET: menu(OPCODES.IMAGES_IMAGES_ADDORSET_MENU),
+                                            NUMBER: num(20),
+                                        },
+                                    },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODES.ENTITY_APPEARANCE_IMAGES_ADDSTRETCH,
+                                        inputs: {
+                                            POS: menu(OPCODES.IMAGES_STRETCH_MENU),
                                             NUMBER: num(20),
                                         },
                                     },
@@ -248,7 +286,16 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                         type: OPCODES.ENTITY_APPEARANCE_IMAGES_SETGRIDDISTANCE,
                                         inputs: {
                                             POS: menu(OPCODES.IMAGES_STRETCH_MENU),
-                                            SET: menu(OPCODES.IMAGES_IMAGES_ADDORSET_MENU),
+                                            NUMBER: num(20),
+                                            UNIT: menu(OPCODES.IMAGES_GRID_MENU),
+                                        },
+                                    },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODES.ENTITY_APPEARANCE_IMAGES_ADDGRIDDISTANCE,
+                                        inputs: {
+                                            POS: menu(OPCODES.IMAGES_STRETCH_MENU),
                                             NUMBER: num(20),
                                             UNIT: menu(OPCODES.IMAGES_GRID_MENU),
                                         },
@@ -292,7 +339,15 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                         type: OPCODES.ENTITY_APPEARANCE_EFFECTS_SETEFFECT,
                                         inputs: {
                                             EFFECT: menu(OPCODES.EFFECTS_MENU),
-                                            SET: menu(OPCODES.EFFECTS_ADDORSET_MENU),
+                                            VALUE: num(25),
+                                        },
+                                    },
+                                    {
+                                        gap: 12,
+                                        kind: 'block',
+                                        type: OPCODES.ENTITY_APPEARANCE_EFFECTS_ADDEFFECT,
+                                        inputs: {
+                                            EFFECT: menu(OPCODES.EFFECTS_MENU),
                                             VALUE: num(25),
                                         },
                                     },
@@ -386,7 +441,15 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                 type: OPCODES.AUDIO_PLAY_SETTIME,
                                 inputs: {
                                     NAME: txt(t('blocks:audio.play.exampleName')),
-                                    DO: menu(OPCODES.AUDIO_ADDORSET_MENU),
+                                    TIME: num(5),
+                                },
+                            },
+                            {
+                                gap: 12,
+                                kind: 'block',
+                                type: OPCODES.AUDIO_PLAY_ADDTIME,
+                                inputs: {
+                                    NAME: txt(t('blocks:audio.play.exampleName')),
                                     TIME: num(5),
                                 },
                             },

@@ -43,7 +43,20 @@ export function initEntityBlocks(blockly: typeof Blockly) {
                 message0: t('blocks:entity.transform.position.setPosition'),
                 args0: [
                     { type: 'input_value', name: 'POSITION' },
-                    { type: 'input_value', name: 'DO' },
+                    { type: 'input_value', name: 'UNIT' },
+                ],
+                colour: BlocksColor.position.primary,
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.ENTITY_TRANSFORM_POSITION_ADDPOSITION] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...connections,
+                message0: t('blocks:entity.transform.position.addPosition'),
+                args0: [
+                    { type: 'input_value', name: 'POSITION' },
                     { type: 'input_value', name: 'UNIT' },
                 ],
                 colour: BlocksColor.position.primary,
@@ -70,7 +83,19 @@ export function initEntityBlocks(blockly: typeof Blockly) {
                 ...connections,
                 message0: t('blocks:entity.transform.scale.setScale'),
                 args0: [
-                    { type: 'input_value', name: 'DO' },
+                    { type: 'input_value', name: 'UNIT' },
+                ],
+                colour: BlocksColor.scale.primary,
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.ENTITY_TRANSFORM_SCALE_ADDSCALE] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...connections,
+                message0: t('blocks:entity.transform.scale.addScale'),
+                args0: [
                     { type: 'input_value', name: 'UNIT' },
                 ],
                 colour: BlocksColor.scale.primary,
@@ -96,7 +121,19 @@ export function initEntityBlocks(blockly: typeof Blockly) {
                 ...connections,
                 message0: t('blocks:entity.transform.direction.setDirection'),
                 args0: [
-                    { type: 'input_value', name: 'DO' },
+                    { type: 'input_value', name: 'UNIT' },
+                ],
+                colour: BlocksColor.direction.primary,
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.ENTITY_TRANSFORM_DIRECTION_ADDDIRECTION] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...connections,
+                message0: t('blocks:entity.transform.direction.addDirection'),
+                args0: [
                     { type: 'input_value', name: 'UNIT' },
                 ],
                 colour: BlocksColor.direction.primary,
@@ -133,7 +170,20 @@ export function initEntityBlocks(blockly: typeof Blockly) {
                 ...connections,
                 message0: t('blocks:entity.transform.layer.setLayer'),
                 args0: [
-                    { type: 'input_value', name: 'DO' },
+                    { type: 'input_value', name: 'UNIT' },
+                ],
+                colour: BlocksColor.layer.primary,
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.ENTITY_TRANSFORM_LAYER_MOVELAYER] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...connections,
+                message0: t('blocks:entity.transform.layer.moveLayer'),
+                args0: [
+                    { type: 'input_value', name: 'MOVE' },
                     { type: 'input_value', name: 'UNIT' },
                 ],
                 colour: BlocksColor.layer.primary,
@@ -172,7 +222,20 @@ export function initEntityBlocks(blockly: typeof Blockly) {
                 message0: t('blocks:entity.appearance.images.setStretch'),
                 args0: [
                     { type: 'input_value', name: 'POS' },
-                    { type: 'input_value', name: 'SET' },
+                    { type: 'input_value', name: 'NUMBER' },
+                ],
+                colour: BlocksColor.Images.primary,
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.ENTITY_APPEARANCE_IMAGES_ADDSTRETCH] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...connections,
+                message0: t('blocks:entity.appearance.images.addStretch'),
+                args0: [
+                    { type: 'input_value', name: 'POS' },
                     { type: 'input_value', name: 'NUMBER' },
                 ],
                 colour: BlocksColor.Images.primary,
@@ -210,7 +273,21 @@ export function initEntityBlocks(blockly: typeof Blockly) {
                 message0: t('blocks:entity.appearance.images.setGridDistance'),
                 args0: [
                     { type: 'input_value', name: 'POS' },
-                    { type: 'input_value', name: 'SET' },
+                    { type: 'input_value', name: 'NUMBER' },
+                    { type: 'input_value', name: 'UNIT' },
+                ],
+                colour: BlocksColor.Images.primary,
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.ENTITY_APPEARANCE_IMAGES_ADDGRIDDISTANCE] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...connections,
+                message0: t('blocks:entity.appearance.images.addGridDistance'),
+                args0: [
+                    { type: 'input_value', name: 'POS' },
                     { type: 'input_value', name: 'NUMBER' },
                     { type: 'input_value', name: 'UNIT' },
                 ],
@@ -253,7 +330,20 @@ export function initEntityBlocks(blockly: typeof Blockly) {
                 message0: t('blocks:entity.appearance.effects.setEffect'),
                 args0: [
                     { type: 'input_value', name: 'EFFECT' },
-                    { type: 'input_value', name: 'SET' },
+                    { type: 'input_value', name: 'VALUE' },
+                ],
+                colour: BlocksColor.effects.primary,
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.ENTITY_APPEARANCE_EFFECTS_ADDEFFECT] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...connections,
+                message0: t('blocks:entity.appearance.effects.addEffect'),
+                args0: [
+                    { type: 'input_value', name: 'EFFECT' },
                     { type: 'input_value', name: 'VALUE' },
                 ],
                 colour: BlocksColor.effects.primary,

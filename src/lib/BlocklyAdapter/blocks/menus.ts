@@ -59,45 +59,45 @@ export function initMenuBlocks(blockly: typeof Blockly, vm: IVM) {
         },
     } as Blockly.Block;
 
-    blockly.Blocks[OPCODES.POSITION_ADDORSET_MENU] = {
-        init(this: Blockly.Block) {
-            this.jsonInit({
-                message0: '%1',
-                args0: [
-                    {
-                        type: 'field_dropdown_with_block',
-                        name: 'ASH_BLOCKMENU',
-                        options: [
-                            [t('blocks:menu.set'), '_SET_'],
-                            [t('blocks:menu.add'), '_ADD_'],
-                        ],
-                    },
-                ],
-                output: 'String',
-                colour: BlocksColor.position.primary,
-            });
-        },
-    } as Blockly.Block;
+    // blockly.Blocks[OPCODES.POSITION_ADDORSET_MENU] = {
+    //     init(this: Blockly.Block) {
+    //         this.jsonInit({
+    //             message0: '%1',
+    //             args0: [
+    //                 {
+    //                     type: 'field_dropdown_with_block',
+    //                     name: 'ASH_BLOCKMENU',
+    //                     options: [
+    //                         [t('blocks:menu.set'), '_SET_'],
+    //                         [t('blocks:menu.add'), '_ADD_'],
+    //                     ],
+    //                 },
+    //             ],
+    //             output: 'String',
+    //             colour: BlocksColor.position.primary,
+    //         });
+    //     },
+    // } as Blockly.Block;
 
-    blockly.Blocks[OPCODES.SCALE_ADDORSET_MENU] = {
-        init(this: Blockly.Block) {
-            this.jsonInit({
-                message0: '%1',
-                args0: [
-                    {
-                        type: 'field_dropdown_with_block',
-                        name: 'ASH_BLOCKMENU',
-                        options: [
-                            [t('blocks:menu.set'), '_SET_'],
-                            [t('blocks:menu.add'), '_ADD_'],
-                        ],
-                    },
-                ],
-                output: 'String',
-                colour: BlocksColor.scale.primary,
-            });
-        },
-    } as Blockly.Block;
+    // blockly.Blocks[OPCODES.SCALE_ADDORSET_MENU] = {
+    //     init(this: Blockly.Block) {
+    //         this.jsonInit({
+    //             message0: '%1',
+    //             args0: [
+    //                 {
+    //                     type: 'field_dropdown_with_block',
+    //                     name: 'ASH_BLOCKMENU',
+    //                     options: [
+    //                         [t('blocks:menu.set'), '_SET_'],
+    //                         [t('blocks:menu.add'), '_ADD_'],
+    //                     ],
+    //                 },
+    //             ],
+    //             output: 'String',
+    //             colour: BlocksColor.scale.primary,
+    //         });
+    //     },
+    // } as Blockly.Block;
 
     blockly.Blocks[OPCODES.DIRECTION_SETWHERE_MENU] = {
         init(this: Blockly.Block) {
@@ -141,7 +141,6 @@ export function initMenuBlocks(blockly: typeof Blockly, vm: IVM) {
                         type: 'field_dropdown_with_block',
                         name: 'ASH_BLOCKMENU',
                         options: [
-                            [t('blocks:menu.set'), '_SET_'],
                             [t('blocks:menu.addLayer'), '_ADDLAYER_'],
                             [t('blocks:menu.subLayer'), '_SUBLAYER_'],
                         ],
@@ -173,25 +172,25 @@ export function initMenuBlocks(blockly: typeof Blockly, vm: IVM) {
         },
     } as Blockly.Block;
 
-    blockly.Blocks[OPCODES.IMAGES_IMAGES_ADDORSET_MENU] = {
-        init(this: Blockly.Block) {
-            this.jsonInit({
-                message0: '%1',
-                args0: [
-                    {
-                        type: 'field_dropdown_with_block',
-                        name: 'ASH_BLOCKMENU',
-                        options: [
-                            [t('blocks:menu.set'), '_SET_'],
-                            [t('blocks:menu.add'), '_ADD_'],
-                        ],
-                    },
-                ],
-                output: 'String',
-                colour: BlocksColor.Images.primary,
-            });
-        },
-    } as Blockly.Block;
+    // blockly.Blocks[OPCODES.IMAGES_IMAGES_ADDORSET_MENU] = {
+    //     init(this: Blockly.Block) {
+    //         this.jsonInit({
+    //             message0: '%1',
+    //             args0: [
+    //                 {
+    //                     type: 'field_dropdown_with_block',
+    //                     name: 'ASH_BLOCKMENU',
+    //                     options: [
+    //                         [t('blocks:menu.set'), '_SET_'],
+    //                         [t('blocks:menu.add'), '_ADD_'],
+    //                     ],
+    //                 },
+    //             ],
+    //             output: 'String',
+    //             colour: BlocksColor.Images.primary,
+    //         });
+    //     },
+    // } as Blockly.Block;
 
     blockly.Blocks[OPCODES.IMAGES_GRID_MENU] = {
         init(this: Blockly.Block) {
@@ -277,25 +276,25 @@ export function initMenuBlocks(blockly: typeof Blockly, vm: IVM) {
         },
     } as Blockly.Block;
 
-    blockly.Blocks[OPCODES.EFFECTS_ADDORSET_MENU] = {
-        init(this: Blockly.Block) {
-            this.jsonInit({
-                message0: '%1',
-                args0: [
-                    {
-                        type: 'field_dropdown_with_block',
-                        name: 'ASH_BLOCKMENU',
-                        options: [
-                            [t('blocks:menu.set'), '_SET_'],
-                            [t('blocks:menu.add'), '_ADD_'],
-                        ],
-                    },
-                ],
-                output: 'String',
-                colour: BlocksColor.effects.primary,
-            });
-        },
-    } as Blockly.Block;
+    // blockly.Blocks[OPCODES.EFFECTS_ADDORSET_MENU] = {
+    //     init(this: Blockly.Block) {
+    //         this.jsonInit({
+    //             message0: '%1',
+    //             args0: [
+    //                 {
+    //                     type: 'field_dropdown_with_block',
+    //                     name: 'ASH_BLOCKMENU',
+    //                     options: [
+    //                         [t('blocks:menu.set'), '_SET_'],
+    //                         [t('blocks:menu.add'), '_ADD_'],
+    //                     ],
+    //                 },
+    //             ],
+    //             output: 'String',
+    //             colour: BlocksColor.effects.primary,
+    //         });
+    //     },
+    // } as Blockly.Block;
 
     // 动态：实体选择菜单
     blockly.Blocks[OPCODES.COLLISION_MENU] = {
@@ -347,25 +346,25 @@ export function initMenuBlocks(blockly: typeof Blockly, vm: IVM) {
         },
     } as Blockly.Block;
 
-    blockly.Blocks[OPCODES.AUDIO_ADDORSET_MENU] = {
-        init(this: Blockly.Block) {
-            this.jsonInit({
-                message0: '%1',
-                args0: [
-                    {
-                        type: 'field_dropdown_with_block',
-                        name: 'ASH_BLOCKMENU',
-                        options: [
-                            [t('blocks:menu.set'), '_SET_'],
-                            [t('blocks:menu.add'), '_ADD_'],
-                        ],
-                    },
-                ],
-                output: 'String',
-                colour: BlocksColor.audio.primary,
-            });
-        },
-    } as Blockly.Block;
+    // blockly.Blocks[OPCODES.AUDIO_ADDORSET_MENU] = {
+    //     init(this: Blockly.Block) {
+    //         this.jsonInit({
+    //             message0: '%1',
+    //             args0: [
+    //                 {
+    //                     type: 'field_dropdown_with_block',
+    //                     name: 'ASH_BLOCKMENU',
+    //                     options: [
+    //                         [t('blocks:menu.set'), '_SET_'],
+    //                         [t('blocks:menu.add'), '_ADD_'],
+    //                     ],
+    //                 },
+    //             ],
+    //             output: 'String',
+    //             colour: BlocksColor.audio.primary,
+    //         });
+    //     },
+    // } as Blockly.Block;
 
     blockly.Blocks[OPCODES.AUDIO_GET_MENU] = {
         init(this: Blockly.Block) {

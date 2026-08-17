@@ -52,7 +52,20 @@ export function initAudioBlocks(blockly: typeof Blockly) {
                 colour: BlocksColor.audio.primary,
                 args0: [
                     { type: 'input_value', name: 'NAME' },
-                    { type: 'input_value', name: 'DO' },
+                    { type: 'input_value', name: 'TIME' },
+                ],
+            });
+        },
+    } as Blockly.Block;
+
+    blockly.Blocks[OPCODES.AUDIO_PLAY_ADDTIME] = {
+        init(this: Blockly.Block) {
+            this.jsonInit({
+                ...connections,
+                message0: t('blocks:audio.play.addTime'),
+                colour: BlocksColor.audio.primary,
+                args0: [
+                    { type: 'input_value', name: 'NAME' },
                     { type: 'input_value', name: 'TIME' },
                 ],
             });
