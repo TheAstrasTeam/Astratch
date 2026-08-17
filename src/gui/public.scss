@@ -185,6 +185,11 @@ span {
     color: $text-primary;
 }
 
+// Blockly 注释框内的文字颜色（不随主题变化）
+.blocklyComment .blocklyTextarea {
+    color: #000 !important;
+}
+
 .fieldColourSlider {
     background-color: $ui-secondary;
 }
