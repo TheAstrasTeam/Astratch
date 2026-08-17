@@ -143,6 +143,8 @@
     "err.link.undefined": "The linked target does not exist",
     "err.link.tryToLinkEntity": "Cannot link to an entity",
     "err.target.undefined": "Target does not exist",
+    "error.title": "Sorry, your browser is unable to use Astratch.",
+    "error.description": "You are currently using {{browser}}, which does not support the File System Access API required by Astrach.We strongly recommend using a Chromium-based browser.",
     "createFunction.title": "Create a Function",
     "createFunction.description": "Strangely, you are looking at the Modal title",
     "createFunction.dropdown": "Dropdown",

@@ -70,11 +70,7 @@ await i18nReady.then(async () => {
             <Suspense fallback='loading...'>
                 {/*  不加延迟会导致错误的关闭 */}
                 <ModalProvider manager={modal} defaultLayerOptions={{ closeDelay: 180 }}>
-                    {vm.projectManager.isAPIAvailable ? (
-                        <GUI vm={vm} />
-                    ) : (
-                        <ErrorPage reason='file_system_access_api_not_supported' />
-                    )}
+                    {vm.projectManager.isAPIAvailable ? <GUI vm={vm} /> : <ErrorPage />}
                 </ModalProvider>
             </Suspense>
         </StrictMode>,
