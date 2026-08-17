@@ -14,14 +14,13 @@ import { AllContextMenu, guiInterface } from '../../types/gui';
 import { useGUIStore } from '../../stores/useGUIStore';
 import {
     openMenuByMouseDown,
+    openSettingsModal,
     saveCurrentProject,
     saveCurrentProjectAs,
     selectProjectThenJump,
 } from '../../utils/ash-gui';
 import { shortcutManager } from '../../lib/ShortcutManager';
 import { SHORTCUTS } from '../../types/lib';
-import { modal } from '../../components/Modal/modal';
-import { SettingsModal } from '../../components/modal_settings';
 
 export const MenuTextWithShortCut = ({ text, shortcut }: { text: string; shortcut: string }) => (
     <span style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
@@ -82,13 +81,22 @@ const MenuBar = ({ vm }: { vm: IVM }): React.ReactNode => {
                 />
             </MenuItem>
             <MenuDivider />
-            <MenuItem onClick={handleOpenSettings}>{t('gui:menu.settings')}</MenuItem>
-            <MenuItem onClick={close}>{t('gui:menu.exit')}</MenuItem>
+            <MenuItem onClick={handleOpenSettings}>
+                <MenuTextWithShortCut
+                    text={t('gui:menu.settings')}
+                    shortcut={shortcutManager.formatHotKey(
+                        shortcutManager.getHotKey(SHORTCUTS.OPEN_SETTINGS.id),
+                    )}
+                />
+            </MenuItem>
+            <MenuItem onClick={close}>
+                <MenuTextWithShortCut text={t('gui:menu.exit')} shortcut='Ctrl+F4' />
+            </MenuItem>
         </>
     ));
 
     const handleOpenSettings = () => {
-        void modal.open(SettingsModal);
+        openSettingsModal();
     };
 
     return (

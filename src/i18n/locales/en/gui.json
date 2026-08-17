@@ -110,6 +110,7 @@
     "shortcut.project.save": "Save Project",
     "shortcut.project.saveAs": "Save Project As",
     "shortcut.project.open": "Open Project",
+    "shortcut.settings.open": "Open Settings",
     "shortcut.blockly.copy": "Copy",
     "shortcut.blockly.cut": "Cut",
     "shortcut.blockly.paste": "Paste",

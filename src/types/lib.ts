@@ -36,6 +36,11 @@ export const SHORTCUTS = {
         defaultKey: 'mod+o',
         scope: 'global',
     },
+    OPEN_SETTINGS: {
+        id: 'settings.open',
+        defaultKey: 'mod+,',
+        scope: 'global',
+    },
     BLOCKLY_COPY: {
         id: 'blockly.copy',
         defaultKey: 'mod+c',

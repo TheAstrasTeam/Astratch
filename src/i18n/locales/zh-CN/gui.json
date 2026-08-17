@@ -110,6 +110,7 @@
     "shortcut.project.save": "保存项目",
     "shortcut.project.saveAs": "另存项目",
     "shortcut.project.open": "打开项目",
+    "shortcut.settings.open": "打开设置",
     "shortcut.blockly.copy": "复制",
     "shortcut.blockly.cut": "剪切",
     "shortcut.blockly.paste": "粘贴",

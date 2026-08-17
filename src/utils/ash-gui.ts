@@ -11,6 +11,8 @@ import type { IVM } from '../types/vm';
 import { Toast } from '../lib/ToastManager';
 import { spawnRandomString } from './ash-data';
 import { t } from 'i18next';
+import { modal } from '../components/Modal/modal';
+import { SettingsModal } from '../components/modal_settings';
 
 /**
  * 选择项目并跳转到编辑器
@@ -67,4 +69,19 @@ const saveCurrentProjectAs = async (vm: IVM) => {
     }
 };
 
-export { selectProjectThenJump, openMenuByMouseDown, saveCurrentProject, saveCurrentProjectAs };
+/**
+ * 打开设置窗口，已打开时不再重复弹出
+ */
+const openSettingsModal = () => {
+    const alreadyOpen = modal.getSnapshot().some(state => state.Component === SettingsModal);
+    if (alreadyOpen) return;
+    void modal.open(SettingsModal);
+};
+
+export {
+    selectProjectThenJump,
+    openMenuByMouseDown,
+    saveCurrentProject,
+    saveCurrentProjectAs,
+    openSettingsModal,
+};
