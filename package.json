@@ -11,6 +11,7 @@
         "lint": "eslint . && tsc -b",
         "check": "prettier --check .",
         "format": "prettier --write .",
+        "sync:i18n": "node scripts/sync-i18n.mjs",
         "preview": "vite preview"
     },
     "dependencies": {
