@@ -13,18 +13,12 @@ import styles from './index.module.scss';
 import { useState } from 'react';
 import classNames from 'classnames';
 import { ArrayIcon, BooleanIcon, FunctionIcon, NumberIcon, ObjectIcon, StringIcon } from './icons';
-import type { TFunctionFieldType, TFunctionInputField } from './functionPreview';
+import {
+    previewBlockColor,
+    type TFunctionFieldType,
+    type TFunctionInputField,
+} from './functionPreview';
 import type { JSX } from 'react/jsx-dev-runtime';
-
-// 此常量由AI生成：可选择添加的字段类型
-const fieldTypes: { type: TFunctionInputField; icon: JSX.Element; label: string }[] = [
-    { type: 'boolean', icon: <BooleanIcon />, label: t('gui:createFunction.boolean') },
-    { type: 'array', icon: <ArrayIcon />, label: t('gui:createFunction.array') },
-    { type: 'object', icon: <ObjectIcon />, label: t('gui:createFunction.object') },
-    { type: 'string', icon: <StringIcon />, label: t('gui:createFunction.string') },
-    { type: 'number', icon: <NumberIcon />, label: t('gui:createFunction.number') },
-    { type: 'function', icon: <FunctionIcon />, label: t('gui:createFunction.function') },
-];
 
 export const FieldTypeModal = ({
     callback,
@@ -34,6 +28,40 @@ export const FieldTypeModal = ({
     const { closeSelf } = useModalInstance();
     const [multiMode, setMultiMode] = useState(false);
     const [selected, setSelected] = useState<TFunctionInputField[]>([]);
+    const [fieldTypes, _] = useState<
+        { type: TFunctionInputField; icon: JSX.Element; label: string }[]
+    >([
+        {
+            type: 'boolean',
+            icon: <BooleanIcon color={previewBlockColor} />,
+            label: t('gui:createFunction.boolean'),
+        },
+        {
+            type: 'array',
+            icon: <ArrayIcon color={previewBlockColor} />,
+            label: t('gui:createFunction.array'),
+        },
+        {
+            type: 'object',
+            icon: <ObjectIcon color={previewBlockColor} />,
+            label: t('gui:createFunction.object'),
+        },
+        {
+            type: 'string',
+            icon: <StringIcon color={previewBlockColor} />,
+            label: t('gui:createFunction.string'),
+        },
+        {
+            type: 'number',
+            icon: <NumberIcon color={previewBlockColor} />,
+            label: t('gui:createFunction.number'),
+        },
+        {
+            type: 'function',
+            icon: <FunctionIcon color={previewBlockColor} />,
+            label: t('gui:createFunction.function'),
+        },
+    ]);
 
     const handleSelectSingle = async (result: TFunctionFieldType) => {
         if (callback) callback(result);

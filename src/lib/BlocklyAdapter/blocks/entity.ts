@@ -7,7 +7,13 @@
 import * as Blockly from 'blockly/core';
 import { t } from 'i18next';
 import { BlocksColor, OPCODES } from '../../../types/blocks';
-import { connections, endConnections, hatConnections, isInFlyoutInsteadOfTrashCan, returnConnections } from './helpers';
+import {
+    connections,
+    endConnections,
+    hatConnections,
+    isInFlyoutInsteadOfTrashCan,
+    returnConnections,
+} from './helpers';
 import {
     createMinusField,
     createPlusField,
@@ -82,9 +88,7 @@ export function initEntityBlocks(blockly: typeof Blockly) {
             this.jsonInit({
                 ...connections,
                 message0: t('blocks:entity.transform.scale.setScale'),
-                args0: [
-                    { type: 'input_value', name: 'UNIT' },
-                ],
+                args0: [{ type: 'input_value', name: 'UNIT' }],
                 colour: BlocksColor.scale.primary,
             });
         },
@@ -95,9 +99,7 @@ export function initEntityBlocks(blockly: typeof Blockly) {
             this.jsonInit({
                 ...connections,
                 message0: t('blocks:entity.transform.scale.addScale'),
-                args0: [
-                    { type: 'input_value', name: 'UNIT' },
-                ],
+                args0: [{ type: 'input_value', name: 'UNIT' }],
                 colour: BlocksColor.scale.primary,
             });
         },
@@ -120,9 +122,7 @@ export function initEntityBlocks(blockly: typeof Blockly) {
             this.jsonInit({
                 ...connections,
                 message0: t('blocks:entity.transform.direction.setDirection'),
-                args0: [
-                    { type: 'input_value', name: 'UNIT' },
-                ],
+                args0: [{ type: 'input_value', name: 'UNIT' }],
                 colour: BlocksColor.direction.primary,
             });
         },
@@ -133,9 +133,7 @@ export function initEntityBlocks(blockly: typeof Blockly) {
             this.jsonInit({
                 ...connections,
                 message0: t('blocks:entity.transform.direction.addDirection'),
-                args0: [
-                    { type: 'input_value', name: 'UNIT' },
-                ],
+                args0: [{ type: 'input_value', name: 'UNIT' }],
                 colour: BlocksColor.direction.primary,
             });
         },
@@ -169,9 +167,7 @@ export function initEntityBlocks(blockly: typeof Blockly) {
             this.jsonInit({
                 ...connections,
                 message0: t('blocks:entity.transform.layer.setLayer'),
-                args0: [
-                    { type: 'input_value', name: 'UNIT' },
-                ],
+                args0: [{ type: 'input_value', name: 'UNIT' }],
                 colour: BlocksColor.layer.primary,
             });
         },
@@ -481,7 +477,7 @@ export function initEntityBlocks(blockly: typeof Blockly) {
                 ),
             );
 
-            if (isInFlyoutInsteadOfTrashCan(this))  return;
+            if (isInFlyoutInsteadOfTrashCan(this)) return;
 
             if (this.itemCount) {
                 for (let i = 0; i < this.itemCount; i++) {

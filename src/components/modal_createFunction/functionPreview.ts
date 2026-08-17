@@ -114,17 +114,15 @@ const addFieldForFunctionPreview = (data: TPreviewFunctionData) => {
 };
 
 const setPreviewBlockColor = (color: IBlockColor) => {
-    if(!previewBlock) return;
+    if (!previewBlock) return;
     previewBlockColor = color;
     previewBlock.colors = previewBlockColor;
-    console.log(previewBlockColor);
     previewBlock.updateShape();
-}
-
+};
 
 const previewFunctionBlocksColorScheme = [
-    ...(Object.values(BlocksColor).filter(color => typeof color === 'object'))
-]
+    ...Object.values(BlocksColor).filter(color => typeof color === 'object'),
+];
 
 export {
     addFieldForFunctionPreview,
@@ -136,4 +134,5 @@ export {
     previewFunctionData,
     previewFunctionBlocksColorScheme,
     previewBlock,
+    previewBlockColor,
 };

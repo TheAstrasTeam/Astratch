@@ -298,7 +298,6 @@ export interface IBlockColor {
     quaternary?: string;
 }
 
-
 const BlocksColor = {
     position: {
         primary: '#4C97FF',

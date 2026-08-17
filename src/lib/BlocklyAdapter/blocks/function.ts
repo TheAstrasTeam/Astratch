@@ -268,7 +268,7 @@ export function initFunctionBlocks(blockly: typeof Blockly) {
             }
 
             this.setColour(this.colors.primary ?? BlocksColor.function.primary);
-            this.setStyle(this.getStyleName())
+            this.setStyle(this.getStyleName());
 
             this.previewData.forEach((fieldData, index) => {
                 if (this.editMode) {
