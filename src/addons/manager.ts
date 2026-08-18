@@ -7,9 +7,13 @@
 // 此文件由AI生成
 
 import { create } from 'zustand';
+import { t } from 'i18next';
 import { localStorageIDs } from '../types/storage';
 import { readLocalStorage, setItemToLocalStorage } from '../utils/localstorage';
+import { Toast } from '../lib/ToastManager';
+import { spawnRandomString } from '../utils/ash-data';
 import { loadAddons } from './loader';
+import { importCustomAddon, loadCustomAddons, removeCustomAddonHandle } from './custom';
 import type { IAddon, IAddonContext, IAddonStorage } from './types';
 
 export type TAddonLoadStatus = 'idle' | 'loading' | 'ready';
@@ -42,8 +46,9 @@ const DEFAULT_PERSIST: IAddonPersist = {
 /**
  * 插件管理器
  *
- * 插件在运行时从 GitHub 的 AstratchAddons 仓库下载，并缓存到 IndexedDB，
- * 不支持外部自定义扩展。
+ * 插件分为两类：
+ * - 官方插件：运行时从 GitHub 的 AstratchAddons 仓库下载，缓存到 IndexedDB；
+ * - 自定义插件：用户上传文件夹安装，目录句柄保存在 IndexedDB。
  */
 class AddonManager {
     private cleanups = new Map<string, () => void>();
@@ -64,14 +69,15 @@ class AddonManager {
     }
 
     /**
-     * 初始化：下载/读取插件，注入上下文，并运行所有已启用的插件（只执行一次）
+     * 初始化：加载官方 + 自定义插件，注入上下文，并运行所有已启用的插件（只执行一次）
      */
     async init(ctx: IAddonContext) {
         if (this.ctx) return;
         this.ctx = ctx;
         useAddonStore.setState({ status: 'loading' });
         try {
-            const addons = await loadAddons();
+            const [remote, custom] = await Promise.all([loadAddons(), loadCustomAddons()]);
+            const addons = [...remote, ...custom];
             const enabled = new Set<string>();
             for (const addon of addons) {
                 const userDisabled = this.persistData.disabled.includes(addon.id);
@@ -87,6 +93,51 @@ class AddonManager {
             console.error('Failed to load addons:', error);
             useAddonStore.setState({ status: 'ready' });
         }
+    }
+
+    /**
+     * 弹出文件夹选择框，安装自定义插件。
+     * 用户取消时不提示；失败时弹错误通知。
+     */
+    async installCustomAddon() {
+        let addon: IAddon | null;
+        try {
+            addon = await importCustomAddon();
+        } catch (error) {
+            console.error('Failed to import custom addon:', error);
+            Toast.create({
+                type: 'error',
+                id: `addon_import_err_${spawnRandomString()}`,
+                text: t('gui:addon.err.importFailed', {
+                    err: error instanceof Error ? error.message : String(error),
+                }),
+            });
+            return;
+        }
+        if (!addon) return;
+        const nextAddons = [
+            ...useAddonStore.getState().addons.filter(item => item.id !== addon.id),
+            addon,
+        ];
+        useAddonStore.setState({ addons: nextAddons });
+        Toast.create({
+            type: 'info',
+            id: `addon_imported_${addon.id}`,
+            text: t('gui:addon.imported', {
+                name: t(`${addon.i18nNamespace}:@name`, { defaultValue: addon.name }),
+            }),
+        });
+    }
+
+    /**
+     * 卸载自定义插件：删除目录句柄并从列表中移除
+     */
+    async uninstallCustomAddon(id: string) {
+        await removeCustomAddonHandle(id);
+        if (useAddonStore.getState().enabled.has(id)) this.disable(id);
+        useAddonStore.setState({
+            addons: useAddonStore.getState().addons.filter(item => item.id !== id),
+        });
     }
 
     toggle(id: string) {

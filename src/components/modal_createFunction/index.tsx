@@ -108,9 +108,7 @@ export const CreateFunctionModal = ({ vm, addID: _addID }: { vm: IVM; addID?: st
 
     const returnTypeLabel = () => {
         if (returnType === null) return t('gui:createFunction.noReturn');
-        const types: TFunctionInputField[] = Array.isArray(returnType)
-            ? returnType
-            : [returnType];
+        const types: TFunctionInputField[] = Array.isArray(returnType) ? returnType : [returnType];
         return types.map(type => t(`gui:createFunction.${type}`)).join(' | ');
     };
 

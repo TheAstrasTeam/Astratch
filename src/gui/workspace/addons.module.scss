@@ -1,6 +1,29 @@
 @use '../styles/color.scss' as *;
 @use '../styles/constants.scss' as *;
 
+.panel {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.footer {
+    display: flex;
+    flex: 0 0 auto;
+    padding: 0 10px 10px;
+}
+
+.import-button {
+    width: 100%;
+    margin: 0;
+    padding: 6px 12px;
+    font-size: small;
+    &:disabled {
+        opacity: 0.6;
+    }
+}
+
 .main {
     flex: 1;
     min-height: 0;
@@ -47,6 +70,19 @@
         font-size: small;
         font-weight: 600;
         word-break: break-all;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .card-badge {
+        flex: 0 0 auto;
+        font-size: x-small;
+        font-weight: 400;
+        color: $ui-white;
+        background-color: $looks-secondary;
+        border-radius: 4px;
+        padding: 1px 6px;
     }
 
     .card-desc {
@@ -60,6 +96,20 @@
         color: $text-primary;
         opacity: 0.4;
         font-size: x-small;
+    }
+
+    .remove-button {
+        margin: 0;
+        padding: 4px 8px;
+        font-size: x-small;
+        flex-shrink: 0;
+        background-color: transparent;
+        color: $text-primary;
+        opacity: 0.6;
+        &:hover {
+            opacity: 1;
+            background-color: $ui-tertiary;
+        }
     }
 
     .toggle {

@@ -72,6 +72,11 @@ export interface IAddon {
     /** 默认是否启用 */
     defaultEnabled: boolean;
     /**
+     * 是否为用户上传文件夹安装的自定义插件。
+     * 自定义插件在名称后会显示“自定义/Custom”Badge。
+     */
+    isCustom: boolean;
+    /**
      * 启用时运行；若返回一个函数，则将其作为禁用时的清理函数
      */
     run: (ctx: IAddonContext) => (() => void) | undefined;

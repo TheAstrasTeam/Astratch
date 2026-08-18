@@ -6,9 +6,9 @@
 
 // 此文件由AI生成
 
-import i18next from 'i18next';
 import type { IAddon, IAddonManifest } from './types';
 import { cacheGet, cacheSet } from './cache';
+import { registerAddonI18n } from './i18n';
 
 /**
  * 插件仓库：AstratchAddons 的 GitHub 发布地址（raw 形式）。
@@ -38,11 +38,11 @@ const getFile = async (cacheKey: string, url: string): Promise<string> => {
 };
 
 /** 把 SVG 文本转成 data URL，供 <img> 使用 */
-const svgToDataUrl = (text: string): string =>
+export const svgToDataUrl = (text: string): string =>
     `data:image/svg+xml;charset=utf-8,${encodeURIComponent(text)}`;
 
 /** 编译 addon 的 main.js：通过 blob URL 动态 import，得到默认导出（run 函数） */
-const compileAddon = async (code: string): Promise<IAddon['run']> => {
+export const compileAddon = async (code: string): Promise<IAddon['run']> => {
     const url = URL.createObjectURL(new Blob([code], { type: 'text/javascript' }));
     try {
         const module = (await import(/* @vite-ignore */ url)) as {
@@ -96,23 +96,19 @@ export async function loadAddons(): Promise<IAddon[]> {
                 }
             }
 
+            const resources: Partial<Record<string, Record<string, string>>> = {};
             for (const language of ['zh-CN', 'en']) {
                 try {
                     const resourcesText = await getFile(
                         `${id}/i18n/${language}.json`,
                         `${ADDONS_FILES_URL}/${id}/i18n/${language}.json`,
                     );
-                    i18next.addResourceBundle(
-                        language,
-                        `addon_${id}`,
-                        JSON.parse(resourcesText) as Record<string, string>,
-                        true,
-                        true,
-                    );
+                    resources[language] = JSON.parse(resourcesText) as Record<string, string>;
                 } catch {
                     // 该语言没有翻译
                 }
             }
+            registerAddonI18n(id, resources);
 
             addons.push({
                 id,
@@ -122,6 +118,7 @@ export async function loadAddons(): Promise<IAddon[]> {
                 author: manifest.author ?? '',
                 i18nNamespace: `addon_${id}`,
                 defaultEnabled: manifest.defaultEnabled ?? false,
+                isCustom: false,
                 run,
             });
         } catch (error) {
