@@ -4,11 +4,36 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-resvg = "0.48.1"
+console_error_panic_hook = "0.1.7"
+console_log = "1.1.0"
+fontdue = "0.9.4"
+js-sys = "0.3.104"
+log = "0.4.33"
+pollster = "1.0.1"
+resvg = { version = "0.48.1", default-features = false, features = ["text", "system-fonts"] }
+wasm-bindgen = "0.2.127"
 wasm-bindgen-futures = "0.4.77"
-wgpu = "30.0.0"
+web-sys = { version = "0.3.104", features = [
+    "Window",
+    "Document",
+    "HtmlCanvasElement",
+    "Gpu",
+    "GpuAdapter",
+    "GpuDevice",
+    "GpuQueue",
+    "GpuTexture",
+    "GpuTextureView",
+    "GpuCommandEncoder",
+    "GpuRenderPassEncoder",
+    "GpuRenderPipeline",
+] }
+wgpu = { version = "30.0.0", features = ["webgl"] }
 
-
-# font
-# ab_glyph + wgpu_text
-# fontdue
+[profile.wasm-release]
+inherits = "release"
+debug = 0
+strip = true
+lto = "fat"
+opt-level = 2
+panic = "abort"
+codegen-units = 1

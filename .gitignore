@@ -23,5 +23,5 @@ dist-ssr
 *.sw?
 
 # rust
-src/renderer/core/target/
+src/renderer/webgpu/target/
 

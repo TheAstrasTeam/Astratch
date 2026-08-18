@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>test</title>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <script type="module">
+        import init from './test/wasm.js';
+        await init();
+        console.log("WebGPU app started!");
+    </script>
+</body>
+</html>
