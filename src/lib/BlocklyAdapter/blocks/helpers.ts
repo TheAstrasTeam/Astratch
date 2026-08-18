@@ -10,6 +10,8 @@ import { BlocksColor, OPCODES } from '../../../types/blocks';
 import { type IVM, type IVariable } from '../../../types/vm';
 import { dropdownWithInput } from '../../../../plugins/fieldDropdown';
 
+export const BLOCKLY_CUSTOM_CSS = 'BLOCKLY_CUSTOM_CSS' as const;
+
 /**
  * 对于链接积木的配置项
  */
@@ -71,6 +73,9 @@ export function clearRegisteredBlocks(blockly: typeof Blockly) {
         blockTypes.forEach(type => {
             // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
             delete blockly.Blocks[type];
+        });
+        document.querySelectorAll(`.${BLOCKLY_CUSTOM_CSS}`).forEach(ele => {
+            ele.remove();
         });
     } catch {
         // 不需要管

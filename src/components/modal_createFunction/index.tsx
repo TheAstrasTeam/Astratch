@@ -27,20 +27,27 @@ import type { TFunctionFieldType } from './functionPreview';
 import type { JSX } from 'react/jsx-dev-runtime';
 import * as Blockly from 'blockly/core';
 
+import DropdownTipIcon from '../../assets/dorpdown.svg?react';
+
 // 此组件由AI生成：创建函数弹窗中的大号字段类型按钮
 const BigSelector = ({
     icon,
     label,
     onClick,
+    isDropdown = false,
 }: {
     icon: JSX.Element;
     label: string;
     onClick: () => void;
+    isDropdown?: boolean;
 }) => {
     return (
         <div className={styles.bigSelector} onClick={onClick}>
             {icon}
-            <span>{label}</span>
+            <span>
+                {label}
+                {isDropdown && <DropdownTipIcon />}
+            </span>
         </div>
     );
 };
@@ -115,6 +122,7 @@ export const CreateFunctionModal = ({ vm, addID: _addID }: { vm: IVM; addID?: st
                                 callback: handleAddFieldButtonClick,
                             });
                         }}
+                        isDropdown={true}
                     />
                     <BigSelector
                         icon={<TextIcon color={blockColor} />}

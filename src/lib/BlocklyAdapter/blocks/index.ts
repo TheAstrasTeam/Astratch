@@ -19,6 +19,7 @@ import { initDataBlocks } from './data';
 import { initFunctionBlocks } from './function';
 import { initCanvasBlocks } from './canvas';
 import { initDebugBlocks } from './debug';
+import { registerBlocksCSS } from './css';
 
 export { connections, hatConnections, endConnections, returnConnections } from './helpers';
 
@@ -31,6 +32,7 @@ export { connections, hatConnections, endConnections, returnConnections } from '
  */
 export const initBlocks = (blockly: typeof Blockly, vm: IVM) => {
     clearRegisteredBlocks(blockly);
+    registerBlocksCSS();
 
     initPrimitiveBlocks(blockly);
     initMenuBlocks(blockly, vm);
