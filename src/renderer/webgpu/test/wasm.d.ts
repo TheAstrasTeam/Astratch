@@ -1,6 +1,3 @@
-/* tslint:disable */
-/* eslint-disable */
-
 export function run(): void;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
