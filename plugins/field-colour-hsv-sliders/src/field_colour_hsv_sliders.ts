@@ -14,6 +14,7 @@
 
 import * as Blockly from 'blockly/core';
 import { FieldColour } from '../../field-colour/src';
+import { t } from 'i18next';
 
 // Experimental API: https://developer.mozilla.org/en-US/docs/Web/API/EyeDropper
 declare interface EyeDropper {
@@ -364,14 +365,17 @@ export class FieldColourHsvSliders extends FieldColour {
         const container: HTMLDivElement = document.createElement('div');
         container.classList.add('fieldColourSliderContainer');
 
-        this.hueReadout = FieldColourHsvSliders.createLabelInContainer('Hue', container);
+        this.hueReadout = FieldColourHsvSliders.createLabelInContainer(
+            t('gui:colorPicker.hue'),
+            container,
+        );
         this.hueSlider = FieldColourHsvSliders.createSliderInContainer(
             FieldColourHsvSliders.HUE_SLIDER_MAX,
             2,
             container,
         );
         this.saturationReadout = FieldColourHsvSliders.createLabelInContainer(
-            'Saturation',
+            t('gui:colorPicker.saturation'),
             container,
         );
         this.saturationSlider = FieldColourHsvSliders.createSliderInContainer(
@@ -380,7 +384,7 @@ export class FieldColourHsvSliders extends FieldColour {
             container,
         );
         this.brightnessReadout = FieldColourHsvSliders.createLabelInContainer(
-            'Brightness',
+            t('gui:colorPicker.brightness'),
             container,
         );
         this.brightnessSlider = FieldColourHsvSliders.createSliderInContainer(
@@ -439,6 +443,7 @@ export class FieldColourHsvSliders extends FieldColour {
             // If the browser supports the eyedropper API, create a button for it.
             const button: HTMLButtonElement = document.createElement('button');
             button.classList.add('fieldColourEyedropper');
+            button.textContent = t('gui:colorPicker.eyedropper');
             container.appendChild(document.createElement('hr'));
             container.appendChild(button);
             this.hsvBoundEvents.push(
@@ -735,9 +740,6 @@ Blockly.Css.register(`
   left: 0;
   right: 0;
   bottom: 0;
-}
-.fieldColourEyedropper::before {
-  content: "Eyedropper";
 }
 .fieldColourEyedropper::after {
   content: "";

@@ -21,8 +21,14 @@ import {
     type IDynamicScopedHost,
     type IScopedSourceBlock,
 } from './scopedSource';
-import moveLeftImage from '../../../assets/blocks/moveLeft.svg';
-import moveRightImage from '../../../assets/blocks/moveRight.svg';
+import moveLeftIcon from '../../../assets/blocks/moveLeft.svg';
+import moveRightIcon from '../../../assets/blocks/moveRight.svg';
+import removeIcon from '../../../assets/remove.svg';
+
+const CONTROL_BAR_BUTTON_SIZE = 20;
+const CONTROL_BAR_GAP = 10;
+const CONTROL_BAR_WIDTH = CONTROL_BAR_BUTTON_SIZE * 3 + CONTROL_BAR_GAP * 2;
+const CONTROL_BAR_HEIGHT = CONTROL_BAR_BUTTON_SIZE;
 
 /** 参数插槽的 input 名前缀，后接稳定 id。 */
 const PARAM_INPUT_PREFIX = 'PARAM_';
@@ -190,6 +196,21 @@ export function initFunctionBlocks(blockly: typeof Blockly) {
             return false;
         }
 
+        override showEditor(e?: Event) {
+            super.showEditor(e);
+            // 编辑器被打开说明该输入框被选中。
+            const block = this.getSourceBlock() as IFunctionValueBlock | null;
+            const match = this.name?.match(/^TEXT_(\d+)$/);
+            if (block && match) block.selectInput(Number(match[1]));
+        }
+
+        protected override widgetDispose_() {
+            super.widgetDispose_();
+            // 编辑器关闭（回车/Esc/失焦）说明取消选中。
+            const block = this.getSourceBlock() as IFunctionValueBlock | null;
+            if (block && !block.isDeadOrDying()) block.deselectInput();
+        }
+
         protected override initView() {
             super.initView();
             const root = this.getSvgRoot();
@@ -212,24 +233,122 @@ export function initFunctionBlocks(blockly: typeof Blockly) {
     }
 
     // 此函数由AI生成
-    /**
-     * 创建函数编辑模式下的左右移动按钮。
-     *
-     * 点击后把 previewData 里第 index 项与相邻项交换并重建形状。
-     * 与 mutation.ts 的按钮同机制：FieldImage 回调发生在 pointerup 手势中，
-     * 结构更新放到微任务里执行。
-     */
-    function createMoveField(direction: 'left' | 'right', index: number): Blockly.FieldImage {
-        const image = direction === 'left' ? moveLeftImage : moveRightImage;
-        return new Blockly.FieldImage(image, 15, 15, undefined, field => {
-            const block = field.getSourceBlock() as IFunctionValueBlock | null;
-            if (!block || block.isInFlyout) return;
+    /** 输入框在画布（blocklyBlockCanvas）坐标里的左上角锚点；渲染完成前可能为 null。 */
+    function inputAnchorOf(
+        this: IFunctionValueBlock,
+        index: number,
+    ): { x: number; y: number } | null {
+        const input = this.getInput(`ARG${String(index)}`);
+        if (!input) return null;
+        const bxy = this.getRelativeToSurfaceXY();
 
-            queueMicrotask(() => {
-                if (block.isDeadOrDying()) return;
-                block.moveField(index, direction === 'left' ? -1 : 1);
-            });
+        if (!input.connection) {
+            const field = this.getField(`TEXT_${String(index)}`);
+            const root = field?.getSvgRoot();
+            if (!field || !root) return null;
+            const xy = Blockly.utils.svgMath.getRelativeXY(root);
+            // 返回输入框的水平中心，便于控制栏居中。
+            return { x: bxy.x + xy.x + field.getSize().width / 2, y: bxy.y + xy.y };
+        }
+
+        const shadow = input.connection.targetBlock();
+        if (!shadow) return null;
+        const sxy = shadow.getRelativeToSurfaceXY();
+        const hw = (shadow as Blockly.BlockSvg).getHeightWidth();
+        return { x: sxy.x + hw.width / 2, y: sxy.y };
+    }
+
+    // 此函数由AI生成
+    /**
+     * 控制栏：HTML div 装在 foreignObject 里挂到画布（blocklyBlockCanvas），
+     * 跟随工作区平移缩放。仅当选中了输入框时创建，定位在它上方。
+     */
+    function updateControlBar(this: IFunctionValueBlock) {
+        this.controlBar?.remove();
+        this.controlBar = null;
+        if (!this.editMode || this.isDeadOrDying()) return;
+
+        const index = this.activeInputIndex ?? -1;
+        const anchor = index >= 0 ? inputAnchorOf.call(this, index) : null;
+        if (!anchor) return;
+
+        const fo = Blockly.utils.dom.createSvgElement(
+            Blockly.utils.Svg.FOREIGNOBJECT,
+            {
+                class: 'blockly-function-previewBlock-controlBar',
+                width: CONTROL_BAR_WIDTH,
+                height: CONTROL_BAR_HEIGHT,
+            },
+            (this.workspace as Blockly.WorkspaceSvg).getCanvas(),
+        );
+        this.controlBar = fo;
+
+        const controlBar = document.createElement('div');
+        controlBar.className = 'blockly-function-previewBlock-controlBar-content';
+        fo.appendChild(controlBar);
+
+        const goLeft = document.createElement('img');
+        goLeft.src = moveLeftIcon;
+        goLeft.style.filter = 'invert(1) var(--svg-filter)';
+        goLeft.className = 'blockly-function-previewBlock-controlBar-button';
+        goLeft.addEventListener('pointerdown', e => {
+            e.stopPropagation();
+            e.preventDefault();
+            // 左移后移动方法内部会重新选中这个输入框。
+            this.moveField(index, -1);
         });
+
+        const remove = document.createElement('img');
+        remove.src = removeIcon;
+        remove.style.filter = 'var(--svg-filter)';
+        remove.className = 'blockly-function-previewBlock-controlBar-button';
+        remove.addEventListener('pointerdown', e => {
+            e.stopPropagation();
+            e.preventDefault();
+            this.removeField(index);
+        });
+
+        const goRight = document.createElement('img');
+        goRight.src = moveRightIcon;
+        goRight.style.filter = 'invert(1) var(--svg-filter)';
+        goRight.className = 'blockly-function-previewBlock-controlBar-button';
+        goRight.addEventListener('pointerdown', e => {
+            e.stopPropagation();
+            e.preventDefault();
+            // 右移后移动方法内部会重新选中这个输入框。
+            this.moveField(index, 1);
+        });
+        controlBar.appendChild(goLeft);
+        controlBar.appendChild(remove);
+        controlBar.appendChild(goRight);
+
+        // 水平居中在输入框上方。
+        fo.setAttribute('x', String(anchor.x - CONTROL_BAR_WIDTH / 2));
+        fo.setAttribute('y', String(anchor.y - CONTROL_BAR_HEIGHT - 6));
+    }
+
+    // 此函数由AI生成
+    /**
+     * 值槽位影子块的 ID 字段无法子类化，这里在实例上包装它的选中生命周期：
+     * showEditor 被调用 = 输入框被选中；widgetDispose_（编辑器关闭） = 取消选中。
+     */
+    function bindShadowSelection(
+        this: IFunctionValueBlock,
+        field: Blockly.FieldTextInput,
+        index: number,
+    ) {
+        const origShow = field.showEditor.bind(field);
+        field.showEditor = (e?: Event) => {
+            origShow(e);
+            // WidgetDiv.show 会先关闭旧编辑器；必须等旧字段完成 deselect 后再选中新字段。
+            this.selectInput(index);
+        };
+        const wrapped = field as unknown as { widgetDispose_: () => void };
+        const origDispose = wrapped.widgetDispose_.bind(field);
+        wrapped.widgetDispose_ = () => {
+            this.deselectInput();
+            origDispose();
+        };
     }
 
     /** 值槽位的影子块：只有一个文字输入框（输入参数 id）。 */
@@ -247,11 +366,25 @@ export function initFunctionBlocks(blockly: typeof Blockly) {
     blockly.Blocks[OPCODES.FUNCTION_VALUE] = {
         init(this: IFunctionValueBlock) {
             this.editMode = false;
+            this.activeInputIndex = -1;
+            this.controlBar = null;
             this.jsonInit({
                 ...returnConnections,
                 colour: BlocksColor.function.primary,
                 output: 'Function',
             });
+        },
+        /** 选中输入框（其编辑器被打开）时显示控制栏。 */
+        selectInput(this: IFunctionValueBlock, index: number) {
+            if (!this.editMode || this.isDeadOrDying()) return;
+            this.activeInputIndex = index;
+            updateControlBar.call(this);
+        },
+        /** 取消选中当前输入框，销毁控制栏。 */
+        deselectInput(this: IFunctionValueBlock) {
+            if (!this.editMode || this.isDeadOrDying()) return;
+            this.activeInputIndex = -1;
+            updateControlBar.call(this);
         },
         moveField(this: IFunctionValueBlock, index: number, delta: number) {
             const target = index + delta;
@@ -260,6 +393,19 @@ export function initFunctionBlocks(blockly: typeof Blockly) {
             const next = [...this.previewData];
             [next[index], next[target]] = [next[target], next[index]];
             this.previewData.splice(0, this.previewData.length, ...next);
+            this.updateShape();
+            // 移动后重新选中该输入框（重新打开它的编辑器，选中状态随之恢复）。
+            const input = this.getInput(`ARG${String(target)}`);
+            const field = input?.connection
+                ? input.connection.targetBlock()?.getField('ID')
+                : this.getField(`TEXT_${String(target)}`);
+            field?.showEditor();
+        },
+        /** 从预览数据里移除一个输入并重建形状（编辑模式下）。 */
+        removeField(this: IFunctionValueBlock, index: number) {
+            if (!this.editMode || this.isDeadOrDying()) return;
+            this.previewData.splice(index, 1);
+            this.activeInputIndex = -1;
             this.updateShape();
         },
         updateShape() {
@@ -271,12 +417,6 @@ export function initFunctionBlocks(blockly: typeof Blockly) {
             this.setStyle(this.getStyleName());
 
             this.previewData.forEach((fieldData, index) => {
-                if (this.editMode) {
-                    this.appendDummyInput(`BTN_MOVE_LEFT_${String(index)}`).appendField(
-                        createMoveField('left', index),
-                    );
-                }
-
                 const inputID = `ARG${String(index)}`;
                 if (fieldData.type === 'text') {
                     const textInput = new FunctionValueTextField(
@@ -315,14 +455,20 @@ export function initFunctionBlocks(blockly: typeof Blockly) {
                         fieldData.text = value;
                         return value;
                     });
-                }
-
-                if (this.editMode) {
-                    this.appendDummyInput(`BTN_MOVE_RIGHT_${String(index)}`).appendField(
-                        createMoveField('right', index),
-                    );
+                    if (this.editMode && shadowText) {
+                        bindShadowSelection.call(this, shadowText, index);
+                    }
                 }
             });
+
+            updateControlBar.call(this);
+            // 等渲染完成后（字段 transform 就位）用最新布局重新定位。
+            requestAnimationFrame(() => {
+                if (!this.isDeadOrDying()) updateControlBar.call(this);
+            });
+        },
+        updateControlBar() {
+            updateControlBar.call(this);
         },
     } as IFunctionValueBlock;
 

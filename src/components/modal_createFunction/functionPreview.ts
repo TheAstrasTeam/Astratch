@@ -22,8 +22,20 @@ export interface IFunctionValueBlock extends Blockly.Block {
     previewData: TPreviewFunctionData[];
     colors: IBlockColor;
     editMode: boolean;
+    /** 当前激活（上次点击）的输入下标；-1 表示没有。 */
+    activeInputIndex?: number;
+    /** 控制栏 foreignObject（挂在积木根组下，随工作区平移缩放）。 */
+    controlBar?: SVGForeignObjectElement | null;
     updateShape(): void;
     moveField(index: number, delta: number): void;
+    /** 从预览数据里移除一个输入并重建形状（编辑模式下）。 */
+    removeField(index: number): void;
+    /** 选中（其编辑器被打开）指定输入框并显示控制栏。 */
+    selectInput(index: number): void;
+    /** 取消选中当前输入框（销毁控制栏）。 */
+    deselectInput(): void;
+    /** 重建并定位控制栏到激活输入框上方。 */
+    updateControlBar(): void;
 }
 
 const previewBlockId = 'preview-function';
@@ -31,8 +43,23 @@ let previewFunctionData: TPreviewFunctionData[] = [];
 let previewBlockColor: IBlockColor = BlocksColor.function;
 let previewBlock: IFunctionValueBlock | null = null;
 let previewWorkspace: Blockly.WorkspaceSvg | null = null;
+let previewSession = 0;
+let setupFrame: number | null = null;
+let focusFrame: number | null = null;
+let focusTimer: number | null = null;
+
+const isCurrentPreview = (
+    session: number,
+    workspace: Blockly.WorkspaceSvg,
+    block: IFunctionValueBlock,
+) =>
+    session === previewSession &&
+    workspace === previewWorkspace &&
+    block === previewBlock &&
+    !block.isDeadOrDying();
 
 const setupWorkspace = (workspace: Blockly.WorkspaceSvg) => {
+    const session = ++previewSession;
     previewWorkspace = workspace;
     workspace.configureContextMenu = options => {
         options.length = 0;
@@ -53,8 +80,11 @@ const setupWorkspace = (workspace: Blockly.WorkspaceSvg) => {
     previewBlock.setDeletable(false);
     previewBlock.updateShape();
     disablePreviewContextMenu();
-    requestAnimationFrame(() => {
-        previewWorkspace?.centerOnBlock(previewBlockId);
+    const block = previewBlock;
+    setupFrame = requestAnimationFrame(() => {
+        setupFrame = null;
+        if (!isCurrentPreview(session, workspace, block)) return;
+        workspace.centerOnBlock(previewBlockId);
         addFieldForFunctionPreview({
             type: 'text',
             text: t('blocks:function.defaultTitle'),
@@ -71,12 +101,20 @@ const disablePreviewContextMenu = () => {
 };
 
 const disposePreviewWorkspace = () => {
-    if (previewWorkspace) {
-        previewWorkspace.dispose();
-        previewWorkspace = null;
-        previewBlock = null;
-        previewFunctionData = [];
-    }
+    previewSession++;
+    if (setupFrame !== null) cancelAnimationFrame(setupFrame);
+    if (focusFrame !== null) cancelAnimationFrame(focusFrame);
+    if (focusTimer !== null) clearTimeout(focusTimer);
+    setupFrame = null;
+    focusFrame = null;
+    focusTimer = null;
+
+    const workspace = previewWorkspace;
+    previewBlock?.controlBar?.remove();
+    previewWorkspace = null;
+    previewBlock = null;
+    previewFunctionData = [];
+    workspace?.dispose();
 };
 
 const resizePreviewWorkspace = () => {
@@ -88,28 +126,41 @@ const resizePreviewWorkspace = () => {
 };
 
 const addFieldForFunctionPreview = (data: TPreviewFunctionData) => {
-    if (!previewBlock) return;
+    const workspace = previewWorkspace;
+    const block = previewBlock;
+    const session = previewSession;
+    if (!workspace || !block) return;
+
     const index = previewFunctionData.length;
     previewFunctionData.push(data);
-    previewBlock.updateShape();
+    block.updateShape();
     disablePreviewContextMenu();
-    setTimeout(() => {
-        const workspace = previewWorkspace;
-        const block = previewBlock;
-        if (!workspace || !block) return;
+
+    if (focusTimer !== null) clearTimeout(focusTimer);
+    if (focusFrame !== null) cancelAnimationFrame(focusFrame);
+    focusTimer = window.setTimeout(() => {
+        focusTimer = null;
+        if (!isCurrentPreview(session, workspace, block)) return;
 
         Blockly.common.svgResize(workspace);
         workspace.centerOnBlock(previewBlockId);
 
-        const field =
-            data.type === 'text'
-                ? block.getField(`TEXT_${String(index)}`)
-                : block
-                      .getInput(`ARG${String(index)}`)
-                      ?.connection?.targetBlock()
-                      ?.getField('ID');
+        focusFrame = requestAnimationFrame(() => {
+            focusFrame = null;
+            if (!isCurrentPreview(session, workspace, block)) return;
 
-        field?.showEditor();
+            const field =
+                data.type === 'text'
+                    ? block.getField(`TEXT_${String(index)}`)
+                    : block
+                          .getInput(`ARG${String(index)}`)
+                          ?.connection?.targetBlock()
+                          ?.getField('ID');
+
+            field?.showEditor();
+            // 自动编辑不应只依赖字段覆写来同步 controlbar；这里显式确认选中状态。
+            block.selectInput(index);
+        });
     }, 200);
 };
 

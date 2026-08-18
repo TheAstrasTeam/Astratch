@@ -36,6 +36,14 @@
     &:active {
         filter: brightness(0.5);
     }
+    span {
+        display: flex;
+        align-items: center;
+        svg {
+            width: 20px;
+            height: auto;
+        }
+    }
 }
 
 .field-type-menu {
