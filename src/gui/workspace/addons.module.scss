@@ -1,0 +1,76 @@
+@use '../styles/color.scss' as *;
+@use '../styles/constants.scss' as *;
+
+.main {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    gap: 8px;
+}
+
+.empty {
+    color: $text-primary;
+    opacity: 0.5;
+    font-size: small;
+    text-align: center;
+    padding: 20px 0;
+}
+
+.card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: $ui-secondary;
+    border-radius: 6px;
+    padding: 8px 10px;
+
+    .card-icon {
+        width: 28px;
+        height: 28px;
+        flex-shrink: 0;
+    }
+
+    .card-info {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .card-name {
+        color: $text-primary;
+        font-size: small;
+        font-weight: 600;
+        word-break: break-all;
+    }
+
+    .card-desc {
+        color: $text-primary;
+        opacity: 0.6;
+        font-size: x-small;
+        word-break: break-all;
+    }
+
+    .card-author {
+        color: $text-primary;
+        opacity: 0.4;
+        font-size: x-small;
+    }
+
+    .toggle {
+        margin: 0;
+        padding: 4px 8px;
+        font-size: x-small;
+        flex-shrink: 0;
+        &.enabled {
+            filter: none;
+            background-color: $looks-secondary;
+            color: $ui-white;
+        }
+    }
+}

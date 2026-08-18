@@ -29,6 +29,7 @@ import { guiInterface } from '../../types/gui';
 import Start from '../start';
 import CreateProject from '../createProjet';
 import TargetsPanel from './targets';
+import AddonsPanel from './addons';
 import SplitPane from '../../components/splitPane';
 import { debounce } from '../../utils/ash-debounce';
 import { BottomBar } from '../bottomBar';
@@ -135,6 +136,12 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
             return (
                 <SelectBar title={t('gui:target.title')}>
                     <TargetsPanel vm={vm} />
+                </SelectBar>
+            );
+        if (tabSelected === allBuiltInTabs.ADDONS)
+            return (
+                <SelectBar title={t('gui:addon.title')}>
+                    <AddonsPanel />
                 </SelectBar>
             );
     };
