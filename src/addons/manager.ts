@@ -6,10 +6,24 @@
 
 // 此文件由AI生成
 
+import { create } from 'zustand';
 import { localStorageIDs } from '../types/storage';
 import { readLocalStorage, setItemToLocalStorage } from '../utils/localstorage';
 import { loadAddons, registerAddonI18n } from './loader';
 import type { IAddon, IAddonContext, IAddonStorage } from './types';
+
+export interface IAddonStoreState {
+    addons: IAddon[];
+    enabled: ReadonlySet<string>;
+}
+
+/**
+ * 插件状态 store：UI 通过订阅它来实时刷新
+ */
+export const useAddonStore = create<IAddonStoreState>(() => ({
+    addons: [],
+    enabled: new Set<string>(),
+}));
 
 /**
  * 插件管理器
@@ -18,19 +32,19 @@ import type { IAddon, IAddonContext, IAddonStorage } from './types';
  * 由构建时的 import.meta.glob 静态收集，不支持外部自定义扩展。
  */
 class AddonManager {
-    private addons = new Map<string, IAddon>();
     private cleanups = new Map<string, () => void>();
-    private enabled = new Set<string>();
     private ctx: IAddonContext | null = null;
 
     constructor() {
-        this.addons = new Map(loadAddons().map(addon => [addon.id, addon]));
+        const addons = loadAddons();
         const stored = readLocalStorage(localStorageIDs.Addons);
-        if (Array.isArray(stored)) {
-            for (const id of stored) {
-                if (typeof id === 'string' && this.addons.has(id)) this.enabled.add(id);
-            }
-        }
+        const enabledIDs = Array.isArray(stored)
+            ? stored.filter((id): id is string => typeof id === 'string')
+            : [];
+        useAddonStore.setState({
+            addons,
+            enabled: new Set(enabledIDs.filter(id => addons.some(addon => addon.id === id))),
+        });
     }
 
     /**
@@ -40,36 +54,33 @@ class AddonManager {
         if (this.ctx) return;
         this.ctx = ctx;
         registerAddonI18n();
-        for (const addon of this.addons.values()) {
-            if (this.enabled.has(addon.id)) this.runAddon(addon);
+        const { addons, enabled } = useAddonStore.getState();
+        for (const addon of addons) {
+            if (enabled.has(addon.id)) this.runAddon(addon);
         }
     }
 
-    getAddons(): IAddon[] {
-        return [...this.addons.values()];
-    }
-
-    isEnabled(id: string): boolean {
-        return this.enabled.has(id);
-    }
-
     toggle(id: string) {
-        if (this.enabled.has(id)) this.disable(id);
+        if (useAddonStore.getState().enabled.has(id)) this.disable(id);
         else this.enable(id);
     }
 
     enable(id: string) {
-        if (this.enabled.has(id)) return;
-        const addon = this.addons.get(id);
+        if (useAddonStore.getState().enabled.has(id)) return;
+        const addon = useAddonStore.getState().addons.find(addon => addon.id === id);
         if (!addon) return;
-        this.enabled.add(id);
+        useAddonStore.setState({
+            enabled: new Set(useAddonStore.getState().enabled).add(id),
+        });
         this.persist();
         if (this.ctx) this.runAddon(addon);
     }
 
     disable(id: string) {
-        if (!this.enabled.has(id)) return;
-        this.enabled.delete(id);
+        if (!useAddonStore.getState().enabled.has(id)) return;
+        const next = new Set(useAddonStore.getState().enabled);
+        next.delete(id);
+        useAddonStore.setState({ enabled: next });
         this.persist();
         this.cleanup(id);
     }
@@ -117,7 +128,7 @@ class AddonManager {
     }
 
     private persist() {
-        setItemToLocalStorage(localStorageIDs.Addons, [...this.enabled]);
+        setItemToLocalStorage(localStorageIDs.Addons, [...useAddonStore.getState().enabled]);
     }
 }
 

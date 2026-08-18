@@ -6,6 +6,7 @@
 
 // 此文件由AI生成
 
-export { addonManager } from './manager';
+export { addonManager, useAddonStore } from './manager';
 export { buildAddonContext } from './context';
 export type { IAddon, IAddonContext, IAddonManifest, IAddonStorage } from './types';
+export type { IAddonStoreState } from './manager';

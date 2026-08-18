@@ -7,10 +7,9 @@
 // 此文件由AI生成
 
 import { t } from 'i18next';
-import { useState } from 'react';
 import classNames from 'classnames';
 import styles from './addons.module.scss';
-import { addonManager } from '../../addons';
+import { addonManager, useAddonStore } from '../../addons';
 
 const AddonCard = ({
     name,
@@ -48,12 +47,8 @@ const AddonCard = ({
 };
 
 const AddonsPanel = () => {
-    const [, setVersion] = useState(0);
-    const refresh = () => {
-        setVersion(v => v + 1);
-    };
-
-    const addons = addonManager.getAddons();
+    const addons = useAddonStore(state => state.addons);
+    const enabled = useAddonStore(state => state.enabled);
 
     if (addons.length === 0) return <div className={styles.empty}>{t('gui:addon.noAddons')}</div>;
 
@@ -66,10 +61,9 @@ const AddonsPanel = () => {
                     description={addon.description}
                     icon={addon.icon}
                     author={addon.author}
-                    enabled={addonManager.isEnabled(addon.id)}
+                    enabled={enabled.has(addon.id)}
                     onToggle={() => {
                         addonManager.toggle(addon.id);
-                        refresh();
                     }}
                 />
             ))}
