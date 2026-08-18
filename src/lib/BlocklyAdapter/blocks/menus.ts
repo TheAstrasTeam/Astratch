@@ -132,7 +132,7 @@ export function initMenuBlocks(blockly: typeof Blockly, vm: IVM) {
         },
     } as Blockly.Block;
 
-    blockly.Blocks[OPCODES.LAYER_ADDORSET_MENU] = {
+    blockly.Blocks[OPCODES.LAYER_MOVE_MENU] = {
         init(this: Blockly.Block) {
             this.jsonInit({
                 message0: '%1',

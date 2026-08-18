@@ -218,7 +218,7 @@ const getToolbox = async (): Promise<Blockly.utils.toolbox.ToolboxInfo> => {
                                         kind: 'block',
                                         type: OPCODES.ENTITY_TRANSFORM_LAYER_MOVELAYER,
                                         inputs: {
-                                            MOVE: menu(OPCODES.LAYER_ADDORSET_MENU),
+                                            MOVE: menu(OPCODES.LAYER_MOVE_MENU),
                                             UNIT: num(1),
                                         },
                                     },

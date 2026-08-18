@@ -14,7 +14,7 @@ const OPCODES = {
     //SCALE_ADDORSET_MENU: 'scale_addOrSet_menu',
     DIRECTION_SETWHERE_MENU: 'direction_setWhere_menu',
     DIRECTION_SETFACE_MENU: 'direction_setFace_menu',
-    LAYER_ADDORSET_MENU: 'layer_addOrSet_menu',
+    LAYER_MOVE_MENU: 'layer_move_menu',
     IMAGES_STRETCH_MENU: 'images_stretch_menu',
     //IMAGES_IMAGES_ADDORSET_MENU: 'images_images_addOrSet_menu',
     IMAGES_GRID_MENU: 'images_grid_menu',
