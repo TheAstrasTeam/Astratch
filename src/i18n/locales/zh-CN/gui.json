@@ -158,7 +158,7 @@
     "createFunction.addField": "添加输入框",
     "createFunction.setColor": "设置积木颜色",
     "createFunction.configFunction": "函数显示方式",
-    "createFunction.customBlock": "显示为可触发积木",
+    "createFunction.customBlock": "显示为⌈直接运行⌋模式",
     "createFunction.returnType": "返回类型",
     "createFunction.selectReturnType": "为函数选择返回值类型",
     "createFunction.noReturn": "无返回值",
