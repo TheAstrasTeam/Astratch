@@ -22,8 +22,10 @@ import type { JSX } from 'react/jsx-dev-runtime';
 
 export const FieldTypeModal = ({
     callback,
+    purpose = 'input',
 }: {
     callback?: (result: TFunctionFieldType) => void;
+    purpose?: 'input' | 'return';
 }) => {
     const { closeSelf } = useModalInstance();
     const [multiMode, setMultiMode] = useState(false);
@@ -98,11 +100,30 @@ export const FieldTypeModal = ({
         <Modal
             fullScreen={false}
             close={closeSelf}
-            title={t('gui:createFunction.input')}
-            description={t('gui:createFunction.selectInputType')}
+            title={t(
+                purpose === 'return' ? 'gui:createFunction.returnType' : 'gui:createFunction.input',
+            )}
+            description={t(
+                purpose === 'return'
+                    ? 'gui:createFunction.selectReturnType'
+                    : 'gui:createFunction.selectInputType',
+            )}
         >
             <div className={styles.fieldTypeMenu}>
                 <div className={styles.fieldTypeGrid}>
+                    {purpose === 'return' && (
+                        <div
+                            className={styles.selector}
+                            onClick={() => {
+                                void handleSelectSingle(null);
+                            }}
+                        >
+                            <span className={styles.noTypeIcon} aria-hidden='true'>
+                                -
+                            </span>
+                            <span>{t('gui:createFunction.noReturn')}</span>
+                        </div>
+                    )}
                     {fieldTypes.map(({ type, icon, label }) => {
                         const isSelected = multiMode && selected.includes(type);
                         return (

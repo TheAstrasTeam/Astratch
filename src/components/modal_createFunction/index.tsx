@@ -18,12 +18,18 @@ import {
     previewBlockColor,
     previewFunctionBlocksColorScheme,
     resizePreviewWorkspace,
+    setPreviewConfig,
     setPreviewBlockColor,
 } from './functionPreview';
 import { DropDownIcon, StringIcon, TextIcon } from './icons';
 import { ColorPickerButton } from '../colorPickerButton';
 import type { IBlockColor } from '../../types/blocks';
-import type { TFunctionFieldType } from './functionPreview';
+import type {
+    TFunctionFieldType,
+    TFunctionInputField,
+    TFunctionPreviewMode,
+    TFunctionReturnType,
+} from './functionPreview';
 import type { JSX } from 'react/jsx-dev-runtime';
 import * as Blockly from 'blockly/core';
 
@@ -55,6 +61,8 @@ const BigSelector = ({
 export const CreateFunctionModal = ({ vm, addID: _addID }: { vm: IVM; addID?: string }) => {
     const { closeSelf } = useModalInstance();
     const [blockColor, setBlockColor] = useState<IBlockColor>(previewBlockColor);
+    const [previewMode, setPreviewMode] = useState<TFunctionPreviewMode>('function-value');
+    const [returnType, setReturnType] = useState<TFunctionReturnType>(null);
 
     const handleButtonClick = useCallback(
         async (close: unknown = null) => {
@@ -79,6 +87,31 @@ export const CreateFunctionModal = ({ vm, addID: _addID }: { vm: IVM; addID?: st
     const handleSetBlockColor = (color: IBlockColor) => {
         setBlockColor(color);
         setPreviewBlockColor(color);
+    };
+
+    const handleChangeCustomBlock = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const nextMode: TFunctionPreviewMode = event.target.checked
+            ? 'custom-block'
+            : 'function-value';
+        setPreviewMode(nextMode);
+        setPreviewConfig({ mode: nextMode, returnType });
+    };
+
+    const handleSetReturnType = (result: TFunctionFieldType) => {
+        // 返回类型 Modal 只会返回值类型、联合值类型或 null；text/dropdown
+        // 是旧字段类型，为避免把它们误当成 Blockly check，明确拒绝。
+        if (result === 'text' || result === 'dropdown') return;
+        const nextReturnType = result;
+        setReturnType(nextReturnType);
+        setPreviewConfig({ mode: previewMode, returnType: nextReturnType });
+    };
+
+    const returnTypeLabel = () => {
+        if (returnType === null) return t('gui:createFunction.noReturn');
+        const types: TFunctionInputField[] = Array.isArray(returnType)
+            ? returnType
+            : [returnType];
+        return types.map(type => t(`gui:createFunction.${type}`)).join(' | ');
     };
 
     // 此函数由AI生成
@@ -106,6 +139,7 @@ export const CreateFunctionModal = ({ vm, addID: _addID }: { vm: IVM; addID?: st
         >
             <div className={styles.content}>
                 <CreateFunctionWorkspace vm={vm} />
+                <span className={styles.mainTitle}>{t('gui:createFunction.addField')}</span>
                 <div className={styles.addFieldContent}>
                     <BigSelector
                         icon={<DropDownIcon color={blockColor} />}
@@ -130,6 +164,7 @@ export const CreateFunctionModal = ({ vm, addID: _addID }: { vm: IVM; addID?: st
                         onClick={handleAddText}
                     />
                 </div>
+                <span className={styles.mainTitle}>{t('gui:createFunction.setColor')}</span>
                 <div className={styles.setBlockColor}>
                     {previewFunctionBlocksColorScheme.map((color, index) => (
                         <div
@@ -151,6 +186,30 @@ export const CreateFunctionModal = ({ vm, addID: _addID }: { vm: IVM; addID?: st
                         title={t('gui:createFunction.pickColor')}
                     />
                 </div>
+            </div>
+            <div className={styles.contentRight}>
+                <span className={styles.mainTitle}>{t('gui:createFunction.configFunction')}</span>
+                <label className={styles.functionOption}>
+                    <input
+                        type='checkbox'
+                        checked={previewMode === 'custom-block'}
+                        onChange={handleChangeCustomBlock}
+                    />
+                    <span>{t('gui:createFunction.customBlock')}</span>
+                </label>
+                <span className={styles.mainTitle}>{t('gui:createFunction.returnType')}</span>
+                <button
+                    type='button'
+                    className={styles.returnTypeButton}
+                    onClick={() => {
+                        void modal.open(FieldTypeModal, {
+                            purpose: 'return',
+                            callback: handleSetReturnType,
+                        });
+                    }}
+                >
+                    {returnTypeLabel()}
+                </button>
             </div>
         </Modal>
     );

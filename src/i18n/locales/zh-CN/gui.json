@@ -155,6 +155,13 @@
     "createFunction.number": "数字",
     "createFunction.function": "函数",
     "createFunction.pickColor": "自定义积木颜色",
+    "createFunction.addField": "添加输入框",
+    "createFunction.setColor": "设置积木颜色",
+    "createFunction.configFunction": "函数显示方式",
+    "createFunction.customBlock": "显示为可触发积木",
+    "createFunction.returnType": "返回类型",
+    "createFunction.selectReturnType": "为函数选择返回值类型",
+    "createFunction.noReturn": "无返回值",
     "error.title": "抱歉，您的浏览器无法使用 Astratch。",
     "error.description": "您正在使用 {{browser}}，它不支持 Astratch 所需的文件系统访问 API。我们强烈建议使用基于 Chromium 的浏览器。"
 }

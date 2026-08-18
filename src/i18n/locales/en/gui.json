@@ -173,5 +173,12 @@
     "createFunction.string": "String",
     "createFunction.number": "Number",
     "createFunction.function": "Function",
-    "createFunction.pickColor": "Custom block color"
+    "createFunction.pickColor": "Custom block color",
+    "createFunction.addField": "Add input",
+    "createFunction.setColor": "Set block color",
+    "createFunction.configFunction": "Function display",
+    "createFunction.customBlock": "Show as a triggerable block",
+    "createFunction.returnType": "Return type",
+    "createFunction.selectReturnType": "Choose the function return type",
+    "createFunction.noReturn": "No return value"
 }

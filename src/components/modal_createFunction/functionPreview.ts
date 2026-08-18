@@ -14,6 +14,12 @@ export type TFunctionInputField = 'boolean' | 'array' | 'object' | 'string' | 'n
 
 export type TFunctionFieldType = TFunctionReturnField | TFunctionInputField[];
 
+/** 预览中函数对外呈现的两种方式。 */
+export type TFunctionPreviewMode = 'function-value' | 'custom-block';
+
+/** 一个函数的返回类型；null 表示没有返回值。 */
+export type TFunctionReturnType = TFunctionInputField | TFunctionInputField[] | null;
+
 export interface TPreviewFunctionData {
     type: TFunctionFieldType;
     text?: string;
@@ -39,14 +45,20 @@ export interface IFunctionValueBlock extends Blockly.Block {
 }
 
 const previewBlockId = 'preview-function';
+const previewWrapperId = 'preview-function-wrapper';
 let previewFunctionData: TPreviewFunctionData[] = [];
 let previewBlockColor: IBlockColor = BlocksColor.function;
 let previewBlock: IFunctionValueBlock | null = null;
+let previewWrapperBlock: Blockly.BlockSvg | null = null;
 let previewWorkspace: Blockly.WorkspaceSvg | null = null;
+let previewRootBlock: Blockly.BlockSvg | IFunctionValueBlock | null = null;
+let previewMode: TFunctionPreviewMode = 'function-value';
+let previewReturnType: TFunctionReturnType = null;
 let previewSession = 0;
 let setupFrame: number | null = null;
 let focusFrame: number | null = null;
 let focusTimer: number | null = null;
+let layoutFrame: number | null = null;
 
 const isCurrentPreview = (
     session: number,
@@ -56,7 +68,141 @@ const isCurrentPreview = (
     session === previewSession &&
     workspace === previewWorkspace &&
     block === previewBlock &&
-    !block.isDeadOrDying();
+    !block.isDeadOrDying() &&
+    !previewRootBlock?.isDeadOrDying();
+
+const checksForReturnType = (returnType: TFunctionReturnType): string[] | null => {
+    if (returnType === null) return null;
+    const types = Array.isArray(returnType) ? returnType : [returnType];
+    return types.map(type => `${type.charAt(0).toUpperCase()}${type.slice(1)}`);
+};
+
+const centerPreviewRoot = (workspace: Blockly.WorkspaceSvg) => {
+    const root = previewRootBlock;
+    if (!root || root.isDeadOrDying()) return;
+    workspace.centerOnBlock(root.id);
+};
+
+/** 等 Blockly 完成当前渲染队列后，再按整棵预览树重新测量和居中。 */
+const schedulePreviewLayout = (
+    workspace: Blockly.WorkspaceSvg,
+    session: number,
+    block: IFunctionValueBlock,
+) => {
+    if (layoutFrame !== null) cancelAnimationFrame(layoutFrame);
+    layoutFrame = requestAnimationFrame(() => {
+        layoutFrame = requestAnimationFrame(() => {
+            layoutFrame = null;
+            if (!isCurrentPreview(session, workspace, block)) return;
+            Blockly.common.svgResize(workspace);
+            centerPreviewRoot(workspace);
+        });
+    });
+};
+
+/** 删除外层调用积木，同时先断开内部签名，避免 Blockly 连带销毁签名。 */
+const disposePreviewWrapper = () => {
+    if (!previewWrapperBlock) return;
+    if (previewWrapperBlock.isDeadOrDying()) {
+        previewWrapperBlock = null;
+        return;
+    }
+    const functionConnection = previewWrapperBlock.getInput('FUNCTION')?.connection;
+    if (functionConnection?.isConnected()) functionConnection.disconnect();
+    previewWrapperBlock.dispose(false);
+    previewWrapperBlock = null;
+};
+
+/** 根据当前预览配置设置签名积木的连接形状。 */
+const configureSignatureConnections = () => {
+    if (!previewBlock) return;
+
+    if (previewBlock.previousConnection?.isConnected()) {
+        previewBlock.previousConnection.disconnect();
+    }
+    if (previewBlock.nextConnection?.isConnected()) {
+        previewBlock.nextConnection.disconnect();
+    }
+
+    if (previewMode === 'custom-block') {
+        if (previewReturnType === null) {
+            previewBlock.setOutput(false);
+            previewBlock.setPreviousStatement(true, 'Action');
+            previewBlock.setNextStatement(true, 'Action');
+        } else {
+            previewBlock.setPreviousStatement(false);
+            previewBlock.setNextStatement(false);
+            previewBlock.setOutput(true, checksForReturnType(previewReturnType));
+        }
+    } else {
+        previewBlock.setPreviousStatement(false);
+        previewBlock.setNextStatement(false);
+        previewBlock.setOutput(true, 'Function');
+    }
+
+    (previewBlock as unknown as Blockly.BlockSvg).render();
+};
+
+/** 按当前配置创建或移除外层调用积木。 */
+const configurePreviewWrapper = () => {
+    if (!previewWorkspace || !previewBlock) return;
+
+    disposePreviewWrapper();
+    if (previewMode === 'custom-block') {
+        previewRootBlock = previewBlock;
+        return;
+    }
+
+    const wrapperType =
+        previewReturnType === null ? OPCODES.FUNCTION_EXECUTE : OPCODES.FUNCTION_CALL;
+    const wrapper = Blockly.serialization.blocks.append(
+        {
+            id: previewWrapperId,
+            type: wrapperType,
+        },
+        previewWorkspace,
+    ) as Blockly.BlockSvg;
+    wrapper.setMovable(false);
+    wrapper.setDeletable(false);
+    // 预览里的签名不是 FUNCTION_INLINE；禁止调用积木的自动实参同步，
+    // 否则接入签名时会切换到手动模式并额外渲染「⊕」。
+    wrapper.setOnChange(() => undefined);
+    wrapper.contextMenu = false;
+
+    const functionConnection = wrapper.getInput('FUNCTION')?.connection;
+    if (!functionConnection || !previewBlock.outputConnection) {
+        wrapper.dispose(false);
+        previewRootBlock = previewBlock;
+        return;
+    }
+    functionConnection.connect(previewBlock.outputConnection);
+
+    if (previewReturnType !== null) {
+        wrapper.outputConnection?.setCheck(checksForReturnType(previewReturnType));
+    }
+
+    previewWrapperBlock = wrapper;
+    previewRootBlock = wrapper;
+};
+
+const applyPreviewConfig = () => {
+    if (!previewWorkspace || !previewBlock) return;
+
+    Blockly.WidgetDiv.hide();
+    previewBlock.deselectInput();
+    disposePreviewWrapper();
+    if (previewBlock.outputConnection?.isConnected()) {
+        previewBlock.outputConnection.disconnect();
+    }
+
+    configureSignatureConnections();
+    configurePreviewWrapper();
+    disablePreviewContextMenu();
+
+    Blockly.common.svgResize(previewWorkspace);
+    centerPreviewRoot(previewWorkspace);
+    schedulePreviewLayout(previewWorkspace, previewSession, previewBlock);
+};
 
 const setupWorkspace = (workspace: Blockly.WorkspaceSvg) => {
     const session = ++previewSession;
@@ -79,12 +225,13 @@ const setupWorkspace = (workspace: Blockly.WorkspaceSvg) => {
     previewBlock.editMode = true;
     previewBlock.setDeletable(false);
     previewBlock.updateShape();
+    applyPreviewConfig();
     disablePreviewContextMenu();
     const block = previewBlock;
     setupFrame = requestAnimationFrame(() => {
         setupFrame = null;
         if (!isCurrentPreview(session, workspace, block)) return;
-        workspace.centerOnBlock(previewBlockId);
+        centerPreviewRoot(workspace);
         addFieldForFunctionPreview({
             type: 'text',
             text: t('blocks:function.defaultTitle'),
@@ -104,16 +251,23 @@ const disposePreviewWorkspace = () => {
     previewSession++;
     if (setupFrame !== null) cancelAnimationFrame(setupFrame);
     if (focusFrame !== null) cancelAnimationFrame(focusFrame);
+    if (layoutFrame !== null) cancelAnimationFrame(layoutFrame);
     if (focusTimer !== null) clearTimeout(focusTimer);
     setupFrame = null;
     focusFrame = null;
+    layoutFrame = null;
     focusTimer = null;
 
     const workspace = previewWorkspace;
+    Blockly.WidgetDiv.hide();
+    disposePreviewWrapper();
     previewBlock?.controlBar?.remove();
     previewWorkspace = null;
     previewBlock = null;
+    previewRootBlock = null;
     previewFunctionData = [];
+    previewMode = 'function-value';
+    previewReturnType = null;
     workspace?.dispose();
 };
 
@@ -121,7 +275,7 @@ const resizePreviewWorkspace = () => {
     requestAnimationFrame(() => {
         if (!previewWorkspace) return;
         Blockly.common.svgResize(previewWorkspace);
-        previewWorkspace.centerOnBlock(previewBlockId);
+        centerPreviewRoot(previewWorkspace);
     });
 };
 
@@ -135,6 +289,7 @@ const addFieldForFunctionPreview = (data: TPreviewFunctionData) => {
     previewFunctionData.push(data);
     block.updateShape();
     disablePreviewContextMenu();
+    schedulePreviewLayout(workspace, session, block);
 
     if (focusTimer !== null) clearTimeout(focusTimer);
     if (focusFrame !== null) cancelAnimationFrame(focusFrame);
@@ -143,7 +298,7 @@ const addFieldForFunctionPreview = (data: TPreviewFunctionData) => {
         if (!isCurrentPreview(session, workspace, block)) return;
 
         Blockly.common.svgResize(workspace);
-        workspace.centerOnBlock(previewBlockId);
+        centerPreviewRoot(workspace);
 
         focusFrame = requestAnimationFrame(() => {
             focusFrame = null;
@@ -165,10 +320,19 @@ const addFieldForFunctionPreview = (data: TPreviewFunctionData) => {
 };
 
 const setPreviewBlockColor = (color: IBlockColor) => {
-    if (!previewBlock) return;
     previewBlockColor = color;
+    if (!previewBlock) return;
     previewBlock.colors = previewBlockColor;
     previewBlock.updateShape();
+};
+
+const setPreviewConfig = (config: {
+    mode: TFunctionPreviewMode;
+    returnType: TFunctionReturnType;
+}) => {
+    previewMode = config.mode;
+    previewReturnType = config.returnType;
+    applyPreviewConfig();
 };
 
 const previewFunctionBlocksColorScheme = [
@@ -181,6 +345,7 @@ export {
     resizePreviewWorkspace,
     setupWorkspace,
     setPreviewBlockColor,
+    setPreviewConfig,
     previewWorkspace,
     previewFunctionData,
     previewFunctionBlocksColorScheme,
