@@ -7,69 +7,126 @@
 // 此文件由AI生成
 
 import i18next from 'i18next';
-import type { IAddon, IAddonContext, IAddonManifest } from './types';
+import type { IAddon, IAddonManifest } from './types';
+import { cacheGet, cacheSet } from './cache';
 
 /**
- * main.js 的默认导出：接收 (ctx)，可返回清理函数
+ * 插件仓库：AstratchAddons 的 GitHub 发布地址（raw 形式）。
+ * 插件在运行时从这里下载并缓存到 IndexedDB，离线也能用。
  */
-interface IAddonMainModule {
-    default?: (ctx: IAddonContext) => (() => void) | undefined;
-}
-
-// 构建时静态收集所有插件目录下的文件
-const mainModules = import.meta.glob<IAddonMainModule>('./addons/*/main.js', { eager: true });
-const manifestModules = import.meta.glob<IAddonManifest>('./addons/*/manifest.json', {
-    eager: true,
-    import: 'default',
-});
-const iconModules = import.meta.glob<string>('./addons/*/*.svg', {
-    eager: true,
-    import: 'default',
-});
-const i18nModules = import.meta.glob<Record<string, string>>('./addons/*/i18n/*.json', {
-    eager: true,
-    import: 'default',
-});
-
-/** 从 glob 路径中提取插件目录名，如 ./addons/example/manifest.json -> example */
-function getAddonName(path: string): string {
-    return path.split('/')[2] ?? '';
-}
+const ADDONS_REPO_URL =
+    'https://raw.githubusercontent.com/TheAstrasTeam/AstratchAddons/refs/heads/main';
 
 /**
- * 加载所有插件
+ * 插件文件的远程根目录：GitHub 仓库里的插件都放在 addons/<addon>/ 下
  */
-export function loadAddons(): IAddon[] {
+const ADDONS_FILES_URL = `${ADDONS_REPO_URL}/addons`;
+
+const fetchText = async (url: string): Promise<string> => {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP ${String(response.status)} for ${url}`);
+    return response.text();
+};
+
+/** 先从 IndexedDB 缓存读取，没有再从 GitHub 下载并写入缓存 */
+const getFile = async (cacheKey: string, url: string): Promise<string> => {
+    const cached = await cacheGet(cacheKey);
+    if (cached !== null) return cached;
+    const text = await fetchText(url);
+    await cacheSet(cacheKey, text);
+    return text;
+};
+
+/** 把 SVG 文本转成 data URL，供 <img> 使用 */
+const svgToDataUrl = (text: string): string =>
+    `data:image/svg+xml;charset=utf-8,${encodeURIComponent(text)}`;
+
+/** 编译 addon 的 main.js：通过 blob URL 动态 import，得到默认导出（run 函数） */
+const compileAddon = async (code: string): Promise<IAddon['run']> => {
+    const url = URL.createObjectURL(new Blob([code], { type: 'text/javascript' }));
+    try {
+        const module = (await import(/* @vite-ignore */ url)) as {
+            default?: IAddon['run'];
+        };
+        const run = module.default;
+        if (typeof run !== 'function') {
+            throw new Error('main.js must export a function as default export');
+        }
+        return run;
+    } finally {
+        URL.revokeObjectURL(url);
+    }
+};
+
+/**
+ * 从 GitHub 加载所有插件（按 addons.json 中的顺序）。
+ * 下载并缓存插件文件，编译 main.js，注册 i18n。
+ */
+export async function loadAddons(): Promise<IAddon[]> {
+    const listText = await getFile('addons.json', `${ADDONS_REPO_URL}/addons.json`);
+    const list = JSON.parse(listText) as unknown;
+    if (!Array.isArray(list)) return [];
+    const names = list.filter((name): name is string => typeof name === 'string');
+
     const addons: IAddon[] = [];
-    for (const [path, manifest] of Object.entries(manifestModules)) {
-        const id = getAddonName(path);
-        if (!id) continue;
-        const run = mainModules[`./addons/${id}/main.js`].default;
-        if (!run) continue;
-        const iconPath = manifest.icon ? `./addons/${id}/${manifest.icon}` : '';
-        addons.push({
-            id,
-            name: manifest.name,
-            description: manifest.description ?? '',
-            icon: iconModules[iconPath] ?? '',
-            author: manifest.author ?? '',
-            i18nNamespace: `addon_${id}`,
-            run,
-        });
+    for (const id of names) {
+        try {
+            const manifestText = await getFile(
+                `${id}/manifest.json`,
+                `${ADDONS_FILES_URL}/${id}/manifest.json`,
+            );
+            const manifest = JSON.parse(manifestText) as IAddonManifest;
+            const mainPath = manifest.main ?? 'main.js';
+            const mainCode = await getFile(
+                `${id}/${mainPath}`,
+                `${ADDONS_FILES_URL}/${id}/${mainPath}`,
+            );
+            const run = await compileAddon(mainCode);
+
+            let icon = '';
+            if (manifest.icon) {
+                try {
+                    const iconText = await getFile(
+                        `${id}/${manifest.icon}`,
+                        `${ADDONS_FILES_URL}/${id}/${manifest.icon}`,
+                    );
+                    icon = svgToDataUrl(iconText);
+                } catch {
+                    // 没有图标也可以
+                }
+            }
+
+            for (const language of ['zh-CN', 'en']) {
+                try {
+                    const resourcesText = await getFile(
+                        `${id}/i18n/${language}.json`,
+                        `${ADDONS_FILES_URL}/${id}/i18n/${language}.json`,
+                    );
+                    i18next.addResourceBundle(
+                        language,
+                        `addon_${id}`,
+                        JSON.parse(resourcesText) as Record<string, string>,
+                        true,
+                        true,
+                    );
+                } catch {
+                    // 该语言没有翻译
+                }
+            }
+
+            addons.push({
+                id,
+                name: manifest.name,
+                description: manifest.description ?? '',
+                icon,
+                author: manifest.author ?? '',
+                i18nNamespace: `addon_${id}`,
+                defaultEnabled: manifest.defaultEnabled ?? false,
+                run,
+            });
+        } catch (error) {
+            console.error(`Failed to load addon "${id}":`, error);
+        }
     }
     return addons;
-}
-
-/**
- * 将各插件的 i18n/*.json 注册到 i18next
- * 需要在 i18next 初始化完成后调用
- */
-export function registerAddonI18n() {
-    for (const [path, resources] of Object.entries(i18nModules)) {
-        const id = getAddonName(path);
-        if (!id) continue;
-        const language = path.split('/')[4]?.replace(/\.json$/, '') ?? '';
-        if (!language) continue;
-        i18next.addResourceBundle(language, `addon_${id}`, resources, true, true);
-    }
 }

@@ -1,6 +1,0 @@
-{
-    "name": "Example Addon",
-    "description": "A sample addon that greets you when enabled.",
-    "icon": "icon.svg",
-    "author": "AstrasTeam"
-}

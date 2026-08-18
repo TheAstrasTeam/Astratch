@@ -49,6 +49,9 @@ const AddonCard = ({
 const AddonsPanel = () => {
     const addons = useAddonStore(state => state.addons);
     const enabled = useAddonStore(state => state.enabled);
+    const status = useAddonStore(state => state.status);
+
+    if (status !== 'ready') return <div className={styles.empty}>{t('gui:addon.loading')}</div>;
 
     if (addons.length === 0) return <div className={styles.empty}>{t('gui:addon.noAddons')}</div>;
 

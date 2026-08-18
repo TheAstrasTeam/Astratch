@@ -38,13 +38,21 @@ export interface IAddonContext {
 }
 
 /**
- * 插件的 manifest.json
+ * 插件的 manifest.json（遵循 AstratchAddons 的包格式）
  */
 export interface IAddonManifest {
     name: string;
+    version?: string;
     description?: string;
-    icon?: string;
     author?: string;
+    license?: string;
+    icon?: string;
+    files?: string[];
+    main?: string;
+    /**
+     * 默认是否启用（用户手动开关后以用户选择为准）
+     */
+    defaultEnabled?: boolean;
 }
 
 /**
@@ -61,6 +69,8 @@ export interface IAddon {
     author: string;
     /** i18n 命名空间 addon_<id> */
     i18nNamespace: string;
+    /** 默认是否启用 */
+    defaultEnabled: boolean;
     /**
      * 启用时运行；若返回一个函数，则将其作为禁用时的清理函数
      */

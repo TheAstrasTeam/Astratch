@@ -49,6 +49,7 @@
     "addon.title": "插件",
     "addon.enable": "启用",
     "addon.disable": "禁用",
+    "addon.loading": "正在加载插件...",
     "addon.noAddons": "还没有安装插件。",
     "target.folderNameAsk": "输入文件夹的名称：",
     "target.attr.x": "X 坐标",

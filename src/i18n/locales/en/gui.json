@@ -49,6 +49,7 @@
     "addon.title": "Addons",
     "addon.enable": "Enable",
     "addon.disable": "Disable",
+    "addon.loading": "Loading addons...",
     "addon.noAddons": "No addons installed yet.",
     "target.folderNameAsk": "Enter the folder name:",
     "target.attr.x": "X",

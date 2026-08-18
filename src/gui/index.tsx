@@ -47,7 +47,7 @@ const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
     }, []);
 
     useEffect(() => {
-        addonManager.init(buildAddonContext(vm));
+        void addonManager.init(buildAddonContext(vm));
     }, [vm]);
 
     useEffect(() => {
