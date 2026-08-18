@@ -133,3 +133,51 @@
         width: 100%;
     }
 }
+
+.set-block-color {
+    display: flex;
+    flex: 1;
+    padding: 10px;
+    justify-content: center;
+    gap: 5px;
+    & .set-block-color-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        border-width: 2px;
+        border-style: solid;
+        &:hover {
+            outline: $text-primary 1px solid;
+        }
+        svg {
+            width: 15px;
+            height: 15px;
+        }
+    }
+    & .set-block-color-button-picker {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        border: 2px solid $text-primary;
+        padding: 0;
+        cursor: pointer;
+        &:hover {
+            outline: $text-primary 1px solid;
+        }
+        &::after {
+            content: '';
+            background: url('../../assets/colorPicker.svg');
+            background-repeat: round;
+            width: 15px;
+            height: 15px;
+            filter: $svg-filter;
+        }
+    }
+}

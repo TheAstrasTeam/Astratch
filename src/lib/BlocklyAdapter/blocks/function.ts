@@ -9,7 +9,8 @@
 
 import * as Blockly from 'blockly/core';
 import { t } from 'i18next';
-import { BlocksColor, OPCODES, type IFunctionValueBlock } from '../../../types/blocks';
+import { BlocksColor, OPCODES } from '../../../types/blocks';
+import type { IFunctionValueBlock } from '../../../components/modal_createFunction/functionPreview';
 import { connections, endConnections, returnConnections } from './helpers';
 import { modal } from '../../../components/Modal/modal';
 import { PromptModal } from '../../../components/modal_prompt';
@@ -192,7 +193,21 @@ export function initFunctionBlocks(blockly: typeof Blockly) {
         protected override initView() {
             super.initView();
             const root = this.getSvgRoot();
-            if (root) Blockly.utils.dom.addClass(root, 'ashFunctionValueText');
+            if (root) {
+                Blockly.utils.dom.addClass(root, 'ashFunctionValueText');
+                this.applyFill_();
+            }
+        }
+        override applyColour() {
+            super.applyColour();
+            this.applyFill_();
+        }
+
+        private applyFill_() {
+            const block = this.getSourceBlock() as Blockly.BlockSvg | null;
+            if (!block) return;
+            const rect = this.getSvgRoot()?.querySelector('rect');
+            if (rect) rect.style.fill = block.getColourTertiary();
         }
     }
 
@@ -242,7 +257,6 @@ export function initFunctionBlocks(blockly: typeof Blockly) {
             const target = index + delta;
             if (target < 0 || target >= this.previewData.length) return;
 
-            // 原地交换：外部（创建弹窗）可能持有同一数组引用，换新数组会断开同步。
             const next = [...this.previewData];
             [next[index], next[target]] = [next[target], next[index]];
             this.previewData.splice(0, this.previewData.length, ...next);
@@ -252,6 +266,9 @@ export function initFunctionBlocks(blockly: typeof Blockly) {
             for (const input of [...this.inputList]) {
                 this.removeInput(input.name, true);
             }
+
+            this.setColour(this.colors.primary ?? BlocksColor.function.primary);
+            this.setStyle(this.getStyleName());
 
             this.previewData.forEach((fieldData, index) => {
                 if (this.editMode) {

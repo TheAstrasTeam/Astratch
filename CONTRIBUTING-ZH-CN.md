@@ -47,5 +47,6 @@ pnpm dev # 可运行`pnpm run`查看更多指令
 ## 提交
 
 对于提交，需要您：
+
 - 使用 Conventional Commits：`feat:` / `fix:` / `chore:` / `docs:` / `refactor:` / `test:` / `ci:` 等。
 - 最好使用**英文**而不是其它语言提交commit。

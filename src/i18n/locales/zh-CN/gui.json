@@ -149,6 +149,7 @@
     "createFunction.string": "字符串",
     "createFunction.number": "数字",
     "createFunction.function": "函数",
+    "createFunction.pickColor": "自定义积木颜色",
     "error.title": "抱歉，您的浏览器无法使用 Astratch。",
     "error.description": "您正在使用 {{browser}}，它不支持 Astratch 所需的文件系统访问 API。我们强烈建议使用基于 Chromium 的浏览器。"
 }

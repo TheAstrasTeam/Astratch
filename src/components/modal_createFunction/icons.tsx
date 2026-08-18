@@ -4,19 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { BlocksColor } from '../../types/blocks';
+import { BlocksColor, type IBlockColor } from '../../types/blocks';
 
 import EnableIcon from '../../assets/blocks/enable.svg?react';
 import UnableIcon from '../../assets/blocks/unable.svg?react';
 
-interface color {
-    primary?: string;
-    secondary?: string;
-    tertiary?: string;
-    quaternary?: string;
-}
-
-const DropDownIcon = ({ color = BlocksColor.function }: { color?: color }) => {
+const DropDownIcon = ({ color = BlocksColor.function }: { color?: IBlockColor }) => {
     return (
         <svg
             xmlns='http://www.w3.org/2000/svg'
@@ -57,7 +50,7 @@ const DropDownIcon = ({ color = BlocksColor.function }: { color?: color }) => {
     );
 };
 
-const BooleanIcon = ({ color = BlocksColor.function }: { color?: color }) => {
+const BooleanIcon = ({ color = BlocksColor.function }: { color?: IBlockColor }) => {
     return (
         <svg
             xmlns='http://www.w3.org/2000/svg'
@@ -95,7 +88,7 @@ const BooleanIcon = ({ color = BlocksColor.function }: { color?: color }) => {
     );
 };
 
-const ArrayIcon = ({ color = BlocksColor.function }: { color?: color }) => {
+const ArrayIcon = ({ color = BlocksColor.function }: { color?: IBlockColor }) => {
     return (
         <svg
             xmlns='http://www.w3.org/2000/svg'
@@ -115,7 +108,7 @@ const ArrayIcon = ({ color = BlocksColor.function }: { color?: color }) => {
     );
 };
 
-const ObjectIcon = ({ color = BlocksColor.function }: { color?: color }) => {
+const ObjectIcon = ({ color = BlocksColor.function }: { color?: IBlockColor }) => {
     return (
         <svg
             xmlns='http://www.w3.org/2000/svg'
@@ -135,7 +128,7 @@ const ObjectIcon = ({ color = BlocksColor.function }: { color?: color }) => {
     );
 };
 
-const StringIcon = ({ color = BlocksColor.function }: { color?: color }) => {
+const StringIcon = ({ color = BlocksColor.function }: { color?: IBlockColor }) => {
     return (
         <svg
             xmlns='http://www.w3.org/2000/svg'
@@ -181,7 +174,7 @@ const StringIcon = ({ color = BlocksColor.function }: { color?: color }) => {
     );
 };
 
-const NumberIcon = ({ color = BlocksColor.function }: { color?: color }) => {
+const NumberIcon = ({ color = BlocksColor.function }: { color?: IBlockColor }) => {
     return (
         <svg
             xmlns='http://www.w3.org/2000/svg'
@@ -225,7 +218,7 @@ const NumberIcon = ({ color = BlocksColor.function }: { color?: color }) => {
     );
 };
 
-const FunctionIcon = ({ color = BlocksColor.function }: { color?: color }) => {
+const FunctionIcon = ({ color = BlocksColor.function }: { color?: IBlockColor }) => {
     return (
         <svg
             xmlns='http://www.w3.org/2000/svg'
@@ -248,7 +241,7 @@ const FunctionIcon = ({ color = BlocksColor.function }: { color?: color }) => {
     );
 };
 
-const TextIcon = ({ color = BlocksColor.function }: { color?: color }) => {
+const TextIcon = ({ color = BlocksColor.function }: { color?: IBlockColor }) => {
     return (
         <svg
             xmlns='http://www.w3.org/2000/svg'
@@ -264,19 +257,19 @@ const TextIcon = ({ color = BlocksColor.function }: { color?: color }) => {
                 <path stroke={color.secondary} stroke-width='1' d='M0 48L80 48'></path>
                 <path
                     fill='#fff'
-                    d='M11.83 29.822L10.234 29.822L10.234 20.498L7 20.498L7 19L15.05 19L15.05 20.498L11.83 20.498L11.83 29.822Z'
+                    d='M29.83 29.822L28.234 29.822L28.234 20.498L25 20.498L25 19L33.05 19L33.05 20.498L29.83 20.498L29.83 29.822Z'
                 ></path>
                 <path
                     fill='#fff'
-                    d='M22.918 25.356C22.918 26.014 22.806 26.476 22.806 26.476L17.556 26.476C17.668 27.512 18.221 28.1 18.221 28.1C18.774 28.688 19.712 28.688 19.712 28.688C20.258 28.688 20.734 28.401 20.734 28.401C21.21 28.114 21.532 27.582 21.532 27.582L22.764 28.268C22.302 29.108 21.532 29.563 21.532 29.563C20.762 30.018 19.712 30.018 19.712 30.018C18.564 30.018 17.724 29.528 17.724 29.528C16.884 29.038 16.429 28.135 16.429 28.135C15.974 27.232 15.974 26.014 15.974 26.014C15.974 24.768 16.408 23.844 16.408 23.844C16.842 22.92 17.654 22.423 17.654 22.423C18.466 21.926 19.558 21.926 19.558 21.926C21.112 21.926 22.015 22.85 22.015 22.85C22.918 23.774 22.918 25.356 22.918 25.356ZM21.364 25.16C21.364 24.292 20.874 23.774 20.874 23.774C20.384 23.256 19.558 23.256 19.558 23.256C18.788 23.256 18.284 23.753 18.284 23.753C17.78 24.25 17.612 25.16 17.612 25.16L21.364 25.16Z'
+                    d='M40.918 25.356C40.918 26.014 40.806 26.476 40.806 26.476L35.556 26.476C35.668 27.512 36.221 28.1 36.221 28.1C36.774 28.688 37.712 28.688 37.712 28.688C38.258 28.688 38.734 28.401 38.734 28.401C39.21 28.114 39.532 27.582 39.532 27.582L40.764 28.268C40.302 29.108 39.532 29.563 39.532 29.563C38.762 30.018 37.712 30.018 37.712 30.018C36.564 30.018 35.724 29.528 35.724 29.528C34.884 29.038 34.429 28.135 34.429 28.135C33.974 27.232 33.974 26.014 33.974 26.014C33.974 24.768 34.408 23.844 34.408 23.844C34.842 22.92 35.654 22.423 35.654 22.423C36.466 21.926 37.558 21.926 37.558 21.926C39.112 21.926 40.015 22.85 40.015 22.85C40.918 23.774 40.918 25.356 40.918 25.356ZM39.364 25.16C39.364 24.292 38.874 23.774 38.874 23.774C38.384 23.256 37.558 23.256 37.558 23.256C36.788 23.256 36.284 23.753 36.284 23.753C35.78 24.25 35.612 25.16 35.612 25.16L39.364 25.16Z'
                 ></path>
                 <path
                     fill='#fff'
-                    d='M28.196 25.916L30.954 29.822L29.106 29.822L27.3 27.064L25.48 29.822L23.646 29.822L26.46 25.832L23.842 22.122L25.662 22.122L27.398 24.74L29.036 22.122L30.828 22.122L28.196 25.916Z'
+                    d='M46.196 25.916L48.954 29.822L47.106 29.822L45.3 27.064L43.48 29.822L41.646 29.822L44.46 25.832L41.842 22.122L43.662 22.122L45.398 24.74L47.036 22.122L48.828 22.122L46.196 25.916Z'
                 ></path>
                 <path
                     fill='#fff'
-                    d='M36.204 23.564L34.062 23.564L34.062 27.47C34.062 28.03 34.363 28.338 34.363 28.338C34.664 28.646 35.21 28.646 35.21 28.646C35.602 28.646 36.036 28.492 36.036 28.492L36.036 29.92C35.504 30.102 34.874 30.102 34.874 30.102C33.74 30.102 33.138 29.465 33.138 29.465C32.536 28.828 32.536 27.638 32.536 27.638L32.536 23.564L31.332 23.564L31.332 22.122L32.536 22.122L32.536 19.77L34.062 19.77L34.062 22.122L36.204 22.122L36.204 23.564Z'
+                    d='M54.204 23.564L52.062 23.564L52.062 27.47C52.062 28.03 52.363 28.338 52.363 28.338C52.664 28.646 53.21 28.646 53.21 28.646C53.602 28.646 54.036 28.492 54.036 28.492L54.036 29.92C53.504 30.102 52.874 30.102 52.874 30.102C51.74 30.102 51.138 29.465 51.138 29.465C50.536 28.828 50.536 27.638 50.536 27.638L50.536 23.564L49.332 23.564L49.332 22.122L50.536 22.122L50.536 19.77L52.062 19.77L52.062 22.122L54.204 22.122L54.204 23.564Z'
                 ></path>
             </g>
             <defs>

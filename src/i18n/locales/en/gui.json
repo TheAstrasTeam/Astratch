@@ -167,5 +167,6 @@
     "createFunction.object": "Object",
     "createFunction.string": "String",
     "createFunction.number": "Number",
-    "createFunction.function": "Function"
+    "createFunction.function": "Function",
+    "createFunction.pickColor": "Custom block color"
 }

@@ -7,7 +7,13 @@
 import * as Blockly from 'blockly/core';
 import { t } from 'i18next';
 import { BlocksColor, OPCODES } from '../../../types/blocks';
-import { connections, createDataMenu, isInFlyoutInsteadOfTrashCan, refreshDataMenu, returnConnections } from './helpers';
+import {
+    connections,
+    createDataMenu,
+    isInFlyoutInsteadOfTrashCan,
+    refreshDataMenu,
+    returnConnections,
+} from './helpers';
 import { events, type IDataCreatedEvent, type IVM } from '../../../types/vm';
 import {
     createMinusField,

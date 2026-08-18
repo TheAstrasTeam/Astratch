@@ -291,6 +291,13 @@ const OPCODES = {
 
 type TOpcodeValue = (typeof OPCODES)[keyof typeof OPCODES];
 
+export interface IBlockColor {
+    primary?: string;
+    secondary?: string;
+    tertiary?: string;
+    quaternary?: string;
+}
+
 const BlocksColor = {
     position: {
         primary: '#4C97FF',
@@ -453,28 +460,6 @@ export interface IBlocksConfig {
 }
 
 export { OPCODES, BlocksColor };
-
-export type TFunctionReturnField =
-    'text' | 'dropdown' | 'boolean' | 'array' | 'object' | 'string' | 'number' | 'function' | null;
-
-export type TFunctionInputField = 'boolean' | 'array' | 'object' | 'string' | 'number' | 'function';
-
-export type TFunctionFieldType = TFunctionReturnField | TFunctionInputField[];
-
-export interface TPreviewFunctionData {
-    type: TFunctionFieldType;
-    text?: string;
-}
-export interface IFunctionValueBlock extends Blockly.Block {
-    /** 要渲染的字段数据（文本段 + 返回字段占位）。 */
-    previewData: TPreviewFunctionData[];
-    /** 是否处于创建编辑模式：为 true 时渲染左右移动按钮。 */
-    editMode: boolean;
-    /** 按 previewData 重建积木形状。 */
-    updateShape(): void;
-    /** 把第 index 项与相邻项交换（delta 为 -1 或 1），用于左右移动按钮。 */
-    moveField(index: number, delta: number): void;
-}
 
 export type Language = Record<string, string>;
 
