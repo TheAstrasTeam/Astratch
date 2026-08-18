@@ -11,6 +11,8 @@
 .footer {
     display: flex;
     flex: 0 0 auto;
+    flex-direction: column;
+    gap: 8px;
     padding: 0 10px 10px;
 }
 

@@ -79,6 +79,25 @@ export async function cacheSet(key: string, value: string): Promise<void> {
 }
 
 /**
+ * 清空远端插件文件缓存（files store），下次加载会重新从 GitHub 下载。
+ * 不会影响自定义插件的目录句柄（handles store）。
+ * 清空失败时抛出错误，由调用方决定如何处理。
+ */
+export async function clearFileCache(): Promise<void> {
+    const db = await openDB();
+    await new Promise<void>((resolve, reject) => {
+        const transaction = db.transaction(FILES_STORE, 'readwrite');
+        transaction.objectStore(FILES_STORE).clear();
+        transaction.oncomplete = () => {
+            resolve();
+        };
+        transaction.onerror = () => {
+            reject(new Error('Failed to clear addon cache'));
+        };
+    });
+}
+
+/**
  * 读取自定义插件的目录句柄，不存在或读取失败时返回 null
  */
 export async function handleGet(id: string): Promise<FileSystemDirectoryHandle | null> {

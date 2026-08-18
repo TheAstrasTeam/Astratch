@@ -14,6 +14,7 @@ import { Toast } from '../lib/ToastManager';
 import { spawnRandomString } from '../utils/ash-data';
 import { loadAddons } from './loader';
 import { importCustomAddon, loadCustomAddons, removeCustomAddonHandle } from './custom';
+import { clearFileCache } from './cache';
 import type { IAddon, IAddonContext, IAddonStorage } from './types';
 
 export type TAddonLoadStatus = 'idle' | 'loading' | 'ready';
@@ -127,6 +128,34 @@ class AddonManager {
                 name: t(`${addon.i18nNamespace}:@name`, { defaultValue: addon.name }),
             }),
         });
+    }
+
+    /**
+     * 刷新官方插件列表：清空远端插件缓存，重新从 GitHub 下载。
+     * 已挂载的自定义插件保持不变。
+     * 注意：仅在没有任何插件启用时调用（UI 已限制按钮可用性）。
+     */
+    async refreshRemoteAddons() {
+        const custom = useAddonStore.getState().addons.filter(addon => addon.isCustom);
+        try {
+            await clearFileCache();
+            const remote = await loadAddons();
+            useAddonStore.setState({ addons: [...remote, ...custom] });
+            Toast.create({
+                type: 'info',
+                id: 'addon_list_refreshed',
+                text: t('gui:addon.remoteRefreshed'),
+            });
+        } catch (error) {
+            console.error('Failed to refresh addons:', error);
+            Toast.create({
+                type: 'error',
+                id: `addon_refresh_err_${spawnRandomString()}`,
+                text: t('gui:addon.err.refreshFailed', {
+                    err: error instanceof Error ? error.message : String(error),
+                }),
+            });
+        }
     }
 
     /**

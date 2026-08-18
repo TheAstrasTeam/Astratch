@@ -64,6 +64,9 @@ const AddonsPanel = () => {
     const enabled = useAddonStore(state => state.enabled);
     const status = useAddonStore(state => state.status);
     const [importing, setImporting] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
+
+    const canRefresh = status === 'ready' && enabled.size === 0 && !refreshing;
 
     const handleImport = async () => {
         setImporting(true);
@@ -71,6 +74,15 @@ const AddonsPanel = () => {
             await addonManager.installCustomAddon();
         } finally {
             setImporting(false);
+        }
+    };
+
+    const handleRefresh = async () => {
+        setRefreshing(true);
+        try {
+            await addonManager.refreshRemoteAddons();
+        } finally {
+            setRefreshing(false);
         }
     };
 
@@ -110,6 +122,20 @@ const AddonsPanel = () => {
                 </div>
             )}
             <div className={styles.footer}>
+                <button
+                    className={styles.importButton}
+                    disabled={!canRefresh}
+                    title={
+                        !canRefresh && enabled.size > 0
+                            ? t('gui:addon.refreshDisabledHint')
+                            : undefined
+                    }
+                    onClick={() => {
+                        void handleRefresh();
+                    }}
+                >
+                    {refreshing ? t('gui:addon.refreshing') : t('gui:addon.refresh')}
+                </button>
                 <button
                     className={styles.importButton}
                     disabled={importing}
