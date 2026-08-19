@@ -1,6 +1,0 @@
-{
-    "@name": "Test Plugin (Custom)",
-    "@description": "A test plugin for verifying the custom addon feature (English).",
-    "greet": "Hello from Test Plugin!",
-    "bye": "Test Plugin disabled."
-}

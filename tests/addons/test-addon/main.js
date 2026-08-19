@@ -5,13 +5,13 @@ export default ctx => {
     ctx.toast.create({
         type: 'info',
         id: 'test_plugin_greet',
-        text: ctx.t('addon_custom-test-plugin:greet'),
+        text: ctx.t('addon_custom-test-addon:greet'),
     });
     return () => {
         ctx.toast.create({
             type: 'info',
             id: 'test_plugin_bye',
-            text: ctx.t('addon_custom-test-plugin:bye'),
+            text: ctx.t('addon_custom-test-addon:bye'),
         });
     };
 };

@@ -1,7 +1,7 @@
 {
-    "name": "Test Plugin",
+    "name": "Test Addon",
     "version": "0.0.1",
-    "description": "A test plugin for verifying the custom addon feature.",
+    "description": "A test addon for verifying the custom addon feature.",
     "author": "AstrasTeam",
     "license": "MIT",
     "icon": "icon.svg",
