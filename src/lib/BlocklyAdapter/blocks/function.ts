@@ -561,7 +561,10 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                         );
                     }
                 } else {
-                    const input = this.appendValueInput(inputID);
+                    let input: Blockly.Input;
+                    if (this.previewMode === 'custom-block' || this.editMode) input = this.appendValueInput(inputID);
+                    else input = this.appendDummyInput(inputID);
+
                     const checks = (
                         Array.isArray(fieldData.type) ? fieldData.type : [fieldData.type]
                     ).map(type => {
@@ -573,7 +576,8 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                         return 'String';
                     });
 
-                    if (checks.length > 0) input.setCheck(checks);
+                    if (checks.length > 0 && this.editMode && this.previewMode === 'custom-block')
+                        input.setCheck(checks);
                     if (this.editMode) {
                         input.connection?.setShadowState({
                             type: OPCODES.FUNCTION_VALUE_ID,
@@ -588,12 +592,13 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                         });
                         if (shadowText) bindShadowSelection.call(this, shadowText, index);
                     } else {
-                        // 工作区里的签名只展示参数名，沿用执行积木的半透明提示 shadow；
-                        // 它不是可编辑的 FUNCTION_VALUE_ID 输入框。
-                        input.connection?.setShadowState({
-                            type: OPCODES.FUNCTION_ARG_HINT,
-                            fields: { HINT: fieldData.text ?? '' },
-                        });
+                        if (this.previewMode === 'function-value')
+                            input.appendField(fieldData.text ?? '');
+                        else
+                            input.connection?.setShadowState({
+                                type: OPCODES.FUNCTION_ARG_HINT,
+                                fields: { HINT: fieldData.text ?? '' },
+                            });
                     }
                 }
             });
