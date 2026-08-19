@@ -18,7 +18,10 @@ const AddonCard = ({
     icon,
     author,
     isCustom,
+    downloaded,
+    downloading,
     enabled,
+    onDownload,
     onToggle,
     onRemove,
 }: {
@@ -27,10 +30,21 @@ const AddonCard = ({
     icon: string;
     author: string;
     isCustom: boolean;
+    downloaded: boolean;
+    downloading: boolean;
     enabled: boolean;
+    onDownload: () => void;
     onToggle: () => void;
     onRemove?: () => void;
 }) => {
+    const actionText = downloading
+        ? t('gui:addon.downloading')
+        : !downloaded
+          ? t('gui:addon.download')
+          : enabled
+            ? t('gui:addon.disable')
+            : t('gui:addon.enable');
+    const handleAction = downloading ? undefined : !downloaded ? onDownload : onToggle;
     return (
         <div className={styles.card}>
             {icon && <img className={styles.cardIcon} src={icon} alt='' />}
@@ -51,9 +65,10 @@ const AddonCard = ({
                 className={classNames(styles.toggle, {
                     [styles.enabled]: enabled,
                 })}
-                onClick={onToggle}
+                disabled={downloading}
+                onClick={handleAction}
             >
-                {enabled ? t('gui:addon.disable') : t('gui:addon.enable')}
+                {actionText}
             </button>
         </div>
     );
@@ -62,6 +77,7 @@ const AddonCard = ({
 const AddonsPanel = () => {
     const addons = useAddonStore(state => state.addons);
     const enabled = useAddonStore(state => state.enabled);
+    const downloading = useAddonStore(state => state.downloading);
     const status = useAddonStore(state => state.status);
     const [importing, setImporting] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
@@ -106,7 +122,12 @@ const AddonsPanel = () => {
                             icon={addon.icon}
                             author={addon.author}
                             isCustom={addon.isCustom}
+                            downloaded={addon.downloaded}
+                            downloading={downloading.has(addon.id)}
                             enabled={enabled.has(addon.id)}
+                            onDownload={() => {
+                                void addonManager.download(addon.id);
+                            }}
                             onToggle={() => {
                                 addonManager.toggle(addon.id);
                             }}

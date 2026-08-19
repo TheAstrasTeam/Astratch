@@ -97,6 +97,7 @@ export async function buildAddonFromHandle(
         i18nNamespace: `addon_${id}`,
         defaultEnabled: manifest.defaultEnabled ?? false,
         isCustom: true,
+        downloaded: true,
         run,
     };
 }

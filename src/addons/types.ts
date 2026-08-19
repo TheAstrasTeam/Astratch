@@ -77,7 +77,14 @@ export interface IAddon {
      */
     isCustom: boolean;
     /**
-     * 启用时运行；若返回一个函数，则将其作为禁用时的清理函数
+     * 插件内容（main.js）是否已下载。
+     * 远端插件按需下载：刷新/初始化时只拉取列表，启用时才下载内容；
+     * 自定义插件在导入时即加载，恒为 true。
      */
-    run: (ctx: IAddonContext) => (() => void) | undefined;
+    downloaded: boolean;
+    /**
+     * 编译后的插件入口。启用时运行；若返回一个函数，则将其作为禁用时的清理函数。
+     * 尚未下载内容的远端插件为 undefined。
+     */
+    run?: (ctx: IAddonContext) => (() => void) | undefined;
 }

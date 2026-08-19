@@ -59,10 +59,10 @@ export const compileAddon = async (code: string): Promise<IAddon['run']> => {
 };
 
 /**
- * 从 GitHub 加载所有插件（按 addons.json 中的顺序）。
- * 下载并缓存插件文件，编译 main.js，注册 i18n。
+ * 从 GitHub 加载所有远端插件的“列表”信息（manifest / 图标 / i18n），
+ * 不下载插件的 main.js 内容。内容在启用插件时才按需下载（见 downloadAddonContent）。
  */
-export async function loadAddons(): Promise<IAddon[]> {
+export async function listRemoteAddons(): Promise<IAddon[]> {
     const listText = await getFile('addons.json', `${ADDONS_REPO_URL}/addons.json`);
     const list = JSON.parse(listText) as unknown;
     if (!Array.isArray(list)) return [];
@@ -76,12 +76,6 @@ export async function loadAddons(): Promise<IAddon[]> {
                 `${ADDONS_FILES_URL}/${id}/manifest.json`,
             );
             const manifest = JSON.parse(manifestText) as IAddonManifest;
-            const mainPath = manifest.main ?? 'main.js';
-            const mainCode = await getFile(
-                `${id}/${mainPath}`,
-                `${ADDONS_FILES_URL}/${id}/${mainPath}`,
-            );
-            const run = await compileAddon(mainCode);
 
             let icon = '';
             if (manifest.icon) {
@@ -119,11 +113,26 @@ export async function loadAddons(): Promise<IAddon[]> {
                 i18nNamespace: `addon_${id}`,
                 defaultEnabled: manifest.defaultEnabled ?? false,
                 isCustom: false,
-                run,
+                downloaded: false,
             });
         } catch (error) {
             console.error(`Failed to load addon "${id}":`, error);
         }
     }
     return addons;
+}
+
+/**
+ * 下载并编译单个远端插件的 main.js，返回编译后的 run 函数。
+ * 在启用插件（或初始化时恢复已启用插件）时调用。
+ */
+export async function downloadAddonContent(id: string): Promise<IAddon['run']> {
+    const manifestText = await getFile(
+        `${id}/manifest.json`,
+        `${ADDONS_FILES_URL}/${id}/manifest.json`,
+    );
+    const manifest = JSON.parse(manifestText) as IAddonManifest;
+    const mainPath = manifest.main ?? 'main.js';
+    const mainCode = await getFile(`${id}/${mainPath}`, `${ADDONS_FILES_URL}/${id}/${mainPath}`);
+    return compileAddon(mainCode);
 }

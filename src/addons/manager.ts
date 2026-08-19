@@ -12,7 +12,7 @@ import { localStorageIDs } from '../types/storage';
 import { readLocalStorage, setItemToLocalStorage } from '../utils/localstorage';
 import { Toast } from '../lib/ToastManager';
 import { spawnRandomString } from '../utils/ash-data';
-import { loadAddons } from './loader';
+import { listRemoteAddons, downloadAddonContent } from './loader';
 import { importCustomAddon, loadCustomAddons, removeCustomAddonHandle } from './custom';
 import { clearFileCache } from './cache';
 import type { IAddon, IAddonContext, IAddonStorage } from './types';
@@ -23,6 +23,8 @@ export interface IAddonStoreState {
     addons: IAddon[];
     enabled: ReadonlySet<string>;
     status: TAddonLoadStatus;
+    /** 正在下载内容（main.js）的插件 id */
+    downloading: ReadonlySet<string>;
 }
 
 /**
@@ -32,6 +34,7 @@ export const useAddonStore = create<IAddonStoreState>(() => ({
     addons: [],
     enabled: new Set<string>(),
     status: 'idle',
+    downloading: new Set<string>(),
 }));
 
 interface IAddonPersist {
@@ -70,14 +73,16 @@ class AddonManager {
     }
 
     /**
-     * 初始化：加载官方 + 自定义插件，注入上下文，并运行所有已启用的插件（只执行一次）
+     * 初始化：加载官方插件列表 + 自定义插件，注入上下文，
+     * 然后下载并运行所有已启用的插件（只执行一次）。
+     * 远端插件只拉取列表，内容在启用时才按需下载。
      */
     async init(ctx: IAddonContext) {
         if (this.ctx) return;
         this.ctx = ctx;
         useAddonStore.setState({ status: 'loading' });
         try {
-            const [remote, custom] = await Promise.all([loadAddons(), loadCustomAddons()]);
+            const [remote, custom] = await Promise.all([listRemoteAddons(), loadCustomAddons()]);
             const addons = [...remote, ...custom];
             const enabled = new Set<string>();
             for (const addon of addons) {
@@ -87,8 +92,12 @@ class AddonManager {
                     enabled.add(addon.id);
             }
             useAddonStore.setState({ addons, enabled, status: 'ready' });
+            const pending = addons.filter(addon => enabled.has(addon.id) && !addon.downloaded);
+            await Promise.all(pending.map(addon => this.downloadAddon(addon.id)));
             for (const addon of addons) {
-                if (enabled.has(addon.id)) this.runAddon(addon);
+                if (!enabled.has(addon.id)) continue;
+                const current = useAddonStore.getState().addons.find(item => item.id === addon.id);
+                if (current) this.runAddon(current);
             }
         } catch (error) {
             console.error('Failed to load addons:', error);
@@ -131,7 +140,8 @@ class AddonManager {
     }
 
     /**
-     * 刷新官方插件列表：清空远端插件缓存，重新从 GitHub 下载。
+     * 刷新官方插件列表：先清空远端插件缓存，再只下载插件列表（manifest / 图标 / i18n），
+     * 不下载插件内容。内容在用户点击“下载/启用”时按需拉取。
      * 已挂载的自定义插件保持不变。
      * 注意：仅在没有任何插件启用时调用（UI 已限制按钮可用性）。
      */
@@ -139,7 +149,7 @@ class AddonManager {
         const custom = useAddonStore.getState().addons.filter(addon => addon.isCustom);
         try {
             await clearFileCache();
-            const remote = await loadAddons();
+            const remote = await listRemoteAddons();
             useAddonStore.setState({ addons: [...remote, ...custom] });
             Toast.create({
                 type: 'info',
@@ -174,10 +184,33 @@ class AddonManager {
         else this.enable(id);
     }
 
+    /**
+     * 下载插件内容（main.js）。仅下载，不启用。
+     * 下载成功后按钮会变为“启用”，由用户再点击启用。
+     */
+    async download(id: string) {
+        if (useAddonStore.getState().downloading.has(id)) return;
+        const addon = useAddonStore.getState().addons.find(item => item.id === id);
+        if (!addon || addon.downloaded) return;
+        useAddonStore.setState({
+            downloading: new Set(useAddonStore.getState().downloading).add(id),
+        });
+        try {
+            await this.downloadAddon(id);
+        } finally {
+            const next = new Set(useAddonStore.getState().downloading);
+            next.delete(id);
+            useAddonStore.setState({ downloading: next });
+        }
+    }
+
+    /**
+     * 启用插件。要求内容已下载（未下载时按钮应显示“下载”，不调用本方法）。
+     */
     enable(id: string) {
         if (useAddonStore.getState().enabled.has(id)) return;
-        const addon = useAddonStore.getState().addons.find(addon => addon.id === id);
-        if (!addon) return;
+        const addon = useAddonStore.getState().addons.find(item => item.id === id);
+        if (!addon?.downloaded) return;
         useAddonStore.setState({
             enabled: new Set(useAddonStore.getState().enabled).add(id),
         });
@@ -200,11 +233,40 @@ class AddonManager {
 
     private runAddon(addon: IAddon) {
         if (!this.ctx) return;
+        if (!addon.run) return;
         try {
             const result = addon.run(this.makeContext(addon.id));
             if (typeof result === 'function') this.cleanups.set(addon.id, result);
         } catch (error) {
             console.error(`Addon "${addon.id}" failed to run:`, error);
+        }
+    }
+
+    /**
+     * 下载单个远端插件的 main.js 并编译，成功后更新 store 中的插件（run / downloaded）。
+     * 失败时弹错误通知，返回 false。
+     */
+    private async downloadAddon(id: string): Promise<boolean> {
+        try {
+            const run = await downloadAddonContent(id);
+            useAddonStore.setState({
+                addons: useAddonStore
+                    .getState()
+                    .addons.map(addon =>
+                        addon.id === id ? { ...addon, run, downloaded: true } : addon,
+                    ),
+            });
+            return true;
+        } catch (error) {
+            console.error(`Failed to download addon "${id}":`, error);
+            Toast.create({
+                type: 'error',
+                id: `addon_download_err_${spawnRandomString()}`,
+                text: t('gui:addon.err.downloadFailed', {
+                    err: error instanceof Error ? error.message : String(error),
+                }),
+            });
+            return false;
         }
     }
 
