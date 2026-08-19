@@ -12,10 +12,48 @@ import { localStorageIDs } from '../types/storage';
 import { readLocalStorage, setItemToLocalStorage } from '../utils/localstorage';
 import { Toast } from '../lib/ToastManager';
 import { spawnRandomString } from '../utils/ash-data';
+import { Settings, type TSettingType } from '../settings/SettingsRegistry';
 import { listRemoteAddons, downloadAddonContent } from './loader';
 import { importCustomAddon, loadCustomAddons, removeCustomAddonHandle } from './custom';
 import { clearFileCache } from './cache';
-import type { IAddon, IAddonContext, IAddonStorage } from './types';
+import type {
+    IAddon,
+    IAddonContext,
+    IAddonSettingDefinition,
+    IAddonSettingsApi,
+    IAddonStorage,
+    TAddonSettingType,
+} from './types';
+
+/** 插件设置项在 Settings 里的 key 前缀（`addon.<addonId>.<settingId>`） */
+const ADDON_SETTINGS_CATEGORY = 'addons';
+
+const addonSettingsKey = (addonID: string, settingId: string): string =>
+    `addon.${addonID}.${settingId}`;
+
+/** 插件设置类型 → Settings 注册表的设置类型 */
+const ADDON_SETTING_TYPE_MAP: Record<TAddonSettingType, TSettingType> = {
+    string: 'text',
+    number: 'number',
+    boolean: 'boolean',
+};
+
+/** 把 manifest 里的设置默认值归一化：string→''，number→0（受 min/max 约束），boolean→false */
+const normalizeSettingDefault = (setting: IAddonSettingDefinition): unknown => {
+    switch (setting.type) {
+        case 'number': {
+            const value = typeof setting.default === 'number' ? setting.default : 0;
+            const min = setting.min ?? -Infinity;
+            const max = setting.max ?? Infinity;
+            return Math.min(Math.max(value, min), max);
+        }
+        case 'boolean':
+            return setting.default === true;
+        case 'string':
+        default:
+            return typeof setting.default === 'string' ? setting.default : '';
+    }
+};
 
 export type TAddonLoadStatus = 'idle' | 'loading' | 'ready';
 
@@ -92,6 +130,7 @@ class AddonManager {
                     enabled.add(addon.id);
             }
             useAddonStore.setState({ addons, enabled, status: 'ready' });
+            this.syncAddonSettings();
             const pending = addons.filter(addon => enabled.has(addon.id) && !addon.downloaded);
             await Promise.all(pending.map(addon => this.downloadAddon(addon.id)));
             for (const addon of addons) {
@@ -130,6 +169,7 @@ class AddonManager {
             addon,
         ];
         useAddonStore.setState({ addons: nextAddons });
+        this.syncAddonSettings();
         Toast.create({
             type: 'info',
             id: `addon_imported_${addon.id}`,
@@ -151,6 +191,7 @@ class AddonManager {
             await clearFileCache();
             const remote = await listRemoteAddons();
             useAddonStore.setState({ addons: [...remote, ...custom] });
+            this.syncAddonSettings();
             Toast.create({
                 type: 'info',
                 id: 'addon_list_refreshed',
@@ -177,6 +218,7 @@ class AddonManager {
         useAddonStore.setState({
             addons: useAddonStore.getState().addons.filter(item => item.id !== id),
         });
+        this.syncAddonSettings();
     }
 
     toggle(id: string) {
@@ -217,6 +259,7 @@ class AddonManager {
         this.persistData.enabled = [...new Set([...this.persistData.enabled, id])];
         this.persistData.disabled = this.persistData.disabled.filter(item => item !== id);
         this.persist();
+        this.syncAddonSettings();
         if (this.ctx) this.runAddon(addon);
     }
 
@@ -229,6 +272,7 @@ class AddonManager {
         this.persistData.enabled = this.persistData.enabled.filter(item => item !== id);
         this.persist();
         this.cleanup(id);
+        this.syncAddonSettings();
     }
 
     private runAddon(addon: IAddon) {
@@ -289,7 +333,40 @@ class AddonManager {
                 localStorage.removeItem(`ash_addon:${addonID}:${key}`);
             },
         };
-        return { ...base, storage };
+        const addon = useAddonStore.getState().addons.find(item => item.id === addonID);
+        const settings: IAddonSettingsApi = {
+            get: id => Settings.get(addonSettingsKey(addonID, id)),
+            set: (id, value) => {
+                Settings.set(addonSettingsKey(addonID, id), value);
+            },
+            defs: addon?.settings ?? [],
+        };
+        return { ...base, storage, settings };
+    }
+
+    /**
+     * 把当前所有已启用插件的 manifest 设置项同步到 Settings 注册表。
+     * 先清空旧的插件设置，再按当前启用的插件重新注册，保证禁用/卸载后不会残留。
+     */
+    private syncAddonSettings() {
+        Settings.unregisterByCategory(ADDON_SETTINGS_CATEGORY);
+        const { addons, enabled } = useAddonStore.getState();
+        for (const addon of addons) {
+            if (!enabled.has(addon.id)) continue;
+            for (const setting of addon.settings) {
+                Settings.register({
+                    key: addonSettingsKey(addon.id, setting.id),
+                    defaultValue: normalizeSettingDefault(setting),
+                    category: ADDON_SETTINGS_CATEGORY,
+                    label: `${addon.i18nNamespace}:@settings/${setting.id}`,
+                    type: ADDON_SETTING_TYPE_MAP[setting.type],
+                    min: setting.min,
+                    max: setting.max,
+                    allowLines: setting.allowLines,
+                    group: `${addon.i18nNamespace}:@name`,
+                });
+            }
+        }
     }
 
     private cleanup(id: string) {

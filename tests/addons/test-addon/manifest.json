@@ -5,5 +5,34 @@
     "author": "AstrasTeam",
     "license": "MIT",
     "icon": "icon.svg",
-    "main": "main.js"
+    "main": "main.js",
+    "settings": [
+        {
+            "name": "greeting text",
+            "id": "greeting",
+            "type": "string",
+            "default": "Hi"
+        },
+        {
+            "name": "volume",
+            "id": "volume",
+            "type": "number",
+            "default": 50,
+            "min": 0,
+            "max": 100
+        },
+        {
+            "name": "notify on disable",
+            "id": "notifyOnDisable",
+            "type": "boolean",
+            "default": true
+        },
+        {
+            "name": "multiline note",
+            "id": "note",
+            "type": "string",
+            "default": "line1\nline2",
+            "allowLines": true
+        }
+    ]
 }

@@ -118,6 +118,7 @@
     "settings.category.general": "General",
     "settings.category.appearance": "Appearance",
     "settings.category.shortcuts": "Shortcuts",
+    "settings.category.addons": "Addons",
     "settings.userName": "User name",
     "settings.userName.description": "Used as the default author when creating a project.",
     "settings.language": "Interface language",

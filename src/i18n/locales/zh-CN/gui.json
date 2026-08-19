@@ -118,6 +118,7 @@
     "settings.category.general": "常规",
     "settings.category.appearance": "外观",
     "settings.category.shortcuts": "快捷键",
+    "settings.category.addons": "插件",
     "settings.userName": "用户名",
     "settings.userName.description": "用于新建项目时自动填写作者信息。",
     "settings.language": "界面语言",

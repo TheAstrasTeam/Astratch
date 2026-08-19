@@ -27,5 +27,11 @@ export function buildAddonContext(vm: IVM): IAddonContext {
             set: () => undefined,
             remove: () => undefined,
         },
+        // 占位实现，真正的设置 API 由 AddonManager.makeContext 按插件注入
+        settings: {
+            get: () => undefined,
+            set: () => undefined,
+            defs: [],
+        },
     };
 }

@@ -25,6 +25,14 @@ export interface ISettingDefinition<T = unknown> {
     description?: string;
     type: TSettingType;
     options?: ISettingOption[];
+    /** number 类型的最小值（默认不限制） */
+    min?: number;
+    /** number 类型的最大值（默认不限制） */
+    max?: number;
+    /** text 类型：是否允许多行输入（渲染为两倍高度的 textarea），默认 false */
+    allowLines?: boolean;
+    /** 所属分组（用于在设置页里按插件划分子标题，一般放 i18n key） */
+    group?: string;
 }
 
 interface SettingsState {
@@ -40,12 +48,32 @@ class SettingsRegistry {
 
     register<T>(def: ISettingDefinition<T>): this {
         this.definitions.set(def.key, def);
+        // build 之后再注册（如插件设置）时，若 store 里还没有该 key，则补上默认值
+        if (this._store) {
+            const current = this._store.getState()[def.key];
+            if (current === undefined) {
+                this._store.getState().setValue(def.key, def.defaultValue);
+            }
+        }
         return this;
     }
 
     registerMany(defs: ISettingDefinition[]): this {
         for (const def of defs) {
-            this.definitions.set(def.key, def);
+            this.register(def);
+        }
+        return this;
+    }
+
+    /**
+     * 注销某个分类下的所有设置定义（如插件刷新/移除时清理旧的插件设置）。
+     * store 里已有的值不会删除，但不存在的定义不会再被持久化。
+     */
+    unregisterByCategory(category: string): this {
+        for (const key of this.definitions.keys()) {
+            if (this.definitions.get(key)?.category === category) {
+                this.definitions.delete(key);
+            }
         }
         return this;
     }

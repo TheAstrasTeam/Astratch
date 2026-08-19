@@ -24,6 +24,10 @@ const SpawnSetting = ({ settings }: { settings: ISettingDefinition }) => {
         setNowValue(e.target.value);
         Settings.set(settings.key, e.target.value);
     };
+    const handleTextareaChanged = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setNowValue(e.target.value);
+        Settings.set(settings.key, e.target.value);
+    };
     const handleSelectChanged = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setNowValue(e.target.value);
         Settings.set(settings.key, e.target.value);
@@ -44,11 +48,19 @@ const SpawnSetting = ({ settings }: { settings: ISettingDefinition }) => {
             </div>
             <div className={styles.settingNode}>
                 {settings.type === 'text' ? (
-                    <input
-                        className={styles.settingsNodeInput}
-                        defaultValue={nowValue as string}
-                        onBlur={handleInputChanged}
-                    />
+                    settings.allowLines ? (
+                        <textarea
+                            className={styles.settingsNodeTextarea}
+                            defaultValue={nowValue as string}
+                            onBlur={handleTextareaChanged}
+                        />
+                    ) : (
+                        <input
+                            className={styles.settingsNodeInput}
+                            defaultValue={nowValue as string}
+                            onBlur={handleInputChanged}
+                        />
+                    )
                 ) : settings.type === 'select' ? (
                     <select
                         className={styles.settingsNodeSelect}
@@ -61,6 +73,34 @@ const SpawnSetting = ({ settings }: { settings: ISettingDefinition }) => {
                             </option>
                         ))}
                     </select>
+                ) : settings.type === 'number' ? (
+                    <input
+                        className={styles.settingsNodeInput}
+                        type='number'
+                        defaultValue={nowValue as number}
+                        min={settings.min}
+                        max={settings.max}
+                        onBlur={e => {
+                            let value = Number(e.target.value);
+                            if (settings.min !== undefined && value < settings.min)
+                                value = settings.min;
+                            if (settings.max !== undefined && value > settings.max)
+                                value = settings.max;
+                            e.target.value = String(value);
+                            setNowValue(value);
+                            Settings.set(settings.key, value);
+                        }}
+                    />
+                ) : settings.type === 'boolean' ? (
+                    <input
+                        className={styles.settingsNodeCheckbox}
+                        type='checkbox'
+                        checked={nowValue as boolean}
+                        onChange={e => {
+                            setNowValue(e.target.checked);
+                            Settings.set(settings.key, e.target.checked);
+                        }}
+                    />
                 ) : settings.type === 'key' ? (
                     <>
                         {Settings.get(settings.key) !==
@@ -90,6 +130,24 @@ export const SettingsModal = () => {
     const [nowTab, setTab] = useState<string>(Object.keys(categories)[0]);
 
     const [isFullScreen, setFullScreen] = useState<boolean>(false);
+
+    /** 按 group 给设置分小节（插件设置按插件名分组），group 变化时插入小标题 */
+    const renderSettings = (defs: ISettingDefinition[]) => {
+        const nodes: React.ReactNode[] = [];
+        let lastGroup: string | undefined;
+        for (const def of defs) {
+            if (def.group !== lastGroup) {
+                nodes.push(
+                    <div key={`group-${def.key}`} className={styles.groupTitle}>
+                        {def.group ? t(def.group, { defaultValue: def.group }) : ''}
+                    </div>,
+                );
+                lastGroup = def.group;
+            }
+            nodes.push(<SpawnSetting key={def.key} settings={def} />);
+        }
+        return nodes;
+    };
 
     return (
         <Modal
@@ -122,9 +180,7 @@ export const SettingsModal = () => {
                         {t(`gui:settings.category.${nowTab}`)}
                     </span>
                     <div className={styles.settingsContent}>
-                        {categories[nowTab].map(settings => (
-                            <SpawnSetting key={settings.key} settings={settings}></SpawnSetting>
-                        ))}
+                        {renderSettings(categories[nowTab])}
                     </div>
                 </div>
             </div>

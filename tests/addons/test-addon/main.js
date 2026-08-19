@@ -2,16 +2,20 @@
 // 测试插件：启用时弹出问候，禁用时弹出告别
 
 export default ctx => {
+    const greeting = ctx.settings.get('greeting');
+    const notifyOnDisable = ctx.settings.get('notifyOnDisable');
     ctx.toast.create({
         type: 'info',
-        id: 'test_plugin_greet',
-        text: ctx.t('addon_custom-test-addon:greet'),
+        id: 'test_addon_greet',
+        text: `${ctx.t('addon_custom-test-addon:greet')} (${greeting})`,
     });
     return () => {
-        ctx.toast.create({
-            type: 'info',
-            id: 'test_plugin_bye',
-            text: ctx.t('addon_custom-test-addon:bye'),
-        });
+        if (notifyOnDisable === true) {
+            ctx.toast.create({
+                type: 'info',
+                id: 'test_addon_bye',
+                text: ctx.t('addon_custom-test-addon:bye'),
+            });
+        }
     };
 };

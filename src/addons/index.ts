@@ -8,5 +8,13 @@
 
 export { addonManager, useAddonStore } from './manager';
 export { buildAddonContext } from './context';
-export type { IAddon, IAddonContext, IAddonManifest, IAddonStorage } from './types';
+export type {
+    IAddon,
+    IAddonContext,
+    IAddonManifest,
+    IAddonStorage,
+    IAddonSettingDefinition,
+    IAddonSettingsApi,
+    TAddonSettingType,
+} from './types';
 export type { IAddonStoreState, TAddonLoadStatus } from './manager';

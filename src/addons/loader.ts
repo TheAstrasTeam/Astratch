@@ -112,6 +112,7 @@ export async function listRemoteAddons(): Promise<IAddon[]> {
                 author: manifest.author ?? '',
                 i18nNamespace: `addon_${id}`,
                 defaultEnabled: manifest.defaultEnabled ?? false,
+                settings: manifest.settings ?? [],
                 isCustom: false,
                 downloaded: false,
             });

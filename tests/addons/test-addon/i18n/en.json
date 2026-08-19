@@ -1,6 +1,10 @@
 {
     "@name": "Test Addon (Custom)",
     "@description": "A test addon for verifying the custom addon feature (English).",
+    "@settings/greeting": "Greeting text",
+    "@settings/volume": "Volume",
+    "@settings/notifyOnDisable": "Notify on disable",
+    "@settings/note": "Multiline note",
     "greet": "Hello from Test Addon!",
     "bye": "Test Addon disabled."
 }

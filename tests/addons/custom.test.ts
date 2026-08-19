@@ -131,4 +131,33 @@ describe('buildAddonFromHandle', () => {
         expect(addon).not.toBeNull();
         expect(compiled).toBe('export default () => {};');
     });
+
+    it('parses manifest settings into the addon', async () => {
+        const handle = makeTreeHandle('my-addon', {
+            'manifest.json': JSON.stringify({
+                name: 'X',
+                settings: [
+                    { name: 'greeting', id: 'greeting', type: 'string', default: 'Hi' },
+                    { name: 'volume', id: 'volume', type: 'number', default: 50, min: 0, max: 100 },
+                    { name: 'enabled', id: 'enabled', type: 'boolean', default: true },
+                ],
+            }),
+            'main.js': 'export default () => {};',
+        });
+        const addon = await buildAddonFromHandle(handle, 'custom-my-addon', () => undefined);
+        expect(addon?.settings).toEqual([
+            { name: 'greeting', id: 'greeting', type: 'string', default: 'Hi' },
+            { name: 'volume', id: 'volume', type: 'number', default: 50, min: 0, max: 100 },
+            { name: 'enabled', id: 'enabled', type: 'boolean', default: true },
+        ]);
+    });
+
+    it('defaults settings to an empty array when manifest has none', async () => {
+        const handle = makeTreeHandle('my-addon', {
+            'manifest.json': JSON.stringify({ name: 'X' }),
+            'main.js': 'export default () => {};',
+        });
+        const addon = await buildAddonFromHandle(handle, 'custom-my-addon', () => undefined);
+        expect(addon?.settings).toEqual([]);
+    });
 });

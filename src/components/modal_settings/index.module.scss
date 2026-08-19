@@ -86,3 +86,40 @@
     overscroll-behavior: contain;
     scrollbar-gutter: stable;
 }
+
+.group-title {
+    margin: 16px 0 8px;
+    font-size: larger;
+    font-weight: bolder;
+    opacity: 0.8;
+}
+
+.settings-node-checkbox {
+    width: 22px !important;
+    height: 22px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    flex: 0 0 auto;
+    align-self: center;
+    accent-color: $ui-primary;
+    cursor: pointer;
+}
+
+.settings-node-textarea {
+    width: 100%;
+    resize: none;
+    background-color: $ui-tertiary;
+    outline: none;
+    color: $text-primary;
+    border: 1px $ui-secondary solid;
+    border-radius: 3px;
+    padding: 5px;
+    transition: border 0.1s ease;
+    font-family: inherit;
+    &:hover {
+        border: 1px $ui-black-transparent solid;
+    }
+    &:focus {
+        border: 1px $looks-secondary solid;
+    }
+}
