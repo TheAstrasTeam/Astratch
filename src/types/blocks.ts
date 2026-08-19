@@ -7,7 +7,6 @@
 import * as Blockly from 'blockly';
 import type { IVM } from './vm';
 import type {
-    TFunctionPreviewMode,
     TFunctionReturnType,
     TPreviewFunctionData,
 } from '../components/modal_createFunction/functionPreview';
@@ -574,8 +573,8 @@ export interface ICustomFunction {
     body: TPreviewFunctionData[];
     color: IBlockColor;
     id: string;
-    /** 函数在工具箱/工作区中的展示方式；旧项目缺省为 function-value。 */
-    previewMode?: TFunctionPreviewMode;
+    /** 是否显示为可传递的函数值；false 时显示为 Scratch 式积木。 */
+    isValue: boolean;
     /** 返回类型；null 表示无返回值。 */
     returnType?: TFunctionReturnType;
 }

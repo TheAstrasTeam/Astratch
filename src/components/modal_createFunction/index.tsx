@@ -28,7 +28,6 @@ import type { IBlockColor, ICustomFunction } from '../../types/blocks';
 import type {
     TFunctionFieldType,
     TFunctionInputField,
-    TFunctionPreviewMode,
     TFunctionReturnType,
 } from './functionPreview';
 import type { JSX } from 'react/jsx-dev-runtime';
@@ -64,7 +63,7 @@ const BigSelector = ({
 export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) => {
     const { closeSelf } = useModalInstance();
     const [blockColor, setBlockColor] = useState<IBlockColor>(previewBlockColor);
-    const [previewMode, setPreviewMode] = useState<TFunctionPreviewMode>('function-value');
+    const [isValue, setIsValue] = useState(true);
     const [returnType, setReturnType] = useState<TFunctionReturnType>(null);
 
     const handleButtonClick = useCallback(
@@ -93,11 +92,9 @@ export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) =
     };
 
     const handleChangeCustomBlock = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const nextMode: TFunctionPreviewMode = event.target.checked
-            ? 'custom-block'
-            : 'function-value';
-        setPreviewMode(nextMode);
-        setPreviewConfig({ mode: nextMode, returnType });
+        const nextIsValue = !event.target.checked;
+        setIsValue(nextIsValue);
+        setPreviewConfig({ isValue: nextIsValue, returnType });
     };
 
     const handleSetReturnType = (result: TFunctionFieldType) => {
@@ -106,7 +103,7 @@ export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) =
         if (result === 'text' || result === 'dropdown') return;
         const nextReturnType = result;
         setReturnType(nextReturnType);
-        setPreviewConfig({ mode: previewMode, returnType: nextReturnType });
+        setPreviewConfig({ isValue, returnType: nextReturnType });
     };
 
     const returnTypeLabel = () => {
@@ -121,7 +118,7 @@ export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) =
             body: structuredClone(previewFunctionData),
             color: structuredClone(previewBlockColor),
             id,
-            previewMode,
+            isValue: true,
             returnType: Array.isArray(returnType) ? [...returnType] : returnType,
         };
         const target = vm.runtime.getTargetByID(addID);
@@ -212,7 +209,7 @@ export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) =
                     <label className={styles.functionOption}>
                         <input
                             type='checkbox'
-                            checked={previewMode === 'custom-block'}
+                            checked={!isValue}
                             onChange={handleChangeCustomBlock}
                         />
                         <span>{t('gui:createFunction.customBlock')}</span>

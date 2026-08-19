@@ -297,7 +297,7 @@ describe('Target 数据序列化', () => {
             ],
             color: { primary: '#123456' },
             id: 'a',
-            previewMode: 'custom-block',
+            isValue: true,
             returnType: ['number', 'string'],
         };
         target.addCustomFunction('a', body);
@@ -340,6 +340,7 @@ describe('自定义函数测试', () => {
             body: [{ type: 'text', text: 'run' }],
             color: { primary: '#123456' },
             id: 'function-a',
+            isValue: false,
         };
 
         target.addCustomFunction(customFunction.id, customFunction);
@@ -374,6 +375,7 @@ describe('自定义函数测试', () => {
             body: [],
             color: {},
             id: 'a',
+            isValue: false,
         };
         expect(target.addCustomFunction('a', body)).toBe(true);
         expect(() => target.addCustomFunction('a', body)).toThrow(Error);
@@ -402,6 +404,7 @@ describe('自定义函数测试', () => {
                 body: [],
                 color: {},
                 id,
+                isValue: false,
             };
             expect(target.addCustomFunction(id, body)).toBe(true);
         }
@@ -416,6 +419,7 @@ describe('自定义函数测试', () => {
                 body: [],
                 color: {},
                 id,
+                isValue: false,
             };
             target.addCustomFunction(id, body);
             expect(emit).toHaveBeenNthCalledWith(1, events.UPDATE_PROJECT);

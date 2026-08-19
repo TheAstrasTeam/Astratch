@@ -15,7 +15,6 @@ import type { IVM } from '../../../types/vm';
 import type {
     IFunctionValueBlock,
     TFunctionInputField,
-    TFunctionPreviewMode,
     TFunctionReturnType,
     TPreviewFunctionData,
 } from '../../../components/modal_createFunction/functionPreview';
@@ -130,17 +129,13 @@ const FUNCTION_VALUE_TYPES: readonly TFunctionInputField[] = [
 
 interface IFunctionValueExtraState {
     functionRef?: IFunctionReference;
-    /** 兼容创建函数预览使用的旧参数快照。 */
+    /** 创建函数预览使用的临时参数快照。 */
     params?: TPreviewFunctionData[];
-    previewMode?: TFunctionPreviewMode;
-    returnType?: TFunctionReturnType;
+    isValue?: boolean;
 }
 
 const isFunctionValueType = (value: unknown): value is TFunctionInputField =>
     typeof value === 'string' && FUNCTION_VALUE_TYPES.includes(value as TFunctionInputField);
-
-const normalizePreviewMode = (value: unknown): TFunctionPreviewMode =>
-    value === 'custom-block' ? 'custom-block' : 'function-value';
 
 const normalizeReturnType = (value: unknown): TFunctionReturnType => {
     if (value === null || value === undefined) return null;
@@ -151,30 +146,22 @@ const normalizeReturnType = (value: unknown): TFunctionReturnType => {
     return null;
 };
 
-const readFunctionReference = (value: unknown): IFunctionReference | null => {
-    if (!value || typeof value !== 'object') return null;
-    const state = value as Record<string, unknown>;
-    const reference = state.functionRef;
-    if (!reference || typeof reference !== 'object') return null;
-    const record = reference as Record<string, unknown>;
-    if (typeof record.targetId !== 'string' || typeof record.functionId !== 'string') return null;
-    return {
-        targetId: record.targetId,
-        functionId: record.functionId,
-    };
-};
+const getReferencedFunction = (vm: IVM, reference?: IFunctionReference) =>
+    reference
+        ? (vm.runtime.getTargetByID(reference.targetId)?.getFunction(reference.functionId) ?? null)
+        : null;
 
 /** 根据函数展示配置切换值积木的输出/语句连接。 */
 const configureFunctionValueConnections = (
     block: Blockly.Block,
-    mode: TFunctionPreviewMode,
+    isValue: boolean,
     returnType: TFunctionReturnType,
 ) => {
     if (block.outputConnection?.isConnected()) block.outputConnection.disconnect();
     if (block.previousConnection?.isConnected()) block.previousConnection.disconnect();
     if (block.nextConnection?.isConnected()) block.nextConnection.disconnect();
 
-    if (mode === 'custom-block' && returnType === null) {
+    if (!isValue && returnType === null) {
         block.setOutput(false);
         block.setPreviousStatement(true, 'Action');
         block.setNextStatement(true, 'Action');
@@ -183,7 +170,7 @@ const configureFunctionValueConnections = (
 
     block.setPreviousStatement(false);
     block.setNextStatement(false);
-    if (mode === 'custom-block' && returnType !== null) {
+    if (!isValue && returnType !== null) {
         const types = Array.isArray(returnType) ? returnType : [returnType];
         block.setOutput(
             true,
@@ -464,7 +451,7 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
             this.editMode = false;
             this.activeInputIndex = -1;
             this.controlBar = null;
-            this.previewMode = 'function-value';
+            this.isValue = true;
             this.returnType = null;
             this.jsonInit({
                 ...returnConnections,
@@ -472,23 +459,17 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                 output: 'Function',
             });
         },
-        loadExtraState(this: IFunctionValueBlock, rawState: unknown) {
-            const state =
-                rawState && typeof rawState === 'object'
-                    ? (rawState as IFunctionValueExtraState)
-                    : {};
-            const reference = readFunctionReference(state);
-            const target = reference ? vm.runtime.getTargetByID(reference.targetId) : undefined;
-            const functionData = reference ? target?.getFunction(reference.functionId) : null;
+        loadExtraState(this: IFunctionValueBlock, state: IFunctionValueExtraState) {
+            const functionData = getReferencedFunction(vm, state.functionRef);
 
-            this.functionRef = reference;
+            this.functionRef = state.functionRef ?? null;
             this.previewData = structuredClone(functionData?.body ?? state.params ?? []);
             this.colors = structuredClone(functionData?.color ?? BlocksColor.function);
-            this.previewMode = normalizePreviewMode(functionData?.previewMode ?? state.previewMode);
-            this.returnType = normalizeReturnType(functionData?.returnType ?? state.returnType);
+            this.isValue = functionData?.isValue ?? state.isValue ?? true;
+            this.returnType = normalizeReturnType(functionData?.returnType);
 
-            // 引用可能来自旧项目或已删除目标；此时仍应渲染一个空签名。
-            configureFunctionValueConnections(this, this.previewMode, this.returnType);
+            // 引用目标可能已删除；此时仍应渲染一个空签名。
+            configureFunctionValueConnections(this, this.isValue, this.returnType);
             this.updateShape();
         },
         saveExtraState(this: IFunctionValueBlock) {
@@ -562,7 +543,7 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                     }
                 } else {
                     let input: Blockly.Input;
-                    if (this.previewMode === 'custom-block' || this.editMode) input = this.appendValueInput(inputID);
+                    if (!this.isValue || this.editMode) input = this.appendValueInput(inputID);
                     else input = this.appendDummyInput(inputID);
 
                     const checks = (
@@ -576,8 +557,7 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                         return 'String';
                     });
 
-                    if (checks.length > 0 && this.editMode && this.previewMode === 'custom-block')
-                        input.setCheck(checks);
+                    if (checks.length > 0 && this.editMode && !this.isValue) input.setCheck(checks);
                     if (this.editMode) {
                         input.connection?.setShadowState({
                             type: OPCODES.FUNCTION_VALUE_ID,
@@ -592,8 +572,7 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                         });
                         if (shadowText) bindShadowSelection.call(this, shadowText, index);
                     } else {
-                        if (this.previewMode === 'function-value')
-                            input.appendField(fieldData.text ?? '');
+                        if (this.isValue) input.appendField(fieldData.text ?? '');
                         else
                             input.connection?.setShadowState({
                                 type: OPCODES.FUNCTION_ARG_HINT,

@@ -15,9 +15,6 @@ export type TFunctionInputField = 'boolean' | 'array' | 'object' | 'string' | 'n
 
 export type TFunctionFieldType = TFunctionReturnField | TFunctionInputField[];
 
-/** 预览中函数对外呈现的两种方式。 */
-export type TFunctionPreviewMode = 'function-value' | 'custom-block';
-
 /** 一个函数的返回类型；null 表示没有返回值。 */
 export type TFunctionReturnType = TFunctionInputField | TFunctionInputField[] | null;
 
@@ -30,8 +27,8 @@ export interface IFunctionValueBlock extends Blockly.Block {
     colors: IBlockColor;
     /** 持久化时指向 VM 中函数配置的稳定引用。 */
     functionRef: IFunctionReference | null;
-    /** 函数在工作区中的展示方式。 */
-    previewMode: TFunctionPreviewMode;
+    /** 是否显示为可传递的函数值；false 时显示为 Scratch 式积木。 */
+    isValue: boolean;
     /** 函数返回类型；null 表示语句积木或无返回值。 */
     returnType: TFunctionReturnType;
     editMode: boolean;
@@ -56,7 +53,7 @@ let previewBlock: IFunctionValueBlock | null = null;
 let previewWrapperBlock: Blockly.BlockSvg | null = null;
 let previewWorkspace: Blockly.WorkspaceSvg | null = null;
 let previewRootBlock: Blockly.BlockSvg | IFunctionValueBlock | null = null;
-let previewMode: TFunctionPreviewMode = 'function-value';
+let previewIsValue = true;
 let previewReturnType: TFunctionReturnType = null;
 let previewSession = 0;
 let setupFrame: number | null = null;
@@ -128,7 +125,7 @@ const configureSignatureConnections = () => {
         previewBlock.nextConnection.disconnect();
     }
 
-    if (previewMode === 'custom-block') {
+    if (!previewIsValue) {
         if (previewReturnType === null) {
             previewBlock.setOutput(false);
             previewBlock.setPreviousStatement(true, 'Action');
@@ -152,7 +149,7 @@ const configurePreviewWrapper = () => {
     if (!previewWorkspace || !previewBlock) return;
 
     disposePreviewWrapper();
-    if (previewMode === 'custom-block') {
+    if (!previewIsValue) {
         previewRootBlock = previewBlock;
         return;
     }
@@ -199,6 +196,8 @@ const applyPreviewConfig = () => {
         previewBlock.outputConnection.disconnect();
     }
 
+    previewBlock.isValue = previewIsValue;
+    previewBlock.updateShape();
     configureSignatureConnections();
     configurePreviewWrapper();
     disablePreviewContextMenu();
@@ -219,7 +218,7 @@ const setupWorkspace = (workspace: Blockly.WorkspaceSvg) => {
         {
             id: previewBlockId,
             type: OPCODES.FUNCTION_VALUE,
-            extraState: { params: previewFunctionData },
+            extraState: { params: previewFunctionData, isValue: true },
         },
         previewWorkspace,
     ) as IFunctionValueBlock;
@@ -270,7 +269,7 @@ const disposePreviewWorkspace = () => {
     previewBlock = null;
     previewRootBlock = null;
     previewFunctionData = [];
-    previewMode = 'function-value';
+    previewIsValue = true;
     previewReturnType = null;
     workspace?.dispose();
 };
@@ -330,11 +329,8 @@ const setPreviewBlockColor = (color: IBlockColor) => {
     previewBlock.updateShape();
 };
 
-const setPreviewConfig = (config: {
-    mode: TFunctionPreviewMode;
-    returnType: TFunctionReturnType;
-}) => {
-    previewMode = config.mode;
+const setPreviewConfig = (config: { isValue: boolean; returnType: TFunctionReturnType }) => {
+    previewIsValue = config.isValue;
     previewReturnType = config.returnType;
     applyPreviewConfig();
 };
