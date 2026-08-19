@@ -10,7 +10,15 @@
 import * as Blockly from 'blockly/core';
 import { t } from 'i18next';
 import { BlocksColor, OPCODES } from '../../../types/blocks';
-import type { IFunctionValueBlock } from '../../../components/modal_createFunction/functionPreview';
+import type { IFunctionReference } from '../../../types/blocks';
+import type { IVM } from '../../../types/vm';
+import type {
+    IFunctionValueBlock,
+    TFunctionInputField,
+    TFunctionPreviewMode,
+    TFunctionReturnType,
+    TPreviewFunctionData,
+} from '../../../components/modal_createFunction/functionPreview';
 import { connections, endConnections, returnConnections } from './helpers';
 import { modal } from '../../../components/Modal/modal';
 import { PromptModal } from '../../../components/modal_prompt';
@@ -111,6 +119,91 @@ const CALLER_RESYNC_EVENTS: readonly string[] = [
     Blockly.Events.FINISHED_LOADING,
 ];
 
+const FUNCTION_VALUE_TYPES: readonly TFunctionInputField[] = [
+    'boolean',
+    'array',
+    'object',
+    'string',
+    'number',
+    'function',
+];
+
+interface IFunctionValueExtraState {
+    functionRef?: IFunctionReference;
+    /** 兼容创建函数预览使用的旧参数快照。 */
+    params?: TPreviewFunctionData[];
+    previewMode?: TFunctionPreviewMode;
+    returnType?: TFunctionReturnType;
+}
+
+const isFunctionValueType = (value: unknown): value is TFunctionInputField =>
+    typeof value === 'string' && FUNCTION_VALUE_TYPES.includes(value as TFunctionInputField);
+
+const normalizePreviewMode = (value: unknown): TFunctionPreviewMode =>
+    value === 'custom-block' ? 'custom-block' : 'function-value';
+
+const normalizeReturnType = (value: unknown): TFunctionReturnType => {
+    if (value === null || value === undefined) return null;
+    if (isFunctionValueType(value)) return value;
+    if (Array.isArray(value) && value.every(isFunctionValueType)) {
+        return [...value];
+    }
+    return null;
+};
+
+const readFunctionReference = (value: unknown): IFunctionReference | null => {
+    if (!value || typeof value !== 'object') return null;
+    const state = value as Record<string, unknown>;
+    const reference = state.functionRef;
+    if (!reference || typeof reference !== 'object') return null;
+    const record = reference as Record<string, unknown>;
+    if (typeof record.targetId !== 'string' || typeof record.functionId !== 'string') return null;
+    return {
+        targetId: record.targetId,
+        functionId: record.functionId,
+    };
+};
+
+/** 根据函数展示配置切换值积木的输出/语句连接。 */
+const configureFunctionValueConnections = (
+    block: Blockly.Block,
+    mode: TFunctionPreviewMode,
+    returnType: TFunctionReturnType,
+) => {
+    if (block.outputConnection?.isConnected()) block.outputConnection.disconnect();
+    if (block.previousConnection?.isConnected()) block.previousConnection.disconnect();
+    if (block.nextConnection?.isConnected()) block.nextConnection.disconnect();
+
+    if (mode === 'custom-block' && returnType === null) {
+        block.setOutput(false);
+        block.setPreviousStatement(true, 'Action');
+        block.setNextStatement(true, 'Action');
+        return;
+    }
+
+    block.setPreviousStatement(false);
+    block.setNextStatement(false);
+    if (mode === 'custom-block' && returnType !== null) {
+        const types = Array.isArray(returnType) ? returnType : [returnType];
+        block.setOutput(
+            true,
+            types.map(type => `${type.charAt(0).toUpperCase()}${type.slice(1)}`),
+        );
+    } else {
+        block.setOutput(true, 'Function');
+    }
+};
+
+/** 让函数值积木里的参数提示跟随函数积木的主色。 */
+const syncFunctionValueHintColors = (block: Blockly.Block) => {
+    const color = block.getColour();
+    for (const input of block.inputList) {
+        const hint = input.connection?.targetBlock();
+        if (hint?.type !== OPCODES.FUNCTION_ARG_HINT || hint.getColour() === color) continue;
+        hint.setColour(color);
+    }
+};
+
 /** 生成参数的稳定 id。 */
 const spawnParamId = (): string => crypto.randomUUID().slice(0, 8);
 
@@ -147,7 +240,7 @@ Blockly.Css.register(`
 /**
  * 注册函数类积木
  */
-export function initFunctionBlocks(blockly: typeof Blockly) {
+export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
     blockly.Blocks[OPCODES.FUNCTION_DEFINITION] = {
         init(this: Blockly.Block) {
             this.jsonInit({
@@ -365,14 +458,41 @@ export function initFunctionBlocks(blockly: typeof Blockly) {
 
     blockly.Blocks[OPCODES.FUNCTION_VALUE] = {
         init(this: IFunctionValueBlock) {
+            this.functionRef = null;
+            this.previewData = [];
+            this.colors = BlocksColor.function;
             this.editMode = false;
             this.activeInputIndex = -1;
             this.controlBar = null;
+            this.previewMode = 'function-value';
+            this.returnType = null;
             this.jsonInit({
                 ...returnConnections,
                 colour: BlocksColor.function.primary,
                 output: 'Function',
             });
+        },
+        loadExtraState(this: IFunctionValueBlock, rawState: unknown) {
+            const state =
+                rawState && typeof rawState === 'object'
+                    ? (rawState as IFunctionValueExtraState)
+                    : {};
+            const reference = readFunctionReference(state);
+            const target = reference ? vm.runtime.getTargetByID(reference.targetId) : undefined;
+            const functionData = reference ? target?.getFunction(reference.functionId) : null;
+
+            this.functionRef = reference;
+            this.previewData = structuredClone(functionData?.body ?? state.params ?? []);
+            this.colors = structuredClone(functionData?.color ?? BlocksColor.function);
+            this.previewMode = normalizePreviewMode(functionData?.previewMode ?? state.previewMode);
+            this.returnType = normalizeReturnType(functionData?.returnType ?? state.returnType);
+
+            // 引用可能来自旧项目或已删除目标；此时仍应渲染一个空签名。
+            configureFunctionValueConnections(this, this.previewMode, this.returnType);
+            this.updateShape();
+        },
+        saveExtraState(this: IFunctionValueBlock) {
+            return this.functionRef ? { functionRef: { ...this.functionRef } } : {};
         },
         /** 选中输入框（其编辑器被打开）时显示控制栏。 */
         selectInput(this: IFunctionValueBlock, index: number) {
@@ -419,17 +539,27 @@ export function initFunctionBlocks(blockly: typeof Blockly) {
             this.previewData.forEach((fieldData, index) => {
                 const inputID = `ARG${String(index)}`;
                 if (fieldData.type === 'text') {
-                    const textInput = new FunctionValueTextField(
-                        fieldData.text ?? '',
-                        value => {
-                            fieldData.text = value;
-                            return value;
-                        },
-                        {
-                            spellcheck: false,
-                        },
-                    );
-                    this.appendDummyInput(inputID).appendField(textInput, `TEXT_${String(index)}`);
+                    if (this.editMode) {
+                        const textInput = new FunctionValueTextField(
+                            fieldData.text ?? '',
+                            value => {
+                                fieldData.text = value;
+                                return value;
+                            },
+                            {
+                                spellcheck: false,
+                            },
+                        );
+                        this.appendDummyInput(inputID).appendField(
+                            textInput,
+                            `TEXT_${String(index)}`,
+                        );
+                    } else {
+                        this.appendDummyInput(inputID).appendField(
+                            fieldData.text ?? '',
+                            `TEXT_${String(index)}`,
+                        );
+                    }
                 } else {
                     const input = this.appendValueInput(inputID);
                     const checks = (
@@ -444,28 +574,46 @@ export function initFunctionBlocks(blockly: typeof Blockly) {
                     });
 
                     if (checks.length > 0) input.setCheck(checks);
-                    input.connection?.setShadowState({
-                        type: OPCODES.FUNCTION_VALUE_ID,
-                        fields: { ID: fieldData.text ?? '' },
-                    });
-                    const shadowText = input.connection
-                        ?.targetBlock()
-                        ?.getField('ID') as Blockly.FieldTextInput | null;
-                    shadowText?.setValidator((value: string) => {
-                        fieldData.text = value;
-                        return value;
-                    });
-                    if (this.editMode && shadowText) {
-                        bindShadowSelection.call(this, shadowText, index);
+                    if (this.editMode) {
+                        input.connection?.setShadowState({
+                            type: OPCODES.FUNCTION_VALUE_ID,
+                            fields: { ID: fieldData.text ?? '' },
+                        });
+                        const shadowText = input.connection
+                            ?.targetBlock()
+                            ?.getField('ID') as Blockly.FieldTextInput | null;
+                        shadowText?.setValidator((value: string) => {
+                            fieldData.text = value;
+                            return value;
+                        });
+                        if (shadowText) bindShadowSelection.call(this, shadowText, index);
+                    } else {
+                        // 工作区里的签名只展示参数名，沿用执行积木的半透明提示 shadow；
+                        // 它不是可编辑的 FUNCTION_VALUE_ID 输入框。
+                        input.connection?.setShadowState({
+                            type: OPCODES.FUNCTION_ARG_HINT,
+                            fields: { HINT: fieldData.text ?? '' },
+                        });
                     }
                 }
             });
 
+            syncFunctionValueHintColors(this);
             updateControlBar.call(this);
             // 等渲染完成后（字段 transform 就位）用最新布局重新定位。
             requestAnimationFrame(() => {
-                if (!this.isDeadOrDying()) updateControlBar.call(this);
+                if (!this.isDeadOrDying()) {
+                    syncFunctionValueHintColors(this);
+                    updateControlBar.call(this);
+                }
             });
+        },
+        onchange(this: IFunctionValueBlock) {
+            // 工作区反序列化会在 loadExtraState 之后再次载入 shadow，
+            // 因此在后续事件中再同步一次颜色，避免恢复后回到默认粉色。
+            if (!this.editMode && !this.isDeadOrDying()) {
+                syncFunctionValueHintColors(this);
+            }
         },
         updateControlBar() {
             updateControlBar.call(this);

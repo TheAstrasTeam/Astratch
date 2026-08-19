@@ -88,6 +88,20 @@ export function setFunctionCategory(_blockly: typeof Blockly, vm: IVM): IRegiste
             text: t('blocks:function.createTip'),
             callbackkey: OPCODES.HANDLE_CREATE_FUNCTION,
         });
+        const targetId = vm.runtime.editingTargetID;
+        const functions = vm.runtime.getTargetByID(targetId)?.listFunctions() ?? [];
+        functions.forEach(customFunction => {
+            items.push({
+                kind: 'block',
+                type: OPCODES.FUNCTION_VALUE,
+                extraState: {
+                    functionRef: {
+                        targetId,
+                        functionId: customFunction.id,
+                    },
+                },
+            });
+        });
         const basicItems: Blockly.utils.toolbox.FlyoutItemInfo[] = [
             {
                 gap: 12,
@@ -126,7 +140,7 @@ export function setFunctionCategory(_blockly: typeof Blockly, vm: IVM): IRegiste
         void modal.open(CreateFunctionModal, {
             vm,
             // 它100亿%会是现在编辑的目标
-            addID: vm.runtime.editingTargetID
+            addID: vm.runtime.editingTargetID,
         });
     };
     return {

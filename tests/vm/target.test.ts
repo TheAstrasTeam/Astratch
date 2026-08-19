@@ -290,15 +290,24 @@ describe('Target 数据序列化', () => {
     it('toJSON应该把function Map序列化为数组并能还原为Map', () => {
         const emit = vi.fn();
         const target = makeTarget(emit);
-        const body: ICustomFunction = { body: [], color: {}, id: 'a' };
+        const body: ICustomFunction = {
+            body: [
+                { type: 'text', text: '计算' },
+                { type: ['number', 'string'], text: 'value' },
+            ],
+            color: { primary: '#123456' },
+            id: 'a',
+            previewMode: 'custom-block',
+            returnType: ['number', 'string'],
+        };
         target.addCustomFunction('a', body);
         const json = target.toJSON();
         expect(Array.isArray(json.function)).toBe(true);
         expect(json.function).toHaveLength(1);
-        expect(json.function[0]).toMatchObject({ id: 'a' });
+        expect(json.function[0]).toEqual(body);
         const roundTrip = Target.fromJSON(JSON.parse(JSON.stringify(json)) as TTargetInfo, vi.fn());
         expect(roundTrip.function).toBeInstanceOf(Map);
-        expect(roundTrip.function.get('a')).toMatchObject({ id: 'a' });
+        expect(roundTrip.getFunction('a')).toEqual(body);
     });
 
     it('fromJSON遇到旧版本的data({})应该还原为空Map而不报错', () => {
@@ -325,6 +334,24 @@ describe('Target 数据序列化', () => {
 });
 
 describe('自定义函数测试', () => {
+    it('应该按稳定ID读取函数并返回独立的列表快照', () => {
+        const target = makeTarget();
+        const customFunction: ICustomFunction = {
+            body: [{ type: 'text', text: 'run' }],
+            color: { primary: '#123456' },
+            id: 'function-a',
+        };
+
+        target.addCustomFunction(customFunction.id, customFunction);
+        const functions = target.listFunctions();
+
+        expect(target.getFunction(customFunction.id)).toBe(customFunction);
+        expect(target.getFunction('missing')).toBeNull();
+        expect(functions).toEqual([customFunction]);
+        (functions as ICustomFunction[]).length = 0;
+        expect(target.listFunctions()).toEqual([customFunction]);
+    });
+
     it('有已存在的函数id时报错', () => {
         const target = Target.fromJSON(
             {
@@ -394,6 +421,7 @@ describe('自定义函数测试', () => {
             expect(emit).toHaveBeenNthCalledWith(1, events.UPDATE_PROJECT);
             expect(emit).toHaveBeenNthCalledWith(2, events.CREATE_CUSTOM_FUNCTION, {
                 id,
+                targetID: target.id,
             });
         }
     });

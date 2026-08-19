@@ -156,8 +156,17 @@ class Target implements ITarget {
         this.emit(events.UPDATE_PROJECT);
         this.emit(events.CREATE_CUSTOM_FUNCTION, {
             id,
+            targetID: this.id,
         });
         return true;
+    }
+
+    getFunction(id: string) {
+        return this.function.get(id) ?? null;
+    }
+
+    listFunctions() {
+        return [...this.function.values()] as readonly ICustomFunction[];
     }
 
     static fromMeta(

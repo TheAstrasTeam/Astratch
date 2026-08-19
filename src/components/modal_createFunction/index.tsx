@@ -118,9 +118,11 @@ export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) =
     const doneCreateFunction = () => {
         const id = spawnRandomString();
         const functionData: ICustomFunction = {
-            body: previewFunctionData,
-            color: previewBlockColor,
+            body: structuredClone(previewFunctionData),
+            color: structuredClone(previewBlockColor),
             id,
+            previewMode,
+            returnType: Array.isArray(returnType) ? [...returnType] : returnType,
         };
         const target = vm.runtime.getTargetByID(addID);
         if (target) {
@@ -203,29 +205,33 @@ export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) =
                 </div>
             </div>
             <div className={styles.contentRight}>
-                <span className={styles.mainTitle}>{t('gui:createFunction.configFunction')}</span>
-                <label className={styles.functionOption}>
-                    <input
-                        type='checkbox'
-                        checked={previewMode === 'custom-block'}
-                        onChange={handleChangeCustomBlock}
-                    />
-                    <span>{t('gui:createFunction.customBlock')}</span>
-                </label>
-                <span className={styles.mainTitle}>{t('gui:createFunction.returnType')}</span>
-                <button
-                    type='button'
-                    className={styles.returnTypeButton}
-                    onClick={() => {
-                        void modal.open(FieldTypeModal, {
-                            purpose: 'return',
-                            callback: handleSetReturnType,
-                        });
-                    }}
-                >
-                    {returnTypeLabel()}
-                </button>
-                <button onClick={doneCreateFunction}>Done</button>
+                <div className={styles.main}>
+                    <span className={styles.mainTitle}>
+                        {t('gui:createFunction.configFunction')}
+                    </span>
+                    <label className={styles.functionOption}>
+                        <input
+                            type='checkbox'
+                            checked={previewMode === 'custom-block'}
+                            onChange={handleChangeCustomBlock}
+                        />
+                        <span>{t('gui:createFunction.customBlock')}</span>
+                    </label>
+                    <span className={styles.mainTitle}>{t('gui:createFunction.returnType')}</span>
+                    <button
+                        type='button'
+                        className={styles.returnTypeButton}
+                        onClick={() => {
+                            void modal.open(FieldTypeModal, {
+                                purpose: 'return',
+                                callback: handleSetReturnType,
+                            });
+                        }}
+                    >
+                        {returnTypeLabel()}
+                    </button>
+                </div>
+                <button onClick={doneCreateFunction}>{t('gui:button.done')}</button>
             </div>
         </Modal>
     );

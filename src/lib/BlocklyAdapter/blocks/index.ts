@@ -43,7 +43,7 @@ export const initBlocks = (blockly: typeof Blockly, vm: IVM) => {
     initControlBlocks(blockly);
     initOperatorBlocks(blockly);
     initDataBlocks(blockly, vm);
-    initFunctionBlocks(blockly);
+    initFunctionBlocks(blockly, vm);
     initCanvasBlocks(blockly);
     initDebugBlocks(blockly);
 };

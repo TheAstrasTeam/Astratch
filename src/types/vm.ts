@@ -149,6 +149,10 @@ export interface ITarget {
      * @returns 是否创建成功
      */
     addCustomFunction: (id: string, meta: ICustomFunction) => boolean;
+    /** 根据稳定 ID 获取一个自定义函数，不存在时返回 null。 */
+    getFunction: (id: string) => ICustomFunction | null;
+    /** 获取自定义函数的只读快照，供动态工具箱生成内容。 */
+    listFunctions: () => readonly ICustomFunction[];
 }
 
 /**
@@ -172,6 +176,8 @@ export type TTargetInfo = Omit<
     | 'addCustomFunction'
     | 'data'
     | 'function'
+    | 'getFunction'
+    | 'listFunctions'
 > & {
     data: IVariable[];
     function: ICustomFunction[];
@@ -574,6 +580,10 @@ export type TViewportUpdateEvent =
 export interface IDataCreatedEvent {
     targetID: string;
     dataID: string;
+}
+export interface IFunctionCreatedEvent {
+    id: string;
+    targetID: string;
 }
 
 export interface IProjectMetaJSON {

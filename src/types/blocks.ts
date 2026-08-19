@@ -6,7 +6,11 @@
 
 import * as Blockly from 'blockly';
 import type { IVM } from './vm';
-import type { TPreviewFunctionData } from '../components/modal_createFunction/functionPreview';
+import type {
+    TFunctionPreviewMode,
+    TFunctionReturnType,
+    TPreviewFunctionData,
+} from '../components/modal_createFunction/functionPreview';
 
 const OPCODES = {
     // 菜单
@@ -561,8 +565,17 @@ export interface IBlocks {
 export const SNAP_RADIUS = 48;
 
 /** 在VM存储的自定义函数 */
+export interface IFunctionReference {
+    targetId: string;
+    functionId: string;
+}
+
 export interface ICustomFunction {
     body: TPreviewFunctionData[];
     color: IBlockColor;
     id: string;
+    /** 函数在工具箱/工作区中的展示方式；旧项目缺省为 function-value。 */
+    previewMode?: TFunctionPreviewMode;
+    /** 返回类型；null 表示无返回值。 */
+    returnType?: TFunctionReturnType;
 }

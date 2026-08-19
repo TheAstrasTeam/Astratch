@@ -5,6 +5,7 @@
  */
 import * as Blockly from 'blockly';
 import { BlocksColor, OPCODES, type IBlockColor } from '../../types/blocks';
+import type { IFunctionReference } from '../../types/blocks';
 import { t } from 'i18next';
 
 export type TFunctionReturnField =
@@ -27,21 +28,24 @@ export interface TPreviewFunctionData {
 export interface IFunctionValueBlock extends Blockly.Block {
     previewData: TPreviewFunctionData[];
     colors: IBlockColor;
+    /** 持久化时指向 VM 中函数配置的稳定引用。 */
+    functionRef: IFunctionReference | null;
+    /** 函数在工作区中的展示方式。 */
+    previewMode: TFunctionPreviewMode;
+    /** 函数返回类型；null 表示语句积木或无返回值。 */
+    returnType: TFunctionReturnType;
     editMode: boolean;
     /** 当前激活（上次点击）的输入下标；-1 表示没有。 */
     activeInputIndex?: number;
-    /** 控制栏 foreignObject（挂在积木根组下，随工作区平移缩放）。 */
+    /** 控制栏 (foreignObject) */
     controlBar?: SVGForeignObjectElement | null;
     updateShape(): void;
     moveField(index: number, delta: number): void;
-    /** 从预览数据里移除一个输入并重建形状（编辑模式下）。 */
     removeField(index: number): void;
-    /** 选中（其编辑器被打开）指定输入框并显示控制栏。 */
     selectInput(index: number): void;
-    /** 取消选中当前输入框（销毁控制栏）。 */
     deselectInput(): void;
-    /** 重建并定位控制栏到激活输入框上方。 */
     updateControlBar(): void;
+    onchange(): void;
 }
 
 const previewBlockId = 'preview-function';

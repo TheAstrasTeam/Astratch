@@ -16,6 +16,7 @@ import { getBlocklyComponentStyles } from '../../../lib/Theme/guiThemeManager';
 import {
     events,
     type IDataCreatedEvent,
+    type IFunctionCreatedEvent,
     type IVM,
     type TViewportUpdateEvent,
 } from '../../../types/vm';
@@ -124,7 +125,14 @@ class Blocks implements IBlocks {
         void this.restartWorkspace();
     };
 
-    private handleVariableCreated = (data: { targetID: string }) => {
+    private handleVariableCreated = (rawData: object) => {
+        const data = rawData as IDataCreatedEvent;
+        if (data.targetID === this.vm.runtime.editingTargetID)
+            this.workspaceSvg?.refreshToolboxSelection();
+    };
+
+    private handleFunctionCreated = (rawData: object) => {
+        const data = rawData as IFunctionCreatedEvent;
         if (data.targetID === this.vm.runtime.editingTargetID)
             this.workspaceSvg?.refreshToolboxSelection();
     };
@@ -271,9 +279,8 @@ class Blocks implements IBlocks {
                     continuousToolbox.refreshFlyoutContents();
                 }
                 this.vm.on(events.UPDATE_THEME, this.handleThemeUpdate);
-                this.vm.on(events.CREATE_DATA, data => {
-                    this.handleVariableCreated(data as IDataCreatedEvent);
-                });
+                this.vm.on(events.CREATE_DATA, this.handleVariableCreated);
+                this.vm.on(events.CREATE_CUSTOM_FUNCTION, this.handleFunctionCreated);
             }
 
             const nowTarget = this.vm.runtime.getTargetByID(this.vm.runtime.editingTargetID);
@@ -312,8 +319,10 @@ class Blocks implements IBlocks {
     }
 
     dispose(): boolean {
+        this.vm.off(events.UPDATE_THEME, this.handleThemeUpdate);
+        this.vm.off(events.CREATE_DATA, this.handleVariableCreated);
+        this.vm.off(events.CREATE_CUSTOM_FUNCTION, this.handleFunctionCreated);
         if (this.workspaceSvg) {
-            this.vm.off(events.UPDATE_THEME, this.handleThemeUpdate);
             this.workspaceSvg.removeChangeListener(this.handleWorkspaceChange);
             this.workspaceSvg.dispose();
             this.workspaceSvg = null;
