@@ -71,7 +71,7 @@ class Blocks implements IBlocks {
         Blockly.Events.TOOLBOX_ITEM_SELECT,
     ];
 
-    handleWorkspaceChange = (event: Blockly.Events.Abstract | null, byHand = false) => {
+    private handleWorkspaceChange = (event: Blockly.Events.Abstract | null, byHand = false) => {
         // 检测更新，并检查这个事件是否需要忽略
         const update = () => {
             if (!this.workspaceSvg) return;
@@ -120,7 +120,7 @@ class Blocks implements IBlocks {
         } else if (byHand) update();
     };
 
-    handleThemeUpdate = () => {
+    private handleThemeUpdate = () => {
         void this.restartWorkspace();
     };
 
@@ -252,6 +252,7 @@ class Blocks implements IBlocks {
                 this._DOM = DOM;
                 await this.init();
                 this.workspaceSvg = this.Blockly.inject(DOM, this.workspaceConfig);
+                // 注册动态工作区
                 const { registerCategory } = await setupBlockly(this.Blockly, this.vm);
                 registerCategory.forEach(category => {
                     this.workspaceSvg?.registerToolboxCategoryCallback(

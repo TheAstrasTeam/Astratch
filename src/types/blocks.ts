@@ -550,10 +550,6 @@ export interface IBlocks {
      */
     init: () => Promise<void>;
     /**
-     * 检测到工作区变化的处理
-     */
-    handleWorkspaceChange: (event: Blockly.Events.Abstract) => void;
-    /**
      * 刷新工作区的大小
      */
     refreshBlocklySize: () => void;
