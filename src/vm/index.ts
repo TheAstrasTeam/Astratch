@@ -21,7 +21,7 @@ import {
     type IProjectMetaJSON,
     type ITargetBlocks,
     TargetModes,
-    type ITarget,
+    type TTargetInfo,
 } from '../types/vm';
 import { ProjectManager } from './project';
 import { t } from 'i18next';
@@ -246,12 +246,12 @@ export class VM implements IVM {
                     ) as ITargetBlocks;
                     const targetMeta = JSON.parse(
                         await (await targetMetaHandle.getFile()).text(),
-                    ) as Partial<ITarget>;
+                    ) as Partial<TTargetInfo>;
 
                     const targetInfo = {
                         ...targetMeta,
                         blocks: targetBlocks,
-                    } as ITarget;
+                    } as TTargetInfo;
 
                     this.runtime.targets.set(targetInfo.id, Target.fromJSON(targetInfo, emit));
                 }

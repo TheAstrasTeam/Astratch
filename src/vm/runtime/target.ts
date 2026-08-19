@@ -141,8 +141,9 @@ class Target implements ITarget {
 
     toJSON() {
         const json = Object.fromEntries(Object.entries(this).filter(([key]) => key !== 'blocks'));
-        // data 是 Map，JSON 序列化会变成 {} 导致数据丢失，这里存成数组
+        // data / function 是 Map，JSON 序列化会变成 {} 导致数据丢失，这里存成数组
         json.data = Array.from(this.data.values());
+        json.function = Array.from(this.function.values());
         return json as TTargetInfo;
     }
 
@@ -154,7 +155,7 @@ class Target implements ITarget {
         this.function.set(id, meta);
         this.emit(events.UPDATE_PROJECT);
         this.emit(events.CREATE_CUSTOM_FUNCTION, {
-            id
+            id,
         });
         return true;
     }
@@ -168,7 +169,11 @@ class Target implements ITarget {
         const id = meta.id ?? crypto.randomUUID();
         const mode = meta.mode ?? defaults.mode;
         const target = new Target(emit);
-        Object.assign(target, structuredClone(defaults), {
+        // 默认模板的 data / function 是序列化数组形式，排除掉，保留构造器初始化的空 Map
+        const { data: _data, function: _function, ...defaultsRest } = structuredClone(defaults);
+        void _data;
+        void _function;
+        Object.assign(target, defaultsRest, {
             id,
             name: meta.name ?? defaults.name,
             parentID: meta.parent ?? defaults.parentID,
@@ -181,7 +186,7 @@ class Target implements ITarget {
     static fromJSON(json: TTargetInfo, emit: TEmit): Target {
         const target = new Target(emit);
         Object.assign(target, json);
-        // 保存时 data 以数组存储，这里还原为 Map；
+        // 保存时 data / function 以数组存储，这里还原为 Map；
         // 兼容旧版本：可能是 Map，也可能是 JSON 序列化丢失后的 {}
         const data: unknown = json.data;
         if (data instanceof Map) {
@@ -191,6 +196,15 @@ class Target implements ITarget {
             target.data = new Map(variables.map(variable => [variable.id, variable]));
         } else {
             target.data = new Map();
+        }
+        const customFunctions: unknown = json.function;
+        if (customFunctions instanceof Map) {
+            target.function = customFunctions as Map<string, ICustomFunction>;
+        } else if (Array.isArray(customFunctions)) {
+            const functions = customFunctions as ICustomFunction[];
+            target.function = new Map(functions.map(fn => [fn.id, fn]));
+        } else {
+            target.function = new Map();
         }
         return target;
     }

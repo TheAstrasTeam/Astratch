@@ -32,8 +32,8 @@ const DEFAULTS: TTargetInfo = {
     viewY: 0,
     viewScale: 1,
     links: [],
-    data: new Map(),
-    function: new Map(),
+    data: [],
+    function: [],
 };
 
 const ENTITY_INFO: IEntityInfo = {
@@ -245,12 +245,12 @@ describe('Target.fromJSON', () => {
                 parentID: null,
                 viewScale: 2,
                 links: [],
-                data: new Map(),
+                data: [],
                 blocks: { _workspace: { blocks: { languageVersion: 0, blocks: [] } }, _script: [] },
                 comments: {},
                 viewX: 0,
                 viewY: 0,
-                function: new Map(),
+                function: [],
             },
             vi.fn(),
         );
@@ -287,6 +287,20 @@ describe('Target 数据序列化', () => {
         ]);
     });
 
+    it('toJSON应该把function Map序列化为数组并能还原为Map', () => {
+        const emit = vi.fn();
+        const target = makeTarget(emit);
+        const body: ICustomFunction = { body: [], color: {}, id: 'a' };
+        target.addCustomFunction('a', body);
+        const json = target.toJSON();
+        expect(Array.isArray(json.function)).toBe(true);
+        expect(json.function).toHaveLength(1);
+        expect(json.function[0]).toMatchObject({ id: 'a' });
+        const roundTrip = Target.fromJSON(JSON.parse(JSON.stringify(json)) as TTargetInfo, vi.fn());
+        expect(roundTrip.function).toBeInstanceOf(Map);
+        expect(roundTrip.function.get('a')).toMatchObject({ id: 'a' });
+    });
+
     it('fromJSON遇到旧版本的data({})应该还原为空Map而不报错', () => {
         const target = Target.fromJSON(
             {
@@ -296,12 +310,12 @@ describe('Target 数据序列化', () => {
                 parentID: null,
                 viewScale: 1,
                 links: [],
-                data: {} as unknown as Map<string, never>,
+                data: {} as unknown as TTargetInfo['data'],
                 blocks: { _workspace: { blocks: { languageVersion: 0, blocks: [] } }, _script: [] },
                 comments: {},
                 viewX: 0,
                 viewY: 0,
-                function: new Map(),
+                function: [],
             },
             vi.fn(),
         );
@@ -320,12 +334,12 @@ describe('自定义函数测试', () => {
                 parentID: null,
                 viewScale: 1,
                 links: [],
-                data: {} as unknown as Map<string, never>,
+                data: {} as unknown as TTargetInfo['data'],
                 blocks: { _workspace: { blocks: { languageVersion: 0, blocks: [] } }, _script: [] },
                 comments: {},
                 viewX: 0,
                 viewY: 0,
-                function: new Map(),
+                function: [],
             },
             vi.fn(),
         );
@@ -367,7 +381,7 @@ describe('自定义函数测试', () => {
     });
     it('应该添加成功创建多个函数并广播', () => {
         const emit = vi.fn();
-        const target = makeTarget(emit)
+        const target = makeTarget(emit);
         for (let i = 0; i <= 20; i++) {
             emit.mockClear();
             const id = crypto.randomUUID();

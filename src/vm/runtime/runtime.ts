@@ -123,7 +123,8 @@ class Runtime implements IRuntime {
             viewY: 0,
             viewScale: 1,
             links: [],
-            data: new Map(),
+            data: [],
+            function: [],
         };
 
         /**
