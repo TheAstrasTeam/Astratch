@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { IBlocks, IWorkspaceState } from './blocks';
+import type { IBlocks, ICustomFunction, IWorkspaceState } from './blocks';
 import * as Blockly from 'blockly/core';
 
 export const DATA_VISIBILITY = {
@@ -99,6 +99,10 @@ export interface ITarget {
      */
     data: Map<string, IVariable>;
     /**
+     * 函数
+     */
+    function: Map<string, ICustomFunction>;
+    /**
      * 重命名目标
      */
     rename: (name: string) => void;
@@ -140,10 +144,18 @@ export interface ITarget {
      * 序列化为纯字段对象（不含blocks）
      */
     toJSON: () => TTargetInfo;
+    /**
+     * 添加一个自定义函数配置
+     * @returns 是否创建成功
+     */
+    addCustomFunction: (id: string, meta: ICustomFunction) => boolean;
 }
 
 /**
  * 纯字段的目标结构（用于默认值模板与序列化）
+ *
+ * 序列化时 data / function 以数组存储（Map 无法被 JSON 序列化，会变成 {}），
+ * 加载时由 fromJSON 还原为 Map
  */
 export type TTargetInfo = Omit<
     ITarget,
@@ -157,7 +169,13 @@ export type TTargetInfo = Omit<
     | 'getData'
     | 'cloneAsNode'
     | 'toJSON'
->;
+    | 'addCustomFunction'
+    | 'data'
+    | 'function'
+> & {
+    data: IVariable[];
+    function: ICustomFunction[];
+};
 
 export interface IVariable {
     name: string;
@@ -536,6 +554,7 @@ export const events = {
     VIEWPORT_VIEW: 'viewport_view',
     UPDATE_TARGET_STRUCTURE: 'update_target_structure',
     CREATE_DATA: 'create_data',
+    CREATE_CUSTOM_FUNCTION: 'create_custom_function',
 } as const;
 
 export type TEvents = (typeof events)[keyof typeof events];

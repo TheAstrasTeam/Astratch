@@ -15,7 +15,7 @@ import {
     type TTargetMode,
     type TViewportUpdateEvent,
 } from '../../types/vm';
-import type { IWorkspaceState } from '../../types/blocks';
+import type { ICustomFunction, IWorkspaceState } from '../../types/blocks';
 import { spawnRandomString } from '../../utils/ash-data';
 import { sendError } from '../../utils/debug';
 import { t } from 'i18next';
@@ -42,6 +42,7 @@ class Target implements ITarget {
     viewScale: number;
     links: string[];
     data: Map<string, IVariable>;
+    function: Map<string, ICustomFunction>;
 
     private emit: TEmit;
 
@@ -66,6 +67,7 @@ class Target implements ITarget {
         this.viewScale = 1;
         this.links = [];
         this.data = new Map();
+        this.function = new Map();
     }
 
     rename(name: string) {
@@ -142,6 +144,19 @@ class Target implements ITarget {
         // data 是 Map，JSON 序列化会变成 {} 导致数据丢失，这里存成数组
         json.data = Array.from(this.data.values());
         return json as TTargetInfo;
+    }
+
+    addCustomFunction(id: string, meta: ICustomFunction) {
+        if (this.function.has(id)) {
+            sendError(t('vm:err.customFunction.existing'));
+            return false;
+        }
+        this.function.set(id, meta);
+        this.emit(events.UPDATE_PROJECT);
+        this.emit(events.CREATE_CUSTOM_FUNCTION, {
+            id
+        });
+        return true;
     }
 
     static fromMeta(

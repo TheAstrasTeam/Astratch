@@ -20,10 +20,11 @@ import {
     resizePreviewWorkspace,
     setPreviewConfig,
     setPreviewBlockColor,
+    previewFunctionData,
 } from './functionPreview';
 import { DropDownIcon, StringIcon, TextIcon } from './icons';
 import { ColorPickerButton } from '../colorPickerButton';
-import type { IBlockColor } from '../../types/blocks';
+import type { IBlockColor, ICustomFunction } from '../../types/blocks';
 import type {
     TFunctionFieldType,
     TFunctionInputField,
@@ -34,6 +35,8 @@ import type { JSX } from 'react/jsx-dev-runtime';
 import * as Blockly from 'blockly/core';
 
 import DropdownTipIcon from '../../assets/dorpdown.svg?react';
+import { spawnRandomString } from '../../utils/ash-data';
+import { sendError } from '../../utils/debug';
 
 // 此组件由AI生成：创建函数弹窗中的大号字段类型按钮
 const BigSelector = ({
@@ -58,7 +61,7 @@ const BigSelector = ({
     );
 };
 
-export const CreateFunctionModal = ({ vm, addID: _addID }: { vm: IVM; addID?: string }) => {
+export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) => {
     const { closeSelf } = useModalInstance();
     const [blockColor, setBlockColor] = useState<IBlockColor>(previewBlockColor);
     const [previewMode, setPreviewMode] = useState<TFunctionPreviewMode>('function-value');
@@ -110,6 +113,20 @@ export const CreateFunctionModal = ({ vm, addID: _addID }: { vm: IVM; addID?: st
         if (returnType === null) return t('gui:createFunction.noReturn');
         const types: TFunctionInputField[] = Array.isArray(returnType) ? returnType : [returnType];
         return types.map(type => t(`gui:createFunction.${type}`)).join(' | ');
+    };
+
+    const doneCreateFunction = () => {
+        const id = spawnRandomString();
+        const functionData: ICustomFunction = {
+            body: previewFunctionData,
+            color: previewBlockColor,
+            id,
+        };
+        const target = vm.runtime.getTargetByID(addID);
+        if (target) {
+            target.addCustomFunction(id, functionData);
+            void closeSelf();
+        } else sendError(t('vm:err.target.undefined'), 'warn');
     };
 
     // 此函数由AI生成
@@ -208,6 +225,7 @@ export const CreateFunctionModal = ({ vm, addID: _addID }: { vm: IVM; addID?: st
                 >
                     {returnTypeLabel()}
                 </button>
+                <button onClick={doneCreateFunction}>Done</button>
             </div>
         </Modal>
     );

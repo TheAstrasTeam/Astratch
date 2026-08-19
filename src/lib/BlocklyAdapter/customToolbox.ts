@@ -125,6 +125,8 @@ export function setFunctionCategory(_blockly: typeof Blockly, vm: IVM): IRegiste
     const handleCreateFunction = () => {
         void modal.open(CreateFunctionModal, {
             vm,
+            // 它100亿%会是现在编辑的目标
+            addID: vm.runtime.editingTargetID
         });
     };
     return {

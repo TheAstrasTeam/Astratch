@@ -9,7 +9,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import Target from '../../src/vm/runtime/target';
 import { events, type IEntityInfo, type TEmit, type TTargetInfo } from '../../src/types/vm';
 import { sendError } from '../../src/utils/debug';
-import type { IWorkspaceState } from '../../src/types/blocks';
+import type { ICustomFunction, IWorkspaceState } from '../../src/types/blocks';
 
 vi.mock('../../src/utils/debug', () => ({
     sendError: vi.fn((error: unknown, type: 'error' | 'warn' = 'error') => {
@@ -33,6 +33,7 @@ const DEFAULTS: TTargetInfo = {
     viewScale: 1,
     links: [],
     data: new Map(),
+    function: new Map(),
 };
 
 const ENTITY_INFO: IEntityInfo = {
@@ -249,6 +250,7 @@ describe('Target.fromJSON', () => {
                 comments: {},
                 viewX: 0,
                 viewY: 0,
+                function: new Map(),
             },
             vi.fn(),
         );
@@ -299,10 +301,86 @@ describe('Target 数据序列化', () => {
                 comments: {},
                 viewX: 0,
                 viewY: 0,
+                function: new Map(),
             },
             vi.fn(),
         );
         expect(target.data).toBeInstanceOf(Map);
         expect(target.data.size).toBe(0);
+    });
+});
+
+describe('自定义函数测试', () => {
+    it('有已存在的函数id时报错', () => {
+        const target = Target.fromJSON(
+            {
+                name: 'legacy',
+                id: 't1',
+                mode: 'module',
+                parentID: null,
+                viewScale: 1,
+                links: [],
+                data: {} as unknown as Map<string, never>,
+                blocks: { _workspace: { blocks: { languageVersion: 0, blocks: [] } }, _script: [] },
+                comments: {},
+                viewX: 0,
+                viewY: 0,
+                function: new Map(),
+            },
+            vi.fn(),
+        );
+        const body: ICustomFunction = {
+            body: [],
+            color: {},
+            id: 'a',
+        };
+        expect(target.addCustomFunction('a', body)).toBe(true);
+        expect(() => target.addCustomFunction('a', body)).toThrow(Error);
+    });
+    it('应该添加成功多个函数', () => {
+        const target = Target.fromJSON(
+            {
+                name: 'legacy',
+                id: 't1',
+                mode: 'module',
+                parentID: null,
+                viewScale: 1,
+                links: [],
+                data: {} as unknown as Map<string, never>,
+                blocks: { _workspace: { blocks: { languageVersion: 0, blocks: [] } }, _script: [] },
+                comments: {},
+                viewX: 0,
+                viewY: 0,
+                function: new Map(),
+            },
+            vi.fn(),
+        );
+        for (let i = 0; i <= 20; i++) {
+            const id = crypto.randomUUID();
+            const body: ICustomFunction = {
+                body: [],
+                color: {},
+                id,
+            };
+            expect(target.addCustomFunction(id, body)).toBe(true);
+        }
+    });
+    it('应该添加成功创建多个函数并广播', () => {
+        const emit = vi.fn();
+        const target = makeTarget(emit)
+        for (let i = 0; i <= 20; i++) {
+            emit.mockClear();
+            const id = crypto.randomUUID();
+            const body: ICustomFunction = {
+                body: [],
+                color: {},
+                id,
+            };
+            target.addCustomFunction(id, body);
+            expect(emit).toHaveBeenNthCalledWith(1, events.UPDATE_PROJECT);
+            expect(emit).toHaveBeenNthCalledWith(2, events.CREATE_CUSTOM_FUNCTION, {
+                id,
+            });
+        }
     });
 });

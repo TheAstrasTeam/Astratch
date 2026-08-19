@@ -6,6 +6,7 @@
 
 import * as Blockly from 'blockly';
 import type { IVM } from './vm';
+import type { TPreviewFunctionData } from '../components/modal_createFunction/functionPreview';
 
 const OPCODES = {
     // 菜单
@@ -562,3 +563,10 @@ export interface IBlocks {
 // -> ScratchBlocks.SNAP_RADIUS
 // <- 48
 export const SNAP_RADIUS = 48;
+
+/** 在VM存储的自定义函数 */
+export interface ICustomFunction {
+    body: TPreviewFunctionData[];
+    color: IBlockColor;
+    id: string;
+}
