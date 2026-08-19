@@ -7,7 +7,7 @@
 import { useModalInstance } from '@reactleaf/modal';
 import { Modal } from '../Modal/modalWindow';
 import { Settings, type ISettingDefinition } from '../../settings/SettingsRegistry';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './index.module.scss';
 import KeyInput from '../keyInput';
@@ -15,6 +15,7 @@ import type { ShortcutIds } from '../../types/lib';
 import { shortcutManager } from '../../lib/ShortcutManager';
 import { t } from 'i18next';
 import classNames from 'classnames';
+import { onSettingsFocus } from '../../utils/ash-gui';
 
 const SpawnSetting = ({ settings }: { settings: ISettingDefinition }) => {
     const { t } = useTranslation();
@@ -123,13 +124,37 @@ const SpawnSetting = ({ settings }: { settings: ISettingDefinition }) => {
     );
 };
 
-export const SettingsModal = () => {
+export const SettingsModal = ({
+    category: initialCategory,
+    focusGroup: initialFocusGroup,
+}: {
+    /** 打开时默认选中的分类（如 'addons'） */
+    category?: string;
+    /** 打开后需要滚动定位到的小节 group（如 'addon_example:@name'） */
+    focusGroup?: string;
+}) => {
     const { closeSelf } = useModalInstance();
     const categories = Settings.getDefinitionsByCategory();
 
-    const [nowTab, setTab] = useState<string>(Object.keys(categories)[0]);
+    const [nowTab, setTab] = useState<string>(initialCategory ?? Object.keys(categories)[0]);
+    const [focusGroup, setFocusGroup] = useState<string | undefined>(initialFocusGroup);
 
     const [isFullScreen, setFullScreen] = useState<boolean>(false);
+
+    /** 打开后滚动定位到指定插件的设置小节 */
+    useEffect(() => {
+        if (!focusGroup || nowTab !== 'addons') return;
+        const el = document.querySelector(`[data-group="${focusGroup}"]`);
+        el?.scrollIntoView({ block: 'start' });
+    }, [nowTab, focusGroup]);
+
+    /** 设置窗口已打开时，接收来自外部（如插件页设置按钮）的跳转请求 */
+    useEffect(() => {
+        return onSettingsFocus(({ category, focusGroup }) => {
+            if (category) setTab(category);
+            if (focusGroup) setFocusGroup(focusGroup);
+        });
+    }, []);
 
     /** 按 group 给设置分小节（插件设置按插件名分组），group 变化时插入小标题 */
     const renderSettings = (defs: ISettingDefinition[]) => {
@@ -138,7 +163,11 @@ export const SettingsModal = () => {
         for (const def of defs) {
             if (def.group !== lastGroup) {
                 nodes.push(
-                    <div key={`group-${def.key}`} className={styles.groupTitle}>
+                    <div
+                        key={`group-${def.key}`}
+                        className={styles.groupTitle}
+                        data-group={def.group}
+                    >
                         {def.group ? t(def.group, { defaultValue: def.group }) : ''}
                     </div>,
                 );

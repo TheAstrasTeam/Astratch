@@ -70,12 +70,39 @@ const saveCurrentProjectAs = async (vm: IVM) => {
 };
 
 /**
- * 打开设置窗口，已打开时不再重复弹出
+ * 设置窗口的跳转目标：指定默认分类与需要滚动定位的小节
  */
-const openSettingsModal = () => {
+export interface ISettingsFocusTarget {
+    category?: string;
+    focusGroup?: string;
+}
+
+const settingsFocusListeners = new Set<(target: ISettingsFocusTarget) => void>();
+
+/**
+ * 订阅设置窗口的“跳转到指定小节”请求
+ */
+export const onSettingsFocus = (listener: (target: ISettingsFocusTarget) => void) => {
+    settingsFocusListeners.add(listener);
+    return () => {
+        settingsFocusListeners.delete(listener);
+    };
+};
+
+/**
+ * 打开设置窗口。已打开时不再重复弹出，而是把跳转目标推送给已打开的窗口。
+ * @param target 可选，指定打开后默认分类与需要滚动定位的小节
+ */
+const openSettingsModal = (target?: ISettingsFocusTarget) => {
     const alreadyOpen = modal.getSnapshot().some(state => state.Component === SettingsModal);
-    if (alreadyOpen) return;
-    void modal.open(SettingsModal);
+    if (alreadyOpen) {
+        if (target)
+            settingsFocusListeners.forEach(fn => {
+                fn(target);
+            });
+        return;
+    }
+    void modal.open(SettingsModal, target);
 };
 
 export {

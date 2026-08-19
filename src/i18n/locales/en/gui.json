@@ -49,6 +49,7 @@
     "addon.title": "Addons",
     "addon.enable": "Enable",
     "addon.disable": "Disable",
+    "addon.settings": "Addon settings",
     "addon.download": "Download",
     "addon.downloading": "Downloading...",
     "addon.loading": "Loading addons...",

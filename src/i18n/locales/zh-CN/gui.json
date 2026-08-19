@@ -49,6 +49,7 @@
     "addon.title": "插件",
     "addon.enable": "启用",
     "addon.disable": "禁用",
+    "addon.settings": "插件设置",
     "addon.download": "下载",
     "addon.downloading": "下载中...",
     "addon.loading": "正在加载插件...",
