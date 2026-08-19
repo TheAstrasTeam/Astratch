@@ -23,8 +23,8 @@ describe('Folder.fromJSON', () => {
     });
 
     it('缺失字段时使用默认值', () => {
-        // @ts-expect-error 检测需要忽略
         const folder = Folder.fromJSON(
+            // @ts-expect-error 检测需要忽略
             {
                 id: 'f1',
             },
