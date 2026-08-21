@@ -96,20 +96,28 @@ const computeHash = async (text: string): Promise<string> => {
 
 /**
  * 从 registry 条目构建一个 IAddon（远端插件）。
- * 条目中已内嵌图标（data URL）与 i18n 资源，无需额外请求；
- * 各版本的下载地址由 download 路径派生。
+ * 图标和 i18n 路径在 registry 中以相对路径提供，客户端据此构建完整 URL。
+ * i18n 资源在后台异步加载并注册。
  */
 export const registryAddonToIAddon = (entry: IRegistryAddon): IAddon => {
-    registerAddonI18n(entry.id, entry.i18n ?? {});
     const releases: Record<string, IRegistryVersion> = {};
     for (const version of entry.versions) {
         releases[version] = { main: 'addon.js', url: addonFileUrl(entry.download, version) };
     }
+
+    // 图标：将相对路径转为完整 URL
+    const icon = entry.icon ? `${ADDONS_REPO_URL}/${entry.icon}` : '';
+
+    // i18n：异步加载并注册
+    if (entry.i18n) {
+        void loadAddonI18n(entry.id, entry.i18n);
+    }
+
     return {
         id: entry.id,
         name: entry.name,
         description: entry.description,
-        icon: entry.icon ?? '',
+        icon,
         author: entry.author,
         i18nNamespace: `addon_${entry.id}`,
         defaultEnabled: entry.defaultEnabled ?? false,
@@ -121,6 +129,35 @@ export const registryAddonToIAddon = (entry: IRegistryAddon): IAddon => {
         versions: entry.versions,
         releases,
     };
+};
+
+/**
+ * 异步加载插件的 i18n 资源并注册到 i18next。
+ * i18n 路径映射（locale -> 相对路径）从 registry 获取。
+ */
+const loadAddonI18n = async (
+    addonId: string,
+    i18nPaths: Partial<Record<string, string>>,
+): Promise<void> => {
+    const entries = Object.entries(i18nPaths).filter(
+        (entry): entry is [string, string] => entry[1] !== undefined,
+    );
+    if (entries.length === 0) return;
+
+    const resources: Partial<Record<string, Record<string, string>>> = {};
+    await Promise.all(
+        entries.map(async ([locale, relativePath]) => {
+            try {
+                const url = `${ADDONS_REPO_URL}/${relativePath}`;
+                const text = await fetchText(url);
+                resources[locale] = JSON.parse(text) as Record<string, string>;
+            } catch {
+                // 加载失败的 locale 静默跳过，走 fallback
+            }
+        }),
+    );
+
+    registerAddonI18n(addonId, resources);
 };
 
 /**
