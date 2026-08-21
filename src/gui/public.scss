@@ -42,6 +42,12 @@ body {
     color: $text-primary;
 }
 
+// 可拖动模态框：react-rnd 通过 transform 定位，需禁用 @reactleaf/modal 自带的 transform 过渡，否则拖动会卡顿
+.modal-layer > *,
+.modal-layer[data-content-visible='true'] > * {
+    transition: none !important;
+}
+
 .blocklyFlyoutButton {
     display: flex;
     stroke: transparent;

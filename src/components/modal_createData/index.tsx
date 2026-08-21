@@ -42,12 +42,15 @@ export const CreateDataModal = ({ vm, addID }: { vm: IVM; addID?: string }) => {
 
     return (
         <Modal
+            windowID='createData'
             fullScreen={false}
             close={async () => {
                 await closeSelf();
             }}
             title={t('gui:prompt.title')}
             description={t('gui:prompt.description')}
+            minWidth='30vw'
+            minHeight='25vh'
         >
             <div className={styles.content}>
                 <div className={styles.state}>

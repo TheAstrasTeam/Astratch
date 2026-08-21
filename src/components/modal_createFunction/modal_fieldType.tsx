@@ -98,8 +98,11 @@ export const FieldTypeModal = ({
 
     return (
         <Modal
+            windowID='fieldType'
             fullScreen={false}
             close={closeSelf}
+            minWidth={300}
+            minHeight={200}
             title={t(
                 purpose === 'return' ? 'gui:createFunction.returnType' : 'gui:createFunction.input',
             )}

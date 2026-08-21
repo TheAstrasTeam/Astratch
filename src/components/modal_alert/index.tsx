@@ -25,10 +25,13 @@ export const AlertModal = ({
 
     return (
         <Modal
+            windowID='alert'
             fullScreen={false}
             close={closeSelf}
             title={t('gui:alert.title')}
             description={t('gui:alert.description')}
+            minWidth='30vw'
+            minHeight='25vh'
         >
             <div className={styles.content}>
                 <div className={styles.text}>{message}</div>

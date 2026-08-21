@@ -143,6 +143,7 @@ export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) =
 
     return (
         <Modal
+            windowID='createFunction'
             fullScreen={false}
             onFullScreen={resizePreviewWorkspace}
             close={async () => {
@@ -150,6 +151,8 @@ export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) =
             }}
             title={t('gui:createFunction.title')}
             description={t('gui:createFunction.description')}
+            minWidth={400}
+            minHeight={350}
         >
             <div className={styles.content}>
                 <CreateFunctionWorkspace vm={vm} />

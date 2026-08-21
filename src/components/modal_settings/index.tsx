@@ -180,11 +180,14 @@ export const SettingsModal = ({
 
     return (
         <Modal
+            windowID='settings'
             fullScreen={false}
             onFullScreen={setFullScreen}
             close={closeSelf}
             title={t('gui:settings.title')}
             description={t('gui:settings.description')}
+            minWidth='30vw'
+            minHeight={200}
         >
             <div
                 className={classNames(styles.content, {
