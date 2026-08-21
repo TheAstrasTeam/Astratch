@@ -13,7 +13,8 @@
 const DB_NAME = 'astratch_addons_cache';
 const FILES_STORE = 'files';
 const HANDLES_STORE = 'handles';
-const DB_VERSION = 2;
+const SETTINGS_STORE = 'settings';
+const DB_VERSION = 3;
 
 function openDB(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
@@ -25,6 +26,9 @@ function openDB(): Promise<IDBDatabase> {
             }
             if (!db.objectStoreNames.contains(HANDLES_STORE)) {
                 db.createObjectStore(HANDLES_STORE);
+            }
+            if (!db.objectStoreNames.contains(SETTINGS_STORE)) {
+                db.createObjectStore(SETTINGS_STORE);
             }
         };
         request.onsuccess = () => {
@@ -199,5 +203,47 @@ export async function listHandleIds(): Promise<string[]> {
         });
     } catch {
         return [];
+    }
+}
+
+/**
+ * 读取 registry.json 的哈希值
+ */
+export async function getRegistryHash(): Promise<string | null> {
+    try {
+        const db = await openDB();
+        return await new Promise<string | null>((resolve, reject) => {
+            const transaction = db.transaction(SETTINGS_STORE, 'readonly');
+            const request = transaction.objectStore(SETTINGS_STORE).get('registryHash');
+            request.onsuccess = () => {
+                resolve((request.result as string | undefined) ?? null);
+            };
+            request.onerror = () => {
+                reject(new Error('Failed to read registry hash'));
+            };
+        });
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * 保存 registry.json 的哈希值
+ */
+export async function setRegistryHash(hash: string): Promise<void> {
+    try {
+        const db = await openDB();
+        await new Promise<void>((resolve, reject) => {
+            const transaction = db.transaction(SETTINGS_STORE, 'readwrite');
+            transaction.objectStore(SETTINGS_STORE).put(hash, 'registryHash');
+            transaction.oncomplete = () => {
+                resolve();
+            };
+            transaction.onerror = () => {
+                reject(new Error('Failed to write registry hash'));
+            };
+        });
+    } catch {
+        // 缓存失败不影响功能
     }
 }

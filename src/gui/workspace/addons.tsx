@@ -13,6 +13,18 @@ import styles from './addons.module.scss';
 import { addonManager, useAddonStore } from '../../addons';
 import { openSettingsModal } from '../../utils/ash-gui';
 
+/** 简易 semver 比较：返回 -1 / 0 / 1 */
+const compareSemver = (a: string, b: string): number => {
+    const pa = a.split('.').map(Number);
+    const pb = b.split('.').map(Number);
+    for (let i = 0; i < 3; i++) {
+        const da = pa[i] ?? 0;
+        const db = pb[i] ?? 0;
+        if (da !== db) return da < db ? -1 : 1;
+    }
+    return 0;
+};
+
 const AddonCard = ({
     name,
     description,
@@ -66,12 +78,12 @@ const AddonCard = ({
                 <span className={styles.cardName}>
                     {name}
                     {isCustom && <span className={styles.cardBadge}>{t('gui:addon.custom')}</span>}
-                    {!isCustom && <span className={styles.cardBadge}>{version}</span>}
+                    {!isCustom && <span className={styles.cardBadge}>v{version}</span>}
                 </span>
                 {description && <span className={styles.cardDesc}>{description}</span>}
                 {author && <span className={styles.cardAuthor}>{author}</span>}
-                {minVersion && (
-                    <span className={styles.cardMinVersion}>
+                {minVersion && compareSemver(__APP_VERSION__, minVersion) < 0 && (
+                    <span className={classNames(styles.cardMinVersion, styles.cardMinVersionWarn)}>
                         {t('gui:addon.minVersion', { version: minVersion })}
                     </span>
                 )}

@@ -7,15 +7,17 @@
 // 此文件由AI生成
 
 import type { IAddon, IAddonRegistry, IRegistryAddon, IRegistryVersion } from './types';
-import { cacheGet, cacheSet } from './cache';
+import { cacheGet, cacheSet, clearFileCache, getRegistryHash, setRegistryHash } from './cache';
 import { registerAddonI18n } from './i18n';
 
 /**
  * 插件仓库：AstratchAddons 的 GitHub 发布地址（raw 形式）。
  * 插件在运行时从这里下载并缓存到 IndexedDB，离线也能用。
+ * release 分支只包含编译后的产物（<id>@v<version>/ 目录 + registry.json），
+ * 不含源码、脚本或工作流文件。
  */
 const ADDONS_REPO_URL =
-    'https://raw.githubusercontent.com/TheAstrasTeam/AstratchAddons/refs/heads/main';
+    'https://raw.githubusercontent.com/TheAstrasTeam/AstratchAddons/refs/heads/release';
 
 /** registry.json —— 统一商店入口，单文件一次请求拿全目录 */
 const REGISTRY_CACHE_KEY = 'registry.json';
@@ -27,11 +29,12 @@ export const addonContentCacheKey = (id: string, version: string): string =>
 
 /**
  * 从 registry 的 download 路径派生某个版本 addon.js 的下载地址。
- * download 形如 addons/example/releases/1.2.0/，去掉尾部 `<版本>/` 后拼接目标版本。
+ * download 形如 example@v1.2.0/，提取 id 后拼接目标版本。
+ * 例：download="example@v1.2.0/", version="2.0.0" → .../example@v2.0.0/addon.js
  */
 export const addonFileUrl = (download: string, version: string): string => {
-    const dirPrefix = download.replace(/[^/]*\/$/, '');
-    return `${ADDONS_REPO_URL}/${dirPrefix}${version}/addon.js`;
+    const id = download.replace(/@v[^/]*\/$/, '');
+    return `${ADDONS_REPO_URL}/${id}@v${version}/addon.js`;
 };
 
 const fetchText = async (url: string): Promise<string> => {
@@ -81,21 +84,40 @@ const parseRegistry = (text: string): IAddonRegistry => {
 };
 
 /**
+ * 计算文本的 SHA-256 哈希值（十六进制字符串）
+ */
+const computeHash = async (text: string): Promise<string> => {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(text);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+};
+
+/**
  * 从 registry 条目构建一个 IAddon（远端插件）。
- * 条目中已内嵌图标（data URL）与 i18n 资源，无需额外请求；
- * 各版本的下载地址由 download 路径派生。
+ * 图标和 i18n 路径在 registry 中以相对路径提供，客户端据此构建完整 URL。
+ * i18n 资源在后台异步加载并注册。
  */
 export const registryAddonToIAddon = (entry: IRegistryAddon): IAddon => {
-    registerAddonI18n(entry.id, entry.i18n ?? {});
     const releases: Record<string, IRegistryVersion> = {};
     for (const version of entry.versions) {
         releases[version] = { main: 'addon.js', url: addonFileUrl(entry.download, version) };
     }
+
+    // 图标：将相对路径转为完整 URL
+    const icon = entry.icon ? `${ADDONS_REPO_URL}/${entry.icon}` : '';
+
+    // i18n：异步加载并注册
+    if (entry.i18n) {
+        void loadAddonI18n(entry.id, entry.i18n);
+    }
+
     return {
         id: entry.id,
         name: entry.name,
         description: entry.description,
-        icon: entry.icon ?? '',
+        icon,
         author: entry.author,
         i18nNamespace: `addon_${entry.id}`,
         defaultEnabled: entry.defaultEnabled ?? false,
@@ -107,6 +129,35 @@ export const registryAddonToIAddon = (entry: IRegistryAddon): IAddon => {
         versions: entry.versions,
         releases,
     };
+};
+
+/**
+ * 异步加载插件的 i18n 资源并注册到 i18next。
+ * i18n 路径映射（locale -> 相对路径）从 registry 获取。
+ */
+const loadAddonI18n = async (
+    addonId: string,
+    i18nPaths: Partial<Record<string, string>>,
+): Promise<void> => {
+    const entries = Object.entries(i18nPaths).filter(
+        (entry): entry is [string, string] => entry[1] !== undefined,
+    );
+    if (entries.length === 0) return;
+
+    const resources: Partial<Record<string, Record<string, string>>> = {};
+    await Promise.all(
+        entries.map(async ([locale, relativePath]) => {
+            try {
+                const url = `${ADDONS_REPO_URL}/${relativePath}`;
+                const text = await fetchText(url);
+                resources[locale] = JSON.parse(text) as Record<string, string>;
+            } catch {
+                // 加载失败的 locale 静默跳过，走 fallback
+            }
+        }),
+    );
+
+    registerAddonI18n(addonId, resources);
 };
 
 /**
@@ -129,12 +180,25 @@ export async function listRemoteAddons(): Promise<IAddon[]> {
 
 /**
  * 强制从 GitHub 拉取最新 registry.json 并更新本地缓存（绕过缓存）。
- * 用于“后台静默更新商店列表”。失败时抛出，由调用方决定如何处理。
+ * 如果 registry.json 内容发生变化（哈希不匹配），会清空所有远端插件文件缓存，
+ * 下次加载插件时需要重新下载。失败时抛出，由调用方决定如何处理。
  */
 export async function refreshRegistry(): Promise<IAddonRegistry> {
     const text = await fetchText(REGISTRY_URL);
     const registry = parseRegistry(text);
+
+    // 比较哈希，检测 registry.json 是否变化
+    const newHash = await computeHash(text);
+    const oldHash = await getRegistryHash();
+
+    if (oldHash !== null && oldHash !== newHash) {
+        // registry.json 变化，清空所有插件文件缓存
+        await clearFileCache();
+    }
+
     await cacheSet(REGISTRY_CACHE_KEY, text);
+    await setRegistryHash(newHash);
+
     return registry;
 }
 

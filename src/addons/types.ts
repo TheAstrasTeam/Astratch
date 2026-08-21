@@ -169,19 +169,19 @@ export interface IRegistryAddon {
     description: string;
     author: string;
     license?: string;
-    /** 内联小图标（data URL） */
+    /** 图标文件路径（相对于 release 根目录，如 addon@v1.0.0/assets/icon.svg） */
     icon?: string;
     defaultEnabled?: boolean;
     settings?: IAddonSettingDefinition[];
-    /** 内嵌的 i18n 资源（无需额外请求） */
-    i18n?: Partial<Record<string, Record<string, string>>>;
+    /** i18n 文件路径映射（locale -> 相对于 release 根目录的路径） */
+    i18n?: Partial<Record<string, string>>;
     /** 兼容的 Astratch 最低版本 */
     astratch?: { minVersion?: string };
     /** 当前（最新）版本 */
     version: string;
     /** 全部可用版本（旧到新） */
     versions: string[];
-    /** 当前版本发布目录的相对路径（如 addons/example/releases/1.2.0/），客户端据此派生各版本 URL */
+    /** 当前版本发布目录的相对路径（如 example@v1.0.0/），客户端据此派生各版本 URL */
     download: string;
 }
 
