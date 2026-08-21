@@ -7,7 +7,7 @@
 // 此文件由AI生成
 
 import type { IAddon, IAddonRegistry, IRegistryAddon, IRegistryVersion } from './types';
-import { cacheGet, cacheSet } from './cache';
+import { cacheGet, cacheSet, clearFileCache, getRegistryHash, setRegistryHash } from './cache';
 import { registerAddonI18n } from './i18n';
 
 /**
@@ -84,6 +84,17 @@ const parseRegistry = (text: string): IAddonRegistry => {
 };
 
 /**
+ * 计算文本的 SHA-256 哈希值（十六进制字符串）
+ */
+const computeHash = async (text: string): Promise<string> => {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(text);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+};
+
+/**
  * 从 registry 条目构建一个 IAddon（远端插件）。
  * 条目中已内嵌图标（data URL）与 i18n 资源，无需额外请求；
  * 各版本的下载地址由 download 路径派生。
@@ -132,12 +143,25 @@ export async function listRemoteAddons(): Promise<IAddon[]> {
 
 /**
  * 强制从 GitHub 拉取最新 registry.json 并更新本地缓存（绕过缓存）。
- * 用于“后台静默更新商店列表”。失败时抛出，由调用方决定如何处理。
+ * 如果 registry.json 内容发生变化（哈希不匹配），会清空所有远端插件文件缓存，
+ * 下次加载插件时需要重新下载。失败时抛出，由调用方决定如何处理。
  */
 export async function refreshRegistry(): Promise<IAddonRegistry> {
     const text = await fetchText(REGISTRY_URL);
     const registry = parseRegistry(text);
+
+    // 比较哈希，检测 registry.json 是否变化
+    const newHash = await computeHash(text);
+    const oldHash = await getRegistryHash();
+
+    if (oldHash !== null && oldHash !== newHash) {
+        // registry.json 变化，清空所有插件文件缓存
+        await clearFileCache();
+    }
+
     await cacheSet(REGISTRY_CACHE_KEY, text);
+    await setRegistryHash(newHash);
+
     return registry;
 }
 
