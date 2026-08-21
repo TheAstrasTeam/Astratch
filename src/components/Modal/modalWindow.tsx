@@ -2,7 +2,7 @@
  * @license
  * Copyright 2026 AstrasTeam
  * SPDX-License-Identifier: Apache-2.0
- * 
+ *
  * 此文件由AI修改
  */
 
@@ -45,7 +45,7 @@ export const Modal = ({
 
     // 持久化窗口状态
     const [instanceID] = useState(() => windowID ?? `modal_${spawnRandomString()}`);
-    const [initialZ] = useState(() => getInitialWindowZ(instanceID));
+    const [initialZ] = useState(() => getInitialWindowZ());
     const windowState = useModalWindowStore(s => s.windows[instanceID]);
     const update = useModalWindowStore(s => s.update);
     const raise = useModalWindowStore(s => s.raise);

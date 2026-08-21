@@ -2,8 +2,8 @@
  * @license
  * Copyright 2026 AstrasTeam
  * SPDX-License-Identifier: Apache-2.0
- * 
- * 此文件由AI生成：可拖动模态框的窗口状态（位置/大小/层级）管理 
+ *
+ * 此文件由AI生成：可拖动模态框的窗口状态（位置/大小/层级）管理
  */
 
 import { create, type UseBoundStore, type StoreApi } from 'zustand';
@@ -38,11 +38,9 @@ const BASE_Z = 1001;
  * 不能使用持久化的旧 z：否则重新打开的窗口会拿到过期的低层级，出现在父窗口下方
  * 用于在组件第一次渲染时就知道正确的层级
  */
-const getInitialWindowZ = (windowID: string): number => {
+const getInitialWindowZ = (): number => {
     const state = useModalWindowStore.getState();
-    return (
-        Object.values(state.windows).reduce((max, w) => Math.max(max, w?.z ?? 0), BASE_Z) + 1
-    );
+    return Object.values(state.windows).reduce((max, w) => Math.max(max, w?.z ?? 0), BASE_Z) + 1;
 };
 
 /**
