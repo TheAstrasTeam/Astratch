@@ -1,0 +1,31 @@
+id: test-addon
+name: Test Addon
+version: 0.0.1
+description: A test addon for verifying the custom addon feature.
+author: AstrasTeam
+license: MIT
+icon: icon.svg
+main: main.js
+defaultEnabled: false
+astratch:
+    minVersion: 0.1.0
+    settings:
+        - name: greeting text
+          id: greeting
+          type: string
+          default: Hi
+        - name: volume
+          id: volume
+          type: number
+          default: 50
+          min: 0
+          max: 100
+        - name: notify on disable
+          id: notifyOnDisable
+          type: boolean
+          default: true
+        - name: multiline note
+          id: note
+          type: string
+          default: "line1\nline2"
+          allowLines: true

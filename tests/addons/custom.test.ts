@@ -44,12 +44,17 @@ describe('buildAddonFromHandle', () => {
     it('builds an addon from a valid folder', async () => {
         const run = (): (() => void) | undefined => undefined;
         const handle = makeTreeHandle('my-addon', {
-            'manifest.json': JSON.stringify({
-                name: 'My Custom Addon',
-                description: 'A test addon',
-                author: 'Me',
-                icon: 'icon.svg',
-            }),
+            'info.yaml': [
+                'id: my-addon',
+                'name: My Custom Addon',
+                'description: A test addon',
+                'author: Me',
+                'icon: icon.svg',
+                'main: main.js',
+                'astratch:',
+                '  minVersion: 0.1.0',
+                '',
+            ].join('\n'),
             'main.js': 'export default () => {};',
             'icon.svg': '<svg xmlns="http://www.w3.org/2000/svg"></svg>',
             i18n: {
@@ -72,7 +77,7 @@ describe('buildAddonFromHandle', () => {
 
     it('registers i18n resources including @name/@description', async () => {
         const handle = makeTreeHandle('my-addon', {
-            'manifest.json': JSON.stringify({ name: 'Raw Name', description: 'Raw desc' }),
+            'info.yaml': 'name: Raw Name\ndescription: Raw desc\nmain: main.js',
             'main.js': 'export default () => {};',
             i18n: {
                 'en.json': JSON.stringify({ '@name': 'EN Name', '@description': 'EN desc' }),
@@ -102,26 +107,24 @@ describe('buildAddonFromHandle', () => {
         );
     });
 
-    it('throws when manifest.json is missing', async () => {
+    it('throws when info.yaml is missing', async () => {
         const handle = makeTreeHandle('addon', { 'main.js': 'export default () => {};' });
         await expect(buildAddonFromHandle(handle, 'custom-addon')).rejects.toThrow(
-            'manifest.json not found',
+            'info.yaml not found',
         );
     });
 
     it('throws when main.js is missing', async () => {
-        const handle = makeTreeHandle('addon', {
-            'manifest.json': JSON.stringify({ name: 'X' }),
-        });
+        const handle = makeTreeHandle('addon', { 'info.yaml': 'name: X\nmain: main.js' });
         await expect(buildAddonFromHandle(handle, 'custom-addon')).rejects.toThrow(
             'main.js not found',
         );
     });
 
-    it('uses manifest.main when provided', async () => {
+    it('uses info.main when provided', async () => {
         let compiled: string | null = null;
         const handle = makeTreeHandle('addon', {
-            'manifest.json': JSON.stringify({ name: 'X', main: 'src/entry.js' }),
+            'info.yaml': 'name: X\nmain: src/entry.js',
             src: { 'entry.js': 'export default () => {};' },
         });
         const addon = await buildAddonFromHandle(handle, 'custom-addon', code => {
@@ -132,16 +135,29 @@ describe('buildAddonFromHandle', () => {
         expect(compiled).toBe('export default () => {};');
     });
 
-    it('parses manifest settings into the addon', async () => {
+    it('parses settings from astratch into the addon', async () => {
         const handle = makeTreeHandle('my-addon', {
-            'manifest.json': JSON.stringify({
-                name: 'X',
-                settings: [
-                    { name: 'greeting', id: 'greeting', type: 'string', default: 'Hi' },
-                    { name: 'volume', id: 'volume', type: 'number', default: 50, min: 0, max: 100 },
-                    { name: 'enabled', id: 'enabled', type: 'boolean', default: true },
-                ],
-            }),
+            'info.yaml': [
+                'name: X',
+                'main: main.js',
+                'astratch:',
+                '  settings:',
+                '    - name: greeting',
+                '      id: greeting',
+                '      type: string',
+                '      default: Hi',
+                '    - name: volume',
+                '      id: volume',
+                '      type: number',
+                '      default: 50',
+                '      min: 0',
+                '      max: 100',
+                '    - name: enabled',
+                '      id: enabled',
+                '      type: boolean',
+                '      default: true',
+                '',
+            ].join('\n'),
             'main.js': 'export default () => {};',
         });
         const addon = await buildAddonFromHandle(handle, 'custom-my-addon', () => undefined);
@@ -152,12 +168,13 @@ describe('buildAddonFromHandle', () => {
         ]);
     });
 
-    it('defaults settings to an empty array when manifest has none', async () => {
+    it('defaults settings to an empty array when info.yaml has none', async () => {
         const handle = makeTreeHandle('my-addon', {
-            'manifest.json': JSON.stringify({ name: 'X' }),
+            'info.yaml': 'name: X\nmain: main.js',
             'main.js': 'export default () => {};',
         });
         const addon = await buildAddonFromHandle(handle, 'custom-my-addon', () => undefined);
         expect(addon?.settings).toEqual([]);
+        expect(addon?.version).toBe('1.0.0');
     });
 });

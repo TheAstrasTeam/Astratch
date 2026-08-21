@@ -24,7 +24,7 @@ export interface IAddonStorage {
 export type TAddonSettingType = 'string' | 'number' | 'boolean';
 
 /**
- * manifest.json 中 settings 数组的单个设置项定义。
+ * info.yaml 中 settings 数组的单个设置项定义。
  * 设置名称通过插件的 i18n 命名空间 addon_<id>:@settings/<id> 翻译。
  */
 export interface IAddonSettingDefinition {
@@ -45,14 +45,14 @@ export interface IAddonSettingDefinition {
 }
 
 /**
- * 提供给插件的设置 API，插件通过它读写自己在 manifest 中声明的设置。
+ * 提供给插件的设置 API，插件通过它读写自己在 info.yaml 中声明的设置。
  */
 export interface IAddonSettingsApi {
     /** 读取当前设置值 */
     get: (id: string) => unknown;
     /** 设置值（Settings 页 UI 会同步刷新） */
     set: (id: string, value: unknown) => void;
-    /** 本插件声明的全部设置定义（来自 manifest） */
+    /** 本插件声明的全部设置定义（来自 info.yaml） */
     defs: IAddonSettingDefinition[];
 }
 
@@ -75,25 +75,35 @@ export interface IAddonContext {
 }
 
 /**
- * 插件的 manifest.json（遵循 AstratchAddons 的包格式）
+ * 插件的 info.yaml（遵循 AstratchAddons 的包格式）
  */
-export interface IAddonManifest {
+export interface IAddonInfo {
+    /** 插件 ID（应与文件夹名一致） */
+    id?: string;
     name: string;
     version?: string;
     description?: string;
     author?: string;
     license?: string;
+    /** 图标路径（相对插件文件夹） */
     icon?: string;
+    /** 入口文件路径（必须声明，TS 插件为 .ts/.tsx，JS 插件为 .js） */
+    main: string;
+    /** 源文件是否为 TypeScript（需要编译） */
+    typescript?: boolean;
+    /** 额外的 JS 文件（纯 JS 插件多文件时使用，支持文件路径和目录路径） */
     files?: string[];
-    main?: string;
     /**
      * 默认是否启用（用户手动开关后以用户选择为准）
      */
     defaultEnabled?: boolean;
-    /**
-     * 插件声明的设置项（Settings 页按此渲染）
-     */
-    settings?: IAddonSettingDefinition[];
+    /** Astratch 插件系统配置 */
+    astratch?: {
+        /** 兼容的 Astratch 最低版本 */
+        minVersion?: string;
+        /** 插件声明的设置项（Settings 页按此渲染） */
+        settings?: IAddonSettingDefinition[];
+    };
 }
 
 /**
@@ -112,15 +122,17 @@ export interface IAddon {
     i18nNamespace: string;
     /** 默认是否启用 */
     defaultEnabled: boolean;
-    /** 插件声明的设置项（来自 manifest，Settings 页按此渲染） */
+    /** 插件声明的设置项（来自 info.yaml，Settings 页按此渲染） */
     settings: IAddonSettingDefinition[];
+    /** 兼容的 Astratch 最低版本 */
+    minVersion?: string;
     /**
      * 是否为用户上传文件夹安装的自定义插件。
      * 自定义插件在名称后会显示“自定义/Custom”Badge。
      */
     isCustom: boolean;
     /**
-     * 插件内容（main.js）是否已下载。
+     * 插件内容（addon.js）是否已下载。
      * 远端插件按需下载：刷新/初始化时只拉取列表，启用时才下载内容；
      * 自定义插件在导入时即加载，恒为 true。
      */
@@ -130,4 +142,54 @@ export interface IAddon {
      * 尚未下载内容的远端插件为 undefined。
      */
     run?: (ctx: IAddonContext) => (() => void) | undefined;
+    /** 当前选择的版本（远端插件默认最新版本，自定义插件为 info.version ?? '1.0.0'） */
+    version: string;
+    /** 全部可用版本（远端插件来自 registry，自定义插件只有当前版本） */
+    versions: string[];
+    /** 各版本的下载信息（远端插件由 registry 的 download 路径派生；自定义插件为空对象） */
+    releases: Record<string, IRegistryVersion>;
+}
+
+/**
+ * registry.json 中单个插件版本的信息
+ */
+export interface IRegistryVersion {
+    /** 该版本入口文件名（一般为 addon.js） */
+    main?: string;
+    /** 该版本 addon.js 的下载地址（GitHub Raw） */
+    url: string;
+}
+
+/**
+ * registry.json 中单个插件的目录条目（统一商店入口）
+ */
+export interface IRegistryAddon {
+    id: string;
+    name: string;
+    description: string;
+    author: string;
+    license?: string;
+    /** 内联小图标（data URL） */
+    icon?: string;
+    defaultEnabled?: boolean;
+    settings?: IAddonSettingDefinition[];
+    /** 内嵌的 i18n 资源（无需额外请求） */
+    i18n?: Partial<Record<string, Record<string, string>>>;
+    /** 兼容的 Astratch 最低版本 */
+    astratch?: { minVersion?: string };
+    /** 当前（最新）版本 */
+    version: string;
+    /** 全部可用版本（旧到新） */
+    versions: string[];
+    /** 当前版本发布目录的相对路径（如 addons/example/releases/1.2.0/），客户端据此派生各版本 URL */
+    download: string;
+}
+
+/**
+ * AstratchAddons 仓库根目录的 registry.json（统一商店入口，单文件一次请求拿全目录）
+ */
+export interface IAddonRegistry {
+    schemaVersion: number;
+    generatedAt?: string;
+    addons: IRegistryAddon[];
 }

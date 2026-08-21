@@ -100,6 +100,38 @@
         font-size: x-small;
     }
 
+    .card-min-version {
+        color: $text-primary;
+        opacity: 0.5;
+        font-size: x-small;
+    }
+
+    .version-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .version-label {
+        color: $text-primary;
+        opacity: 0.6;
+        font-size: x-small;
+        flex-shrink: 0;
+    }
+
+    .version-select {
+        margin: 0;
+        padding: 1px 4px;
+        font-size: x-small;
+        background-color: $ui-tertiary;
+        color: $text-primary;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        &:hover {
+            border-color: $text-primary;
+        }
+    }
+
     .remove-button {
         margin: 0;
         padding: 4px 8px;

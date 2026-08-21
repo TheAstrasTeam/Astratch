@@ -6,7 +6,7 @@
 
 // 此文件由AI生成
 
-import type { IAddon, IAddonManifest } from './types';
+import type { IAddon, IAddonRegistry, IRegistryAddon, IRegistryVersion } from './types';
 import { cacheGet, cacheSet } from './cache';
 import { registerAddonI18n } from './i18n';
 
@@ -17,10 +17,22 @@ import { registerAddonI18n } from './i18n';
 const ADDONS_REPO_URL =
     'https://raw.githubusercontent.com/TheAstrasTeam/AstratchAddons/refs/heads/main';
 
+/** registry.json —— 统一商店入口，单文件一次请求拿全目录 */
+const REGISTRY_CACHE_KEY = 'registry.json';
+const REGISTRY_URL = `${ADDONS_REPO_URL}/registry.json`;
+
+/** 插件内容缓存 key：addon:<id>@<version> */
+export const addonContentCacheKey = (id: string, version: string): string =>
+    `addon:${id}@${version}`;
+
 /**
- * 插件文件的远程根目录：GitHub 仓库里的插件都放在 addons/<addon>/ 下
+ * 从 registry 的 download 路径派生某个版本 addon.js 的下载地址。
+ * download 形如 addons/example/releases/1.2.0/，去掉尾部 `<版本>/` 后拼接目标版本。
  */
-const ADDONS_FILES_URL = `${ADDONS_REPO_URL}/addons`;
+export const addonFileUrl = (download: string, version: string): string => {
+    const dirPrefix = download.replace(/[^/]*\/$/, '');
+    return `${ADDONS_REPO_URL}/${dirPrefix}${version}/addon.js`;
+};
 
 const fetchText = async (url: string): Promise<string> => {
     const response = await fetch(url);
@@ -41,7 +53,7 @@ const getFile = async (cacheKey: string, url: string): Promise<string> => {
 export const svgToDataUrl = (text: string): string =>
     `data:image/svg+xml;charset=utf-8,${encodeURIComponent(text)}`;
 
-/** 编译 addon 的 main.js：通过 blob URL 动态 import，得到默认导出（run 函数） */
+/** 编译 addon 的 addon.js：通过 blob URL 动态 import，得到默认导出（run 函数） */
 export const compileAddon = async (code: string): Promise<IAddon['run']> => {
     const url = URL.createObjectURL(new Blob([code], { type: 'text/javascript' }));
     try {
@@ -50,7 +62,7 @@ export const compileAddon = async (code: string): Promise<IAddon['run']> => {
         };
         const run = module.default;
         if (typeof run !== 'function') {
-            throw new Error('main.js must export a function as default export');
+            throw new Error('addon.js must export a function as default export');
         }
         return run;
     } finally {
@@ -58,82 +70,90 @@ export const compileAddon = async (code: string): Promise<IAddon['run']> => {
     }
 };
 
-/**
- * 从 GitHub 加载所有远端插件的“列表”信息（manifest / 图标 / i18n），
- * 不下载插件的 main.js 内容。内容在启用插件时才按需下载（见 downloadAddonContent）。
- */
-export async function listRemoteAddons(): Promise<IAddon[]> {
-    const listText = await getFile('addons.json', `${ADDONS_REPO_URL}/addons.json`);
-    const list = JSON.parse(listText) as unknown;
-    if (!Array.isArray(list)) return [];
-    const names = list.filter((name): name is string => typeof name === 'string');
-
-    const addons: IAddon[] = [];
-    for (const id of names) {
-        try {
-            const manifestText = await getFile(
-                `${id}/manifest.json`,
-                `${ADDONS_FILES_URL}/${id}/manifest.json`,
-            );
-            const manifest = JSON.parse(manifestText) as IAddonManifest;
-
-            let icon = '';
-            if (manifest.icon) {
-                try {
-                    const iconText = await getFile(
-                        `${id}/${manifest.icon}`,
-                        `${ADDONS_FILES_URL}/${id}/${manifest.icon}`,
-                    );
-                    icon = svgToDataUrl(iconText);
-                } catch {
-                    // 没有图标也可以
-                }
-            }
-
-            const resources: Partial<Record<string, Record<string, string>>> = {};
-            for (const language of ['zh-CN', 'en']) {
-                try {
-                    const resourcesText = await getFile(
-                        `${id}/i18n/${language}.json`,
-                        `${ADDONS_FILES_URL}/${id}/i18n/${language}.json`,
-                    );
-                    resources[language] = JSON.parse(resourcesText) as Record<string, string>;
-                } catch {
-                    // 该语言没有翻译
-                }
-            }
-            registerAddonI18n(id, resources);
-
-            addons.push({
-                id,
-                name: manifest.name,
-                description: manifest.description ?? '',
-                icon,
-                author: manifest.author ?? '',
-                i18nNamespace: `addon_${id}`,
-                defaultEnabled: manifest.defaultEnabled ?? false,
-                settings: manifest.settings ?? [],
-                isCustom: false,
-                downloaded: false,
-            });
-        } catch (error) {
-            console.error(`Failed to load addon "${id}":`, error);
-        }
+const parseRegistry = (text: string): IAddonRegistry => {
+    const parsed = JSON.parse(text) as unknown;
+    if (!parsed || typeof parsed !== 'object') throw new Error('invalid registry');
+    const registry = parsed as Partial<IAddonRegistry>;
+    if (!Array.isArray(registry.addons)) {
+        throw new Error('registry has no addons');
     }
-    return addons;
+    return registry as IAddonRegistry;
+};
+
+/**
+ * 从 registry 条目构建一个 IAddon（远端插件）。
+ * 条目中已内嵌图标（data URL）与 i18n 资源，无需额外请求；
+ * 各版本的下载地址由 download 路径派生。
+ */
+export const registryAddonToIAddon = (entry: IRegistryAddon): IAddon => {
+    registerAddonI18n(entry.id, entry.i18n ?? {});
+    const releases: Record<string, IRegistryVersion> = {};
+    for (const version of entry.versions) {
+        releases[version] = { main: 'addon.js', url: addonFileUrl(entry.download, version) };
+    }
+    return {
+        id: entry.id,
+        name: entry.name,
+        description: entry.description,
+        icon: entry.icon ?? '',
+        author: entry.author,
+        i18nNamespace: `addon_${entry.id}`,
+        defaultEnabled: entry.defaultEnabled ?? false,
+        settings: entry.settings ?? [],
+        minVersion: entry.astratch?.minVersion,
+        isCustom: false,
+        downloaded: false,
+        version: entry.version,
+        versions: entry.versions,
+        releases,
+    };
+};
+
+/**
+ * 读取 registry.json（统一商店入口）。先从 IndexedDB 缓存读取，
+ * 没有缓存时再从 GitHub 下载并写回缓存。
+ */
+export async function getRegistry(): Promise<IAddonRegistry> {
+    const text = await getFile(REGISTRY_CACHE_KEY, REGISTRY_URL);
+    return parseRegistry(text);
 }
 
 /**
- * 下载并编译单个远端插件的 main.js，返回编译后的 run 函数。
+ * 从 GitHub 加载所有远端插件的列表（registry.json），不下载插件的 addon.js 内容。
+ * 内容在启用插件时才按需下载（见 downloadAddonContent）。
+ */
+export async function listRemoteAddons(): Promise<IAddon[]> {
+    const registry = await getRegistry();
+    return registry.addons.map(entry => registryAddonToIAddon(entry));
+}
+
+/**
+ * 强制从 GitHub 拉取最新 registry.json 并更新本地缓存（绕过缓存）。
+ * 用于“后台静默更新商店列表”。失败时抛出，由调用方决定如何处理。
+ */
+export async function refreshRegistry(): Promise<IAddonRegistry> {
+    const text = await fetchText(REGISTRY_URL);
+    const registry = parseRegistry(text);
+    await cacheSet(REGISTRY_CACHE_KEY, text);
+    return registry;
+}
+
+/**
+ * 下载并编译单个远端插件指定版本的 addon.js，返回编译后的 run 函数。
  * 在启用插件（或初始化时恢复已启用插件）时调用。
  */
-export async function downloadAddonContent(id: string): Promise<IAddon['run']> {
-    const manifestText = await getFile(
-        `${id}/manifest.json`,
-        `${ADDONS_FILES_URL}/${id}/manifest.json`,
+export async function downloadAddonContent(id: string, version: string): Promise<IAddon['run']> {
+    const registry = await getRegistry();
+    const entry = registry.addons.find(item => item.id === id);
+    if (!entry) {
+        throw new Error(`Addon "${id}" not found in registry`);
+    }
+    if (!entry.versions.includes(version)) {
+        throw new Error(`Addon "${id}"@${version} not found in registry`);
+    }
+    const mainCode = await getFile(
+        addonContentCacheKey(id, version),
+        addonFileUrl(entry.download, version),
     );
-    const manifest = JSON.parse(manifestText) as IAddonManifest;
-    const mainPath = manifest.main ?? 'main.js';
-    const mainCode = await getFile(`${id}/${mainPath}`, `${ADDONS_FILES_URL}/${id}/${mainPath}`);
     return compileAddon(mainCode);
 }

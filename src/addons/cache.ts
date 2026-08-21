@@ -79,6 +79,27 @@ export async function cacheSet(key: string, value: string): Promise<void> {
 }
 
 /**
+ * 删除指定 key 的缓存，失败不抛出
+ */
+export async function cacheDelete(key: string): Promise<void> {
+    try {
+        const db = await openDB();
+        await new Promise<void>((resolve, reject) => {
+            const transaction = db.transaction(FILES_STORE, 'readwrite');
+            transaction.objectStore(FILES_STORE).delete(key);
+            transaction.oncomplete = () => {
+                resolve();
+            };
+            transaction.onerror = () => {
+                reject(new Error('Failed to delete addon cache'));
+            };
+        });
+    } catch {
+        // 删除失败不影响功能
+    }
+}
+
+/**
  * 清空远端插件文件缓存（files store），下次加载会重新从 GitHub 下载。
  * 不会影响自定义插件的目录句柄（handles store）。
  * 清空失败时抛出错误，由调用方决定如何处理。

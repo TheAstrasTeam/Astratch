@@ -13,9 +13,13 @@ import { readLocalStorage, setItemToLocalStorage } from '../utils/localstorage';
 import { Toast } from '../lib/ToastManager';
 import { spawnRandomString } from '../utils/ash-data';
 import { Settings, type TSettingType } from '../settings/SettingsRegistry';
-import { listRemoteAddons, downloadAddonContent } from './loader';
+import {
+    listRemoteAddons,
+    downloadAddonContent,
+    refreshRegistry,
+    registryAddonToIAddon,
+} from './loader';
 import { importCustomAddon, loadCustomAddons, removeCustomAddonHandle } from './custom';
-import { clearFileCache } from './cache';
 import type {
     IAddon,
     IAddonContext,
@@ -78,11 +82,14 @@ export const useAddonStore = create<IAddonStoreState>(() => ({
 interface IAddonPersist {
     enabled: string[];
     disabled: string[];
+    /** 每个已启用插件选择的版本：addonId -> version（项目保存时记录具体依赖版本） */
+    versions: Record<string, string>;
 }
 
 const DEFAULT_PERSIST: IAddonPersist = {
     enabled: [],
     disabled: [],
+    versions: {},
 };
 
 /**
@@ -104,6 +111,7 @@ class AddonManager {
             this.persistData = {
                 enabled: stored.filter((id): id is string => typeof id === 'string'),
                 disabled: [],
+                versions: {},
             };
         } else if (stored && typeof stored === 'object') {
             this.persistData = { ...DEFAULT_PERSIST, ...stored };
@@ -111,9 +119,10 @@ class AddonManager {
     }
 
     /**
-     * 初始化：加载官方插件列表 + 自定义插件，注入上下文，
+     * 初始化：加载官方插件列表（registry）+ 自定义插件，注入上下文，
      * 然后下载并运行所有已启用的插件（只执行一次）。
      * 远端插件只拉取列表，内容在启用时才按需下载。
+     * 随后在后台静默刷新 registry，更新商店列表。
      */
     async init(ctx: IAddonContext) {
         if (this.ctx) return;
@@ -121,7 +130,14 @@ class AddonManager {
         useAddonStore.setState({ status: 'loading' });
         try {
             const [remote, custom] = await Promise.all([listRemoteAddons(), loadCustomAddons()]);
-            const addons = [...remote, ...custom];
+            const addons = [...remote, ...custom].map(addon => {
+                // 恢复该插件之前选择的版本
+                const persistedVersion = this.persistData.versions[addon.id];
+                if (persistedVersion && addon.versions.includes(persistedVersion)) {
+                    return { ...addon, version: persistedVersion };
+                }
+                return addon;
+            });
             const enabled = new Set<string>();
             for (const addon of addons) {
                 const userDisabled = this.persistData.disabled.includes(addon.id);
@@ -132,15 +148,51 @@ class AddonManager {
             useAddonStore.setState({ addons, enabled, status: 'ready' });
             this.syncAddonSettings();
             const pending = addons.filter(addon => enabled.has(addon.id) && !addon.downloaded);
-            await Promise.all(pending.map(addon => this.downloadAddon(addon.id)));
+            await Promise.all(pending.map(addon => this.downloadAddon(addon.id, addon.version)));
             for (const addon of addons) {
                 if (!enabled.has(addon.id)) continue;
                 const current = useAddonStore.getState().addons.find(item => item.id === addon.id);
                 if (current) this.runAddon(current);
             }
+            void this.backgroundRefresh();
         } catch (error) {
             console.error('Failed to load addons:', error);
             useAddonStore.setState({ status: 'ready' });
+        }
+    }
+
+    /**
+     * 后台静默刷新 registry：更新本地缓存并合并商店列表。
+     * 失败的静默忽略（商店继续用旧缓存展示），不影响主流程。
+     */
+    private async backgroundRefresh() {
+        try {
+            const registry = await refreshRegistry();
+            const freshRemote = registry.addons.map(entry => registryAddonToIAddon(entry));
+            const current = useAddonStore.getState();
+            const custom = current.addons.filter(addon => addon.isCustom);
+            const merged = freshRemote.map(fresh => {
+                const existing = current.addons.find(item => item.id === fresh.id);
+                if (!existing) return fresh;
+                // 保留用户已选择的版本、下载状态与已编译内容
+                const version =
+                    existing.version && fresh.versions.includes(existing.version)
+                        ? existing.version
+                        : fresh.version;
+                return {
+                    ...fresh,
+                    version,
+                    downloaded: existing.downloaded && version === existing.version,
+                    run:
+                        existing.downloaded && version === existing.version
+                            ? existing.run
+                            : undefined,
+                };
+            });
+            useAddonStore.setState({ addons: [...merged, ...custom] });
+            this.syncAddonSettings();
+        } catch {
+            // 后台刷新失败不影响已展示的列表
         }
     }
 
@@ -180,17 +232,34 @@ class AddonManager {
     }
 
     /**
-     * 刷新官方插件列表：先清空远端插件缓存，再只下载插件列表（manifest / 图标 / i18n），
-     * 不下载插件内容。内容在用户点击“下载/启用”时按需拉取。
+     * 刷新官方插件列表：强制重新拉取 registry.json（统一商店入口）并更新本地缓存，
+     * 展示最新可用插件与版本。不下载插件内容，内容在用户点击“下载/启用”时按需拉取。
      * 已挂载的自定义插件保持不变。
-     * 注意：仅在没有任何插件启用时调用（UI 已限制按钮可用性）。
      */
     async refreshRemoteAddons() {
-        const custom = useAddonStore.getState().addons.filter(addon => addon.isCustom);
+        const current = useAddonStore.getState();
+        const custom = current.addons.filter(addon => addon.isCustom);
         try {
-            await clearFileCache();
-            const remote = await listRemoteAddons();
-            useAddonStore.setState({ addons: [...remote, ...custom] });
+            const registry = await refreshRegistry();
+            const freshRemote = registry.addons.map(entry => registryAddonToIAddon(entry));
+            const merged = freshRemote.map(fresh => {
+                const existing = current.addons.find(item => item.id === fresh.id);
+                if (!existing) return fresh;
+                const version =
+                    existing.version && fresh.versions.includes(existing.version)
+                        ? existing.version
+                        : fresh.version;
+                return {
+                    ...fresh,
+                    version,
+                    downloaded: existing.downloaded && version === existing.version,
+                    run:
+                        existing.downloaded && version === existing.version
+                            ? existing.run
+                            : undefined,
+                };
+            });
+            useAddonStore.setState({ addons: [...merged, ...custom] });
             this.syncAddonSettings();
             Toast.create({
                 type: 'info',
@@ -227,7 +296,45 @@ class AddonManager {
     }
 
     /**
-     * 下载插件内容（main.js）。仅下载，不启用。
+     * 返回所有已启用插件的依赖版本（addonId -> version）。
+     * 供项目保存时记录具体依赖版本，以便下次打开项目时恢复一致的插件环境。
+     */
+    getEnabledAddonVersions(): Record<string, string> {
+        const { addons, enabled } = useAddonStore.getState();
+        const result: Record<string, string> = {};
+        for (const addon of addons) {
+            if (!enabled.has(addon.id)) continue;
+            result[addon.id] = addon.version;
+        }
+        return result;
+    }
+
+    /**
+     * 选择插件的某个版本。已启用的插件会先停用旧版本，
+     * 再下载并重新启用新版本。
+     */
+    async selectVersion(id: string, version: string) {
+        const addon = useAddonStore.getState().addons.find(item => item.id === id);
+        if (!addon || !addon.versions.includes(version) || addon.version === version) return;
+        const wasEnabled = useAddonStore.getState().enabled.has(id);
+        if (wasEnabled) this.disable(id);
+        useAddonStore.setState({
+            addons: useAddonStore
+                .getState()
+                .addons.map(item =>
+                    item.id === id ? { ...item, version, downloaded: false, run: undefined } : item,
+                ),
+        });
+        this.persistData.versions[id] = version;
+        this.persist();
+        if (wasEnabled) {
+            await this.download(id);
+            this.enable(id);
+        }
+    }
+
+    /**
+     * 下载插件内容（addon.js）。仅下载，不启用。
      * 下载成功后按钮会变为“启用”，由用户再点击启用。
      */
     async download(id: string) {
@@ -238,7 +345,7 @@ class AddonManager {
             downloading: new Set(useAddonStore.getState().downloading).add(id),
         });
         try {
-            await this.downloadAddon(id);
+            await this.downloadAddon(id, addon.version);
         } finally {
             const next = new Set(useAddonStore.getState().downloading);
             next.delete(id);
@@ -258,6 +365,7 @@ class AddonManager {
         });
         this.persistData.enabled = [...new Set([...this.persistData.enabled, id])];
         this.persistData.disabled = this.persistData.disabled.filter(item => item !== id);
+        this.persistData.versions[id] = addon.version;
         this.persist();
         this.syncAddonSettings();
         if (this.ctx) this.runAddon(addon);
@@ -290,9 +398,9 @@ class AddonManager {
      * 下载单个远端插件的 main.js 并编译，成功后更新 store 中的插件（run / downloaded）。
      * 失败时弹错误通知，返回 false。
      */
-    private async downloadAddon(id: string): Promise<boolean> {
+    private async downloadAddon(id: string, version: string): Promise<boolean> {
         try {
-            const run = await downloadAddonContent(id);
+            const run = await downloadAddonContent(id, version);
             useAddonStore.setState({
                 addons: useAddonStore
                     .getState()
@@ -383,6 +491,7 @@ class AddonManager {
         setItemToLocalStorage(localStorageIDs.Addons, {
             enabled: [...useAddonStore.getState().enabled],
             disabled: this.persistData.disabled,
+            versions: this.persistData.versions,
         });
     }
 }

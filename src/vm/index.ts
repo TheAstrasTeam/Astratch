@@ -24,6 +24,7 @@ import {
     type TTargetInfo,
 } from '../types/vm';
 import { ProjectManager } from './project';
+import { addonManager } from '../addons/manager';
 import { t } from 'i18next';
 import { modal } from '../components/Modal/modal';
 import { ConfirmModal } from '../components/modal_confirm';
@@ -168,6 +169,7 @@ export class VM implements IVM {
                 entity: entitysFolder,
                 module: modulesFolder,
             },
+            addons: addonManager.getEnabledAddonVersions(),
         };
 
         await this.projectManager.createFile(

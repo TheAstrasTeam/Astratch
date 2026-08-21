@@ -23,8 +23,12 @@ const AddonCard = ({
     downloading,
     enabled,
     hasSettings,
+    version,
+    versions,
+    minVersion,
     onDownload,
     onToggle,
+    onSelectVersion,
     onOpenSettings,
     onRemove,
 }: {
@@ -37,8 +41,12 @@ const AddonCard = ({
     downloading: boolean;
     enabled: boolean;
     hasSettings: boolean;
+    version: string;
+    versions: string[];
+    minVersion?: string;
     onDownload: () => void;
     onToggle: () => void;
+    onSelectVersion: (version: string) => void;
     onOpenSettings?: () => void;
     onRemove?: () => void;
 }) => {
@@ -50,6 +58,7 @@ const AddonCard = ({
             ? t('gui:addon.disable')
             : t('gui:addon.enable');
     const handleAction = downloading ? undefined : !downloaded ? onDownload : onToggle;
+    const showVersionSelect = !isCustom && versions.length > 1;
     return (
         <div className={styles.card}>
             {icon && <img className={styles.cardIcon} src={icon} alt='' />}
@@ -57,9 +66,33 @@ const AddonCard = ({
                 <span className={styles.cardName}>
                     {name}
                     {isCustom && <span className={styles.cardBadge}>{t('gui:addon.custom')}</span>}
+                    {!isCustom && <span className={styles.cardBadge}>{version}</span>}
                 </span>
                 {description && <span className={styles.cardDesc}>{description}</span>}
                 {author && <span className={styles.cardAuthor}>{author}</span>}
+                {minVersion && (
+                    <span className={styles.cardMinVersion}>
+                        {t('gui:addon.minVersion', { version: minVersion })}
+                    </span>
+                )}
+                {showVersionSelect && (
+                    <span className={styles.versionRow}>
+                        <label className={styles.versionLabel}>{t('gui:addon.version')}</label>
+                        <select
+                            className={styles.versionSelect}
+                            value={version}
+                            onChange={event => {
+                                onSelectVersion(event.target.value);
+                            }}
+                        >
+                            {versions.map(item => (
+                                <option key={item} value={item}>
+                                    {item}
+                                </option>
+                            ))}
+                        </select>
+                    </span>
+                )}
             </div>
             {isCustom && onRemove && (
                 <button className={styles.removeButton} onClick={onRemove}>
@@ -100,7 +133,7 @@ const AddonsPanel = () => {
     const [importing, setImporting] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
 
-    const canRefresh = status === 'ready' && enabled.size === 0 && !refreshing;
+    const canRefresh = status === 'ready' && !refreshing;
 
     const handleImport = async () => {
         setImporting(true);
@@ -144,11 +177,17 @@ const AddonsPanel = () => {
                             downloading={downloading.has(addon.id)}
                             enabled={enabled.has(addon.id)}
                             hasSettings={addon.settings.length > 0}
+                            version={addon.version}
+                            versions={addon.versions}
+                            minVersion={addon.minVersion}
                             onDownload={() => {
                                 void addonManager.download(addon.id);
                             }}
                             onToggle={() => {
                                 addonManager.toggle(addon.id);
+                            }}
+                            onSelectVersion={version => {
+                                void addonManager.selectVersion(addon.id, version);
                             }}
                             onOpenSettings={() => {
                                 openSettingsModal({

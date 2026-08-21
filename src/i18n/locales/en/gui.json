@@ -66,6 +66,8 @@
     "addon.remoteRefreshed": "Addon list refreshed.",
     "addon.err.refreshFailed": "Failed to refresh addon list: {{err}}",
     "addon.refreshDisabledHint": "Disable all addons first to refresh the list.",
+    "addon.version": "Version",
+    "addon.minVersion": "Requires Astratch {{version}} or later",
     "target.folderNameAsk": "Enter the folder name:",
     "target.attr.x": "X",
     "target.attr.y": "Y",

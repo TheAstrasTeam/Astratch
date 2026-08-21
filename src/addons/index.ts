@@ -11,10 +11,13 @@ export { buildAddonContext } from './context';
 export type {
     IAddon,
     IAddonContext,
-    IAddonManifest,
+    IAddonInfo,
     IAddonStorage,
     IAddonSettingDefinition,
     IAddonSettingsApi,
+    IAddonRegistry,
+    IRegistryAddon,
+    IRegistryVersion,
     TAddonSettingType,
 } from './types';
 export type { IAddonStoreState, TAddonLoadStatus } from './manager';
