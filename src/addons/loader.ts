@@ -13,9 +13,11 @@ import { registerAddonI18n } from './i18n';
 /**
  * 插件仓库：AstratchAddons 的 GitHub 发布地址（raw 形式）。
  * 插件在运行时从这里下载并缓存到 IndexedDB，离线也能用。
+ * release 分支只包含编译后的产物（<id>@v<version>/ 目录 + registry.json），
+ * 不含源码、脚本或工作流文件。
  */
 const ADDONS_REPO_URL =
-    'https://raw.githubusercontent.com/TheAstrasTeam/AstratchAddons/refs/heads/main';
+    'https://raw.githubusercontent.com/TheAstrasTeam/AstratchAddons/refs/heads/release';
 
 /** registry.json —— 统一商店入口，单文件一次请求拿全目录 */
 const REGISTRY_CACHE_KEY = 'registry.json';
@@ -27,11 +29,12 @@ export const addonContentCacheKey = (id: string, version: string): string =>
 
 /**
  * 从 registry 的 download 路径派生某个版本 addon.js 的下载地址。
- * download 形如 addons/example/releases/1.2.0/，去掉尾部 `<版本>/` 后拼接目标版本。
+ * download 形如 example@v1.2.0/，提取 id 后拼接目标版本。
+ * 例：download="example@v1.2.0/", version="2.0.0" → .../example@v2.0.0/addon.js
  */
 export const addonFileUrl = (download: string, version: string): string => {
-    const dirPrefix = download.replace(/[^/]*\/$/, '');
-    return `${ADDONS_REPO_URL}/${dirPrefix}${version}/addon.js`;
+    const id = download.replace(/@v[^/]*\/$/, '');
+    return `${ADDONS_REPO_URL}/${id}@v${version}/addon.js`;
 };
 
 const fetchText = async (url: string): Promise<string> => {

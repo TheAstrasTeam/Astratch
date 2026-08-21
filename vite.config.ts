@@ -1,9 +1,14 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'node:path';
+import { readFileSync } from 'node:fs';
 import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import pageReload from 'vite-plugin-page-reload';
 import babel from '@rolldown/plugin-babel';
 import svgr from 'vite-plugin-svgr';
+
+const pkg = JSON.parse(readFileSync(resolve(import.meta.dirname, 'package.json'), 'utf8')) as {
+    version: string;
+};
 
 // eslint-disable-next-line no-console
 console.log(`\x1b[34m
@@ -44,6 +49,9 @@ export default defineConfig({
     build: {
         outDir: '../dist',
         emptyOutDir: true,
+    },
+    define: {
+        __APP_VERSION__: JSON.stringify(pkg.version),
     },
     plugins: [
         react(),
