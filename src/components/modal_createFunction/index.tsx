@@ -146,6 +146,7 @@ export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) =
             windowID='createFunction'
             fullScreen={false}
             onFullScreen={resizePreviewWorkspace}
+            onResize={resizePreviewWorkspace}
             close={async () => {
                 await handleButtonClick();
             }}

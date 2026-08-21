@@ -21,6 +21,7 @@ import { spawnRandomString } from '../../utils/ash-data';
 export const Modal = ({
     fullScreen,
     onFullScreen,
+    onResize,
     close,
     children,
     title,
@@ -31,6 +32,11 @@ export const Modal = ({
 }: {
     fullScreen?: boolean;
     onFullScreen?: (isFullScreen: boolean) => void;
+    /**
+     * 模态框尺寸调整完成后触发，用于刷新内部内容。
+     * 在这里英文创建函数的预览 Blockly 工作区而添加。
+     */
+    onResize?: () => void;
     close?: () => Promise<void>;
     children?: React.ReactNode;
     title?: string;
@@ -171,6 +177,7 @@ export const Modal = ({
                     x: position.x,
                     y: position.y,
                 });
+                if (onResize) onResize();
             }}
         >
             {inner}
