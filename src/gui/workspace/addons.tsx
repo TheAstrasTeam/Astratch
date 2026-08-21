@@ -78,7 +78,7 @@ const AddonCard = ({
                 <span className={styles.cardName}>
                     {name}
                     {isCustom && <span className={styles.cardBadge}>{t('gui:addon.custom')}</span>}
-                    {!isCustom && <span className={styles.cardBadge}>{version}</span>}
+                    {!isCustom && <span className={styles.cardBadge}>v{version}</span>}
                 </span>
                 {description && <span className={styles.cardDesc}>{description}</span>}
                 {author && <span className={styles.cardAuthor}>{author}</span>}
