@@ -481,7 +481,11 @@ describe('自定义函数测试', () => {
             ?.connection?.targetBlock() as Blockly.Block | null;
         console.log(
             'signature',
-            { isShadow: signature?.isShadow(), dead: signature?.isDeadOrDying(), flyout: signature?.isInFlyout },
+            {
+                isShadow: signature?.isShadow(),
+                dead: signature?.isDeadOrDying(),
+                flyout: signature?.isInFlyout,
+            },
             signature?.inputList.map(input => ({
                 name: input.name,
                 target: input.connection?.targetBlock()?.type,
@@ -493,10 +497,12 @@ describe('自定义函数测试', () => {
             'after ensure',
             signature?.getInput('ARG1')?.connection?.targetBlock()?.type,
             signature &&
-                (signature as unknown as {
-                    isFillingScopedSlots?: boolean;
-                    getScopedSlots?: () => unknown;
-                }).isFillingScopedSlots,
+                (
+                    signature as unknown as {
+                        isFillingScopedSlots?: boolean;
+                        getScopedSlots?: () => unknown;
+                    }
+                ).isFillingScopedSlots,
             signature &&
                 (signature as unknown as { getScopedSlots?: () => unknown }).getScopedSlots?.(),
             tempWorkspace.getAllBlocks(false).map(block => block.type),
@@ -539,8 +545,8 @@ describe('自定义函数测试', () => {
         expect(loadedSignature?.getInput('ARG1')?.connection?.targetBlock()?.type).toBe(
             OPCODES.FUNCTION_PARAM,
         );
-        expect(loadedSignature?.getInput('ARG1')?.connection?.targetBlock()?.getFieldValue('NAME')).toBe(
-            'name',
-        );
+        expect(
+            loadedSignature?.getInput('ARG1')?.connection?.targetBlock()?.getFieldValue('NAME'),
+        ).toBe('name');
     });
 });

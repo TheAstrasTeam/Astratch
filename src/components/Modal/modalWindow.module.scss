@@ -23,12 +23,24 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    position: relative;
     &.fullScreen {
         width: 100% !important;
         height: 100% !important;
         border: none !important;
         border-radius: 0 !important;
     }
+    &.inactive {
+        filter: brightness(0.95) saturate(0.65);
+    }
+}
+
+.blockOverlay {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    pointer-events: auto;
+    cursor: default;
 }
 
 .bar {
@@ -83,4 +95,24 @@
     flex: 1;
     min-height: 0;
     overflow: auto;
+}
+
+@keyframes shake {
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+    10%,
+    50%,
+    90% {
+        transform: translateX(-5px);
+    }
+    30%,
+    70% {
+        transform: translateX(5px);
+    }
+}
+
+.shaking {
+    animation: shake 0.4s ease-in-out;
 }

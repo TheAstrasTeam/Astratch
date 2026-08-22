@@ -143,9 +143,9 @@ interface IFunctionValueExtraState {
 
 type IDefinitionFunctionValueBlock = IFunctionValueBlock &
     Omit<IScopedSourceHost, 'loadExtraState' | 'saveExtraState'> & {
-    definitionMode: boolean;
-    definitionScopedSourceReady: boolean;
-};
+        definitionMode: boolean;
+        definitionScopedSourceReady: boolean;
+    };
 
 interface IFunctionDefinitionBlock extends Blockly.Block {
     functionData: ICustomFunction | null | undefined;
@@ -646,9 +646,7 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                     functionData?.color ?? state.colors ?? BlocksColor.function,
                 );
                 this.isValue = true;
-                this.returnType = normalizeReturnType(
-                    functionData?.returnType ?? state.returnType,
-                );
+                this.returnType = normalizeReturnType(functionData?.returnType ?? state.returnType);
                 this.setMovable(false);
                 this.setDeletable(false);
                 configureFunctionValueConnections(this, true, null);
@@ -682,7 +680,8 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                 | Blockly.ContextMenuRegistry.LegacyContextMenuOption
             )[],
         ) {
-            if (this.definitionMode || this.isInFlyout || this.editMode || !this.functionRef) return;
+            if (this.definitionMode || this.isInFlyout || this.editMode || !this.functionRef)
+                return;
 
             const block = this as unknown as Blockly.BlockSvg;
             options.unshift({
@@ -762,9 +761,7 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                                 `TEXT_${String(index)}`,
                             );
                         } else {
-                            this.getField(`TEXT_${String(index)}`)?.setValue(
-                                fieldData.text ?? '',
-                            );
+                            this.getField(`TEXT_${String(index)}`)?.setValue(fieldData.text ?? '');
                         }
                         return;
                     }
@@ -777,9 +774,7 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                     const checks = (
                         Array.isArray(fieldData.type) ? fieldData.type : [fieldData.type]
                     ).map(type =>
-                        type
-                            ? `${type.charAt(0).toUpperCase()}${type.slice(1)}`
-                            : 'String',
+                        type ? `${type.charAt(0).toUpperCase()}${type.slice(1)}` : 'String',
                     );
                     input.setCheck(checks);
                 });
@@ -839,7 +834,10 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                         return 'String';
                     });
 
-                    if (checks.length > 0 && ((this.editMode && !this.isValue) || this.definitionMode))
+                    if (
+                        checks.length > 0 &&
+                        ((this.editMode && !this.isValue) || this.definitionMode)
+                    )
                         input.setCheck(checks);
                     if (this.editMode && !this.definitionMode) {
                         input.connection?.setShadowState({
@@ -883,12 +881,14 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
         onchange(this: IDefinitionFunctionValueBlock, event: Blockly.Events.Abstract) {
             if (
                 this.definitionMode &&
-                ([
-                    Blockly.Events.BLOCK_CREATE,
-                    Blockly.Events.BLOCK_MOVE,
-                    Blockly.Events.BLOCK_DELETE,
-                    Blockly.Events.FINISHED_LOADING,
-                ] as string[]).includes(event.type)
+                (
+                    [
+                        Blockly.Events.BLOCK_CREATE,
+                        Blockly.Events.BLOCK_MOVE,
+                        Blockly.Events.BLOCK_DELETE,
+                        Blockly.Events.FINISHED_LOADING,
+                    ] as string[]
+                ).includes(event.type)
             ) {
                 this.ensureScopedBlocks();
             }

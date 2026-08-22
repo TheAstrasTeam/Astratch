@@ -23,9 +23,13 @@ import type { JSX } from 'react/jsx-dev-runtime';
 export const FieldTypeModal = ({
     callback,
     purpose = 'input',
+    parentWindowID,
+    blocking,
 }: {
     callback?: (result: TFunctionFieldType) => void;
     purpose?: 'input' | 'return';
+    parentWindowID?: string;
+    blocking?: boolean;
 }) => {
     const { closeSelf } = useModalInstance();
     const [multiMode, setMultiMode] = useState(false);
@@ -103,6 +107,8 @@ export const FieldTypeModal = ({
             close={closeSelf}
             minWidth={300}
             minHeight={200}
+            parentWindowID={parentWindowID}
+            blocking={blocking}
             title={t(
                 purpose === 'return' ? 'gui:createFunction.returnType' : 'gui:createFunction.input',
             )}

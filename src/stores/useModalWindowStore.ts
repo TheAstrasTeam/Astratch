@@ -81,6 +81,10 @@ const writeStored = (windows: Record<string, IModalWindowState | undefined>) => 
 interface IModalWindowStore {
     windows: Record<string, IModalWindowState | undefined>;
     /**
+     * 当前活跃（最顶层）窗口的 ID，用于非活动窗口的暗淡显示
+     */
+    activeWindowID: string | null;
+    /**
      * 确保窗口已登记（还没有则新建一个并置顶）
      * 新打开的窗口总是放在最前面
      */
@@ -98,6 +102,7 @@ interface IModalWindowStore {
 const useModalWindowStore: UseBoundStore<StoreApi<IModalWindowStore>> = create<IModalWindowStore>(
     (set, get) => ({
         windows: readStored(),
+        activeWindowID: null,
         register: windowID => {
             const { windows } = get();
             const existing = windows[windowID];
@@ -111,7 +116,7 @@ const useModalWindowStore: UseBoundStore<StoreApi<IModalWindowStore>> = create<I
                 ? { ...existing, z: maxZ + 1 }
                 : { ...createDefaultState(), z: maxZ + 1 };
             const nextWindows = { ...windows, [windowID]: next };
-            set({ windows: nextWindows });
+            set({ windows: nextWindows, activeWindowID: windowID });
             writeStored(nextWindows);
         },
         update: (windowID, rect) => {
@@ -137,7 +142,7 @@ const useModalWindowStore: UseBoundStore<StoreApi<IModalWindowStore>> = create<I
                 ...windows,
                 [windowID]: { ...existing, z: maxZ + 1 },
             };
-            set({ windows: nextWindows });
+            set({ windows: nextWindows, activeWindowID: windowID });
             writeStored(nextWindows);
         },
     }),

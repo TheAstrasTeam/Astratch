@@ -172,6 +172,8 @@ export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) =
                         onClick={() => {
                             void modal.open(FieldTypeModal, {
                                 callback: handleAddFieldButtonClick,
+                                parentWindowID: 'createFunction',
+                                blocking: true,
                             });
                         }}
                         isDropdown={true}
@@ -226,6 +228,8 @@ export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) =
                             void modal.open(FieldTypeModal, {
                                 purpose: 'return',
                                 callback: handleSetReturnType,
+                                parentWindowID: 'createFunction',
+                                blocking: true,
                             });
                         }}
                     >
