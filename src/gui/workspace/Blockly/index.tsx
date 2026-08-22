@@ -58,11 +58,10 @@ const BlocklyWorkspace = ({ vm, targetId }: { vm: IVM; targetId: string }): Reac
         if (!workspaceDiv.current) return;
 
         if (vm.runtime.editingTargetID !== targetId) {
-            // 保持 VM 与当前标签一致；workspace 层的全局监听会同步标签激活状态
             vm.runtime.switchTarget(targetId);
         }
 
-        void vm.runtime.blocks.createWorkspace(workspaceDiv.current, true);
+        void vm.runtime.blocks.createWorkspace(workspaceDiv.current, false);
 
         return () => {
             vm.runtime.blocks.dispose();

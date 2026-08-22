@@ -133,8 +133,7 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
             return <CreateProject vm={vm} />;
         }
         // 编辑器
-        if (activeTab)
-            return <BlocklyWorkspace key={activeTab.id} vm={vm} targetId={activeTab.targetId} />;
+        if (activeTab) return <BlocklyWorkspace vm={vm} targetId={activeTab.targetId} />;
         else
             return (
                 <div className={styles.empty}>
