@@ -73,6 +73,8 @@ export interface IDynamicScopedHost extends IScopedSourceHost {
 export interface IScopedSourceHost extends Blockly.Block {
     /** 每个插槽当前的显示名，key 为 {@link IScopedSlot.key}。 */
     scopedNames?: Partial<Record<string, string>>;
+    /** 是否允许用户点击源积木修改宿主插槽的名称。 */
+    allowScopedRename?: boolean;
     /** 防重入：newBlock 自身会触发 BLOCK_CREATE。 */
     isFillingScopedSlots: boolean;
     /** 声明当前有哪些插槽；宿主形状可变时（函数参数）返回值随之变化。 */
@@ -418,6 +420,7 @@ export function scopedSourceBlock(options: IScopedSourceBlockOptions) {
                 ? (this.workspace.getBlockById(this.ownerId) as IScopedSourceHost | null)
                 : null;
             if (!owner || !hostTypes.includes(owner.type)) return;
+            if (owner.allowScopedRename === false) return;
 
             const key = this.slotKey;
             if (!key) return;

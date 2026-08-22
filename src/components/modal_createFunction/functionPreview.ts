@@ -5,7 +5,7 @@
  */
 import * as Blockly from 'blockly';
 import { BlocksColor, OPCODES, type IBlockColor } from '../../types/blocks';
-import type { IFunctionReference } from '../../types/blocks';
+import type { ICustomFunction, IFunctionReference } from '../../types/blocks';
 import { t } from 'i18next';
 
 export type TFunctionReturnField =
@@ -43,6 +43,19 @@ export interface IFunctionValueBlock extends Blockly.Block {
     deselectInput(): void;
     updateControlBar(): void;
     onchange(): void;
+    customContextMenu(
+        this: IFunctionValueBlock,
+        options: (
+            | Blockly.ContextMenuRegistry.ContextMenuOption
+            | Blockly.ContextMenuRegistry.LegacyContextMenuOption
+        )[],
+    ): void;
+}
+
+export interface IFunctionDefinition extends Blockly.Block {
+    functionData: ICustomFunction | null | undefined;
+    functionRef: IFunctionReference | null;
+    refreshFunctionValue(): void;
 }
 
 const previewBlockId = 'preview-function';

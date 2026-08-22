@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { type IBlocks, type IWorkspaceState, type Language } from '../../../types/blocks';
+import { OPCODES, type IBlocks, type IWorkspaceState, type Language } from '../../../types/blocks';
 import * as Blockly from 'blockly';
 // 导入两个插件试试
 import * as AstratchToolbox from '../../../../plugins/astratch-toolbox/src';
@@ -21,10 +21,12 @@ import {
     type TViewportUpdateEvent,
 } from '../../../types/vm';
 import { getBlocklyI18nByI18next } from '../../../utils/ash-i18n';
-import i18next from 'i18next';
+import i18next, { t } from 'i18next';
 import { replaceChineseI18n } from '../../../lib/BlocklyAdapter/i18n';
 import { Toast } from '../../../lib/ToastManager';
 import { spawnRandomString } from '../../../utils/ash-data';
+import type { IFunctionDefinition } from '../../../components/modal_createFunction/functionPreview';
+import { sendError } from '../../../utils/debug';
 
 /**
  * 用于便捷的管理WebGPU或Blockly工作区
@@ -133,8 +135,50 @@ class Blocks implements IBlocks {
 
     private handleFunctionCreated = (rawData: object) => {
         const data = rawData as IFunctionCreatedEvent;
-        if (data.targetID === this.vm.runtime.editingTargetID)
+        if (data.targetID === this.vm.runtime.editingTargetID) {
             this.workspaceSvg?.refreshToolboxSelection();
+            // 添加帽子块
+            const definition = this.workspaceSvg?.newBlock(
+                OPCODES.FUNCTION_DEFINITION,
+            ) as unknown as IFunctionDefinition;
+            definition.functionRef = { targetId: data.targetID, functionId: data.id };
+            definition.functionData = this.vm.runtime
+                .getTargetByID(data.targetID)
+                ?.getFunction(data.id);
+            if (this.workspaceSvg?.rendered) {
+                const svg = definition as unknown as Blockly.BlockSvg;
+                svg.initSvg();
+                svg.moveBy(-this.workspaceSvg.scrollX, -this.workspaceSvg.scrollY);
+                svg.render();
+            }
+        } else {
+            const target = this.vm.runtime.getTargetByID(data.targetID);
+            if (!target) {
+                sendError(t('vm:err.target.undefined'));
+                return;
+            }
+            // 新建一个临时工作区并创建头积木
+            // 再将数据加会target内
+            const tempWorkspace = new this.Blockly.Workspace();
+
+            const definition = tempWorkspace.newBlock(
+                OPCODES.FUNCTION_DEFINITION,
+            ) as IFunctionDefinition;
+            definition.functionRef = { targetId: data.targetID, functionId: data.id };
+            definition.functionData = target.getFunction(data.id);
+
+            // 格式直接来自生成，绝对不会为null
+            const state = this.Blockly.serialization.blocks.save(
+                definition,
+            ) as unknown as Blockly.serialization.blocks.State;
+
+            // 销毁工作区
+            tempWorkspace.dispose();
+            state.x = target.viewX;
+            state.y = target.viewY;
+
+            target.blocks._workspace.blocks.blocks.push(state);
+        }
     };
 
     constructor(BlocklySelf: typeof Blockly, vm: IVM) {

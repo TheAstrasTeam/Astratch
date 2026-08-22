@@ -10,7 +10,7 @@
 import * as Blockly from 'blockly/core';
 import { t } from 'i18next';
 import { BlocksColor, OPCODES } from '../../../types/blocks';
-import type { IFunctionReference } from '../../../types/blocks';
+import type { ICustomFunction, IFunctionReference } from '../../../types/blocks';
 import type { IVM } from '../../../types/vm';
 import type {
     IFunctionValueBlock,
@@ -18,7 +18,8 @@ import type {
     TFunctionReturnType,
     TPreviewFunctionData,
 } from '../../../components/modal_createFunction/functionPreview';
-import { connections, endConnections, returnConnections } from './helpers';
+import { connections, endConnections, hatConnections, returnConnections } from './helpers';
+import type { AshConnection } from '../connectionRules';
 import { modal } from '../../../components/Modal/modal';
 import { PromptModal } from '../../../components/modal_prompt';
 import { createMinusFieldByKey, createPlusField } from './mutation';
@@ -26,6 +27,7 @@ import {
     scopedSourceBlock,
     scopedSourceHost,
     type IDynamicScopedHost,
+    type IScopedSourceHost,
     type IScopedSourceBlock,
 } from './scopedSource';
 import moveLeftIcon from '../../../assets/blocks/moveLeft.svg';
@@ -132,7 +134,42 @@ interface IFunctionValueExtraState {
     /** 创建函数预览使用的临时参数快照。 */
     params?: TPreviewFunctionData[];
     isValue?: boolean;
+    /** 定义帽中的函数值签名，参数由作用域源积木提供。 */
+    definitionMode?: boolean;
+    scopedNames?: Partial<Record<string, string>>;
+    colors?: ICustomFunction['color'];
+    returnType?: TFunctionReturnType;
 }
+
+type IDefinitionFunctionValueBlock = IFunctionValueBlock &
+    Omit<IScopedSourceHost, 'loadExtraState' | 'saveExtraState'> & {
+    definitionMode: boolean;
+    definitionScopedSourceReady: boolean;
+};
+
+interface IFunctionDefinitionBlock extends Blockly.Block {
+    functionData: ICustomFunction | null | undefined;
+    functionRef: IFunctionReference | null;
+    ensureFunctionValue(): IDefinitionFunctionValueBlock | null;
+    refreshFunctionValue(): void;
+}
+
+const saveFunctionValueState = (block: IFunctionValueBlock): IFunctionValueExtraState => {
+    const definitionBlock = block as IDefinitionFunctionValueBlock;
+    return {
+        ...(block.functionRef ? { functionRef: { ...block.functionRef } } : {}),
+        ...(definitionBlock.definitionMode
+            ? {
+                  definitionMode: true,
+                  params: structuredClone(block.previewData),
+                  scopedNames: { ...definitionBlock.scopedNames },
+                  colors: structuredClone(block.colors),
+                  returnType: structuredClone(block.returnType),
+              }
+            : {}),
+        isValue: block.isValue,
+    };
+};
 
 const isFunctionValueType = (value: unknown): value is TFunctionInputField =>
     typeof value === 'string' && FUNCTION_VALUE_TYPES.includes(value as TFunctionInputField);
@@ -150,6 +187,85 @@ const getReferencedFunction = (vm: IVM, reference?: IFunctionReference) =>
     reference
         ? (vm.runtime.getTargetByID(reference.targetId)?.getFunction(reference.functionId) ?? null)
         : null;
+
+/**
+ * 定义帽中的函数值是一个作用域宿主：每个参数槽里都放着可拖出的参数积木。
+ * 普通 FUNCTION_VALUE 不使用这些槽，因此不会改变普通函数值的交互。
+ */
+const functionDefinitionValueScopedHost = scopedSourceHost({
+    sourceType: OPCODES.FUNCTION_PARAM,
+    slots: host => {
+        const block = host as IDefinitionFunctionValueBlock;
+        return block.previewData.flatMap((fieldData, index) =>
+            fieldData.type === 'text'
+                ? []
+                : [
+                      {
+                          inputName: `ARG${String(index)}`,
+                          key: String(index),
+                          defaultName: fieldData.text ?? '',
+                      },
+                  ],
+        );
+    },
+});
+
+/** 把 VM 函数快照应用到定义帽里的签名积木。 */
+const hydrateDefinitionFunctionValue = (
+    block: IDefinitionFunctionValueBlock,
+    functionData: ICustomFunction | null | undefined,
+    functionRef?: IFunctionReference | null,
+) => {
+    block.definitionMode = true;
+    block.allowScopedRename = false;
+    block.functionRef = functionRef ?? block.functionRef;
+    block.previewData = structuredClone(functionData?.body ?? []);
+    block.colors = structuredClone(functionData?.color ?? BlocksColor.function);
+    block.isValue = true;
+    block.returnType = normalizeReturnType(functionData?.returnType);
+    block.updateShape();
+    block.initScopedHost();
+    block.definitionScopedSourceReady = true;
+    block.ensureScopedBlocks();
+};
+
+/** 在锁定的 NAME 槽里放入一个普通函数值积木。 */
+const ensureDefinitionFunctionValue = (
+    definition: IFunctionDefinitionBlock,
+): IDefinitionFunctionValueBlock | null => {
+    const connection = definition.getInput('NAME')?.connection as AshConnection | undefined;
+    if (!connection) return null;
+
+    const current = connection.targetBlock() as IDefinitionFunctionValueBlock | null;
+    if (current?.type === OPCODES.FUNCTION_VALUE && !current.isShadow()) {
+        current.setMovable(false);
+        current.setDeletable(false);
+        return current;
+    }
+
+    // 早期实现把签名设成 shadow。shadow 不能稳定容纳可拖出的普通参数积木，
+    // 每次补块都会把参数顶到工作区；在这里原地迁移为普通锁定子积木。
+    if (current?.isShadow()) connection.setShadowState(null);
+    else if (current) connection.disconnect();
+
+    const block = definition.workspace.newBlock(
+        OPCODES.FUNCTION_VALUE,
+    ) as IDefinitionFunctionValueBlock;
+    block.definitionMode = true;
+    block.allowScopedRename = false;
+    block.setMovable(false);
+    block.setDeletable(false);
+    if (definition.workspace.rendered) (block as unknown as Blockly.BlockSvg).initSvg();
+
+    connection.allowScopedSource = true;
+    try {
+        if (block.outputConnection) connection.connect(block.outputConnection);
+    } finally {
+        connection.allowScopedSource = false;
+    }
+    if (definition.workspace.rendered) (block as unknown as Blockly.BlockSvg).render();
+    return block;
+};
 
 /** 根据函数展示配置切换值积木的输出/语句连接。 */
 const configureFunctionValueConnections = (
@@ -178,6 +294,30 @@ const configureFunctionValueConnections = (
         );
     } else {
         block.setOutput(true, 'Function');
+    }
+};
+
+/** 切换单个函数引用积木的显示方式，并把它作为一次可撤销的 mutation。 */
+const setFunctionValueMode = (block: IFunctionValueBlock, isValue: boolean) => {
+    if (block.isInFlyout || block.editMode || block.isDeadOrDying() || block.isValue === isValue)
+        return;
+
+    const oldState = JSON.stringify(saveFunctionValueState(block));
+    const previousGroup = Blockly.Events.getGroup();
+    Blockly.Events.setGroup(true);
+    try {
+        block.isValue = isValue;
+        configureFunctionValueConnections(block, isValue, block.returnType);
+        block.updateShape();
+
+        const newState = JSON.stringify(saveFunctionValueState(block));
+        if (oldState !== newState) {
+            Blockly.Events.fire(
+                new Blockly.Events.BlockChange(block, 'mutation', null, oldState, newState),
+            );
+        }
+    } finally {
+        Blockly.Events.setGroup(previousGroup || false);
     }
 };
 
@@ -229,17 +369,49 @@ Blockly.Css.register(`
  */
 export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
     blockly.Blocks[OPCODES.FUNCTION_DEFINITION] = {
-        init(this: Blockly.Block) {
+        init(this: IFunctionDefinitionBlock) {
+            this.functionRef = null;
             this.jsonInit({
-                ...connections,
+                ...hatConnections,
                 message0: t('blocks:function.definition'),
-                message1: '%1',
                 colour: BlocksColor.function.primary,
-                args0: [{ type: 'input_value', name: 'NAME', check: 'String' }],
-                args1: [{ type: 'input_statement', name: 'DO', check: 'Action' }],
+                args0: [{ type: 'input_value', name: 'NAME', check: 'Function' }],
+            });
+
+            let functionData: ICustomFunction | null | undefined;
+            Object.defineProperty(this, 'functionData', {
+                configurable: true,
+                enumerable: false,
+                get: () => functionData,
+                set: (value: ICustomFunction | null | undefined) => {
+                    functionData = value;
+                    this.refreshFunctionValue();
+                },
+            });
+
+            const connection = this.getInput('NAME')?.connection as AshConnection | undefined;
+            if (connection) {
+                connection.isScopedSourceSlot = true;
+                // 反序列化紧接着会恢复已保存的函数值，当前微任务结束后再锁住。
+                connection.allowScopedSource = true;
+            }
+            queueMicrotask(() => {
+                if (this.isDeadOrDying()) return;
+                if (connection) connection.allowScopedSource = false;
+                this.refreshFunctionValue();
             });
         },
-    } as Blockly.Block;
+        ensureFunctionValue(this: IFunctionDefinitionBlock) {
+            return ensureDefinitionFunctionValue(this);
+        },
+        refreshFunctionValue(this: IFunctionDefinitionBlock) {
+            const existing = this.getInput('NAME')?.connection?.targetBlock();
+            const name = this.ensureFunctionValue();
+            if (name && (this.functionData || this.functionRef || !existing)) {
+                hydrateDefinitionFunctionValue(name, this.functionData, this.functionRef);
+            }
+        },
+    } as unknown as Blockly.Block;
 
     blockly.Blocks[OPCODES.FUNCTION_RETURN] = {
         init(this: Blockly.Block) {
@@ -444,7 +616,8 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
     } as Blockly.Block;
 
     blockly.Blocks[OPCODES.FUNCTION_VALUE] = {
-        init(this: IFunctionValueBlock) {
+        ...functionDefinitionValueScopedHost,
+        init(this: IDefinitionFunctionValueBlock) {
             this.functionRef = null;
             this.previewData = [];
             this.colors = BlocksColor.function;
@@ -453,27 +626,80 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
             this.controlBar = null;
             this.isValue = true;
             this.returnType = null;
+            this.definitionMode = false;
+            this.definitionScopedSourceReady = false;
             this.jsonInit({
                 ...returnConnections,
                 colour: BlocksColor.function.primary,
                 output: 'Function',
             });
         },
-        loadExtraState(this: IFunctionValueBlock, state: IFunctionValueExtraState) {
+        loadExtraState(this: IDefinitionFunctionValueBlock, state: IFunctionValueExtraState) {
+            if (state.definitionMode) {
+                const functionData = getReferencedFunction(vm, state.functionRef);
+                this.definitionMode = true;
+                this.allowScopedRename = false;
+                this.functionRef = state.functionRef ?? null;
+                this.scopedNames = { ...state.scopedNames };
+                this.previewData = structuredClone(functionData?.body ?? state.params ?? []);
+                this.colors = structuredClone(
+                    functionData?.color ?? state.colors ?? BlocksColor.function,
+                );
+                this.isValue = true;
+                this.returnType = normalizeReturnType(
+                    functionData?.returnType ?? state.returnType,
+                );
+                this.setMovable(false);
+                this.setDeletable(false);
+                configureFunctionValueConnections(this, true, null);
+                this.updateShape();
+                this.initScopedHost();
+                this.definitionScopedSourceReady = true;
+                return;
+            }
+
+            this.definitionMode = false;
             const functionData = getReferencedFunction(vm, state.functionRef);
 
             this.functionRef = state.functionRef ?? null;
             this.previewData = structuredClone(functionData?.body ?? state.params ?? []);
             this.colors = structuredClone(functionData?.color ?? BlocksColor.function);
-            this.isValue = functionData?.isValue ?? state.isValue ?? true;
+            // 引用积木自己的显示状态优先；函数定义中的 true 只是默认值。
+            this.isValue = state.isValue ?? functionData?.isValue ?? true;
             this.returnType = normalizeReturnType(functionData?.returnType);
 
             // 引用目标可能已删除；此时仍应渲染一个空签名。
             configureFunctionValueConnections(this, this.isValue, this.returnType);
             this.updateShape();
         },
-        saveExtraState(this: IFunctionValueBlock) {
-            return this.functionRef ? { functionRef: { ...this.functionRef } } : {};
+        saveExtraState(this: IDefinitionFunctionValueBlock) {
+            return saveFunctionValueState(this);
+        },
+        customContextMenu(
+            this: IDefinitionFunctionValueBlock,
+            options: (
+                | Blockly.ContextMenuRegistry.ContextMenuOption
+                | Blockly.ContextMenuRegistry.LegacyContextMenuOption
+            )[],
+        ) {
+            if (this.definitionMode || this.isInFlyout || this.editMode || !this.functionRef) return;
+
+            const block = this as unknown as Blockly.BlockSvg;
+            options.unshift({
+                separator: true,
+            } as Blockly.ContextMenuRegistry.SeparatorContextMenuOption);
+            options.unshift({
+                id: 'functionValueDisplayMode',
+                text: t(
+                    this.isValue ? 'blocks:function.showAsScratch' : 'blocks:function.showAsValue',
+                ),
+                enabled: this.isEditable(),
+                scope: { block, focusedNode: block },
+                weight: 10,
+                callback: () => {
+                    setFunctionValueMode(this, !this.isValue);
+                },
+            });
         },
         /** 选中输入框（其编辑器被打开）时显示控制栏。 */
         selectInput(this: IFunctionValueBlock, index: number) {
@@ -509,7 +735,62 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
             this.activeInputIndex = -1;
             this.updateShape();
         },
-        updateShape() {
+        updateShape(this: IDefinitionFunctionValueBlock) {
+            if (this.definitionMode) {
+                const wanted = new Set(this.previewData.map((_, index) => `ARG${String(index)}`));
+                for (const input of [...this.inputList]) {
+                    if (input.name.startsWith('ARG') && !wanted.has(input.name)) {
+                        this.removeInput(input.name, true);
+                    }
+                }
+
+                this.setColour(this.colors.primary ?? BlocksColor.function.primary);
+                this.setStyle(this.getStyleName());
+
+                this.previewData.forEach((fieldData, index) => {
+                    const inputName = `ARG${String(index)}`;
+                    let input = this.getInput(inputName);
+
+                    if (fieldData.type === 'text') {
+                        if (input?.connection) {
+                            this.removeInput(inputName, true);
+                            input = null;
+                        }
+                        if (!input) {
+                            this.appendDummyInput(inputName).appendField(
+                                fieldData.text ?? '',
+                                `TEXT_${String(index)}`,
+                            );
+                        } else {
+                            this.getField(`TEXT_${String(index)}`)?.setValue(
+                                fieldData.text ?? '',
+                            );
+                        }
+                        return;
+                    }
+
+                    if (input && !input.connection) {
+                        this.removeInput(inputName, true);
+                        input = null;
+                    }
+                    input ??= this.appendValueInput(inputName);
+                    const checks = (
+                        Array.isArray(fieldData.type) ? fieldData.type : [fieldData.type]
+                    ).map(type =>
+                        type
+                            ? `${type.charAt(0).toUpperCase()}${type.slice(1)}`
+                            : 'String',
+                    );
+                    input.setCheck(checks);
+                });
+
+                for (let index = 0; index < this.previewData.length; index++) {
+                    this.moveInputBefore(`ARG${String(index)}`, null);
+                }
+                updateControlBar.call(this);
+                return;
+            }
+
             for (const input of [...this.inputList]) {
                 this.removeInput(input.name, true);
             }
@@ -543,7 +824,8 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                     }
                 } else {
                     let input: Blockly.Input;
-                    if (!this.isValue || this.editMode) input = this.appendValueInput(inputID);
+                    if (this.definitionMode) input = this.appendValueInput(inputID);
+                    else if (!this.isValue || this.editMode) input = this.appendValueInput(inputID);
                     else input = this.appendDummyInput(inputID);
 
                     const checks = (
@@ -557,8 +839,9 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                         return 'String';
                     });
 
-                    if (checks.length > 0 && this.editMode && !this.isValue) input.setCheck(checks);
-                    if (this.editMode) {
+                    if (checks.length > 0 && ((this.editMode && !this.isValue) || this.definitionMode))
+                        input.setCheck(checks);
+                    if (this.editMode && !this.definitionMode) {
                         input.connection?.setShadowState({
                             type: OPCODES.FUNCTION_VALUE_ID,
                             fields: { ID: fieldData.text ?? '' },
@@ -571,6 +854,9 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                             return value;
                         });
                         if (shadowText) bindShadowSelection.call(this, shadowText, index);
+                    } else if (this.definitionMode) {
+                        // 作用域宿主会在这个空槽里放入 FUNCTION_PARAM，
+                        // 用户拖走后再补一个新的参数源积木。
                     } else {
                         if (this.isValue) input.appendField(fieldData.text ?? '');
                         else
@@ -585,24 +871,37 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
             syncFunctionValueHintColors(this);
             updateControlBar.call(this);
             // 等渲染完成后（字段 transform 就位）用最新布局重新定位。
-            requestAnimationFrame(() => {
-                if (!this.isDeadOrDying()) {
-                    syncFunctionValueHintColors(this);
-                    updateControlBar.call(this);
-                }
-            });
+            if (typeof requestAnimationFrame === 'function') {
+                requestAnimationFrame(() => {
+                    if (!this.isDeadOrDying()) {
+                        syncFunctionValueHintColors(this);
+                        updateControlBar.call(this);
+                    }
+                });
+            }
         },
-        onchange(this: IFunctionValueBlock) {
+        onchange(this: IDefinitionFunctionValueBlock, event: Blockly.Events.Abstract) {
+            if (
+                this.definitionMode &&
+                ([
+                    Blockly.Events.BLOCK_CREATE,
+                    Blockly.Events.BLOCK_MOVE,
+                    Blockly.Events.BLOCK_DELETE,
+                    Blockly.Events.FINISHED_LOADING,
+                ] as string[]).includes(event.type)
+            ) {
+                this.ensureScopedBlocks();
+            }
             // 工作区反序列化会在 loadExtraState 之后再次载入 shadow，
             // 因此在后续事件中再同步一次颜色，避免恢复后回到默认粉色。
             if (!this.editMode && !this.isDeadOrDying()) {
                 syncFunctionValueHintColors(this);
             }
         },
-        updateControlBar() {
+        updateControlBar(this: IFunctionValueBlock) {
             updateControlBar.call(this);
         },
-    } as IFunctionValueBlock;
+    } as unknown as IFunctionValueBlock;
 
     // ── 行内函数 ──────────────────────────────────────────────
     // 形如 `行内函数 (a)⊖ (b)⊖ ⊕ { ... }`，
@@ -716,7 +1015,7 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
     blockly.Blocks[OPCODES.FUNCTION_PARAM] = scopedSourceBlock({
         colour: BlocksColor.function.secondary,
         defaultLabel: () => t('blocks:function.param'),
-        hostTypes: [OPCODES.FUNCTION_INLINE],
+        hostTypes: [OPCODES.FUNCTION_INLINE, OPCODES.FUNCTION_VALUE],
         openRenamePrompt: ({ currentName, commit }) => {
             void modal.open(PromptModal, {
                 message: t('blocks:rename.functionParam.prompt', { message: currentName }),

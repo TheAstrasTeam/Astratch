@@ -316,6 +316,8 @@
     "function.setDataValue": "set parameter %1 to %2",
     "function.value": "function Value",
     "function.defaultTitle": "function name",
+    "function.showAsScratch": "Switch to Scratch mode",
+    "function.showAsValue": "Switch to function value mode",
 
     "canvas.cleanAll": "erase all",
     "canvas.color": "set drawing color to %1",
