@@ -18,6 +18,7 @@ const guiTheme = {
     'ui-modal-foreground': '#eeeeee',
     'ui-modal-header-background': '#333333',
     'ui-modal-header-foreground': '#ffffff',
+    'ui-modal-border': '#555555',
 
     'ui-blockly-background': '#151515',
     'ui-blockly-foreground': 'var(--ui-modal-foreground)',

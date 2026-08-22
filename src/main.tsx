@@ -69,7 +69,14 @@ await i18nReady.then(async () => {
         <StrictMode>
             <Suspense fallback='loading...'>
                 {/*  不加延迟会导致错误的关闭 */}
-                <ModalProvider manager={modal} defaultLayerOptions={{ closeDelay: 180 }}>
+                <ModalProvider
+                    manager={modal}
+                    defaultLayerOptions={{
+                        closeDelay: 180,
+                        closeOnOutsideClick: false,
+                        dim: false,
+                    }}
+                >
                     {vm.projectManager.isAPIAvailable ? <GUI vm={vm} /> : <ErrorPage />}
                 </ModalProvider>
             </Suspense>

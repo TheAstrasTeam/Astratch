@@ -43,9 +43,14 @@ body {
 }
 
 // 可拖动模态框：react-rnd 通过 transform 定位，需禁用 @reactleaf/modal 自带的 transform 过渡，否则拖动会卡顿
+// 同时让各模态框能从外部操作，使 layer 背景不拦截点击，只有窗口本身可交互
 .modal-layer > *,
 .modal-layer[data-content-visible='true'] > * {
     transition: none !important;
+    pointer-events: auto !important;
+}
+.modal-layer {
+    pointer-events: none !important;
 }
 
 .blocklyFlyoutButton {
