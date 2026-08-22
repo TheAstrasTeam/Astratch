@@ -65,6 +65,16 @@ const AddonDetail = ({
                                 })}
                             </span>
                         )}
+                        {addon.readme && addon.readme.length > 0 && (
+                            <span className={styles.detailMetaItem}>
+                                {t('gui:addon.languages')}: {addon.readme.join(', ')}
+                            </span>
+                        )}
+                        {addon.astratchVersion && (
+                            <span className={styles.detailMetaItem}>
+                                {t('gui:addon.compatibility')}: {addon.astratchVersion}
+                            </span>
+                        )}
                     </div>
                 </div>
             </div>

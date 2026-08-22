@@ -74,12 +74,12 @@ export async function buildAddonFromHandle(
 ): Promise<IAddon | null> {
     // 读取 info.json
     const infoText = await readTextFile(handle, 'info.json');
-    if (infoText === null) throw new Error('info.json not found');
+    if (infoText === null) return null;
     const info = (parseJson(infoText) ?? {}) as IAddonInfo;
 
     // 读取 addon.js（已编译的入口）
     const mainCode = await readTextFile(handle, 'addon.js');
-    if (mainCode === null) throw new Error('addon.js not found');
+    if (mainCode === null) return null;
     const run = await compile(mainCode);
 
     // 读取图标

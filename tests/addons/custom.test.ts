@@ -104,20 +104,16 @@ describe('buildAddonFromHandle', () => {
         );
     });
 
-    it('throws when info.json is missing', async () => {
+    it('returns null when info.json is missing', async () => {
         const handle = makeTreeHandle('addon', { 'addon.js': 'export default () => {};' });
-        await expect(buildAddonFromHandle(handle, 'custom-addon')).rejects.toThrow(
-            'info.json not found',
-        );
+        expect(await buildAddonFromHandle(handle, 'custom-addon')).toBeNull();
     });
 
-    it('throws when addon.js is missing', async () => {
+    it('returns null when addon.js is missing', async () => {
         const handle = makeTreeHandle('addon', {
             'info.json': JSON.stringify({ name: 'X' }),
         });
-        await expect(buildAddonFromHandle(handle, 'custom-addon')).rejects.toThrow(
-            'addon.js not found',
-        );
+        expect(await buildAddonFromHandle(handle, 'custom-addon')).toBeNull();
     });
 
     it('parses settings from astratch into the addon', async () => {

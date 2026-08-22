@@ -71,6 +71,8 @@
     "addon.back": "返回",
     "addon.loadingReadme": "正在加载 README...",
     "addon.noReadme": "此插件暂无 README。",
+    "addon.languages": "支持语言",
+    "addon.compatibility": "兼容版本",
     "target.folderNameAsk": "输入文件夹的名称：",
     "target.attr.x": "X 坐标",
     "target.attr.y": "Y 坐标",

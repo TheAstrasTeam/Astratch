@@ -71,6 +71,8 @@
     "addon.back": "Back",
     "addon.loadingReadme": "Loading README...",
     "addon.noReadme": "No README available for this addon.",
+    "addon.languages": "Languages",
+    "addon.compatibility": "Requires",
     "target.folderNameAsk": "Enter the folder name:",
     "target.attr.x": "X",
     "target.attr.y": "Y",
