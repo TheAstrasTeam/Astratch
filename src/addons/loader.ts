@@ -28,14 +28,11 @@ export const addonContentCacheKey = (id: string, version: string): string =>
     `addon:${id}@${version}`;
 
 /**
- * 从 registry 的 download 路径派生某个版本 addon.js 的下载地址。
- * download 形如 example@v1.2.0/，提取 id 后拼接目标版本。
- * 例：download="example@v1.2.0/", version="2.0.0" → .../example@v2.0.0/addon.js
+ * 根据插件 id 和版本号派生 addon.js 的下载地址。
+ * 例：id="example", version="2.0.0" → .../example@v2.0.0/addon.js
  */
-export const addonFileUrl = (download: string, version: string): string => {
-    const id = download.replace(/@v[^/]*\/$/, '');
-    return `${ADDONS_REPO_URL}/${id}@v${version}/addon.js`;
-};
+export const addonFileUrl = (id: string, version: string): string =>
+    `${ADDONS_REPO_URL}/${id}@v${version}/addon.js`;
 
 const fetchText = async (url: string): Promise<string> => {
     const response = await fetch(url);
@@ -102,15 +99,17 @@ const computeHash = async (text: string): Promise<string> => {
 export const registryAddonToIAddon = (entry: IRegistryAddon): IAddon => {
     const releases: Record<string, IRegistryVersion> = {};
     for (const version of entry.versions) {
-        releases[version] = { main: 'addon.js', url: addonFileUrl(entry.download, version) };
+        releases[version] = { main: 'addon.js', url: addonFileUrl(entry.id, version) };
     }
 
     // 图标：将相对路径转为完整 URL
-    const icon = entry.icon ? `${ADDONS_REPO_URL}/${entry.icon}` : '';
+    const icon = entry.icon
+        ? `${ADDONS_REPO_URL}/${entry.id}@v${entry.version}/${entry.icon}`
+        : '';
 
     // i18n：异步加载并注册
-    if (entry.i18n) {
-        void loadAddonI18n(entry.id, entry.i18n);
+    if (entry.i18n && entry.i18n.length > 0) {
+        void loadAddonI18n(entry.id, entry.version, entry.i18n);
     }
 
     return {
@@ -133,22 +132,18 @@ export const registryAddonToIAddon = (entry: IRegistryAddon): IAddon => {
 
 /**
  * 异步加载插件的 i18n 资源并注册到 i18next。
- * i18n 路径映射（locale -> 相对路径）从 registry 获取。
+ * 从版本目录下 i18n/{locale}.json 加载。
  */
 const loadAddonI18n = async (
     addonId: string,
-    i18nPaths: Partial<Record<string, string>>,
+    version: string,
+    locales: string[],
 ): Promise<void> => {
-    const entries = Object.entries(i18nPaths).filter(
-        (entry): entry is [string, string] => entry[1] !== undefined,
-    );
-    if (entries.length === 0) return;
-
     const resources: Partial<Record<string, Record<string, string>>> = {};
     await Promise.all(
-        entries.map(async ([locale, relativePath]) => {
+        locales.map(async locale => {
             try {
-                const url = `${ADDONS_REPO_URL}/${relativePath}`;
+                const url = `${ADDONS_REPO_URL}/${addonId}@v${version}/i18n/${locale}.json`;
                 const text = await fetchText(url);
                 resources[locale] = JSON.parse(text) as Record<string, string>;
             } catch {
@@ -217,7 +212,7 @@ export async function downloadAddonContent(id: string, version: string): Promise
     }
     const mainCode = await getFile(
         addonContentCacheKey(id, version),
-        addonFileUrl(entry.download, version),
+        addonFileUrl(entry.id, version),
     );
     return compileAddon(mainCode);
 }

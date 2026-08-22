@@ -146,7 +146,7 @@ export interface IAddon {
     version: string;
     /** 全部可用版本（远端插件来自 registry，自定义插件只有当前版本） */
     versions: string[];
-    /** 各版本的下载信息（远端插件由 registry 的 download 路径派生；自定义插件为空对象） */
+    /** 各版本的下载信息（远端插件由 registry 的 id + version 派生；自定义插件为空对象） */
     releases: Record<string, IRegistryVersion>;
 }
 
@@ -169,20 +169,18 @@ export interface IRegistryAddon {
     description: string;
     author: string;
     license?: string;
-    /** 图标文件路径（相对于 release 根目录，如 addon@v1.0.0/assets/icon.svg） */
+    /** 图标文件路径（相对于版本目录，如 assets/icon.svg） */
     icon?: string;
     defaultEnabled?: boolean;
     settings?: IAddonSettingDefinition[];
-    /** i18n 文件路径映射（locale -> 相对于 release 根目录的路径） */
-    i18n?: Partial<Record<string, string>>;
+    /** 支持的语言列表（如 ["en", "zh-CN"]），客户端据此拼接 i18n/{locale}.json 路径 */
+    i18n?: string[];
     /** 兼容的 Astratch 最低版本 */
     astratch?: { minVersion?: string };
     /** 当前（最新）版本 */
     version: string;
     /** 全部可用版本（旧到新） */
     versions: string[];
-    /** 当前版本发布目录的相对路径（如 example@v1.0.0/），客户端据此派生各版本 URL */
-    download: string;
 }
 
 /**

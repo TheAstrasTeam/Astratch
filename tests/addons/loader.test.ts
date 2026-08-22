@@ -31,13 +31,13 @@ describe('registryAddonToIAddon', () => {
         description: 'A sample',
         author: 'AstrasTeam',
         license: 'MIT',
-        icon: 'example@v2.0.0/assets/icon.svg',
+        icon: 'assets/icon.svg',
+        i18n: ['en', 'zh-CN'],
         defaultEnabled: true,
         settings: [{ name: 'name', id: 'name', type: 'string', default: 'world' }],
         astratch: { minVersion: '0.1.0' },
         version: '2.0.0',
         versions: ['1.0.0', '2.0.0'],
-        download: 'example@v2.0.0/',
     };
 
     it('maps registry entry to an IAddon', () => {
@@ -60,7 +60,7 @@ describe('registryAddonToIAddon', () => {
         expect(addon.versions).toEqual(['1.0.0', '2.0.0']);
     });
 
-    it('derives per-version download urls from the download path', () => {
+    it('derives per-version download urls from id and version', () => {
         const addon = registryAddonToIAddon(entry);
         expect(addon.releases['1.0.0'].url).toContain('example@v1.0.0/addon.js');
         expect(addon.releases['2.0.0'].url).toContain('example@v2.0.0/addon.js');
@@ -81,7 +81,6 @@ describe('registryAddonToIAddon', () => {
 
     it('converts icon path to full URL', () => {
         const addon = registryAddonToIAddon(entry);
-        expect(addon.icon).toContain('example@v2.0.0/assets/icon.svg');
-        expect(addon.icon).toMatch(/^https?:\/\//);
+        expect(addon.icon).toBe('https://raw.githubusercontent.com/TheAstrasTeam/AstratchAddons/refs/heads/release/example@v2.0.0/assets/icon.svg');
     });
 });
