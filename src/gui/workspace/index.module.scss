@@ -15,9 +15,9 @@
     flex-direction: column;
 }
 .switch-tabs {
-    width: 2rem;
+    width: auto;
     height: 2rem;
-    flex: 0.5;
+    flex: 0 0 auto;
     display: flex;
     overflow: auto hidden;
     // 让滚动条出现在上面
@@ -90,21 +90,40 @@
     }
 }
 
-.tool-bar {
-    height: 2rem;
-    width: 100%;
+.sidebar-col,
+.editor-col {
     display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
 }
 
-.tool-bar-left,
-.tool-bar-right {
-    flex: 1;
+.sidebar-header {
+    flex: 0 0 2rem;
+    height: 2rem;
     display: flex;
-    align-items: center;
+    align-items: stretch;
+    overflow: hidden;
 }
-.tool-bar-right {
-    flex-direction: row-reverse;
+
+.sidebar-body {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
+
+.editor-body {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
 .tabs {
     display: flex;
     flex-direction: column;
@@ -125,6 +144,8 @@
     min-height: 0;
 }
 .empty {
+    flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     align-items: center;

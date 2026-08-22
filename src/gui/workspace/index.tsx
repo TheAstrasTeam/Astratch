@@ -4,13 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-    allBuiltInTabs,
-    events,
-    type ITarget,
-    type IVM,
-    type TallBuiltInTabs,
-} from '../../types/vm';
+import { allBuiltInTabs, events, type IVM, type TallBuiltInTabs } from '../../types/vm';
 import styles from './index.module.scss';
 import BlocklyWorkspace from './Blockly/index';
 import { useEffect, useMemo, useState, type FunctionComponent, type SVGProps } from 'react';
@@ -35,6 +29,8 @@ import { debounce } from '../../utils/ash-debounce';
 import { BottomBar } from '../bottomBar';
 import { shortcutManager } from '../../lib/ShortcutManager';
 import { SHORTCUTS } from '../../types/lib';
+import TabBar from '../../tabs/TabBar';
+import { useTabsStore } from '../../stores/useTabsStore';
 
 const TabButton = ({
     id,
@@ -63,25 +59,40 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
     const nowGuiInterface = useGUIStore(state => state.guiInterface);
     const [, setTargetsRevision] = useState(0);
     const [tabSelected, setTabSelect] = useState<TallBuiltInTabs>(allBuiltInTabs.TARGETS);
-    const [selectedTarget, setSelectedTarget] = useState<ITarget | null>(
-        vm.runtime.targets.get(vm.runtime.editingTargetID) ?? null,
-    );
+    const tabs = useTabsStore(state => state.tabs);
+    const activeTabId = useTabsStore(state => state.activeTabId);
+
+    const activeTab = activeTabId ? tabs.find(tab => tab.id === activeTabId) : null;
 
     useEffect(() => {
         const handleTargetsUpdate = () => {
             setTargetsRevision(revision => revision + 1);
-            setSelectedTarget(vm.runtime.targets.get(vm.runtime.editingTargetID) ?? null);
         };
-        const handleSwitchTargetTab = () => {
-            setSelectedTarget(vm.runtime.targets.get(vm.runtime.editingTargetID) ?? null);
+        const handleProjectCreated = () => {
+            const editingTargetID = vm.runtime.getEditingTarget()?.id ?? '';
+            const target = vm.runtime.targets.get(editingTargetID);
+            if (!target && vm.runtime.targets.size > 0) {
+                const first = vm.runtime.targets.values().next().value;
+                if (first) {
+                    vm.runtime.switchTarget(first.id);
+                }
+            }
+            const latest = vm.runtime.getEditingTarget();
+            if (latest) useTabsStore.getState().openTab(latest.id, latest.name, latest.mode);
+        };
+        // 任何位置触发目标切换时，同步打开/激活对应标签。
+        // 保证左侧列表、创建目标、以及其它调用 switchTarget 的路径行为一致。
+        const handleSwitchTarget = () => {
+            const target = vm.runtime.getEditingTarget();
+            if (target) useTabsStore.getState().openTab(target.id, target.name, target.mode);
         };
 
         vm.off(events.UPDATE_TARGET_STRUCTURE, handleTargetsUpdate);
-        vm.off(events.SWITCH_TARGET, handleSwitchTargetTab);
-        vm.off(events.CREATE_PROJECT, handleSwitchTargetTab);
+        vm.off(events.CREATE_PROJECT, handleProjectCreated);
+        vm.off(events.SWITCH_TARGET, handleSwitchTarget);
         vm.on(events.UPDATE_TARGET_STRUCTURE, handleTargetsUpdate);
-        vm.on(events.SWITCH_TARGET, handleSwitchTargetTab);
-        vm.on(events.CREATE_PROJECT, handleSwitchTargetTab);
+        vm.on(events.CREATE_PROJECT, handleProjectCreated);
+        vm.on(events.SWITCH_TARGET, handleSwitchTarget);
         const unbindShortcutCommands = shortcutManager.bindCommands({
             [SHORTCUTS.SWITCH_TAB_TARGET.id]: () => {
                 setTabSelect(allBuiltInTabs.TARGETS);
@@ -95,8 +106,8 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
         });
         return () => {
             vm.off(events.UPDATE_TARGET_STRUCTURE, handleTargetsUpdate);
-            vm.off(events.SWITCH_TARGET, handleSwitchTargetTab);
-            vm.off(events.CREATE_PROJECT, handleSwitchTargetTab);
+            vm.off(events.CREATE_PROJECT, handleProjectCreated);
+            vm.off(events.SWITCH_TARGET, handleSwitchTarget);
             unbindShortcutCommands();
         };
     }, [vm]);
@@ -122,7 +133,8 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
             return <CreateProject vm={vm} />;
         }
         // 编辑器
-        if (selectedTarget) return <BlocklyWorkspace vm={vm} />;
+        if (activeTab)
+            return <BlocklyWorkspace key={activeTab.id} vm={vm} targetId={activeTab.targetId} />;
         else
             return (
                 <div className={styles.empty}>
@@ -148,42 +160,45 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
 
     return (
         <div className={styles.main}>
-            <div className={styles.toolBar}>
-                <div className={styles.switchTabs}>
-                    <TabButton
-                        selected={tabSelected}
-                        id={allBuiltInTabs.TARGETS}
-                        ICON={SpriteIcon}
-                        callback={setTabSelect}
-                    />
-                    <TabButton
-                        selected={tabSelected}
-                        id={allBuiltInTabs.ADDONS}
-                        ICON={AddonsIcon}
-                        callback={setTabSelect}
-                    />
-                    <TabButton
-                        selected={tabSelected}
-                        id={allBuiltInTabs.DEBUG}
-                        ICON={DebuggerIcon}
-                        callback={setTabSelect}
-                    />
-                </div>
-                <div className={styles.toolBarLeft}>
-                    <button>{'Testing'}</button>
-                </div>
-                <div className={styles.toolBarRight}>
-                    <button>{'Testing'}</button>
-                </div>
-            </div>
             <div className={styles.workspace}>
                 <SplitPane
                     direction='horizontal'
                     defaultRatio={0.2}
                     minFirst={50}
                     minSecond={150}
-                    first={renderToolBar()}
-                    second={renderEditorContent()}
+                    first={
+                        <div className={styles.sidebarCol}>
+                            <div className={styles.sidebarHeader}>
+                                <div className={styles.switchTabs}>
+                                    <TabButton
+                                        selected={tabSelected}
+                                        id={allBuiltInTabs.TARGETS}
+                                        ICON={SpriteIcon}
+                                        callback={setTabSelect}
+                                    />
+                                    <TabButton
+                                        selected={tabSelected}
+                                        id={allBuiltInTabs.ADDONS}
+                                        ICON={AddonsIcon}
+                                        callback={setTabSelect}
+                                    />
+                                    <TabButton
+                                        selected={tabSelected}
+                                        id={allBuiltInTabs.DEBUG}
+                                        ICON={DebuggerIcon}
+                                        callback={setTabSelect}
+                                    />
+                                </div>
+                            </div>
+                            <div className={styles.sidebarBody}>{renderToolBar()}</div>
+                        </div>
+                    }
+                    second={
+                        <div className={styles.editorCol}>
+                            <TabBar />
+                            <div className={styles.editorBody}>{renderEditorContent()}</div>
+                        </div>
+                    }
                     onMove={svgResizeDebounced}
                     onOver={() => {
                         vm.runtime.blocks.refreshBlocklySize();

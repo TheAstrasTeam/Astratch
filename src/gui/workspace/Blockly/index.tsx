@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { events, type IVM } from '../../../types/vm';
+import { type IVM } from '../../../types/vm';
 import styles from './index.module.scss';
 import { useEffect, useRef } from 'react';
 import { MenuItem, MenuDivider } from '@szhsin/react-menu';
@@ -13,7 +13,7 @@ import { useContextMenu } from '../../contextMenu';
 import { AllContextMenu } from '../../../types/gui';
 import { getBlocklyMenuOptions, getBlocklyMenuEvent } from '../../../lib/BlocklyAdapter/index';
 
-const BlocklyWorkspace = ({ vm }: { vm: IVM }): React.ReactNode => {
+const BlocklyWorkspace = ({ vm, targetId }: { vm: IVM; targetId: string }): React.ReactNode => {
     const workspaceDiv = useRef<HTMLDivElement>(null);
 
     useContextMenu(AllContextMenu.BLOCKLY, closeMenu => {
@@ -55,23 +55,19 @@ const BlocklyWorkspace = ({ vm }: { vm: IVM }): React.ReactNode => {
     });
 
     useEffect(() => {
-        const handleTargetChanged = () => {
-            restartWorkspace();
-        };
-        const restartWorkspace = () => {
-            if (!workspaceDiv.current) return;
+        if (!workspaceDiv.current) return;
 
-            void vm.runtime.blocks.createWorkspace(workspaceDiv.current, false);
-        };
+        if (vm.runtime.editingTargetID !== targetId) {
+            // 保持 VM 与当前标签一致；workspace 层的全局监听会同步标签激活状态
+            vm.runtime.switchTarget(targetId);
+        }
 
-        vm.off(events.SWITCH_TARGET, handleTargetChanged);
-        vm.on(events.SWITCH_TARGET, handleTargetChanged);
-        restartWorkspace();
+        void vm.runtime.blocks.createWorkspace(workspaceDiv.current, true);
+
         return () => {
-            vm.off(events.SWITCH_TARGET, handleTargetChanged);
             vm.runtime.blocks.dispose();
         };
-    }, [vm, vm.on]);
+    }, [vm, vm.on, targetId]);
 
     return (
         <div className={styles.root}>
