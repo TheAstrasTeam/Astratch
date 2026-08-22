@@ -103,9 +103,7 @@ export const registryAddonToIAddon = (entry: IRegistryAddon): IAddon => {
     }
 
     // 图标：将相对路径转为完整 URL
-    const icon = entry.icon
-        ? `${ADDONS_REPO_URL}/${entry.id}@v${entry.version}/${entry.icon}`
-        : '';
+    const icon = entry.icon ? `${ADDONS_REPO_URL}/${entry.id}@v${entry.version}/${entry.icon}` : '';
 
     // i18n：异步加载并注册
     if (entry.i18n && entry.i18n.length > 0) {

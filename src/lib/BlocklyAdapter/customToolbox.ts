@@ -9,7 +9,7 @@ import { OPCODES, getEditingDataList } from './blocks/helpers';
 import { menu, num, txt } from './toolbox';
 import { t } from 'i18next';
 import type { IRegisterCategory } from '.';
-import { modal } from '../../components/Modal/modal';
+import { modal, isModalOpen } from '../../components/Modal/modal';
 import { CreateDataModal } from '../../components/modal_createData';
 import { CreateFunctionModal } from '../../components/modal_createFunction';
 
@@ -62,6 +62,7 @@ export function setDataCategory(_blockly: typeof Blockly, vm: IVM): IRegisterCat
         return items;
     };
     const handleCreateData = () => {
+        if (isModalOpen(CreateDataModal)) return;
         void modal.open(CreateDataModal, {
             vm,
         });
@@ -137,6 +138,7 @@ export function setFunctionCategory(_blockly: typeof Blockly, vm: IVM): IRegiste
         return items;
     };
     const handleCreateFunction = () => {
+        if (isModalOpen(CreateFunctionModal)) return;
         void modal.open(CreateFunctionModal, {
             vm,
             // 它100亿%会是现在编辑的目标

@@ -81,6 +81,8 @@ describe('registryAddonToIAddon', () => {
 
     it('converts icon path to full URL', () => {
         const addon = registryAddonToIAddon(entry);
-        expect(addon.icon).toBe('https://raw.githubusercontent.com/TheAstrasTeam/AstratchAddons/refs/heads/release/example@v2.0.0/assets/icon.svg');
+        expect(addon.icon).toBe(
+            'https://raw.githubusercontent.com/TheAstrasTeam/AstratchAddons/refs/heads/release/example@v2.0.0/assets/icon.svg',
+        );
     });
 });

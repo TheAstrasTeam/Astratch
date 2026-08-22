@@ -7,6 +7,7 @@
 import { useModalInstance } from '@reactleaf/modal';
 import { Modal } from '../Modal/modalWindow';
 import { modal } from '../Modal/modal';
+import { isModalOpen } from '../Modal/modal';
 import { t } from 'i18next';
 import styles from './index.module.scss';
 import { useCallback, useState } from 'react';
@@ -170,6 +171,7 @@ export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) =
                         icon={<StringIcon color={blockColor} />}
                         label={t('gui:createFunction.input')}
                         onClick={() => {
+                            if (isModalOpen(FieldTypeModal)) return;
                             void modal.open(FieldTypeModal, {
                                 callback: handleAddFieldButtonClick,
                                 parentWindowID: 'createFunction',
@@ -225,6 +227,7 @@ export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) =
                         type='button'
                         className={styles.returnTypeButton}
                         onClick={() => {
+                            if (isModalOpen(FieldTypeModal)) return;
                             void modal.open(FieldTypeModal, {
                                 purpose: 'return',
                                 callback: handleSetReturnType,

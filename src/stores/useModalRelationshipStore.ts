@@ -19,6 +19,8 @@ interface IModalRelationshipStore {
     getBlockingChildren: (parentID: string) => string[];
 }
 
+const shakeTimers: Record<string, number | undefined> = {};
+
 const useModalRelationshipStore: UseBoundStore<StoreApi<IModalRelationshipStore>> =
     create<IModalRelationshipStore>((set, get) => ({
         parentChild: {},
@@ -70,12 +72,14 @@ const useModalRelationshipStore: UseBoundStore<StoreApi<IModalRelationshipStore>
             }
         },
         triggerShake: windowID => {
+            if (shakeTimers[windowID]) clearTimeout(shakeTimers[windowID]);
             const { shakeMap } = get();
             set({ shakeMap: { ...shakeMap, [windowID]: true } });
-            setTimeout(() => {
+            shakeTimers[windowID] = setTimeout(() => {
                 const { shakeMap } = get();
-                const { [windowID]: _, ...rest } = shakeMap;
+                const { [windowID]: _shake, ...rest } = shakeMap;
                 set({ shakeMap: rest });
+                shakeTimers[windowID] = undefined;
             }, 500);
         },
         getBlockingChildren: parentID => {

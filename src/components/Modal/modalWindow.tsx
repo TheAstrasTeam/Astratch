@@ -59,10 +59,11 @@ export const Modal = ({
     const raise = useModalWindowStore(s => s.raise);
 
     // 父子关系与阻塞
+    // 注意：每个 selector 必须返回稳定的值或引用，不能返回每次新建的对象字面量，
+    // 否则 useSyncExternalStore 会因引用不相等而无限重渲染
     const shaking = useModalRelationshipStore(s => s.shakeMap[instanceID]);
     const parentChild = useModalRelationshipStore(s => s.parentChild);
     const blockingChildren = useModalRelationshipStore(s => s.blockingChildren);
-    const isBlocked = (parentChild[instanceID] ?? []).some(c => blockingChildren[c]);
     const registerChild = useModalRelationshipStore(s => s.registerChild);
     const unregisterChild = useModalRelationshipStore(s => s.unregisterChild);
     const registerCloseFunction = useModalRelationshipStore(s => s.registerCloseFunction);
@@ -72,6 +73,7 @@ export const Modal = ({
     const closeChildren = useModalRelationshipStore(s => s.closeChildren);
     const getBlockingChildren = useModalRelationshipStore(s => s.getBlockingChildren);
     const triggerShake = useModalRelationshipStore(s => s.triggerShake);
+    const isBlocked = (parentChild[instanceID] ?? []).some(c => blockingChildren[c]);
 
     useEffect(() => {
         useModalWindowStore.getState().register(instanceID);
@@ -83,12 +85,24 @@ export const Modal = ({
         if (blocking) setBlocking(instanceID, true);
         return () => {
             closeChildren(instanceID);
+            if (parentWindowID) useModalWindowStore.getState().raise(parentWindowID);
             unregisterCloseFunction(instanceID);
             unregisterChild(instanceID);
             clearBlocking(instanceID);
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [instanceID, parentWindowID, blocking]);
+    }, [
+        instanceID,
+        parentWindowID,
+        blocking,
+        closeChildren,
+        unregisterCloseFunction,
+        unregisterChild,
+        clearBlocking,
+        registerCloseFunction,
+        registerChild,
+        setBlocking,
+        closeSelf,
+    ]);
 
     // 将 store 中的 z-index 同步到 .modal-layer 元素
     useEffect(() => {
@@ -97,11 +111,12 @@ export const Modal = ({
         layer.style.zIndex = String(windowState?.z ?? initialZ);
     }, [initialZ, windowState?.z]);
 
-    // 点击 / 触摸时提升窗口层级；若存在阻塞子窗口则不提升
+    // 点击 / 触摸时提升窗口层级；若存在阻塞子窗口则提升子窗口并抖动
     const handleRaise = useCallback(() => {
         const blockingChildren = getBlockingChildren(instanceID);
         if (blockingChildren.length > 0) {
             for (const childID of blockingChildren) {
+                useModalWindowStore.getState().raise(childID);
                 triggerShake(childID);
             }
             return;
