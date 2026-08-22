@@ -121,7 +121,7 @@ export const registryAddonToIAddon = (entry: IRegistryAddon): IAddon => {
         i18nNamespace: `addon_${entry.id}`,
         defaultEnabled: entry.defaultEnabled ?? false,
         settings: entry.settings ?? [],
-        minVersion: entry.astratch?.minVersion,
+        astratchVersion: entry.astratch?.version,
         isCustom: false,
         downloaded: false,
         version: entry.version,

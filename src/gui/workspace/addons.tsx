@@ -8,22 +8,11 @@
 
 import { useState } from 'react';
 import { t } from 'i18next';
+import semver from 'semver';
 import classNames from 'classnames';
 import styles from './addons.module.scss';
 import { addonManager, useAddonStore } from '../../addons';
 import { openSettingsModal } from '../../utils/ash-gui';
-
-/** 简易 semver 比较：返回 -1 / 0 / 1 */
-const compareSemver = (a: string, b: string): number => {
-    const pa = a.split('.').map(Number);
-    const pb = b.split('.').map(Number);
-    for (let i = 0; i < 3; i++) {
-        const da = pa[i] ?? 0;
-        const db = pb[i] ?? 0;
-        if (da !== db) return da < db ? -1 : 1;
-    }
-    return 0;
-};
 
 const AddonCard = ({
     name,
@@ -37,7 +26,7 @@ const AddonCard = ({
     hasSettings,
     version,
     versions,
-    minVersion,
+    astratchVersion,
     onDownload,
     onToggle,
     onSelectVersion,
@@ -55,7 +44,7 @@ const AddonCard = ({
     hasSettings: boolean;
     version: string;
     versions: string[];
-    minVersion?: string;
+    astratchVersion?: string;
     onDownload: () => void;
     onToggle: () => void;
     onSelectVersion: (version: string) => void;
@@ -82,9 +71,9 @@ const AddonCard = ({
                 </span>
                 {description && <span className={styles.cardDesc}>{description}</span>}
                 {author && <span className={styles.cardAuthor}>{author}</span>}
-                {minVersion && compareSemver(__APP_VERSION__, minVersion) < 0 && (
+                {astratchVersion && !semver.satisfies(__APP_VERSION__, astratchVersion) && (
                     <span className={classNames(styles.cardMinVersion, styles.cardMinVersionWarn)}>
-                        {t('gui:addon.minVersion', { version: minVersion })}
+                        {t('gui:addon.astratchVersion', { range: astratchVersion })}
                     </span>
                 )}
                 {showVersionSelect && (
@@ -191,7 +180,7 @@ const AddonsPanel = () => {
                             hasSettings={addon.settings.length > 0}
                             version={addon.version}
                             versions={addon.versions}
-                            minVersion={addon.minVersion}
+                            astratchVersion={addon.astratchVersion}
                             onDownload={() => {
                                 void addonManager.download(addon.id);
                             }}

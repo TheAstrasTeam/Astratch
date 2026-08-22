@@ -50,7 +50,7 @@ describe('buildAddonFromHandle', () => {
                 author: 'Me',
                 icon: 'assets/icon.svg',
                 version: '1.0.0',
-                astratch: { minVersion: '0.1.0' },
+                astratch: { version: '>=0.1.0' },
             }),
             'addon.js': 'export default () => {};',
             assets: { 'icon.svg': '<svg xmlns="http://www.w3.org/2000/svg"></svg>' },
