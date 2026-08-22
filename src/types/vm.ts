@@ -591,6 +591,6 @@ export interface IProjectMetaJSON {
     projectSaveVersion: number;
     meta: IProjectMeta;
     folders: Record<TTargetMode, IFolder[]>;
-    /** 项目依赖的插件及其精确版本（addonId -> version），打开项目时据此恢复插件环境 */
-    addons?: Record<string, string>;
+    /** 项目启用/禁用的远端插件（不含自定义插件），打开项目时据此恢复插件环境 */
+    addonState?: { enabled: string[]; disabled: string[] };
 }

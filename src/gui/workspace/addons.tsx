@@ -85,6 +85,9 @@ const AddonCard = ({
                         <select
                             className={styles.versionSelect}
                             value={version}
+                            onClick={e => {
+                                e.stopPropagation();
+                            }}
                             onChange={event => {
                                 onSelectVersion(event.target.value);
                             }}
@@ -99,11 +102,22 @@ const AddonCard = ({
                 )}
             </div>
             {isCustom && onRemove && (
-                <button className={styles.removeButton} onClick={onRemove}>
+                <button
+                    className={styles.removeButton}
+                    onClick={e => {
+                        e.stopPropagation();
+                        onRemove();
+                    }}
+                >
                     {t('gui:addon.removeCustom')}
                 </button>
             )}
-            <div className={styles.cardActions}>
+            <div
+                className={styles.cardActions}
+                onClick={e => {
+                    e.stopPropagation();
+                }}
+            >
                 {enabled && hasSettings && onOpenSettings && (
                     <button
                         className={styles.settingsButton}

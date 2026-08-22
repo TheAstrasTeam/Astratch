@@ -169,7 +169,7 @@ export class VM implements IVM {
                 entity: entitysFolder,
                 module: modulesFolder,
             },
-            addons: addonManager.getEnabledAddonVersions(),
+            addons: addonManager.getProjectAddonState(),
         };
 
         await this.projectManager.createFile(
@@ -286,6 +286,9 @@ export class VM implements IVM {
         try {
             const projectMeta = JSON.parse(metaFileContent) as IProjectMetaJSON;
             this.runtime.settings.setProjectMeta(projectMeta.meta);
+            if (projectMeta.addonState) {
+                addonManager.loadProjectAddonState(projectMeta.addonState);
+            }
             for (const mode of Object.values(TargetModes)) {
                 this.runtime.folders.set(
                     mode,

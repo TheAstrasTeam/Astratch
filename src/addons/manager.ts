@@ -296,17 +296,53 @@ class AddonManager {
     }
 
     /**
-     * 返回所有已启用插件的依赖版本（addonId -> version）。
-     * 供项目保存时记录具体依赖版本，以便下次打开项目时恢复一致的插件环境。
+     * 返回当前远端插件的启用/禁用状态（不含自定义插件）。
+     * 供项目保存时记录，以便下次打开项目时恢复一致的插件环境。
      */
-    getEnabledAddonVersions(): Record<string, string> {
+    getProjectAddonState(): { enabled: string[]; disabled: string[] } {
         const { addons, enabled } = useAddonStore.getState();
-        const result: Record<string, string> = {};
+        const enabledList: string[] = [];
+        const disabledList: string[] = [];
         for (const addon of addons) {
-            if (!enabled.has(addon.id)) continue;
-            result[addon.id] = addon.version;
+            if (addon.isCustom) continue;
+            if (enabled.has(addon.id)) enabledList.push(addon.id);
+            else disabledList.push(addon.id);
         }
-        return result;
+        return { enabled: enabledList, disabled: disabledList };
+    }
+
+    /**
+     * 恢复项目保存的远端插件启用/禁用状态。
+     * 自定义插件不受影响；不在列表中的插件保持默认状态。
+     */
+    loadProjectAddonState(state: { enabled: string[]; disabled: string[] }) {
+        const { addons } = useAddonStore.getState();
+        const remoteIds = new Set(addons.filter(a => !a.isCustom).map(a => a.id));
+        const projectEnabled = new Set(state.enabled.filter(id => remoteIds.has(id)));
+        const projectDisabled = new Set(state.disabled.filter(id => remoteIds.has(id)));
+
+        // 先禁用所有当前启用的远端插件
+        for (const addon of addons) {
+            if (addon.isCustom) continue;
+            if (projectEnabled.has(addon.id)) continue;
+            if (useAddonStore.getState().enabled.has(addon.id)) {
+                this.disable(addon.id);
+            }
+        }
+
+        // 启用项目中启用的远端插件
+        for (const addon of addons) {
+            if (addon.isCustom) continue;
+            if (!projectEnabled.has(addon.id)) continue;
+            if (!useAddonStore.getState().enabled.has(addon.id)) {
+                this.enable(addon.id);
+            }
+        }
+
+        // 更新全局持久化（让 localStorage 也反映项目状态）
+        this.persistData.enabled = [...projectEnabled];
+        this.persistData.disabled = [...projectDisabled];
+        this.persist();
     }
 
     /**
