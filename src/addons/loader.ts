@@ -124,6 +124,7 @@ export const registryAddonToIAddon = (entry: IRegistryAddon): IAddon => {
         downloaded: false,
         version: entry.version,
         versions: entry.versions,
+        readme: entry.readme,
         releases,
     };
 };
@@ -213,4 +214,30 @@ export async function downloadAddonContent(id: string, version: string): Promise
         addonFileUrl(entry.id, version),
     );
     return compileAddon(mainCode);
+}
+
+/** 插件 README 缓存 key：readme:<id>@<version>:<locale> */
+const addonReadmeCacheKey = (id: string, version: string, locale: string): string =>
+    `readme:${id}@${version}:${locale}`;
+
+/**
+ * 获取插件的 README（Markdown 格式），支持多语言。
+ * 按 locale 尝试加载 README/{locale}.md，失败时回退到 README/en.md。
+ * 插件没有 README 时返回 null。
+ */
+export async function fetchAddonReadme(
+    id: string,
+    version: string,
+    locale: string,
+): Promise<string | null> {
+    const tryLocales = locale === 'en' ? ['en'] : [locale, 'en'];
+    for (const loc of tryLocales) {
+        const url = `${ADDONS_REPO_URL}/${id}@v${version}/README/${loc}.md`;
+        try {
+            return await getFile(addonReadmeCacheKey(id, version, loc), url);
+        } catch {
+            // try next locale
+        }
+    }
+    return null;
 }

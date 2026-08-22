@@ -13,6 +13,7 @@ import classNames from 'classnames';
 import styles from './addons.module.scss';
 import { addonManager, useAddonStore } from '../../addons';
 import { openSettingsModal } from '../../utils/ash-gui';
+import AddonDetail from './addonDetail';
 
 const AddonCard = ({
     name,
@@ -32,6 +33,7 @@ const AddonCard = ({
     onSelectVersion,
     onOpenSettings,
     onRemove,
+    onSelectAddon,
 }: {
     name: string;
     description: string;
@@ -50,6 +52,7 @@ const AddonCard = ({
     onSelectVersion: (version: string) => void;
     onOpenSettings?: () => void;
     onRemove?: () => void;
+    onSelectAddon?: () => void;
 }) => {
     const actionText = downloading
         ? t('gui:addon.downloading')
@@ -61,7 +64,7 @@ const AddonCard = ({
     const handleAction = downloading ? undefined : !downloaded ? onDownload : onToggle;
     const showVersionSelect = !isCustom && versions.length > 1;
     return (
-        <div className={styles.card}>
+        <div className={styles.card} onClick={onSelectAddon} role='button' tabIndex={0}>
             {icon && <img className={styles.cardIcon} src={icon} alt='' />}
             <div className={styles.cardInfo}>
                 <span className={styles.cardName}>
@@ -133,8 +136,11 @@ const AddonsPanel = () => {
     const status = useAddonStore(state => state.status);
     const [importing, setImporting] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
+    const [selectedAddon, setSelectedAddon] = useState<string | null>(null);
 
     const canRefresh = status === 'ready' && !refreshing;
+
+    const selected = selectedAddon ? addons.find(a => a.id === selectedAddon) ?? null : null;
 
     const handleImport = async () => {
         setImporting(true);
@@ -156,7 +162,14 @@ const AddonsPanel = () => {
 
     return (
         <div className={styles.panel}>
-            {status !== 'ready' ? (
+            {selected ? (
+                <AddonDetail
+                    addon={selected}
+                    onBack={() => {
+                        setSelectedAddon(null);
+                    }}
+                />
+            ) : status !== 'ready' ? (
                 <div className={styles.empty}>{t('gui:addon.loading')}</div>
             ) : addons.length === 0 ? (
                 <div className={styles.empty}>{t('gui:addon.noAddons')}</div>
@@ -203,6 +216,9 @@ const AddonsPanel = () => {
                                       }
                                     : undefined
                             }
+                            onSelectAddon={() => {
+                                setSelectedAddon(addon.id);
+                            }}
                         />
                     ))}
                 </div>

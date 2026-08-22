@@ -190,3 +190,160 @@
         }
     }
 }
+
+.detail {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.detail-header {
+    flex: 0 0 auto;
+    padding: 10px;
+    border-bottom: 1px solid $ui-tertiary;
+}
+
+.back-button {
+    margin: 0 0 8px;
+    padding: 4px 8px;
+    font-size: x-small;
+    background: none;
+    color: $text-primary;
+    opacity: 0.7;
+    cursor: pointer;
+    &:hover {
+        opacity: 1;
+    }
+}
+
+.detail-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.detail-icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+}
+
+.detail-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.detail-name {
+    color: $text-primary;
+    font-size: small;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.detail-author {
+    color: $text-primary;
+    opacity: 0.4;
+    font-size: x-small;
+}
+
+.detail-desc {
+    color: $text-primary;
+    opacity: 0.6;
+    font-size: x-small;
+    word-break: break-all;
+}
+
+.detail-readme {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.detail-loading,
+.detail-no-readme {
+    color: $text-primary;
+    opacity: 0.5;
+    font-size: small;
+    text-align: center;
+    padding: 20px 0;
+}
+
+.readme-content {
+    color: $text-primary;
+    font-size: x-small;
+    line-height: 1.6;
+    word-break: break-word;
+
+    :global(h1), :global(h2), :global(h3), :global(h4), :global(h5), :global(h6) {
+        margin: 12px 0 6px;
+        font-weight: 600;
+    }
+    :global(h1) { font-size: 14px; }
+    :global(h2) { font-size: 13px; }
+    :global(h3) { font-size: 12px; }
+
+    :global(p) {
+        margin: 4px 0;
+    }
+
+    :global(a) {
+        color: $looks-secondary;
+        text-decoration: none;
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    :global(code) {
+        background-color: $ui-tertiary;
+        padding: 1px 4px;
+        border-radius: 3px;
+        font-size: x-small;
+    }
+
+    :global(pre) {
+        background-color: $ui-tertiary;
+        padding: 8px;
+        border-radius: 4px;
+        overflow-x: auto;
+        margin: 6px 0;
+        :global(code) {
+            background: none;
+            padding: 0;
+        }
+    }
+
+    :global(table) {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 6px 0;
+    }
+    :global(th), :global(td) {
+        border: 1px solid $ui-tertiary;
+        padding: 4px 8px;
+        text-align: left;
+    }
+    :global(th) {
+        font-weight: 600;
+    }
+
+    :global(ul) {
+        padding-left: 16px;
+        margin: 4px 0;
+    }
+
+    :global(li) {
+        margin: 2px 0;
+    }
+
+    :global(strong) {
+        font-weight: 600;
+    }
+}

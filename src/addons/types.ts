@@ -146,6 +146,8 @@ export interface IAddon {
     version: string;
     /** 全部可用版本（远端插件来自 registry，自定义插件只有当前版本） */
     versions: string[];
+    /** 有 README 的语言列表 */
+    readme?: string[];
     /** 各版本的下载信息（远端插件由 registry 的 id + version 派生；自定义插件为空对象） */
     releases: Record<string, IRegistryVersion>;
 }
@@ -175,6 +177,8 @@ export interface IRegistryAddon {
     settings?: IAddonSettingDefinition[];
     /** 支持的语言列表（如 ["en", "zh-CN"]），客户端据此拼接 i18n/{locale}.json 路径 */
     i18n?: string[];
+    /** 有 README 的语言列表（如 ["en", "zh-CN"]），客户端据此拼接 README/{locale}.md 路径 */
+    readme?: string[];
     /** 兼容的 Astratch 最低版本 */
     astratch?: { version?: string };
     /** 当前（最新）版本 */
