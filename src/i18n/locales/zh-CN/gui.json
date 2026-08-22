@@ -67,7 +67,7 @@
     "addon.err.refreshFailed": "刷新插件列表失败：{{err}}",
     "addon.refreshDisabledHint": "请先禁用所有插件再刷新列表。",
     "addon.version": "版本",
-    "addon.minVersion": "需要 Astratch {{version}} 或更高版本",
+    "addon.astratchVersion": "需要 Astratch {{range}}",
     "target.folderNameAsk": "输入文件夹的名称：",
     "target.attr.x": "X 坐标",
     "target.attr.y": "Y 坐标",

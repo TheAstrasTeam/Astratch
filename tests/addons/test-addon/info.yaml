@@ -8,7 +8,7 @@ icon: icon.svg
 main: main.js
 defaultEnabled: false
 astratch:
-    minVersion: 0.1.0
+    version: '>=0.1.0'
     settings:
         - name: greeting text
           id: greeting

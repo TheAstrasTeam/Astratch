@@ -35,7 +35,7 @@ describe('registryAddonToIAddon', () => {
         i18n: ['en', 'zh-CN'],
         defaultEnabled: true,
         settings: [{ name: 'name', id: 'name', type: 'string', default: 'world' }],
-        astratch: { minVersion: '0.1.0' },
+        astratch: { version: '>=0.1.0' },
         version: '2.0.0',
         versions: ['1.0.0', '2.0.0'],
     };

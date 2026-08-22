@@ -107,7 +107,7 @@ export async function buildAddonFromHandle(
         i18nNamespace: `addon_${id}`,
         defaultEnabled: info.defaultEnabled ?? false,
         settings: info.astratch?.settings ?? [],
-        minVersion: info.astratch?.minVersion,
+        astratchVersion: info.astratch?.version,
         isCustom: true,
         downloaded: true,
         run,

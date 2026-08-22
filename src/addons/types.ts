@@ -99,8 +99,8 @@ export interface IAddonInfo {
     defaultEnabled?: boolean;
     /** Astratch 插件系统配置 */
     astratch?: {
-        /** 兼容的 Astratch 最低版本 */
-        minVersion?: string;
+        /** 兼容的 Astratch 版本范围（semver range，如 ">=1.0.0 <2.0.0"） */
+        version?: string;
         /** 插件声明的设置项（Settings 页按此渲染） */
         settings?: IAddonSettingDefinition[];
     };
@@ -124,8 +124,8 @@ export interface IAddon {
     defaultEnabled: boolean;
     /** 插件声明的设置项（来自 info.yaml，Settings 页按此渲染） */
     settings: IAddonSettingDefinition[];
-    /** 兼容的 Astratch 最低版本 */
-    minVersion?: string;
+    /** 兼容的 Astratch 版本范围（semver range） */
+    astratchVersion?: string;
     /**
      * 是否为用户上传文件夹安装的自定义插件。
      * 自定义插件在名称后会显示“自定义/Custom”Badge。
@@ -176,7 +176,7 @@ export interface IRegistryAddon {
     /** 支持的语言列表（如 ["en", "zh-CN"]），客户端据此拼接 i18n/{locale}.json 路径 */
     i18n?: string[];
     /** 兼容的 Astratch 最低版本 */
-    astratch?: { minVersion?: string };
+    astratch?: { version?: string };
     /** 当前（最新）版本 */
     version: string;
     /** 全部可用版本（旧到新） */
