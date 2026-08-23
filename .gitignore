@@ -24,4 +24,4 @@ dist-ssr
 
 # rust
 src/renderer/webgpu/target/
-
+src/renderer/webgpu/pkg
