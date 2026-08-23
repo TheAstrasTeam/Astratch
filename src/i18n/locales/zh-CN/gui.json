@@ -187,8 +187,9 @@
     "createFunction.noReturn": "无返回值",
     "error.title": "抱歉，您的浏览器无法使用 Astratch。",
     "error.description": "您正在使用 {{browser}}，它不支持 Astratch 所需的文件系统访问 API。我们强烈建议使用基于 Chromium 的浏览器。",
-    "tab.close": "关闭标签页",
-    "tab.closeOthers": "关闭其他标签页",
+    "tab.close": "关闭",
+    "tab.closeOthers": "关闭其他",
+    "tab.closeAll": "关闭全部",
     "tab.closeRight": "关闭右侧标签页",
     "tab.newTab": "新建标签页"
 }
