@@ -60,11 +60,37 @@ const createDefaultState = (): IModalWindowState => {
     };
 };
 
+/**
+ * 将窗口矩形钳制到当前视口内
+ * 若持久化的尺寸/位置来自更大的屏幕或旧版本，窗口会比 .modal-layer 还大，
+ * 导致 react-rnd 的 bounds='parent' 约束区间为空（left > right），
+ * 拖拽时坐标被坍缩到固定角落，表现为"鼠标动了窗口不动"
+ */
+const clampRectToViewport = (rect: IModalWindowState): IModalWindowState => {
+    if (typeof window === 'undefined') return rect;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const width = Math.min(rect.width, vw);
+    const height = Math.min(rect.height, vh);
+    return {
+        ...rect,
+        width,
+        height,
+        x: Math.min(Math.max(rect.x, 0), Math.max(0, vw - width)),
+        y: Math.min(Math.max(rect.y, 0), Math.max(0, vh - height)),
+    };
+};
+
 const readStored = (): Record<string, IModalWindowState | undefined> => {
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return {};
-        return JSON.parse(raw) as Record<string, IModalWindowState>;
+        const parsed = JSON.parse(raw) as Record<string, IModalWindowState | undefined>;
+        const next: Record<string, IModalWindowState | undefined> = {};
+        for (const [key, value] of Object.entries(parsed)) {
+            if (value) next[key] = clampRectToViewport(value);
+        }
+        return next;
     } catch {
         return {};
     }
@@ -113,7 +139,7 @@ const useModalWindowStore: UseBoundStore<StoreApi<IModalWindowStore>> = create<I
             // 已存在的窗口保留位置/大小，但层级必须刷新到当前最高，否则
             // 重新打开（如子窗口）会出现在父窗口下方
             const next: IModalWindowState = existing
-                ? { ...existing, z: maxZ + 1 }
+                ? clampRectToViewport({ ...existing, z: maxZ + 1 })
                 : { ...createDefaultState(), z: maxZ + 1 };
             const nextWindows = { ...windows, [windowID]: next };
             set({ windows: nextWindows, activeWindowID: windowID });
@@ -125,7 +151,7 @@ const useModalWindowStore: UseBoundStore<StoreApi<IModalWindowStore>> = create<I
             if (!existing) return;
             const nextWindows = {
                 ...windows,
-                [windowID]: { ...existing, ...rect },
+                [windowID]: clampRectToViewport({ ...existing, ...rect }),
             };
             set({ windows: nextWindows });
             writeStored(nextWindows);
@@ -148,4 +174,4 @@ const useModalWindowStore: UseBoundStore<StoreApi<IModalWindowStore>> = create<I
     }),
 );
 
-export { useModalWindowStore, getInitialWindowZ }; // 此导出由AI生成
+export { useModalWindowStore, getInitialWindowZ, clampRectToViewport }; // 此导出由AI生成

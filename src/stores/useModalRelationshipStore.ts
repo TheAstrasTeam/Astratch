@@ -31,6 +31,8 @@ const useModalRelationshipStore: UseBoundStore<StoreApi<IModalRelationshipStore>
         registerChild: (parentID, childID) => {
             const { parentChild } = get();
             const existing = parentChild[parentID] ?? [];
+            // 去重：effect 因依赖变化销毁重建时会重复登记同一个子窗口
+            if (existing.includes(childID)) return;
             set({ parentChild: { ...parentChild, [parentID]: [...existing, childID] } });
         },
         unregisterChild: childID => {
