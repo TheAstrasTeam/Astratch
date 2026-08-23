@@ -157,9 +157,11 @@ export const SettingsModal = ({
     }, []);
 
     /** 按 group 给设置分小节（插件设置按插件名分组），group 变化时插入小标题 */
-    const renderSettings = (defs: ISettingDefinition[]) => {
+    const renderSettings = (defs: ISettingDefinition[] | undefined) => {
         const nodes: React.ReactNode[] = [];
         let lastGroup: string | undefined;
+        // 插件中tab可能不存在，这会导致爆炸
+        if (!defs) return;
         for (const def of defs) {
             if (def.group !== lastGroup) {
                 nodes.push(
