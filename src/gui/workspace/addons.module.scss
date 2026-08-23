@@ -37,6 +37,25 @@
     gap: 8px;
 }
 
+.search-input {
+    width: 100%;
+    padding: 6px 10px;
+    font-size: small;
+    background-color: $ui-tertiary;
+    color: $text-primary;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    outline: none;
+    box-sizing: border-box;
+    &:focus {
+        border-color: $text-primary;
+    }
+    &::placeholder {
+        color: $text-primary;
+        opacity: 0.4;
+    }
+}
+
 .empty {
     color: $text-primary;
     opacity: 0.5;
@@ -291,13 +310,24 @@
     line-height: 1.6;
     word-break: break-word;
 
-    :global(h1), :global(h2), :global(h3), :global(h4), :global(h5), :global(h6) {
+    :global(h1),
+    :global(h2),
+    :global(h3),
+    :global(h4),
+    :global(h5),
+    :global(h6) {
         margin: 12px 0 6px;
         font-weight: 600;
     }
-    :global(h1) { font-size: 14px; }
-    :global(h2) { font-size: 13px; }
-    :global(h3) { font-size: 12px; }
+    :global(h1) {
+        font-size: 14px;
+    }
+    :global(h2) {
+        font-size: 13px;
+    }
+    :global(h3) {
+        font-size: 12px;
+    }
 
     :global(p) {
         margin: 4px 0;
@@ -335,7 +365,8 @@
         width: 100%;
         margin: 6px 0;
     }
-    :global(th), :global(td) {
+    :global(th),
+    :global(td) {
         border: 1px solid $ui-tertiary;
         padding: 4px 8px;
         text-align: left;

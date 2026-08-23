@@ -12,13 +12,7 @@ import type { IAddon } from '../../addons/types';
 import { fetchAddonReadme } from '../../addons/loader';
 import { renderMarkdown } from '../../utils/markdown';
 
-const AddonDetail = ({
-    addon,
-    onBack,
-}: {
-    addon: IAddon;
-    onBack: () => void;
-}) => {
+const AddonDetail = ({ addon, onBack }: { addon: IAddon; onBack: () => void }) => {
     const [readme, setReadme] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -45,9 +39,7 @@ const AddonDetail = ({
                     ← {t('gui:addon.back')}
                 </button>
                 <div className={styles.detailInfo}>
-                    {addon.icon && (
-                        <img className={styles.detailIcon} src={addon.icon} alt='' />
-                    )}
+                    {addon.icon && <img className={styles.detailIcon} src={addon.icon} alt='' />}
                     <div className={styles.detailMeta}>
                         <span className={styles.detailName}>
                             {t(`${addon.i18nNamespace}:@name`, {

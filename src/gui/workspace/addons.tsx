@@ -151,10 +151,24 @@ const AddonsPanel = () => {
     const [importing, setImporting] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [selectedAddon, setSelectedAddon] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
 
     const canRefresh = status === 'ready' && !refreshing;
 
-    const selected = selectedAddon ? addons.find(a => a.id === selectedAddon) ?? null : null;
+    const selected = selectedAddon ? (addons.find(a => a.id === selectedAddon) ?? null) : null;
+
+    const filteredAddons = addons.filter(addon => {
+        if (!searchQuery.trim()) return true;
+        const query = searchQuery.toLowerCase();
+        const name = t(`${addon.i18nNamespace}:@name`, {
+            defaultValue: addon.name,
+        }).toLowerCase();
+        const description = t(`${addon.i18nNamespace}:@description`, {
+            defaultValue: addon.description,
+        }).toLowerCase();
+        const id = addon.id.toLowerCase();
+        return name.includes(query) || description.includes(query) || id.includes(query);
+    });
 
     const handleImport = async () => {
         setImporting(true);
@@ -189,52 +203,65 @@ const AddonsPanel = () => {
                 <div className={styles.empty}>{t('gui:addon.noAddons')}</div>
             ) : (
                 <div className={styles.main}>
-                    {addons.map(addon => (
-                        <AddonCard
-                            key={addon.id}
-                            name={t(`${addon.i18nNamespace}:@name`, {
-                                defaultValue: addon.name,
-                            })}
-                            description={t(`${addon.i18nNamespace}:@description`, {
-                                defaultValue: addon.description,
-                            })}
-                            icon={addon.icon}
-                            author={addon.author}
-                            isCustom={addon.isCustom}
-                            downloaded={addon.downloaded}
-                            downloading={downloading.has(addon.id)}
-                            enabled={enabled.has(addon.id)}
-                            hasSettings={addon.settings.length > 0}
-                            version={addon.version}
-                            versions={addon.versions}
-                            astratchVersion={addon.astratchVersion}
-                            onDownload={() => {
-                                void addonManager.download(addon.id);
-                            }}
-                            onToggle={() => {
-                                addonManager.toggle(addon.id);
-                            }}
-                            onSelectVersion={version => {
-                                void addonManager.selectVersion(addon.id, version);
-                            }}
-                            onOpenSettings={() => {
-                                openSettingsModal({
-                                    category: 'addons',
-                                    focusGroup: `${addon.i18nNamespace}:@name`,
-                                });
-                            }}
-                            onRemove={
-                                addon.isCustom
-                                    ? () => {
-                                          void addonManager.uninstallCustomAddon(addon.id);
-                                      }
-                                    : undefined
-                            }
-                            onSelectAddon={() => {
-                                setSelectedAddon(addon.id);
-                            }}
-                        />
-                    ))}
+                    <input
+                        className={styles.searchInput}
+                        type='text'
+                        placeholder={t('gui:addon.search')}
+                        value={searchQuery}
+                        onChange={e => {
+                            setSearchQuery(e.target.value);
+                        }}
+                    />
+                    {filteredAddons.length === 0 ? (
+                        <div className={styles.empty}>{t('gui:addon.noResults')}</div>
+                    ) : (
+                        filteredAddons.map(addon => (
+                            <AddonCard
+                                key={addon.id}
+                                name={t(`${addon.i18nNamespace}:@name`, {
+                                    defaultValue: addon.name,
+                                })}
+                                description={t(`${addon.i18nNamespace}:@description`, {
+                                    defaultValue: addon.description,
+                                })}
+                                icon={addon.icon}
+                                author={addon.author}
+                                isCustom={addon.isCustom}
+                                downloaded={addon.downloaded}
+                                downloading={downloading.has(addon.id)}
+                                enabled={enabled.has(addon.id)}
+                                hasSettings={addon.settings.length > 0}
+                                version={addon.version}
+                                versions={addon.versions}
+                                astratchVersion={addon.astratchVersion}
+                                onDownload={() => {
+                                    void addonManager.download(addon.id);
+                                }}
+                                onToggle={() => {
+                                    addonManager.toggle(addon.id);
+                                }}
+                                onSelectVersion={version => {
+                                    void addonManager.selectVersion(addon.id, version);
+                                }}
+                                onOpenSettings={() => {
+                                    openSettingsModal({
+                                        category: 'addons',
+                                        focusGroup: `${addon.i18nNamespace}:@name`,
+                                    });
+                                }}
+                                onRemove={
+                                    addon.isCustom
+                                        ? () => {
+                                              void addonManager.uninstallCustomAddon(addon.id);
+                                          }
+                                        : undefined
+                                }
+                                onSelectAddon={() => {
+                                    setSelectedAddon(addon.id);
+                                }}
+                            />
+                        ))
+                    )}
                 </div>
             )}
             <div className={styles.footer}>

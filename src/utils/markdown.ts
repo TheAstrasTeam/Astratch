@@ -69,9 +69,7 @@ export const renderMarkdown = (md: string): string => {
                 // separator row — skip
                 continue;
             }
-            const tag = out.length > 0 && out[out.length - 1].startsWith('<tr>')
-                ? 'td'
-                : 'th';
+            const tag = out.length > 0 && out[out.length - 1].startsWith('<tr>') ? 'td' : 'th';
             const row = cells.map(c => `<${tag}>${inlineMd(c)}</${tag}>`).join('');
             if (tag === 'th') {
                 out.push(`<tr>${row}</tr>`);
