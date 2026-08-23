@@ -264,31 +264,33 @@ const AddonsPanel = () => {
                     )}
                 </div>
             )}
-            <div className={styles.footer}>
-                <button
-                    className={styles.importButton}
-                    disabled={!canRefresh}
-                    title={
-                        !canRefresh && enabled.size > 0
-                            ? t('gui:addon.refreshDisabledHint')
-                            : undefined
-                    }
-                    onClick={() => {
-                        void handleRefresh();
-                    }}
-                >
-                    {refreshing ? t('gui:addon.refreshing') : t('gui:addon.refresh')}
-                </button>
-                <button
-                    className={styles.importButton}
-                    disabled={importing}
-                    onClick={() => {
-                        void handleImport();
-                    }}
-                >
-                    {importing ? t('gui:addon.importing') : t('gui:addon.importCustom')}
-                </button>
-            </div>
+            {!selected && (
+                <div className={styles.footer}>
+                    <button
+                        className={styles.importButton}
+                        disabled={!canRefresh}
+                        title={
+                            !canRefresh && enabled.size > 0
+                                ? t('gui:addon.refreshDisabledHint')
+                                : undefined
+                        }
+                        onClick={() => {
+                            void handleRefresh();
+                        }}
+                    >
+                        {refreshing ? t('gui:addon.refreshing') : t('gui:addon.refresh')}
+                    </button>
+                    <button
+                        className={styles.importButton}
+                        disabled={importing}
+                        onClick={() => {
+                            void handleImport();
+                        }}
+                    >
+                        {importing ? t('gui:addon.importing') : t('gui:addon.importCustom')}
+                    </button>
+                </div>
+            )}
         </div>
     );
 };
