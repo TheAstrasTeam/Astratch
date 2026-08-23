@@ -26,8 +26,7 @@ pub fn run() {
     "#;
     console_log!("{render_init}");
     console_log!("Init canvas");
-    let (_width, _height) = get_screen_width().unwrap();
-    let canvas = CanvasWebGPU::new((_width, _height)).unwrap();
-    let (width, height) = canvas.size();
-    console_log!("Canvas size: {}x{}", width, height);
+    let (width, height) = get_screen_size().unwrap();
+    let canvas = CanvasWebGPU::new((width, height)).unwrap();
+    console_log!("Canvas init done, size: {} x {}.", width, height);
 }

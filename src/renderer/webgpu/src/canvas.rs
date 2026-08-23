@@ -32,12 +32,20 @@ impl CanvasWebGPU {
         body.append_child(&canvas)
             .map_err(|_| JsValue::from_str("Failed to append canvas"))?;
 
-        let style = canvas.style();
-        style.set_property("display", "block")?;
-        style.set_property("margin", "0 auto")?;
-        
-        style.set_property("background", "#66ccff")?;
+        body.set_attribute("style", "margin: 0; padding: 0; overflow: hidden;")?;
 
+        canvas.set_attribute(
+            "style",
+            "display: block; \
+            position: fixed; \
+            top: 0; \
+            left: 0; \
+            width: 100vw; \
+            height: 100vh; \
+            margin: 0; \
+            padding: 0; \
+            background: #66ccff;",
+        )?;
         Ok(Self { canvas })
     }
 

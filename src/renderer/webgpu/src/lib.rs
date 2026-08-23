@@ -25,6 +25,7 @@ macro_rules! console_log {
 }
 
 pub struct WgpuApp {
+    pub canvas: CanvasWebGPU,
     pub surface: wgpu::Surface<'static>,
     pub device: wgpu::Device,
     pub queue: wgpu::Queue,
@@ -33,6 +34,8 @@ pub struct WgpuApp {
 
 impl WgpuApp {
     async fn new() -> Self {
+        let (width, height) = get_screen_size().unwrap();
+        let canvas = CanvasWebGPU::new((width, height)).unwrap();
         todo!();
     }
 }
