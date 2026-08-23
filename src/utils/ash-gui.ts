@@ -27,11 +27,20 @@ const selectProjectThenJump = async (vm: IVM, setInterface: (state: IGuiInterfac
 /**
  * 打开Menu通过控件位置
  */
-const openMenuByMouseDown = (openFn: (point: { x: number; y: number }) => void) => {
+const openMenuByMouseDown = (
+    openFn: (point: { x: number; y: number }) => void,
+    /** 0：左键 1：中键 2：右键 */
+    mouseButton = 0,
+    /** 对齐模式，mouse则是在鼠标右下角出现，dom则是在挂载元素下出现 */
+    position: 'mouse' | 'dom' = 'dom',
+) => {
     return (e: React.MouseEvent<HTMLElement>) => {
-        if (e.button !== 0) return;
+        if (e.button !== mouseButton) return;
         e.preventDefault();
-        const rect = e.currentTarget.getBoundingClientRect();
+        const rect =
+            position === 'dom'
+                ? e.currentTarget.getBoundingClientRect()
+                : { left: e.clientX, bottom: e.clientY };
         openFn({ x: rect.left, y: rect.bottom });
     };
 };
