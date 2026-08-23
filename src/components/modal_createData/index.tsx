@@ -8,7 +8,7 @@ import { useModalInstance } from '@reactleaf/modal';
 import { Modal } from '../Modal/modalWindow';
 import { t } from 'i18next';
 import styles from './index.module.scss';
-import { useCallback, useEffect, useState, type ChangeEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { DATA_VISIBILITY, type IVM, type TDATA_VISIBILITY } from '../../types/vm';
 
 export const CreateDataModal = ({ vm, addID }: { vm: IVM; addID?: string }) => {
@@ -17,39 +17,45 @@ export const CreateDataModal = ({ vm, addID }: { vm: IVM; addID?: string }) => {
     const [AddID, _] = useState(() => addID ?? vm.runtime.editingTargetID);
     const { closeSelf } = useModalInstance();
 
-    const handleButtonClick = useCallback(async () => {
+    // 创建 + 关闭的统一出口
+    const finish = useCallback(() => {
         if (nowValue.trim())
             vm.runtime
                 .getTargetByID(AddID)
                 ?.createData(nowValue, null, nowMode === DATA_VISIBILITY.PRIVATE, false);
-        await closeSelf();
+        void closeSelf();
     }, [AddID, closeSelf, nowMode, nowValue, vm.runtime]);
 
     const handleModeChanged = (e: ChangeEvent<HTMLSelectElement, HTMLSelectElement>) => {
         setMode(e.currentTarget.value as TDATA_VISIBILITY);
     };
 
+    // 用 ref 持有最新回调，keydown 监听只挂载一次，
+    // 不再随每次按键重绑事件监听器
+    const finishRef = useRef(finish);
+    useEffect(() => {
+        finishRef.current = finish;
+    }, [finish]);
+
     useEffect(() => {
         const handleEnterClick = (e: KeyboardEvent) => {
             if (e.key !== 'Enter' || e.isComposing) return;
-            void handleButtonClick();
+            finishRef.current();
         };
         document.addEventListener('keydown', handleEnterClick);
         return () => {
             document.removeEventListener('keydown', handleEnterClick);
         };
-    }, [handleButtonClick, nowValue]);
+    }, []);
 
     return (
         <Modal
             windowID='createData'
             fullScreen={false}
-            close={async () => {
-                await closeSelf();
-            }}
+            close={closeSelf}
             title={t('gui:prompt.title')}
             description={t('gui:prompt.description')}
-            minWidth={400}
+            minWidth={500}
             minHeight={350}
         >
             <div className={styles.content}>
@@ -73,7 +79,7 @@ export const CreateDataModal = ({ vm, addID }: { vm: IVM; addID?: string }) => {
                 <div className={styles.buttons}>
                     <button
                         onClick={() => {
-                            void handleButtonClick();
+                            finish();
                         }}
                     >
                         {t('gui:button.done')}

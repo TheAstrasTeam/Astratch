@@ -15,7 +15,13 @@ import CloseICON from '../../assets/close.svg?react';
 import MiniSizeICON from '../../assets/miniScreen.svg?react';
 import FullSizeICON from '../../assets/fullScreen.svg?react';
 import { useModalInstance } from '@reactleaf/modal';
-import { useModalWindowStore, getInitialWindowZ, clampRectToViewport } from '../../stores/useModalWindowStore';
+import { useShallow } from 'zustand/react/shallow';
+import {
+    useModalWindowStore,
+    getInitialWindowZ,
+    clampRectToViewport,
+    getDefaultRect,
+} from '../../stores/useModalWindowStore';
 import { useModalRelationshipStore } from '../../stores/useModalRelationshipStore';
 import { spawnRandomString } from '../../utils/ash-data';
 
@@ -51,28 +57,50 @@ export const Modal = ({
     const { closeSelf } = useModalInstance();
 
     // 持久化窗口状态
+    // useShallow 对合并后的对象做浅比较：zustand 的 action 函数引用稳定，
+    // windows[id] 与 activeWindowID 为原始值/稳定引用，
+    // 因此只有真正用到的字段变化时才会重渲染
     const [instanceID] = useState(() => windowID ?? `modal_${spawnRandomString()}`);
     const [initialZ] = useState(() => getInitialWindowZ());
-    const windowState = useModalWindowStore(s => s.windows[instanceID]);
-    const activeWindowID = useModalWindowStore(s => s.activeWindowID);
-    const update = useModalWindowStore(s => s.update);
-    const raise = useModalWindowStore(s => s.raise);
+    const { windowState, activeWindowID, update, raise } = useModalWindowStore(
+        useShallow(s => ({
+            windowState: s.windows[instanceID],
+            activeWindowID: s.activeWindowID,
+            update: s.update,
+            raise: s.raise,
+        })),
+    );
 
     // 父子关系与阻塞
-    // 注意：每个 selector 必须返回稳定的值或引用，不能返回每次新建的对象字面量，
-    // 否则 useSyncExternalStore 会因引用不相等而无限重渲染
-    const shaking = useModalRelationshipStore(s => s.shakeMap[instanceID]);
-    const parentChild = useModalRelationshipStore(s => s.parentChild);
-    const blockingChildren = useModalRelationshipStore(s => s.blockingChildren);
-    const registerChild = useModalRelationshipStore(s => s.registerChild);
-    const unregisterChild = useModalRelationshipStore(s => s.unregisterChild);
-    const registerCloseFunction = useModalRelationshipStore(s => s.registerCloseFunction);
-    const unregisterCloseFunction = useModalRelationshipStore(s => s.unregisterCloseFunction);
-    const setBlocking = useModalRelationshipStore(s => s.setBlocking);
-    const clearBlocking = useModalRelationshipStore(s => s.clearBlocking);
-    const closeChildren = useModalRelationshipStore(s => s.closeChildren);
-    const getBlockingChildren = useModalRelationshipStore(s => s.getBlockingChildren);
-    const triggerShake = useModalRelationshipStore(s => s.triggerShake);
+    const {
+        shaking,
+        parentChild,
+        blockingChildren,
+        registerChild,
+        unregisterChild,
+        registerCloseFunction,
+        unregisterCloseFunction,
+        setBlocking,
+        clearBlocking,
+        closeChildren,
+        getBlockingChildren,
+        triggerShake,
+    } = useModalRelationshipStore(
+        useShallow(s => ({
+            shaking: s.shakeMap[instanceID],
+            parentChild: s.parentChild,
+            blockingChildren: s.blockingChildren,
+            registerChild: s.registerChild,
+            unregisterChild: s.unregisterChild,
+            registerCloseFunction: s.registerCloseFunction,
+            unregisterCloseFunction: s.unregisterCloseFunction,
+            setBlocking: s.setBlocking,
+            clearBlocking: s.clearBlocking,
+            closeChildren: s.closeChildren,
+            getBlockingChildren: s.getBlockingChildren,
+            triggerShake: s.triggerShake,
+        })),
+    );
     const isBlocked = (parentChild[instanceID] ?? []).some(c => blockingChildren[c]);
 
     // @reactleaf/modal 的 closeSelf 在 ModalLayer 每次渲染时都是新引用
@@ -188,8 +216,7 @@ export const Modal = ({
     }, []);
 
     const handleClose = useCallback(() => {
-        if (close) void close();
-        else void closeSelf();
+        void (close?.() ?? closeSelf());
     }, [close, closeSelf]);
 
     const handleToggleFullScreen = useCallback(() => {
@@ -232,12 +259,8 @@ export const Modal = ({
         return inner;
     }
 
-    const initialRect = windowState ?? {
-        x: Math.max(0, Math.round((window.innerWidth - 480) / 2)),
-        y: Math.max(0, Math.round((window.innerHeight - 360) / 2)),
-        width: 480,
-        height: 360,
-    };
+    // windowState 缺失时（如 store 初始化前的极端时序）使用统一的默认居中矩形
+    const initialRect = windowState ?? getDefaultRect();
 
     return (
         <Rnd

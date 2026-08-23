@@ -33,32 +33,38 @@ const STORAGE_KEY = 'astratch.modalWindows';
 /** 与 @reactleaf/modal 的 .modal-layer 默认 z-index 保持一致 */
 const BASE_Z = 1001;
 
+type TWindows = Record<string, IModalWindowState | undefined>;
+
+/**
+ * 计算当前所有窗口中的最高层级（下限为 BASE_Z）
+ */
+const computeMaxZ = (windows: TWindows): number =>
+    Object.values(windows).reduce((max, w) => Math.max(max, w?.z ?? 0), BASE_Z);
+
 /**
  * 纯读取：计算窗口的初始 z-index（总是当前最高 + 1）
  * 不能使用持久化的旧 z：否则重新打开的窗口会拿到过期的低层级，出现在父窗口下方
  * 用于在组件第一次渲染时就知道正确的层级
  */
-const getInitialWindowZ = (): number => {
-    const state = useModalWindowStore.getState();
-    return Object.values(state.windows).reduce((max, w) => Math.max(max, w?.z ?? 0), BASE_Z) + 1;
-};
+const getInitialWindowZ = (): number => computeMaxZ(useModalWindowStore.getState().windows) + 1;
 
 /**
- * 计算默认窗口状态：首次打开时居中显示
+ * 默认窗口矩形：首次打开时居中显示
  */
-const createDefaultState = (): IModalWindowState => {
-    const width = Math.min(480, (typeof window === 'undefined' ? 1000 : window.innerWidth) * 0.6);
-    const height = 360;
+const getDefaultRect = (): IModalWindowRect => {
     const innerWidth = typeof window === 'undefined' ? 1000 : window.innerWidth;
     const innerHeight = typeof window === 'undefined' ? 800 : window.innerHeight;
+    const width = Math.min(480, innerWidth * 0.6);
+    const height = 360;
     return {
         x: Math.max(0, Math.round((innerWidth - width) / 2)),
         y: Math.max(0, Math.round((innerHeight - height) / 2)),
         width,
         height,
-        z: BASE_Z,
     };
 };
+
+const createDefaultState = (): IModalWindowState => ({ ...getDefaultRect(), z: BASE_Z });
 
 /**
  * 将窗口矩形钳制到当前视口内
@@ -81,7 +87,7 @@ const clampRectToViewport = (rect: IModalWindowState): IModalWindowState => {
     };
 };
 
-const readStored = (): Record<string, IModalWindowState | undefined> => {
+const readStored = (): TWindows => {
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return {};
@@ -96,7 +102,7 @@ const readStored = (): Record<string, IModalWindowState | undefined> => {
     }
 };
 
-const writeStored = (windows: Record<string, IModalWindowState | undefined>) => {
+const writeStored = (windows: TWindows) => {
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(windows));
     } catch {
@@ -104,8 +110,37 @@ const writeStored = (windows: Record<string, IModalWindowState | undefined>) => 
     }
 };
 
+/**
+ * 节流写入持久化：拖拽/点击置顶会高频触发状态更新，
+ * 同步全量 JSON.stringify 写入 localStorage 代价过高，
+ * 因此合并为 trailing 定时写入
+ */
+let storedTimer: ReturnType<typeof setTimeout> | undefined;
+
+const scheduleWriteStored = () => {
+    if (storedTimer !== undefined) return;
+    storedTimer = setTimeout(() => {
+        storedTimer = undefined;
+        writeStored(useModalWindowStore.getState().windows);
+    }, 200);
+};
+
+const flushStored = () => {
+    if (storedTimer === undefined) return;
+    clearTimeout(storedTimer);
+    storedTimer = undefined;
+    writeStored(useModalWindowStore.getState().windows);
+};
+
+if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') flushStored();
+    });
+    window.addEventListener('beforeunload', flushStored);
+}
+
 interface IModalWindowStore {
-    windows: Record<string, IModalWindowState | undefined>;
+    windows: TWindows;
     /**
      * 当前活跃（最顶层）窗口的 ID，用于非活动窗口的暗淡显示
      */
@@ -132,10 +167,7 @@ const useModalWindowStore: UseBoundStore<StoreApi<IModalWindowStore>> = create<I
         register: windowID => {
             const { windows } = get();
             const existing = windows[windowID];
-            const maxZ = Object.values(windows).reduce(
-                (max, w) => Math.max(max, w?.z ?? 0),
-                BASE_Z,
-            );
+            const maxZ = computeMaxZ(windows);
             // 已存在的窗口保留位置/大小，但层级必须刷新到当前最高，否则
             // 重新打开（如子窗口）会出现在父窗口下方
             const next: IModalWindowState = existing
@@ -143,7 +175,7 @@ const useModalWindowStore: UseBoundStore<StoreApi<IModalWindowStore>> = create<I
                 : { ...createDefaultState(), z: maxZ + 1 };
             const nextWindows = { ...windows, [windowID]: next };
             set({ windows: nextWindows, activeWindowID: windowID });
-            writeStored(nextWindows);
+            scheduleWriteStored();
         },
         update: (windowID, rect) => {
             const { windows } = get();
@@ -154,24 +186,25 @@ const useModalWindowStore: UseBoundStore<StoreApi<IModalWindowStore>> = create<I
                 [windowID]: clampRectToViewport({ ...existing, ...rect }),
             };
             set({ windows: nextWindows });
-            writeStored(nextWindows);
+            scheduleWriteStored();
         },
         raise: windowID => {
-            const { windows } = get();
+            const { windows, activeWindowID } = get();
             const existing = windows[windowID];
             if (!existing) return;
-            const maxZ = Object.values(windows).reduce(
-                (max, w) => Math.max(max, w?.z ?? 0),
-                BASE_Z,
-            );
+            const maxZ = computeMaxZ(windows);
+            // 已经是最高层且处于活跃状态时无需更新：
+            // raise 由窗口内每次 mousedown 触发，短路可避免
+            // 每次点击都进行全量 set 与持久化写入
+            if (existing.z >= maxZ && activeWindowID === windowID) return;
             const nextWindows = {
                 ...windows,
                 [windowID]: { ...existing, z: maxZ + 1 },
             };
             set({ windows: nextWindows, activeWindowID: windowID });
-            writeStored(nextWindows);
+            scheduleWriteStored();
         },
     }),
 );
 
-export { useModalWindowStore, getInitialWindowZ, clampRectToViewport }; // 此导出由AI生成
+export { useModalWindowStore, getInitialWindowZ, clampRectToViewport, getDefaultRect }; // 此导出由AI生成

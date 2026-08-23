@@ -18,7 +18,8 @@ export const AlertModal = ({
 }) => {
     const { closeSelf } = useModalInstance();
 
-    const handleButtonClick = async () => {
+    // 回调 + 关闭的统一出口
+    const finish = async () => {
         if (callback) callback();
         await closeSelf();
     };
@@ -35,7 +36,7 @@ export const AlertModal = ({
         >
             <div className={styles.content}>
                 <div className={styles.text}>{message}</div>
-                <button onClick={() => void handleButtonClick()}>{t('gui:button.ok')}</button>
+                <button onClick={() => void finish()}>{t('gui:button.ok')}</button>
             </div>
         </Modal>
     );

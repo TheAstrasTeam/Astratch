@@ -18,7 +18,8 @@ export const ConfirmModal = ({
 }) => {
     const { closeSelf } = useModalInstance();
 
-    const handleButtonClick = async (result: boolean) => {
+    // 回调 + 关闭的统一出口
+    const finish = async (result: boolean) => {
         if (callback) callback(result);
         await closeSelf();
     };
@@ -38,14 +39,14 @@ export const ConfirmModal = ({
                 <div className={styles.buttons}>
                     <button
                         onClick={() => {
-                            void handleButtonClick(true);
+                            void finish(true);
                         }}
                     >
                         {t('gui:button.ok')}
                     </button>
                     <button
                         onClick={() => {
-                            void handleButtonClick(false);
+                            void finish(false);
                         }}
                     >
                         {t('gui:button.no')}

@@ -69,8 +69,11 @@ const TabBar = (): React.ReactNode => {
     };
 
     const handleClick = (e: ReactMouseEvent<HTMLDivElement>, tabID: string) => {
-        if (e.button === 1) {
+        if (e.button === 0) {
             setActiveTab(tabID);
+        } else if (e.button === 1) {
+            e.preventDefault();
+            closeTab(tabID);
         } else if (e.button === 2) {
             setWhereIsInContextMenuID(tabID);
         }

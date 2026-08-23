@@ -37,6 +37,9 @@ const useModalRelationshipStore: UseBoundStore<StoreApi<IModalRelationshipStore>
         },
         unregisterChild: childID => {
             const { parentChild } = get();
+            // childID 未登记在任何父窗口下时直接返回，
+            // 避免无谓地重建整个映射并触发订阅组件重渲染
+            if (!Object.values(parentChild).some(children => children.includes(childID))) return;
             const next: Record<string, string[]> = {};
             for (const [pid, children] of Object.entries(parentChild)) {
                 const filtered = children.filter(c => c !== childID);
