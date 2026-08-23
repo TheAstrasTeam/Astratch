@@ -15,7 +15,7 @@ import CloseICON from '../../assets/close.svg?react';
 import MiniSizeICON from '../../assets/miniScreen.svg?react';
 import FullSizeICON from '../../assets/fullScreen.svg?react';
 import { useModalInstance } from '@reactleaf/modal';
-import { useModalWindowStore, getInitialWindowZ } from '../../stores/useModalWindowStore';
+import { useModalWindowStore, getInitialWindowZ, clampRectToViewport } from '../../stores/useModalWindowStore';
 import { useModalRelationshipStore } from '../../stores/useModalRelationshipStore';
 import { spawnRandomString } from '../../utils/ash-data';
 
@@ -75,12 +75,24 @@ export const Modal = ({
     const triggerShake = useModalRelationshipStore(s => s.triggerShake);
     const isBlocked = (parentChild[instanceID] ?? []).some(c => blockingChildren[c]);
 
+    // @reactleaf/modal 的 closeSelf 在 ModalLayer 每次渲染时都是新引用
+    // （context value 也是每次新建的对象），不能放进 effect 依赖数组：
+    // 否则本 effect 会在窗口每次重渲染时反复销毁重建，
+    // 且其 cleanup 中的 raise(parentWindowID) 会把父窗口提到子窗口之上。
+    // 因此用 ref 持有最新引用，effect 只依赖真正需要的值。
+    const closeSelfRef = useRef(closeSelf);
+    useEffect(() => {
+        closeSelfRef.current = closeSelf;
+    }, [closeSelf]);
+
     useEffect(() => {
         useModalWindowStore.getState().register(instanceID);
     }, [instanceID]);
 
     useEffect(() => {
-        registerCloseFunction(instanceID, closeSelf);
+        registerCloseFunction(instanceID, (...args: Parameters<typeof closeSelf>) =>
+            closeSelfRef.current(...args),
+        );
         if (parentWindowID) registerChild(parentWindowID, instanceID);
         if (blocking) setBlocking(instanceID, true);
         return () => {
@@ -101,7 +113,6 @@ export const Modal = ({
         registerCloseFunction,
         registerChild,
         setBlocking,
-        closeSelf,
     ]);
 
     // 将 store 中的 z-index 同步到 .modal-layer 元素
@@ -110,6 +121,33 @@ export const Modal = ({
         if (!layer) return;
         layer.style.zIndex = String(windowState?.z ?? initialZ);
     }, [initialZ, windowState?.z]);
+
+    // 浏览器视口缩小时，已打开的窗口可能变得比视口还大，
+    // react-rnd 的 bounds='parent' 约束区间会变为空（left > right），
+    // 拖拽时坐标被坍缩到固定角落，表现为"鼠标动了窗口不动"。
+    // 因此钳制 store 中的矩形，并重挂载 Rnd 使新尺寸/位置生效
+    const [rndKey, setRndKey] = useState(0);
+    useEffect(() => {
+        const onResize = () => {
+            const state = useModalWindowStore.getState();
+            const rect = state.windows[instanceID];
+            if (!rect) return;
+            const clamped = clampRectToViewport(rect);
+            if (
+                clamped.x !== rect.x ||
+                clamped.y !== rect.y ||
+                clamped.width !== rect.width ||
+                clamped.height !== rect.height
+            ) {
+                state.update(instanceID, clamped);
+                setRndKey(key => key + 1);
+            }
+        };
+        window.addEventListener('resize', onResize);
+        return () => {
+            window.removeEventListener('resize', onResize);
+        };
+    }, [instanceID]);
 
     // 点击 / 触摸时提升窗口层级；若存在阻塞子窗口则提升子窗口并抖动
     const handleRaise = useCallback(() => {
@@ -203,6 +241,7 @@ export const Modal = ({
 
     return (
         <Rnd
+            key={rndKey}
             className={styles.rndWrap}
             style={{ display: 'flex' }}
             bounds='parent'
