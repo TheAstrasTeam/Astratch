@@ -4,29 +4,14 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-
 #![no_main]
 
 use wasm_bindgen::prelude::*;
-
-macro_rules! console_log {
-    ($($t:tt)*) => {
-        web_sys::console::log_1(&format!($($t)*).into())
-    }
-}
-
-struct WgpuApp {
-    surface: wgpu::Surface<'static>,
-    device: wgpu::Device,
-    queue: wgpu::Queue,
-    config: wgpu::SurfaceConfiguration,
-}
-
-
+use webgpu::*;
 
 #[wasm_bindgen(start)]
 pub fn run() {
-    let oobe = r#"
+    let render_init = r#"
   _
  | |
  | |__  _   _
@@ -39,5 +24,10 @@ pub fn run() {
   / ____ \\__ \ |_| | | (_| \__ \ |  __/ (_| | | | | | |
  /_/    \_\___/\__|_|  \__,_|___/_|\___|\__,_|_| |_| |_|
     "#;
-    console_log!("{oobe}");
+    console_log!("{render_init}");
+    console_log!("Init canvas");
+    let (_width, _height) = get_screen_width().unwrap();
+    let canvas = CanvasWebGPU::new((_width, _height)).unwrap();
+    let (width, height) = canvas.size();
+    console_log!("Canvas size: {}x{}", width, height);
 }
