@@ -153,8 +153,8 @@ export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) =
             }}
             title={t('gui:createFunction.title')}
             description={t('gui:createFunction.description')}
-            minWidth={400}
-            minHeight={350}
+            minWidth={780}
+            minHeight={570}
         >
             <div className={styles.content}>
                 <CreateFunctionWorkspace vm={vm} />

@@ -30,8 +30,8 @@ export const ConfirmModal = ({
             close={closeSelf}
             title={t('gui:confirm.title')}
             description={t('gui:confirm.description')}
-            minWidth='30vw'
-            minHeight='25vh'
+            minWidth={400}
+            minHeight={350}
         >
             <div className={styles.content}>
                 <div className={styles.text}>{message}</div>

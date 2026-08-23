@@ -186,8 +186,8 @@ export const SettingsModal = ({
             close={closeSelf}
             title={t('gui:settings.title')}
             description={t('gui:settings.description')}
-            minWidth='30vw'
-            minHeight={200}
+            minWidth={540}
+            minHeight={400}
         >
             <div
                 className={classNames(styles.content, {

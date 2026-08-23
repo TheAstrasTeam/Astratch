@@ -48,8 +48,8 @@ export const PromptModal = ({
             close={closeSelf}
             title={t('gui:prompt.title')}
             description={t('gui:prompt.description')}
-            minWidth='30vw'
-            minHeight='25vh'
+            minWidth={400}
+            minHeight={350}
         >
             <div className={styles.content}>
                 <div className={styles.state}>

@@ -30,8 +30,8 @@ export const AlertModal = ({
             close={closeSelf}
             title={t('gui:alert.title')}
             description={t('gui:alert.description')}
-            minWidth='30vw'
-            minHeight='25vh'
+            minWidth={400}
+            minHeight={350}
         >
             <div className={styles.content}>
                 <div className={styles.text}>{message}</div>
