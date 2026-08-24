@@ -21,6 +21,7 @@ import { events } from './types/vm.ts';
 import { Toast } from './lib/ToastManager/index.ts';
 import i18next from 'i18next';
 import { isSupportedLanguage } from './i18n/index.ts';
+import { debug } from './utils/debug.ts';
 
 // 等待国际化初始化
 await i18nReady.then(async () => {
@@ -30,7 +31,7 @@ await i18nReady.then(async () => {
     const Loading: HTMLElement | null = document.querySelector('.loading');
     if (Loading) {
         // 热加载没必要播放动画
-        if (import.meta.hot) {
+        if (debug) {
             Loading.remove();
         } else {
             Loading.style.animation = 'loadingOut 0.3s forwards';
