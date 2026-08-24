@@ -18,9 +18,7 @@ import {
     downloadAddonContent,
     refreshRegistry,
     registryAddonToIAddon,
-    addonContentCacheKey,
 } from './loader';
-import { cacheGet } from './cache';
 import { importCustomAddon, loadCustomAddons, removeCustomAddonHandle } from './custom';
 import type {
     IAddon,
@@ -363,12 +361,14 @@ class AddonManager {
             }
         }
 
-        // 启用项目中启用的远端插件（内容已在 selectVersion 中下载好）
+        // 启用项目中启用的远端插件（需要先下载编译）
         for (const addon of addons) {
             if (addon.isCustom) continue;
             if (!projectEnabled.has(addon.id)) continue;
-            const current = useAddonStore.getState().addons.find(a => a.id === addon.id);
-            if (current?.downloaded && !useAddonStore.getState().enabled.has(addon.id)) {
+            if (!useAddonStore.getState().enabled.has(addon.id)) {
+                if (!useAddonStore.getState().addons.find(a => a.id === addon.id)?.downloaded) {
+                    await this.download(addon.id);
+                }
                 this.enable(addon.id);
             }
         }
@@ -381,31 +381,25 @@ class AddonManager {
 
     /**
      * 选择插件的某个版本。
-     * - 已启用：先停用，切换版本并下载，再重新启用。
-     * - 已禁用：仅切换版本。若该版本已缓存则标记为已下载，否则显示"下载"按钮。
+     * - 已启用：先停用，切换版本并下载编译，再重新启用。
+     * - 已禁用：仅切换版本。若该版本已缓存则标记为已下载可直接启用，
+     *   但 run 需要重新编译，因此不设 downloaded。
      */
     async selectVersion(id: string, version: string) {
         const addon = useAddonStore.getState().addons.find(item => item.id === id);
         if (!addon || !addon.versions.includes(version) || addon.version === version) return;
         const wasEnabled = useAddonStore.getState().enabled.has(id);
         if (wasEnabled) this.disable(id);
-
-        // 检查该版本是否已缓存
-        const cached = await cacheGet(addonContentCacheKey(id, version));
-
         useAddonStore.setState({
             addons: useAddonStore
                 .getState()
                 .addons.map(item =>
-                    item.id === id
-                        ? { ...item, version, downloaded: cached !== null, run: undefined }
-                        : item,
+                    item.id === id ? { ...item, version, downloaded: false, run: undefined } : item,
                 ),
         });
         this.persistData.versions[id] = version;
         this.persist();
         if (wasEnabled) {
-            // 已启用：必须下载并重新启用（即使缓存也要编译）
             await this.download(id);
             this.enable(id);
         }
