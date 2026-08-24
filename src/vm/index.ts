@@ -287,7 +287,7 @@ export class VM implements IVM {
             const projectMeta = JSON.parse(metaFileContent) as IProjectMetaJSON;
             this.runtime.settings.setProjectMeta(projectMeta.meta);
             if (projectMeta.addonState) {
-                addonManager.loadProjectAddonState(projectMeta.addonState);
+                await addonManager.loadProjectAddonState(projectMeta.addonState);
             }
             for (const mode of Object.values(TargetModes)) {
                 this.runtime.folders.set(

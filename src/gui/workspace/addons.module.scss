@@ -106,6 +106,27 @@
         padding: 1px 6px;
     }
 
+    .card-badge-select {
+        flex: 0 0 auto;
+        font-size: x-small;
+        font-weight: 400;
+        color: $ui-white;
+        background-color: $looks-secondary;
+        border-radius: 4px;
+        padding: 1px 6px;
+        border: none;
+        margin: 0;
+        cursor: pointer;
+        appearance: auto;
+        &:hover {
+            opacity: 0.85;
+        }
+    }
+
+    .card-badge-update {
+        background-color: #e53935;
+    }
+
     .card-desc {
         color: $text-primary;
         opacity: 0.6;
@@ -129,32 +150,6 @@
         color: #e53935;
         opacity: 1;
         font-weight: 600;
-    }
-
-    .version-row {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .version-label {
-        color: $text-primary;
-        opacity: 0.6;
-        font-size: x-small;
-        flex-shrink: 0;
-    }
-
-    .version-select {
-        margin: 0;
-        padding: 1px 4px;
-        font-size: x-small;
-        background-color: $ui-tertiary;
-        color: $text-primary;
-        border: 1px solid transparent;
-        border-radius: 4px;
-        &:hover {
-            border-color: $text-primary;
-        }
     }
 
     .remove-button {

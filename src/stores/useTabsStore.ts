@@ -10,10 +10,18 @@ export interface Tab {
     modified: boolean;
 }
 
+// 将 id 移动到 MRU 数组队首（不存在则插入，已存在则去重后前置）
+const moveToFront = (arr: readonly string[], id: string): string[] => [
+    id,
+    ...arr.filter(item => item !== id),
+];
+
 interface ITabsStore {
     tabs: Tab[];
     activeTabId: string | null;
     tabOrder: string[];
+    /** 最近使用顺序（队首 = 最近激活），供 Ctrl+Tab 快速切换使用 */
+    mruTabIds: string[];
     openTab: (targetId: string, title: string, mode: TTargetMode) => void;
     closeTab: (id: string) => void;
     closeOtherTabs: (id: string) => void;
@@ -27,11 +35,12 @@ const useTabsStore: UseBoundStore<StoreApi<ITabsStore>> = create<ITabsStore>((se
     tabs: [],
     activeTabId: null,
     tabOrder: [],
+    mruTabIds: [],
     openTab: (targetId, title, mode) => {
-        const { tabs, tabOrder } = get();
+        const { tabs, tabOrder, mruTabIds } = get();
         const existing = tabs.find(t => t.targetId === targetId);
         if (existing) {
-            set({ activeTabId: existing.id });
+            set({ activeTabId: existing.id, mruTabIds: moveToFront(mruTabIds, existing.id) });
             return;
         }
         const id = targetId;
@@ -39,14 +48,16 @@ const useTabsStore: UseBoundStore<StoreApi<ITabsStore>> = create<ITabsStore>((se
         set({
             tabs: [...tabs, newTab],
             tabOrder: [...tabOrder, id],
+            mruTabIds: moveToFront(mruTabIds, id),
             activeTabId: id,
         });
     },
     closeTab: id => {
-        const { tabs, tabOrder, activeTabId } = get();
+        const { tabs, tabOrder, activeTabId, mruTabIds } = get();
         const idx = tabOrder.indexOf(id);
         const nextTabs = tabs.filter(t => t.id !== id);
         const nextOrder = tabOrder.filter(t => t !== id);
+        const nextMru = mruTabIds.filter(t => t !== id);
         let nextActive = activeTabId;
         if (activeTabId === id) {
             if (nextOrder.length === 0) {
@@ -57,7 +68,12 @@ const useTabsStore: UseBoundStore<StoreApi<ITabsStore>> = create<ITabsStore>((se
                 nextActive = nextOrder[nextOrder.length - 1];
             }
         }
-        set({ tabs: nextTabs, tabOrder: nextOrder, activeTabId: nextActive });
+        set({
+            tabs: nextTabs,
+            tabOrder: nextOrder,
+            mruTabIds: nextMru,
+            activeTabId: nextActive,
+        });
     },
     closeOtherTabs: id => {
         const { tabs } = get();
@@ -66,6 +82,7 @@ const useTabsStore: UseBoundStore<StoreApi<ITabsStore>> = create<ITabsStore>((se
         set({
             tabs: [needKeepTab],
             tabOrder: [id],
+            mruTabIds: [id],
             activeTabId: id,
         });
     },
@@ -73,11 +90,12 @@ const useTabsStore: UseBoundStore<StoreApi<ITabsStore>> = create<ITabsStore>((se
         set({
             tabs: [],
             tabOrder: [],
+            mruTabIds: [],
             activeTabId: null,
         });
     },
     setActiveTab: id => {
-        set({ activeTabId: id });
+        set({ activeTabId: id, mruTabIds: moveToFront(get().mruTabIds, id) });
     },
     reorderTabs: (fromIndex, toIndex) => {
         const { tabOrder } = get();

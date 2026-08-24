@@ -110,6 +110,16 @@ export const SHORTCUTS = {
         defaultKey: 'mod+3',
         scope: 'global',
     },
+    QUICK_OPEN_NEXT_TAB: {
+        id: 'tabs.quickOpenNext',
+        defaultKey: 'mod+tab',
+        scope: 'global',
+    },
+    QUICK_OPEN_PREV_TAB: {
+        id: 'tabs.quickOpenPrev',
+        defaultKey: 'mod+shift+tab',
+        scope: 'global',
+    },
 } as const satisfies Record<string, ShortcutDefinition>;
 
 export type ShortcutIds = (typeof SHORTCUTS)[keyof typeof SHORTCUTS]['id'];

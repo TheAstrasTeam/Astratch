@@ -63,7 +63,9 @@ const AddonCard = ({
             ? t('gui:addon.disable')
             : t('gui:addon.enable');
     const handleAction = downloading ? undefined : !downloaded ? onDownload : onToggle;
-    const showVersionSelect = !isCustom && versions.length > 1;
+    const showVersionSelect = !isCustom && !enabled && versions.length > 1;
+    const latestVersion = versions[versions.length - 1];
+    const hasUpdate = !isCustom && version !== latestVersion;
     return (
         <div className={styles.card} onClick={onSelectAddon} role='button' tabIndex={0}>
             {icon && <img className={styles.cardIcon} src={icon} alt='' />}
@@ -71,20 +73,12 @@ const AddonCard = ({
                 <span className={styles.cardName}>
                     {name}
                     {isCustom && <span className={styles.cardBadge}>{t('gui:addon.custom')}</span>}
-                    {!isCustom && <span className={styles.cardBadge}>v{version}</span>}
-                </span>
-                {description && <span className={styles.cardDesc}>{description}</span>}
-                {author && <span className={styles.cardAuthor}>{author}</span>}
-                {astratchVersion && !semver.satisfies(__APP_VERSION__, astratchVersion) && (
-                    <span className={classNames(styles.cardMinVersion, styles.cardMinVersionWarn)}>
-                        {t('gui:addon.astratchVersion', { range: astratchVersion })}
-                    </span>
-                )}
-                {showVersionSelect && (
-                    <span className={styles.versionRow}>
-                        <label className={styles.versionLabel}>{t('gui:addon.version')}</label>
+                    {!isCustom && !showVersionSelect && (
+                        <span className={styles.cardBadge}>v{version}</span>
+                    )}
+                    {!isCustom && showVersionSelect && (
                         <select
-                            className={styles.versionSelect}
+                            className={styles.cardBadgeSelect}
                             value={version}
                             onClick={e => {
                                 e.stopPropagation();
@@ -95,10 +89,22 @@ const AddonCard = ({
                         >
                             {versions.map(item => (
                                 <option key={item} value={item}>
-                                    {item}
+                                    v{item}
                                 </option>
                             ))}
                         </select>
+                    )}
+                    {hasUpdate && (
+                        <span className={classNames(styles.cardBadge, styles.cardBadgeUpdate)}>
+                            {t('gui:addon.updateAvailable')}
+                        </span>
+                    )}
+                </span>
+                {description && <span className={styles.cardDesc}>{description}</span>}
+                {author && <span className={styles.cardAuthor}>{author}</span>}
+                {astratchVersion && !semver.satisfies(__APP_VERSION__, astratchVersion) && (
+                    <span className={classNames(styles.cardMinVersion, styles.cardMinVersionWarn)}>
+                        {t('gui:addon.astratchVersion', { range: astratchVersion })}
                     </span>
                 )}
             </div>
