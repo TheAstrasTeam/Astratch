@@ -63,7 +63,6 @@ const Start = ({ vm }: { vm: IVM }): React.ReactNode => {
                 {t('gui:start.loadProject')}
             </button>
 
-            {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
             {debug && (
                 <>
                     <h4>DEBUG TOOLS</h4>

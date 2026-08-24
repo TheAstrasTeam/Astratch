@@ -10,16 +10,50 @@ import i18next from 'i18next';
 import styles from './addons.module.scss';
 import type { IAddon } from '../../addons/types';
 import { fetchAddonReadme } from '../../addons/loader';
-import { renderMarkdown } from '../../utils/markdown';
+import Markdown from 'react-markdown';
 
-const AddonDetail = ({ addon, onBack }: { addon: IAddon; onBack: () => void }) => {
+import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
+import rehypeRaw from 'rehype-raw';
+import rehypeSanitize from 'rehype-sanitize';
+
+import { events, type IUpdateThemeEvent, type IVM } from '../../types/vm';
+import { useSettings } from '../../settings/SettingsRegistry';
+import type { TGuiTheme } from '../../types/gui';
+
+const AddonDetail = ({ addon, onBack, vm }: { addon: IAddon; onBack: () => void; vm: IVM }) => {
     const [readme, setReadme] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
+    const themeMode = useSettings(state => state.guiThemeMode);
+
     useEffect(() => {
+        const handleThemeChanged = (theme: IUpdateThemeEvent | null = null) => {
+            const correctTheme: TGuiTheme = theme?.guiThemeMode ?? (themeMode as TGuiTheme);
+            void (async function () {
+                document.querySelectorAll('.ash-addons-readme-markdown').forEach(ele => {
+                    ele.remove();
+                });
+                const style = document.createElement('style');
+                style.className = 'ash-addons-readme-markdown';
+
+                if (correctTheme === 'dark')
+                    style.textContent = (
+                        await import('highlight.js/styles/github-dark.css?inline')
+                    ).default;
+                else
+                    style.textContent = (
+                        await import('highlight.js/styles/github.css?inline')
+                    ).default;
+
+                document.head.appendChild(style);
+            })();
+        };
+        handleThemeChanged();
+        // @ts-expect-error 它会传递正确的数据
+        vm.on(events.UPDATE_THEME, handleThemeChanged);
+
         let cancelled = false;
-        setLoading(true);
-        setReadme(null);
         const locale = i18next.language || 'en';
         void fetchAddonReadme(addon.id, addon.version, locale).then(md => {
             if (!cancelled) {
@@ -29,8 +63,10 @@ const AddonDetail = ({ addon, onBack }: { addon: IAddon; onBack: () => void }) =
         });
         return () => {
             cancelled = true;
+            // @ts-expect-error 这里不会运行所以不需要
+            vm.off(events.UPDATE_THEME, handleThemeChanged);
         };
-    }, [addon.id, addon.version, i18next.language]);
+    }, [addon.id, addon.version, themeMode, vm]);
 
     return (
         <div className={styles.detail}>
@@ -74,10 +110,14 @@ const AddonDetail = ({ addon, onBack }: { addon: IAddon; onBack: () => void }) =
                 {loading ? (
                     <div className={styles.detailLoading}>{t('gui:addon.loadingReadme')}</div>
                 ) : readme ? (
-                    <div
-                        className={styles.readmeContent}
-                        dangerouslySetInnerHTML={{ __html: renderMarkdown(readme) }}
-                    />
+                    <div className={styles.readmeContent}>
+                        <Markdown
+                            remarkPlugins={[remarkGfm]}
+                            rehypePlugins={[rehypeRaw, rehypeSanitize, rehypeHighlight]}
+                        >
+                            {readme}
+                        </Markdown>
+                    </div>
                 ) : (
                     <div className={styles.detailNoReadme}>{t('gui:addon.noReadme')}</div>
                 )}

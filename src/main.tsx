@@ -57,7 +57,7 @@ await i18nReady.then(async () => {
             state.guiThemeAccent !== prevState.guiThemeAccent
         ) {
             applyGuiTheme();
-            vm.emit(events.UPDATE_THEME);
+            vm.emit(events.UPDATE_THEME, state);
         }
 
         if (state.language !== prevState.language && isSupportedLanguage(state.language)) {

@@ -6,6 +6,7 @@
 
 import type { IBlocks, ICustomFunction, IWorkspaceState } from './blocks';
 import * as Blockly from 'blockly/core';
+import type { TGuiAccent, TGuiTheme } from './gui';
 
 export const DATA_VISIBILITY = {
     PUBLIC: 'public',
@@ -584,6 +585,10 @@ export interface IDataCreatedEvent {
 export interface IFunctionCreatedEvent {
     id: string;
     targetID: string;
+}
+export interface IUpdateThemeEvent {
+    guiThemeMode: TGuiTheme;
+    guiThemeAccent: TGuiAccent;
 }
 
 export interface IProjectMetaJSON {

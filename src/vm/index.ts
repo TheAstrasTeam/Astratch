@@ -169,7 +169,7 @@ export class VM implements IVM {
                 entity: entitysFolder,
                 module: modulesFolder,
             },
-            addons: addonManager.getProjectAddonState(),
+            addonState: addonManager.getProjectAddonState(),
         };
 
         await this.projectManager.createFile(
@@ -193,7 +193,7 @@ export class VM implements IVM {
                 const userWantRemoveAllFile = await new Promise(resolve => {
                     void modal.open(ConfirmModal, {
                         message: t('vm:project.removeAllFileAsk'),
-                        callback: result => {
+                        callback: (result: boolean) => {
                             resolve(result);
                         },
                     });

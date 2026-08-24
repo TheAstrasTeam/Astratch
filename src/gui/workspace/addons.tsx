@@ -8,12 +8,13 @@
 
 import { useState } from 'react';
 import { t } from 'i18next';
-import semver from 'semver';
+import * as semver from 'semver';
 import classNames from 'classnames';
 import styles from './addons.module.scss';
 import { addonManager, useAddonStore } from '../../addons';
 import { openSettingsModal } from '../../utils/ash-gui';
 import AddonDetail from './addonDetail';
+import type { IVM } from '../../types/vm';
 
 const AddonCard = ({
     name,
@@ -143,7 +144,7 @@ const AddonCard = ({
     );
 };
 
-const AddonsPanel = () => {
+const AddonsPanel = ({ vm }: { vm: IVM }) => {
     const addons = useAddonStore(state => state.addons);
     const enabled = useAddonStore(state => state.enabled);
     const downloading = useAddonStore(state => state.downloading);
@@ -196,6 +197,7 @@ const AddonsPanel = () => {
                     onBack={() => {
                         setSelectedAddon(null);
                     }}
+                    vm={vm}
                 />
             ) : status !== 'ready' ? (
                 <div className={styles.empty}>{t('gui:addon.loading')}</div>

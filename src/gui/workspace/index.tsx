@@ -152,7 +152,7 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
         if (tabSelected === allBuiltInTabs.ADDONS)
             return (
                 <SelectBar title={t('gui:addon.title')}>
-                    <AddonsPanel />
+                    <AddonsPanel vm={vm} />
                 </SelectBar>
             );
     };
