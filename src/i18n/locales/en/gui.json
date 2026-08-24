@@ -120,6 +120,7 @@
     "toast.error": "Error",
     "toast.spinner": "Loading",
     "toast.progress": "Progress",
+    "target.rename": "Rename target",
     "scale.title": "Scale",
     "keyInput.recording": "Press a key combo…",
     "keyInput.placeholder": "Click to set",
