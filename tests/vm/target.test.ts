@@ -1,4 +1,4 @@
-﻿// 此文件由AI生成
+// 此文件由AI生成
 /**
  * @license
  * Copyright 2026 AstrasTeam
@@ -7,20 +7,9 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import Target from '../../src/vm/runtime/target';
-import {
-    events,
-    type IEntityInfo,
-    type IVM,
-    type TEmit,
-    type TTargetInfo,
-} from '../../src/types/vm';
+import { events, type IEntityInfo, type TEmit, type TTargetInfo } from '../../src/types/vm';
 import { sendError } from '../../src/utils/debug';
-import { OPCODES, type ICustomFunction, type IWorkspaceState } from '../../src/types/blocks';
-import { initFunctionBlocks } from '../../src/lib/BlocklyAdapter/blocks/function';
-import type { IFunctionDefinition } from '../../src/components/modal_createFunction/functionPreview';
-import * as Blockly from 'blockly';
-import i18next from 'i18next';
-import { readFileSync } from 'node:fs';
+import type { ICustomFunction, IWorkspaceState } from '../../src/types/blocks';
 
 vi.mock('../../src/utils/debug', () => ({
     sendError: vi.fn((error: unknown, type: 'error' | 'warn' = 'error') => {
@@ -439,114 +428,5 @@ describe('自定义函数测试', () => {
                 targetID: target.id,
             });
         }
-    });
-    it('跨target定义函数时定义帽应序列化写入目标target的blocks数据', async () => {
-        // 积木 init 会取 t('blocks:function.definition')（含 %1 占位符），
-        // 必须用真实语言包初始化 i18next
-        const zhBlocks = JSON.parse(
-            readFileSync('src/i18n/locales/zh-CN/blocks.json', 'utf-8'),
-        ) as Record<string, string>;
-        await i18next.init({
-            lng: 'zh-CN',
-            fallbackLng: 'en',
-            resources: { 'zh-CN': { blocks: zhBlocks } },
-        });
-        initFunctionBlocks(Blockly, {} as unknown as IVM);
-
-        const emit = vi.fn();
-        const target = makeTarget(emit);
-        target.viewX = 40;
-        target.viewY = 30;
-        const id = 'fn-1';
-        target.addCustomFunction(id, {
-            body: [
-                { type: 'text', text: '函数名称' },
-                { type: 'string', text: 'name' },
-                { type: 'number', text: 'count' },
-            ],
-            color: {},
-            id,
-            isValue: true,
-        });
-
-        // 模拟 handleFunctionCreated 的跨 target 分支：
-        // 临时工作区 → newBlock → 序列化 → 销毁 → 定位 → 写入该 target 的 blocks 数据
-        const tempWorkspace = new Blockly.Workspace();
-        const definition = tempWorkspace.newBlock(
-            OPCODES.FUNCTION_DEFINITION,
-        ) as unknown as IFunctionDefinition;
-        definition.functionData = target.getFunction(id);
-        const signature = definition
-            .getInput('NAME')
-            ?.connection?.targetBlock() as Blockly.Block | null;
-        console.log(
-            'signature',
-            {
-                isShadow: signature?.isShadow(),
-                dead: signature?.isDeadOrDying(),
-                flyout: signature?.isInFlyout,
-            },
-            signature?.inputList.map(input => ({
-                name: input.name,
-                target: input.connection?.targetBlock()?.type,
-                check: input.connection?.getCheck(),
-            })),
-        );
-        (signature as unknown as { ensureScopedBlocks?: () => void }).ensureScopedBlocks?.();
-        console.log(
-            'after ensure',
-            signature?.getInput('ARG1')?.connection?.targetBlock()?.type,
-            signature &&
-                (
-                    signature as unknown as {
-                        isFillingScopedSlots?: boolean;
-                        getScopedSlots?: () => unknown;
-                    }
-                ).isFillingScopedSlots,
-            signature &&
-                (signature as unknown as { getScopedSlots?: () => unknown }).getScopedSlots?.(),
-            tempWorkspace.getAllBlocks(false).map(block => block.type),
-        );
-        expect(signature?.type).toBe(OPCODES.FUNCTION_VALUE);
-        expect(signature?.getInput('ARG1')?.connection?.targetBlock()?.type).toBe(
-            OPCODES.FUNCTION_PARAM,
-        );
-        expect(signature?.getInput('ARG2')?.connection?.targetBlock()?.type).toBe(
-            OPCODES.FUNCTION_PARAM,
-        );
-        expect(signature?.getInput('ARG1')?.connection?.targetBlock()?.getFieldValue('NAME')).toBe(
-            'name',
-        );
-        const state = Blockly.serialization.blocks.save(
-            definition,
-        ) as unknown as Blockly.serialization.blocks.State;
-        tempWorkspace.dispose();
-        state.x = target.viewX;
-        state.y = target.viewY;
-        target.blocks._workspace.blocks.blocks.push(state);
-
-        expect(target.blocks._workspace.blocks.blocks).toHaveLength(1);
-        expect(target.blocks._workspace.blocks.blocks[0]).toMatchObject({
-            type: OPCODES.FUNCTION_DEFINITION,
-            x: 40,
-            y: 30,
-        });
-
-        // 切到该 target 时工作区会从 blocks 数据重建，定义帽应能被加载出来
-        const ws = new Blockly.Workspace();
-        Blockly.serialization.workspaces.load(target.blocks._workspace, ws);
-        const loaded = ws.getTopBlocks(true)[0];
-        expect(loaded.type).toBe(OPCODES.FUNCTION_DEFINITION);
-        expect(loaded.getRelativeToSurfaceXY()).toEqual({ x: 40, y: 30 });
-        const loadedSignature = loaded
-            .getInput('NAME')
-            ?.connection?.targetBlock() as Blockly.Block | null;
-        expect(loadedSignature?.type).toBe(OPCODES.FUNCTION_VALUE);
-        expect(loadedSignature?.getInput('ARG1')?.connection?.targetBlock()?.type).toBe(
-            OPCODES.FUNCTION_PARAM,
-        );
-        expect(
-            loadedSignature?.getInput('ARG1')?.connection?.targetBlock()?.getFieldValue('NAME'),
-        ).toBe('name');
     });
 });

@@ -19,7 +19,6 @@ import type {
     TPreviewFunctionData,
 } from '../../../components/modal_createFunction/functionPreview';
 import { connections, endConnections, hatConnections, returnConnections } from './helpers';
-import type { AshConnection } from '../connectionRules';
 import { modal } from '../../../components/Modal/modal';
 import { PromptModal } from '../../../components/modal_prompt';
 import { createMinusFieldByKey, createPlusField } from './mutation';
@@ -147,13 +146,6 @@ type IDefinitionFunctionValueBlock = IFunctionValueBlock &
         definitionScopedSourceReady: boolean;
     };
 
-interface IFunctionDefinitionBlock extends Blockly.Block {
-    functionData: ICustomFunction | null | undefined;
-    functionRef: IFunctionReference | null;
-    ensureFunctionValue(): IDefinitionFunctionValueBlock | null;
-    refreshFunctionValue(): void;
-}
-
 const saveFunctionValueState = (block: IFunctionValueBlock): IFunctionValueExtraState => {
     const definitionBlock = block as IDefinitionFunctionValueBlock;
     return {
@@ -209,63 +201,6 @@ const functionDefinitionValueScopedHost = scopedSourceHost({
         );
     },
 });
-
-/** 把 VM 函数快照应用到定义帽里的签名积木。 */
-const hydrateDefinitionFunctionValue = (
-    block: IDefinitionFunctionValueBlock,
-    functionData: ICustomFunction | null | undefined,
-    functionRef?: IFunctionReference | null,
-) => {
-    block.definitionMode = true;
-    block.allowScopedRename = false;
-    block.functionRef = functionRef ?? block.functionRef;
-    block.previewData = structuredClone(functionData?.body ?? []);
-    block.colors = structuredClone(functionData?.color ?? BlocksColor.function);
-    block.isValue = true;
-    block.returnType = normalizeReturnType(functionData?.returnType);
-    block.updateShape();
-    block.initScopedHost();
-    block.definitionScopedSourceReady = true;
-    block.ensureScopedBlocks();
-};
-
-/** 在锁定的 NAME 槽里放入一个普通函数值积木。 */
-const ensureDefinitionFunctionValue = (
-    definition: IFunctionDefinitionBlock,
-): IDefinitionFunctionValueBlock | null => {
-    const connection = definition.getInput('NAME')?.connection as AshConnection | undefined;
-    if (!connection) return null;
-
-    const current = connection.targetBlock() as IDefinitionFunctionValueBlock | null;
-    if (current?.type === OPCODES.FUNCTION_VALUE && !current.isShadow()) {
-        current.setMovable(false);
-        current.setDeletable(false);
-        return current;
-    }
-
-    // 早期实现把签名设成 shadow。shadow 不能稳定容纳可拖出的普通参数积木，
-    // 每次补块都会把参数顶到工作区；在这里原地迁移为普通锁定子积木。
-    if (current?.isShadow()) connection.setShadowState(null);
-    else if (current) connection.disconnect();
-
-    const block = definition.workspace.newBlock(
-        OPCODES.FUNCTION_VALUE,
-    ) as IDefinitionFunctionValueBlock;
-    block.definitionMode = true;
-    block.allowScopedRename = false;
-    block.setMovable(false);
-    block.setDeletable(false);
-    if (definition.workspace.rendered) (block as unknown as Blockly.BlockSvg).initSvg();
-
-    connection.allowScopedSource = true;
-    try {
-        if (block.outputConnection) connection.connect(block.outputConnection);
-    } finally {
-        connection.allowScopedSource = false;
-    }
-    if (definition.workspace.rendered) (block as unknown as Blockly.BlockSvg).render();
-    return block;
-};
 
 /** 根据函数展示配置切换值积木的输出/语句连接。 */
 const configureFunctionValueConnections = (
@@ -368,50 +303,17 @@ Blockly.Css.register(`
  * 注册函数类积木
  */
 export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
+    // 定义帽目前仅保留最基本的外壳：签名与参数系统待重构后重建。
     blockly.Blocks[OPCODES.FUNCTION_DEFINITION] = {
-        init(this: IFunctionDefinitionBlock) {
-            this.functionRef = null;
+        init(this: Blockly.Block) {
             this.jsonInit({
                 ...hatConnections,
                 message0: t('blocks:function.definition'),
                 colour: BlocksColor.function.primary,
                 args0: [{ type: 'input_value', name: 'NAME', check: 'Function' }],
             });
-
-            let functionData: ICustomFunction | null | undefined;
-            Object.defineProperty(this, 'functionData', {
-                configurable: true,
-                enumerable: false,
-                get: () => functionData,
-                set: (value: ICustomFunction | null | undefined) => {
-                    functionData = value;
-                    this.refreshFunctionValue();
-                },
-            });
-
-            const connection = this.getInput('NAME')?.connection as AshConnection | undefined;
-            if (connection) {
-                connection.isScopedSourceSlot = true;
-                // 反序列化紧接着会恢复已保存的函数值，当前微任务结束后再锁住。
-                connection.allowScopedSource = true;
-            }
-            queueMicrotask(() => {
-                if (this.isDeadOrDying()) return;
-                if (connection) connection.allowScopedSource = false;
-                this.refreshFunctionValue();
-            });
         },
-        ensureFunctionValue(this: IFunctionDefinitionBlock) {
-            return ensureDefinitionFunctionValue(this);
-        },
-        refreshFunctionValue(this: IFunctionDefinitionBlock) {
-            const existing = this.getInput('NAME')?.connection?.targetBlock();
-            const name = this.ensureFunctionValue();
-            if (name && (this.functionData || this.functionRef || !existing)) {
-                hydrateDefinitionFunctionValue(name, this.functionData, this.functionRef);
-            }
-        },
-    } as unknown as Blockly.Block;
+    } as Blockly.Block;
 
     blockly.Blocks[OPCODES.FUNCTION_RETURN] = {
         init(this: Blockly.Block) {
@@ -901,7 +803,7 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
         updateControlBar(this: IFunctionValueBlock) {
             updateControlBar.call(this);
         },
-    } as unknown as IFunctionValueBlock;
+    } as IDefinitionFunctionValueBlock;
 
     // ── 行内函数 ──────────────────────────────────────────────
     // 形如 `行内函数 (a)⊖ (b)⊖ ⊕ { ... }`，
