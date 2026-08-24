@@ -775,9 +775,9 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                     else if (!this.isValue || this.editMode) input = this.appendValueInput(inputID);
                     else input = this.appendDummyInput(inputID);
 
-                    if ((this.editMode && !this.isValue) || this.definitionMode)
-                        input.setCheck(fieldData.type);
+                    if (this.definitionMode) input.setCheck(fieldData.type);
                     if (this.editMode && !this.definitionMode) {
+                        input.setCheck(fieldData.type);
                         input.connection?.setShadowState({
                             type: OPCODES.FUNCTION_VALUE_ID,
                             fields: { ID: fieldData.text ?? '' },
@@ -795,11 +795,15 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                         // 用户拖走后再补一个新的参数源积木。
                     } else {
                         if (this.isValue) input.appendField(fieldData.text ?? '');
-                        else
-                            input.connection?.setShadowState({
+                        else {
+                            input.setCheck(fieldData.type);
+                            input.connection?.setShadowState(fieldData.type === AllCheckers.BOOLEAN ? {
+                                type: OPCODES.OPERATOR_LOGIC_BOOLEAN
+                            } : {
                                 type: OPCODES.FUNCTION_ARG_HINT,
                                 fields: { HINT: fieldData.text ?? '' },
                             });
+                        }
                     }
                 }
             });
