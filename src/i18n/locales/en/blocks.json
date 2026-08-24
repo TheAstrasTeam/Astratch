@@ -310,7 +310,7 @@
     "function.definition": "define function %1",
     "function.call": "call and return",
     "function.execute": "execute",
-    "function.return": "return %1",
+    "function.return": "return",
     "function.inline": "inline function",
     "function.param": "parameter",
     "function.setDataValue": "set parameter %1 to %2",

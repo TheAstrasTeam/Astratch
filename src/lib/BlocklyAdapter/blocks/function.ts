@@ -186,6 +186,14 @@ const getReferencedFunction = (vm: IVM, reference?: IFunctionReference) =>
         : null;
 
 /**
+ * 定义帽签名（NAME 槽与签名输出共用）的 check。
+ * 返回类型非空时签名直接以返回类型的形状渲染，直观展示函数返回什么；
+ * 为 null（无返回值语境）时退回 'Function' 万能胶囊。
+ */
+const returnTypeChecks = (returnType: TFunctionReturnType): string | string[] =>
+    returnType === null ? 'Function' : Array.isArray(returnType) ? [...returnType] : [returnType];
+
+/**
  * 定义帽中的函数值是一个作用域宿主：每个参数槽里都放着可拖出的参数积木。
  * 普通 FUNCTION_VALUE 不使用这些槽，因此不会改变普通函数值的交互。
  */
@@ -315,7 +323,7 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                 ...hatConnections,
                 message0: t('blocks:function.definition'),
                 colour: BlocksColor.function.primary,
-                args0: [{ type: 'input_value', name: 'NAME', check: 'Function' }],
+                args0: [{ type: 'input_value', name: 'NAME' }],
             });
             this.setDeletable(false);
 
@@ -347,6 +355,12 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                     if (!value.outputConnection) return;
                     if (this.workspace.rendered) (value as Blockly.BlockSvg).initSvg();
 
+                    // NAME 槽与签名输出使用同一份返回类型 check，
+                    // 两边一致才能连上（connect 不匹配时静默失败）。
+                    const returnType = normalizeReturnType(
+                        getReferencedFunction(vm, this.functionRef ?? undefined)?.returnType,
+                    );
+                    connection.setCheck(returnTypeChecks(returnType));
                     connection.connect(value.outputConnection);
 
                     if (this.workspace.rendered) (value as Blockly.BlockSvg).render();
@@ -367,19 +381,77 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
             state: { functionRef?: IFunctionReference },
         ) {
             this.functionRef = state.functionRef ?? null;
+            // 签名的输出形状 = 返回类型（见签名 definitionMode 读档），
+            // NAME 槽的 check 必须同步，否则反序列化时签名插不进槽
+            // （connect 在 check 不匹配时静默失败）。
+            const returnType = normalizeReturnType(
+                getReferencedFunction(vm, this.functionRef ?? undefined)?.returnType,
+            );
+            this.getInput('NAME')?.connection?.setCheck(returnTypeChecks(returnType));
         },
     } as IFunctionDefinitionBlock;
 
+    interface IFUNCTION_RETURN extends Blockly.Block {
+        updateShape(): void;
+    }
+
     blockly.Blocks[OPCODES.FUNCTION_RETURN] = {
-        init(this: Blockly.Block) {
+        init(this: IFUNCTION_RETURN) {
             this.jsonInit({
                 ...endConnections,
-                message0: t('blocks:function.return'),
                 colour: BlocksColor.function.primary,
-                args0: [{ type: 'input_value', name: 'VALUE' }],
+            });
+            this.updateShape();
+        },
+        onchange(this: IFUNCTION_RETURN, event: Blockly.Events.Abstract) {
+            if (
+                !(
+                    [
+                        Blockly.Events.BLOCK_MOVE,
+                        Blockly.Events.BLOCK_DELETE,
+                        Blockly.Events.FINISHED_LOADING,
+                    ] as string[]
+                ).includes(event.type)
+            )
+                return;
+            this.updateShape();
+        },
+        updateShape(this: IFUNCTION_RETURN) {
+            queueMicrotask(() => {
+                if (this.isDeadOrDying()) return;
+
+                const getValueType = (): TFunctionReturnType => {
+                    if (this.isInsertionMarker()) return AllCheckers.STRING;
+                    // 向上找定义帽；不在任何帽子里时回退字符串。
+                    let block: Blockly.Block | null = this.getParent();
+                    while (block && block.type !== OPCODES.FUNCTION_DEFINITION)
+                        block = block.getParent();
+                    if (!block) return AllCheckers.STRING;
+                    const signature = block
+                        .getInput('NAME')
+                        ?.connection?.targetBlock() as IFunctionValueBlock | null;
+                    return signature?.returnType ?? AllCheckers.STRING;
+                };
+
+                if (!this.getInput('TEXT'))
+                    this.appendDummyInput('TEXT').appendField(t('blocks:function.return'));
+
+                const wanted = getValueType();
+                const wantedChecks =
+                    wanted === null ? null : Array.isArray(wanted) ? [...wanted] : [wanted];
+                const input = this.getInput('VALUE');
+                if (!input) {
+                    this.appendValueInput('VALUE').setCheck(wantedChecks);
+                    return;
+                }
+                // check 一致就别动：setCheck 会复检已连接的子积木，
+                // 多余的重设可能拔下积木并再次触发本监听。
+                const current = input.connection?.getCheck() ?? null;
+                if (JSON.stringify(current) === JSON.stringify(wantedChecks)) return;
+                input.setCheck(wantedChecks);
             });
         },
-    } as Blockly.Block;
+    } as IFUNCTION_RETURN;
 
     blockly.Blocks[OPCODES.FUNCTION_SETDATAVALUE] = {
         init(this: Blockly.Block) {
@@ -606,7 +678,17 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                 this.returnType = normalizeReturnType(functionData?.returnType ?? state.returnType);
                 this.setMovable(false);
                 this.setDeletable(false);
-                configureFunctionValueConnections(this, true, null);
+                // 定义帽里的签名直接以返回类型的形状示人（Number→方形、
+                // Boolean→菱形……），直观展示函数返回什么；
+                // 无返回类型时保持 'Function' 万能胶囊。
+                // 引用侧的函数值不受影响，仍输出 'Function'。
+                if (this.returnType !== null) {
+                    this.setPreviousStatement(false);
+                    this.setNextStatement(false);
+                    this.setOutput(true, returnTypeChecks(this.returnType));
+                } else {
+                    configureFunctionValueConnections(this, true, null);
+                }
                 this.updateShape();
                 this.initScopedHost();
                 this.definitionScopedSourceReady = true;
@@ -797,12 +879,16 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                         if (this.isValue) input.appendField(fieldData.text ?? '');
                         else {
                             input.setCheck(fieldData.type);
-                            input.connection?.setShadowState(fieldData.type === AllCheckers.BOOLEAN ? {
-                                type: OPCODES.OPERATOR_LOGIC_BOOLEAN
-                            } : {
-                                type: OPCODES.FUNCTION_ARG_HINT,
-                                fields: { HINT: fieldData.text ?? '' },
-                            });
+                            input.connection?.setShadowState(
+                                fieldData.type === AllCheckers.BOOLEAN
+                                    ? {
+                                          type: OPCODES.OPERATOR_LOGIC_BOOLEAN,
+                                      }
+                                    : {
+                                          type: OPCODES.FUNCTION_ARG_HINT,
+                                          fields: { HINT: fieldData.text ?? '' },
+                                      },
+                            );
                         }
                     }
                 }
