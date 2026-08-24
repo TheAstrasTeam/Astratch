@@ -18,7 +18,9 @@ import {
     downloadAddonContent,
     refreshRegistry,
     registryAddonToIAddon,
+    addonContentCacheKey,
 } from './loader';
+import { cacheGet } from './cache';
 import { importCustomAddon, loadCustomAddons, removeCustomAddonHandle } from './custom';
 import type {
     IAddon,
@@ -296,32 +298,63 @@ class AddonManager {
     }
 
     /**
-     * 返回当前远端插件的启用/禁用状态（不含自定义插件）。
+     * 返回当前远端插件的启用/禁用状态及版本（不含自定义插件）。
      * 供项目保存时记录，以便下次打开项目时恢复一致的插件环境。
      */
-    getProjectAddonState(): { enabled: string[]; disabled: string[] } {
+    getProjectAddonState(): {
+        enabled: string[];
+        disabled: string[];
+        versions: Record<string, string>;
+    } {
         const { addons, enabled } = useAddonStore.getState();
         const enabledList: string[] = [];
         const disabledList: string[] = [];
+        const versions: Record<string, string> = {};
         for (const addon of addons) {
             if (addon.isCustom) continue;
             if (enabled.has(addon.id)) enabledList.push(addon.id);
             else disabledList.push(addon.id);
+            versions[addon.id] = addon.version;
         }
-        return { enabled: enabledList, disabled: disabledList };
+        return { enabled: enabledList, disabled: disabledList, versions };
     }
 
     /**
-     * 恢复项目保存的远端插件启用/禁用状态。
+     * 恢复项目保存的远端插件启用/禁用状态及版本。
      * 自定义插件不受影响；不在列表中的插件保持默认状态。
+     * 若记录的版本在可用版本列表中，则选择该版本；否则保留当前版本。
+     * 版本切换完成后，再按项目记录的启用/禁用状态恢复。
      */
-    loadProjectAddonState(state: { enabled: string[]; disabled: string[] }) {
+    async loadProjectAddonState(state: {
+        enabled: string[];
+        disabled: string[];
+        versions?: Record<string, string>;
+    }) {
         const { addons } = useAddonStore.getState();
         const remoteIds = new Set(addons.filter(a => !a.isCustom).map(a => a.id));
         const projectEnabled = new Set(state.enabled.filter(id => remoteIds.has(id)));
         const projectDisabled = new Set(state.disabled.filter(id => remoteIds.has(id)));
+        const versions = state.versions ?? {};
 
-        // 先禁用所有当前启用的远端插件
+        // 先选择项目记录的版本并下载，等待所有版本切换完成
+        await Promise.all(
+            addons
+                .filter(addon => {
+                    if (addon.isCustom) return false;
+                    const recordedVersion = versions[addon.id];
+                    return (
+                        recordedVersion &&
+                        addon.versions.includes(recordedVersion) &&
+                        addon.version !== recordedVersion
+                    );
+                })
+                .map(addon => {
+                    const recordedVersion = versions[addon.id];
+                    return this.selectVersion(addon.id, recordedVersion);
+                }),
+        );
+
+        // 禁用所有当前启用的远端插件（除了项目中需要启用的）
         for (const addon of addons) {
             if (addon.isCustom) continue;
             if (projectEnabled.has(addon.id)) continue;
@@ -330,11 +363,12 @@ class AddonManager {
             }
         }
 
-        // 启用项目中启用的远端插件
+        // 启用项目中启用的远端插件（内容已在 selectVersion 中下载好）
         for (const addon of addons) {
             if (addon.isCustom) continue;
             if (!projectEnabled.has(addon.id)) continue;
-            if (!useAddonStore.getState().enabled.has(addon.id)) {
+            const current = useAddonStore.getState().addons.find(a => a.id === addon.id);
+            if (current?.downloaded && !useAddonStore.getState().enabled.has(addon.id)) {
                 this.enable(addon.id);
             }
         }
@@ -346,24 +380,32 @@ class AddonManager {
     }
 
     /**
-     * 选择插件的某个版本。已启用的插件会先停用旧版本，
-     * 再下载并重新启用新版本。
+     * 选择插件的某个版本。
+     * - 已启用：先停用，切换版本并下载，再重新启用。
+     * - 已禁用：仅切换版本。若该版本已缓存则标记为已下载，否则显示"下载"按钮。
      */
     async selectVersion(id: string, version: string) {
         const addon = useAddonStore.getState().addons.find(item => item.id === id);
         if (!addon || !addon.versions.includes(version) || addon.version === version) return;
         const wasEnabled = useAddonStore.getState().enabled.has(id);
         if (wasEnabled) this.disable(id);
+
+        // 检查该版本是否已缓存
+        const cached = await cacheGet(addonContentCacheKey(id, version));
+
         useAddonStore.setState({
             addons: useAddonStore
                 .getState()
                 .addons.map(item =>
-                    item.id === id ? { ...item, version, downloaded: false, run: undefined } : item,
+                    item.id === id
+                        ? { ...item, version, downloaded: cached !== null, run: undefined }
+                        : item,
                 ),
         });
         this.persistData.versions[id] = version;
         this.persist();
         if (wasEnabled) {
+            // 已启用：必须下载并重新启用（即使缓存也要编译）
             await this.download(id);
             this.enable(id);
         }
