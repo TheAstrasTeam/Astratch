@@ -26,7 +26,7 @@ export const sendError = (error: unknown, type: 'error' | 'warn' = 'error') => {
     else throw error;
 };
 
-export const log = (message: string) => {
+export const log = (message: unknown) => {
     // eslint-disable-next-line no-console
     if (debug) console.log(message);
 };
