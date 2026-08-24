@@ -196,5 +196,6 @@
     "tab.closeOthers": "关闭其他",
     "tab.closeAll": "关闭全部",
     "tab.closeRight": "关闭右侧标签页",
-    "tab.newTab": "新建标签页"
+    "tab.newTab": "新建标签页",
+    "target.rename": "重命名目标"
 }
