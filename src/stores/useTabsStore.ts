@@ -16,12 +16,11 @@ interface ITabsStore {
     tabOrder: string[];
     openTab: (targetId: string, title: string, mode: TTargetMode) => void;
     closeTab: (id: string) => void;
-    closeOtherTabs: (id:string)=> void;
-    closeAllTabs:()=>void;
+    closeOtherTabs: (id: string) => void;
+    closeAllTabs: () => void;
     setActiveTab: (id: string) => void;
     reorderTabs: (fromIndex: number, toIndex: number) => void;
     markModified: (id: string, modified: boolean) => void;
-    
 }
 
 const useTabsStore: UseBoundStore<StoreApi<ITabsStore>> = create<ITabsStore>((set, get) => ({
@@ -60,17 +59,17 @@ const useTabsStore: UseBoundStore<StoreApi<ITabsStore>> = create<ITabsStore>((se
         }
         set({ tabs: nextTabs, tabOrder: nextOrder, activeTabId: nextActive });
     },
-    closeOtherTabs:(id)=> {
-        const { tabs }=get();
+    closeOtherTabs: id => {
+        const { tabs } = get();
         const needKeepTab = tabs.find(t => t.id == id);
-        if(!needKeepTab) return;
+        if (!needKeepTab) return;
         set({
             tabs: [needKeepTab],
             tabOrder: [id],
             activeTabId: id,
         });
     },
-    closeAllTabs:()=> {
+    closeAllTabs: () => {
         set({
             tabs: [],
             tabOrder: [],

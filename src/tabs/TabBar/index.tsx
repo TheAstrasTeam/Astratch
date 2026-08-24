@@ -88,7 +88,9 @@ const TabBar = (): React.ReactNode => {
                         [styles.isActive]: tab.id === activeTabId,
                     })}
                     onContextMenu={openMenuByMouseDown(openTabsMenu, 2, 'mouse')}
-                    onMouseDown={(e) => {handleClick(e, tab.id)}}
+                    onMouseDown={e => {
+                        handleClick(e, tab.id);
+                    }}
                 >
                     {tab.mode === TargetModes.ENTITY ? (
                         <SpriteIcon className={styles.tabIcon} />
