@@ -8,8 +8,9 @@
 // 此文件由AI修改于2026/8/15：联合类型直接参与 check 数组，槽位形状由 renderer 统一处理
 
 import * as Blockly from 'blockly/core';
+import type { AshConnection } from '../connectionRules';
 import { t } from 'i18next';
-import { BlocksColor, OPCODES } from '../../../types/blocks';
+import { AllCheckers, BlocksColor, OPCODES } from '../../../types/blocks';
 import type { ICustomFunction, IFunctionReference } from '../../../types/blocks';
 import type { IVM } from '../../../types/vm';
 import type {
@@ -119,14 +120,10 @@ const CALLER_RESYNC_EVENTS: readonly string[] = [
     Blockly.Events.FINISHED_LOADING,
 ];
 
-const FUNCTION_VALUE_TYPES: readonly TFunctionInputField[] = [
-    'boolean',
-    'array',
-    'object',
-    'string',
-    'number',
-    'function',
-];
+/** 输入槽合法类型：AllCheckers 中除万能（null）外的全部 checker。 */
+const FUNCTION_VALUE_TYPES: readonly TFunctionInputField[] = Object.values(AllCheckers).filter(
+    (checker): checker is TFunctionInputField => checker !== null,
+);
 
 interface IFunctionValueExtraState {
     functionRef?: IFunctionReference;
@@ -150,14 +147,9 @@ interface IFunctionDefinitionBlock extends Blockly.Block {
     /** 指向 VM 函数的轻量引用；数据本体以 VM 为唯一事实源。 */
     functionRef: IFunctionReference | null;
     setFunctionRef(ref: IFunctionReference | null): void;
-    refreshName(): void;
     saveExtraState(): { functionRef?: IFunctionReference };
     loadExtraState(state: { functionRef?: IFunctionReference }): void;
 }
-
-/** 帽面显示名：取签名里第一段文字，缺省回退到函数 id。 */
-const displayNameOf = (fn: ICustomFunction): string =>
-    fn.body.find(field => field.type === 'text')?.text ?? fn.id;
 
 const saveFunctionValueState = (block: IFunctionValueBlock): IFunctionValueExtraState => {
     const definitionBlock = block as IDefinitionFunctionValueBlock;
@@ -235,11 +227,8 @@ const configureFunctionValueConnections = (
     block.setPreviousStatement(false);
     block.setNextStatement(false);
     if (!isValue && returnType !== null) {
-        const types = Array.isArray(returnType) ? returnType : [returnType];
-        block.setOutput(
-            true,
-            types.map(type => `${type.charAt(0).toUpperCase()}${type.slice(1)}`),
-        );
+        // checker 字符串本身就是合法的输出类型（'Boolean'、'String'……）。
+        block.setOutput(true, Array.isArray(returnType) ? returnType : [returnType]);
     } else {
         block.setOutput(true, 'Function');
     }
@@ -318,7 +307,7 @@ Blockly.Css.register(`
 export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
     // 定义帽：持有指向 VM 函数的轻量引用并持久化。
     // 数据本体永远以 VM（target.function）为唯一事实源，
-    // 帽子只保存"我属于哪个函数"，渲染时再从 VM 拉。
+    // 帽子只保存"我属于哪个函数"。
     blockly.Blocks[OPCODES.FUNCTION_DEFINITION] = {
         init(this: IFunctionDefinitionBlock) {
             this.functionRef = null;
@@ -326,25 +315,49 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                 ...hatConnections,
                 message0: t('blocks:function.definition'),
                 colour: BlocksColor.function.primary,
-                args0: [
-                    {
-                        // 必须可序列化：函数名要随存档往返。
-                        type: 'field_label_serializable',
-                        name: 'FUNC_NAME',
-                        text: '',
-                    },
-                ],
+                args0: [{ type: 'input_value', name: 'NAME', check: 'Function' }],
+            });
+            this.setDeletable(false);
+
+            const connection = this.getInput('NAME')?.connection as AshConnection | undefined;
+            if (!connection) return;
+            connection.isScopedSourceSlot = true;
+            connection.allowScopedSource = true;
+
+            // 时序问题可能撞车
+            queueMicrotask(() => {
+                try {
+                    if (this.isDeadOrDying()) return;
+                    if (connection.targetBlock()) return;
+
+                    const value = this.workspace.newBlock(OPCODES.FUNCTION_VALUE);
+                    value.setMovable(false);
+
+                    // 新建的签名子块与存档恢复的签名走同一条 definitionMode
+                    // 读档路径，从 VM 里读出函数数据（参数、颜色、返回类型），
+                    // 否则它只是一块没有任何形状信息的空白积木。
+                    if (this.functionRef) {
+                        (value as unknown as IDefinitionFunctionValueBlock).loadExtraState?.({
+                            definitionMode: true,
+                            functionRef: { ...this.functionRef },
+                        });
+                        value.setDeletable(false);
+                    }
+
+                    if (!value.outputConnection) return;
+                    if (this.workspace.rendered) (value as Blockly.BlockSvg).initSvg();
+
+                    connection.connect(value.outputConnection);
+
+                    if (this.workspace.rendered) (value as Blockly.BlockSvg).render();
+                } finally {
+                    connection.allowScopedSource = false;
+                }
             });
         },
-        /** 设置持有的函数引用，并刷新帽面显示的函数名。 */
+        /** 设置持有的函数引用。 */
         setFunctionRef(this: IFunctionDefinitionBlock, ref: IFunctionReference | null) {
             this.functionRef = ref;
-            this.refreshName();
-        },
-        refreshName(this: IFunctionDefinitionBlock) {
-            const fn = getReferencedFunction(vm, this.functionRef ?? undefined);
-            // 找不到 VM 函数时保留序列化里的旧名，避免加载旧档直接空白。
-            if (fn) this.getField('FUNC_NAME')?.setValue(displayNameOf(fn));
         },
         saveExtraState(this: IFunctionDefinitionBlock) {
             return this.functionRef ? { functionRef: { ...this.functionRef } } : {};
@@ -354,7 +367,6 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
             state: { functionRef?: IFunctionReference },
         ) {
             this.functionRef = state.functionRef ?? null;
-            this.refreshName();
         },
     } as IFunctionDefinitionBlock;
 
@@ -716,12 +728,7 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                         input = null;
                     }
                     input ??= this.appendValueInput(inputName);
-                    const checks = (
-                        Array.isArray(fieldData.type) ? fieldData.type : [fieldData.type]
-                    ).map(type =>
-                        type ? `${type.charAt(0).toUpperCase()}${type.slice(1)}` : 'String',
-                    );
-                    input.setCheck(checks);
+                    input.setCheck(fieldData.type);
                 });
 
                 for (let index = 0; index < this.previewData.length; index++) {
@@ -768,22 +775,8 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                     else if (!this.isValue || this.editMode) input = this.appendValueInput(inputID);
                     else input = this.appendDummyInput(inputID);
 
-                    const checks = (
-                        Array.isArray(fieldData.type) ? fieldData.type : [fieldData.type]
-                    ).map(type => {
-                        if (type)
-                            return type
-                                .split('')
-                                .map((char, index) => (index ? char : char.toUpperCase()))
-                                .join('');
-                        return 'String';
-                    });
-
-                    if (
-                        checks.length > 0 &&
-                        ((this.editMode && !this.isValue) || this.definitionMode)
-                    )
-                        input.setCheck(checks);
+                    if ((this.editMode && !this.isValue) || this.definitionMode)
+                        input.setCheck(fieldData.type);
                     if (this.editMode && !this.definitionMode) {
                         input.connection?.setShadowState({
                             type: OPCODES.FUNCTION_VALUE_ID,
@@ -959,7 +952,7 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
     // output 为 null（万能），因此能插进任何插槽，包括「执行函数」。
     blockly.Blocks[OPCODES.FUNCTION_PARAM] = scopedSourceBlock({
         colour: BlocksColor.function.secondary,
-        defaultLabel: () => t('blocks:function.param'),
+        defaultLabel: () => '',
         hostTypes: [OPCODES.FUNCTION_INLINE, OPCODES.FUNCTION_VALUE],
         openRenamePrompt: ({ currentName, commit }) => {
             void modal.open(PromptModal, {

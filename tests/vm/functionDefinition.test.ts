@@ -6,26 +6,19 @@ import i18next from 'i18next';
 import * as Blockly from 'blockly/core';
 
 import { initFunctionBlocks } from '../../src/lib/BlocklyAdapter/blocks/function';
+import { AshConnectionChecker } from '../../src/lib/BlocklyAdapter/connectionRules';
+import type { AshConnection } from '../../src/lib/BlocklyAdapter/connectionRules';
 import type { ICustomFunction } from '../../src/types/blocks';
 import { OPCODES } from '../../src/types/blocks';
 
-const flush = async () => {
-    for (let i = 0; i < 5; i++) {
-        await Promise.resolve();
-        await new Promise(resolve => setTimeout(resolve, 0));
-    }
-};
-
 const makeFunction = (id: string): ICustomFunction => ({
-    // 显示名取签名里第一段文字
     body: [{ type: 'text', text: `攻击-${id}` }],
     color: {},
     id,
     isValue: true,
 });
 
-/** 认识 fn-1 的 VM 桩。 */
-const vmKnowsFn1 = {
+const vmStub = {
     runtime: {
         getTargetByID: (targetId: string) =>
             targetId === 't1'
@@ -37,18 +30,28 @@ const vmKnowsFn1 = {
     },
 };
 
-/** 对一切都装作不认识的 VM 桩。 */
-const vmOblivious = {
-    runtime: { getTargetByID: () => null },
-};
-
 interface HatState {
     type: string;
-    fields?: { FUNC_NAME?: string };
     extraState?: { functionRef?: { targetId: string; functionId: string } };
+    inputs?: { NAME?: { block?: { type: string } } };
 }
 
-describe('函数定义帽：数据持有与持久化', () => {
+interface HatBlock {
+    setFunctionRef(ref: unknown): void;
+    functionRef: { targetId: string; functionId: string } | null;
+    getInput(name: string): { connection: AshConnection | null } | undefined;
+}
+
+const newHat = (ws: Blockly.Workspace): HatBlock =>
+    ws.newBlock(OPCODES.FUNCTION_DEFINITION) as never;
+
+const slotOf = (hat: HatBlock): AshConnection => {
+    const slot = hat.getInput('NAME')?.connection;
+    if (!slot) throw new Error('定义帽缺少 NAME 槽');
+    return slot;
+};
+
+describe('函数定义帽：数据持有、锁定槽与自动嵌入', () => {
     beforeAll(async () => {
         const strip = (path: string) => fs.readFileSync(path, 'utf-8').replace(/^\uFEFF/, '');
         const zhBlocks = JSON.parse(strip('src/i18n/locales/zh-CN/blocks.json')) as Record<
@@ -60,95 +63,85 @@ describe('函数定义帽：数据持有与持久化', () => {
             fallbackLng: 'en',
             resources: { 'zh-CN': { blocks: zhBlocks } },
         });
-        initFunctionBlocks(Blockly, vmKnowsFn1 as never);
+        initFunctionBlocks(Blockly, vmStub as never);
     });
 
-    it('setFunctionRef 后帽面显示函数名', async () => {
+    it('空帽在微任务后自动嵌入一枚函数值积木', async () => {
         const ws = new Blockly.Workspace();
-        interface Def {
-            setFunctionRef(ref: unknown): void;
-            getFieldValue(name: string): string;
-        }
-        const hat = ws.newBlock(OPCODES.FUNCTION_DEFINITION) as never as Def;
-        hat.setFunctionRef({ targetId: 't1', functionId: 'fn-1' });
-        await flush();
+        const hat = newHat(ws);
+        // 同步阶段尚未嵌入（补块走微任务）。
+        expect(slotOf(hat).targetBlock()).toBeNull();
 
-        expect(hat.getFieldValue('FUNC_NAME')).toBe('攻击-fn-1');
+        await Promise.resolve();
+        const embedded = slotOf(hat).targetBlock();
+        expect(embedded?.type).toBe(OPCODES.FUNCTION_VALUE);
     });
 
-    it('序列化包含 extraState.functionRef 与函数名', () => {
+    it('锁定槽默认拒绝任何连接，宿主开锁后才放行', async () => {
+        const checker = new AshConnectionChecker();
         const ws = new Blockly.Workspace();
-        interface Def {
-            setFunctionRef(ref: unknown): void;
-            getFieldValue(name: string): string;
-        }
-        const hat = ws.newBlock(OPCODES.FUNCTION_DEFINITION) as never as Def;
+        const donor = ws.newBlock(OPCODES.FUNCTION_PARAM);
+        const out = donor.outputConnection;
+        expect(out).not.toBeNull();
+        if (!out) return;
+
+        const hat = newHat(ws);
+        // init 先开锁、微任务里锁回；等它锁回后再验证拒绝语义。
+        await Promise.resolve();
+
+        const slot = hat.getInput('NAME')?.connection;
+        expect(slot).not.toBeNull();
+        if (!slot) return;
+
+        // 未开锁：拒绝。
+        expect(checker.doTypeChecks(slot, out)).toBe(false);
+
+        // 宿主临时开锁：放行。
+        slot.allowScopedSource = true;
+        expect(checker.doTypeChecks(slot, out)).toBe(true);
+        slot.allowScopedSource = false;
+        expect(checker.doTypeChecks(slot, out)).toBe(false);
+    });
+
+    it('序列化携带 extraState.functionRef 与嵌入的函数值', () => {
+        const ws = new Blockly.Workspace();
+        const hat = newHat(ws);
         hat.setFunctionRef({ targetId: 't1', functionId: 'fn-1' });
 
-        const state = Blockly.serialization.blocks.save(
-            hat as never as Blockly.Block,
-        ) as never as HatState;
+        return Promise.resolve().then(() => {
+            const state = Blockly.serialization.blocks.save(
+                hat as never as Blockly.Block,
+            ) as unknown as HatState;
 
-        expect(state.extraState?.functionRef).toEqual({
-            targetId: 't1',
-            functionId: 'fn-1',
+            expect(state.extraState?.functionRef).toEqual({
+                targetId: 't1',
+                functionId: 'fn-1',
+            });
+            expect(state.inputs?.NAME?.block?.type).toBe(OPCODES.FUNCTION_VALUE);
         });
-        expect(state.fields?.FUNC_NAME).toBe('攻击-fn-1');
     });
 
-    it('加载后帽子恢复引用，并从 VM 刷新显示名', async () => {
+    it('加载后引用恢复；存档自带签名时不重复嵌入', async () => {
         const savedHat: HatState = {
             type: OPCODES.FUNCTION_DEFINITION,
-            fields: { FUNC_NAME: '攻击-fn-1' },
             extraState: { functionRef: { targetId: 't1', functionId: 'fn-1' } },
+            inputs: {
+                NAME: {
+                    block: { type: OPCODES.FUNCTION_VALUE },
+                },
+            },
         };
         const ws = new Blockly.Workspace();
         Blockly.serialization.workspaces.load(
             { blocks: { languageVersion: 0, blocks: [savedHat] } },
             ws,
         );
-        await flush();
+        await Promise.resolve();
 
-        const loaded = ws.getTopBlocks(true)[0] as unknown as {
-            type: string;
-            functionRef: { targetId: string; functionId: string } | null;
-            getFieldValue(name: string): string;
-        };
-        expect(loaded.type).toBe(OPCODES.FUNCTION_DEFINITION);
+        const values = ws.getAllBlocks(false).filter(b => b.type === OPCODES.FUNCTION_VALUE);
+        expect(values).toHaveLength(1);
+
+        const loaded = ws.getTopBlocks(true)[0] as unknown as HatBlock;
         expect(loaded.functionRef).toEqual({ targetId: 't1', functionId: 'fn-1' });
-        expect(loaded.getFieldValue('FUNC_NAME')).toBe('攻击-fn-1');
-
-        // 再走一次序列化，引用应稳定往返。
-        const state = Blockly.serialization.blocks.save(
-            loaded as never as Blockly.Block,
-        ) as never as HatState;
-        expect(state.extraState?.functionRef).toEqual({
-            targetId: 't1',
-            functionId: 'fn-1',
-        });
-    });
-
-    it('VM 中函数缺失时保留存档里的旧名且不崩溃', async () => {
-        // 用"什么都不认识"的 VM 重新注册，模拟加载旧档但函数已被删的场景。
-        initFunctionBlocks(Blockly, vmOblivious as never);
-
-        const savedHat: HatState = {
-            type: OPCODES.FUNCTION_DEFINITION,
-            fields: { FUNC_NAME: '旧名字' },
-            extraState: { functionRef: { targetId: 'gone', functionId: 'gone' } },
-        };
-        const ws = new Blockly.Workspace();
-        Blockly.serialization.workspaces.load(
-            { blocks: { languageVersion: 0, blocks: [savedHat] } },
-            ws,
-        );
-        await flush();
-
-        const loaded = ws.getTopBlocks(true)[0] as unknown as {
-            functionRef: unknown;
-            getFieldValue(name: string): string;
-        };
-        expect(loaded.functionRef).toEqual({ targetId: 'gone', functionId: 'gone' });
-        expect(loaded.getFieldValue('FUNC_NAME')).toBe('旧名字');
     });
 });

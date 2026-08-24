@@ -578,3 +578,15 @@ export interface ICustomFunction {
     /** 返回类型；null 表示无返回值。 */
     returnType?: TFunctionReturnType;
 }
+
+export const AllCheckers = {
+    FUNCTION: 'Function',
+    STRING: 'String',
+    ARRAY: 'Array',
+    NUMBER: 'Number',
+    OBJECT: 'Object',
+    COLOUR: 'Colour',
+    BOOLEAN: 'Boolean',
+    ANY: null,
+} as const;
+export type TAllCheckers = (typeof AllCheckers)[keyof typeof AllCheckers];

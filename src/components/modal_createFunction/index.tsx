@@ -25,7 +25,7 @@ import {
 } from './functionPreview';
 import { DropDownIcon, StringIcon, TextIcon } from './icons';
 import { ColorPickerButton } from '../colorPickerButton';
-import type { IBlockColor, ICustomFunction } from '../../types/blocks';
+import { AllCheckers, type IBlockColor, type ICustomFunction } from '../../types/blocks';
 import type {
     TFunctionFieldType,
     TFunctionInputField,
@@ -99,9 +99,9 @@ export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) =
     };
 
     const handleSetReturnType = (result: TFunctionFieldType) => {
-        // 返回类型 Modal 只会返回值类型、联合值类型或 null；text/dropdown
-        // 是旧字段类型，为避免把它们误当成 Blockly check，明确拒绝。
-        if (result === 'text' || result === 'dropdown') return;
+        // 返回类型 Modal 只会返回值类型、联合值类型或 null；
+        // text 是旧字段类型，为避免把它误当成 Blockly check，明确拒绝。
+        if (result === 'text') return;
         const nextReturnType = result;
         setReturnType(nextReturnType);
         setPreviewConfig({ isValue, returnType: nextReturnType });
@@ -110,7 +110,8 @@ export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) =
     const returnTypeLabel = () => {
         if (returnType === null) return t('gui:createFunction.noReturn');
         const types: TFunctionInputField[] = Array.isArray(returnType) ? returnType : [returnType];
-        return types.map(type => t(`gui:createFunction.${type}`)).join(' | ');
+        // checker 是大写开头（'Boolean'），i18n key 是全小写。
+        return types.map(type => t(`gui:createFunction.${type.toLowerCase()}`)).join(' | ');
     };
 
     const doneCreateFunction = () => {
@@ -164,7 +165,8 @@ export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) =
                         icon={<DropDownIcon color={blockColor} />}
                         label={t('gui:createFunction.dropdown')}
                         onClick={() => {
-                            handleAddFieldButtonClick('dropdown');
+                            // 下拉框定义还没做完，暂时按字符串输入处理。
+                            handleAddFieldButtonClick(AllCheckers.STRING);
                         }}
                     />
                     <BigSelector

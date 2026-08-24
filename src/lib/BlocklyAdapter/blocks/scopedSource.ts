@@ -31,7 +31,9 @@
 
 import * as Blockly from 'blockly/core';
 import type { AshConnection } from '../connectionRules';
-import { isInFlyoutInsteadOfTrashCan } from './helpers';
+import { isInFlyoutInsteadOfTrashCan, OPCODES } from './helpers';
+import type { TAllCheckers } from '../../../types/blocks';
+import type { IFunctionValueBlock } from '../../../components/modal_createFunction/functionPreview';
 
 /** 源积木上显示名字的字段名。 */
 const NAME_FIELD = 'NAME';
@@ -135,6 +137,49 @@ function withUnlocked<T>(connection: AshConnection, action: () => T): T {
     } finally {
         connection.allowScopedSource = previous ?? false;
     }
+}
+
+/**
+ * 把函数参数积木的输出对齐到宿主签名里对应字段的 checker。
+ *
+ * 参数积木的 init 跑在 ownerId / slotKey 赋值之前（newBlock 内部就会调
+ * init），在那里读不到宿主；因此统一在宿主绑定时调用本函数。
+ *
+ * setCheck 会触发 onCheckChanged_ 复检现有连接，而锁定的作用域插槽
+ * 在检查器里默认拒绝一切连接，所以必须在临时开锁下进行；
+ * 且目标 check 与现状一致时绝不能动，否则每次重绑都会把参数拔下来，
+ * 拔下又触发补块事件，陷入无限生成。
+ */
+function alignParamCheckerWithHost(
+    source: IScopedSourceBlock,
+    host: IScopedSourceHost,
+    slotConnection: Blockly.Connection,
+): void {
+    if (source.type !== OPCODES.FUNCTION_PARAM) return;
+    const fieldData = (host as unknown as Partial<IFunctionValueBlock>).previewData?.[
+        Number(source.slotKey)
+    ];
+    if (!fieldData || fieldData.type === 'text') return;
+
+    const wanted =
+        fieldData.type === null || Array.isArray(fieldData.type)
+            ? fieldData.type
+            : [fieldData.type];
+    const output = source.outputConnection;
+    if (!output) return;
+    const current = output.getCheck();
+    const unchanged =
+        wanted === null
+            ? current === null
+            : Array.isArray(wanted) &&
+              Array.isArray(current) &&
+              wanted.length === current.length &&
+              wanted.every((check, index) => check === current[index]);
+    if (unchanged) return;
+
+    withUnlocked(slotConnection as AshConnection, () => {
+        output.setCheck(wanted);
+    });
 }
 
 /** {@link scopedSourceHost} 的配置。 */
@@ -244,6 +289,7 @@ export function scopedSourceHost(options: IScopedSourceHostOptions) {
                 current.ownerId = this.id;
                 current.slotKey = key;
                 current.updateLabel(name);
+                alignParamCheckerWithHost(current, this, connection);
 
                 // 复制整个宿主时，副本内部的源积木仍指向旧宿主，需一并改绑。
                 if (previousOwnerId && previousOwnerId !== this.id) {
@@ -259,6 +305,7 @@ export function scopedSourceHost(options: IScopedSourceHostOptions) {
             source.ownerId = this.id;
             source.slotKey = key;
             source.updateLabel(name);
+            alignParamCheckerWithHost(source, this, connection);
 
             if (this.workspace.rendered) (source as unknown as Blockly.BlockSvg).initSvg();
 
@@ -360,12 +407,9 @@ export interface IScopedSourceBlockOptions {
     /** 积木颜色。 */
     colour: string;
     /** 输出类型；`null` 表示万能 reporter。 */
-    output?: string | null;
+    output?: TAllCheckers | null;
     /**
      * 初始显示名。
-     *
-     * 源积木在工具箱（flyout）里是**没有宿主**的，不会有人调用 `updateLabel`，
-     * 因此必须自带一个默认文本，否则会显示为空白积木。
      */
     defaultLabel: () => string;
     /** 允许作为宿主的 opcode 列表，用于校验 `ownerId` 指向的积木。 */

@@ -18,6 +18,7 @@ import {
     type TFunctionFieldType,
     type TFunctionInputField,
 } from './functionPreview';
+import { AllCheckers } from '../../types/blocks';
 import type { JSX } from 'react/jsx-dev-runtime';
 
 export const FieldTypeModal = ({
@@ -38,32 +39,32 @@ export const FieldTypeModal = ({
         { type: TFunctionInputField; icon: JSX.Element; label: string }[]
     >([
         {
-            type: 'boolean',
+            type: AllCheckers.BOOLEAN,
             icon: <BooleanIcon color={previewBlockColor} />,
             label: t('gui:createFunction.boolean'),
         },
         {
-            type: 'array',
+            type: AllCheckers.ARRAY,
             icon: <ArrayIcon color={previewBlockColor} />,
             label: t('gui:createFunction.array'),
         },
         {
-            type: 'object',
+            type: AllCheckers.OBJECT,
             icon: <ObjectIcon color={previewBlockColor} />,
             label: t('gui:createFunction.object'),
         },
         {
-            type: 'string',
+            type: AllCheckers.STRING,
             icon: <StringIcon color={previewBlockColor} />,
             label: t('gui:createFunction.string'),
         },
         {
-            type: 'number',
+            type: AllCheckers.NUMBER,
             icon: <NumberIcon color={previewBlockColor} />,
             label: t('gui:createFunction.number'),
         },
         {
-            type: 'function',
+            type: AllCheckers.FUNCTION,
             icon: <FunctionIcon color={previewBlockColor} />,
             label: t('gui:createFunction.function'),
         },

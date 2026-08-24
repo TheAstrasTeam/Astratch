@@ -5,13 +5,21 @@
  */
 import * as Blockly from 'blockly';
 import { BlocksColor, OPCODES, type IBlockColor } from '../../types/blocks';
+import { type TAllCheckers } from '../../types/blocks';
 import type { IFunctionReference } from '../../types/blocks';
 import { t } from 'i18next';
 
-export type TFunctionReturnField =
-    'text' | 'dropdown' | 'boolean' | 'array' | 'object' | 'string' | 'number' | 'function' | null;
+/**
+ * 输入槽支持的类型：AllCheckers 中除万能（null）外的全部 checker。
+ * 值即 Blockly check 字符串（'Boolean'、'String'……），可直传 setOutput/setCheck。
+ */
+export type TFunctionInputField = Exclude<TAllCheckers, null>;
 
-export type TFunctionInputField = 'boolean' | 'array' | 'object' | 'string' | 'number' | 'function';
+/**
+ * 一个字段的类型：文本标签、单个 checker 或 checker 联合。
+ * `null`（AllCheckers.ANY）表示万能；仅返回值语境下表示无返回值。
+ */
+export type TFunctionReturnField = 'text' | TAllCheckers;
 
 export type TFunctionFieldType = TFunctionReturnField | TFunctionInputField[];
 
@@ -85,9 +93,9 @@ const isCurrentPreview = (
     !previewRootBlock?.isDeadOrDying();
 
 const checksForReturnType = (returnType: TFunctionReturnType): string[] | null => {
+    // 类型值本身就是 Blockly check 字符串，无需再转换。
     if (returnType === null) return null;
-    const types = Array.isArray(returnType) ? returnType : [returnType];
-    return types.map(type => `${type.charAt(0).toUpperCase()}${type.slice(1)}`);
+    return Array.isArray(returnType) ? [...returnType] : [returnType];
 };
 
 const centerPreviewRoot = (workspace: Blockly.WorkspaceSvg) => {
