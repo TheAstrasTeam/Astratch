@@ -99,6 +99,45 @@ const MenuBar = ({ vm }: { vm: IVM }): React.ReactNode => {
         openSettingsModal();
     };
 
+    const blocklyUndo = () => {
+        vm.runtime.blocks.workspaceSvg?.undo(false);
+    };
+
+    const blocklyRedo = () => {
+        vm.runtime.blocks.workspaceSvg?.redo();
+    };
+
+    const { openMenu: openEditMenu } = useContextMenu(AllContextMenu.MENUBAR_EDIT, close => (
+        <>
+            <MenuItem
+                onClick={() => {
+                    blocklyUndo();
+                    close();
+                }}
+            >
+                <MenuTextWithShortCut
+                    text={t('gui:menu.undo')}
+                    shortcut={shortcutManager.formatHotKey(
+                        shortcutManager.getHotKey(SHORTCUTS.BLOCKLY_UNDO.id),
+                    )}
+                />
+            </MenuItem>
+            <MenuItem
+                onClick={() => {
+                    blocklyRedo();
+                    close();
+                }}
+            >
+                <MenuTextWithShortCut
+                    text={t('gui:menu.redo')}
+                    shortcut={shortcutManager.formatHotKey(
+                        shortcutManager.getHotKey(SHORTCUTS.BLOCKLY_REDO.id),
+                    )}
+                />
+            </MenuItem>
+        </>
+    ));
+
     return (
         <div className={styles.menubarContents}>
             <div className={styles.menubarContentsLeft}>
@@ -107,7 +146,9 @@ const MenuBar = ({ vm }: { vm: IVM }): React.ReactNode => {
                     <button onMouseDown={openMenuByMouseDown(openFileMenu)}>
                         {t('gui:menu.file')}
                     </button>
-                    <button>{t('gui:menu.edit')}</button>
+                    <button onMouseDown={openMenuByMouseDown(openEditMenu)}>
+                        {t('gui:menu.edit')}
+                    </button>
                     <button>{t('gui:menu.run')}</button>
                     <button>{t('gui:menu.help')}</button>
                 </div>
