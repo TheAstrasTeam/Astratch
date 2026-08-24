@@ -307,7 +307,7 @@
     "data.type.null": "空值",
 
     "function.createTip": "创建自定义函数",
-    "function.definition": "创建函数 %1",
+    "function.definition": "定义函数 %1",
     "function.call": "执行并返回",
     "function.execute": "执行",
     "function.return": "返回 %1",

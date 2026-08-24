@@ -146,6 +146,19 @@ type IDefinitionFunctionValueBlock = IFunctionValueBlock &
         definitionScopedSourceReady: boolean;
     };
 
+interface IFunctionDefinitionBlock extends Blockly.Block {
+    /** 指向 VM 函数的轻量引用；数据本体以 VM 为唯一事实源。 */
+    functionRef: IFunctionReference | null;
+    setFunctionRef(ref: IFunctionReference | null): void;
+    refreshName(): void;
+    saveExtraState(): { functionRef?: IFunctionReference };
+    loadExtraState(state: { functionRef?: IFunctionReference }): void;
+}
+
+/** 帽面显示名：取签名里第一段文字，缺省回退到函数 id。 */
+const displayNameOf = (fn: ICustomFunction): string =>
+    fn.body.find(field => field.type === 'text')?.text ?? fn.id;
+
 const saveFunctionValueState = (block: IFunctionValueBlock): IFunctionValueExtraState => {
     const definitionBlock = block as IDefinitionFunctionValueBlock;
     return {
@@ -303,17 +316,47 @@ Blockly.Css.register(`
  * 注册函数类积木
  */
 export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
-    // 定义帽目前仅保留最基本的外壳：签名与参数系统待重构后重建。
+    // 定义帽：持有指向 VM 函数的轻量引用并持久化。
+    // 数据本体永远以 VM（target.function）为唯一事实源，
+    // 帽子只保存"我属于哪个函数"，渲染时再从 VM 拉。
     blockly.Blocks[OPCODES.FUNCTION_DEFINITION] = {
-        init(this: Blockly.Block) {
+        init(this: IFunctionDefinitionBlock) {
+            this.functionRef = null;
             this.jsonInit({
                 ...hatConnections,
                 message0: t('blocks:function.definition'),
                 colour: BlocksColor.function.primary,
-                args0: [{ type: 'input_value', name: 'NAME', check: 'Function' }],
+                args0: [
+                    {
+                        // 必须可序列化：函数名要随存档往返。
+                        type: 'field_label_serializable',
+                        name: 'FUNC_NAME',
+                        text: '',
+                    },
+                ],
             });
         },
-    } as Blockly.Block;
+        /** 设置持有的函数引用，并刷新帽面显示的函数名。 */
+        setFunctionRef(this: IFunctionDefinitionBlock, ref: IFunctionReference | null) {
+            this.functionRef = ref;
+            this.refreshName();
+        },
+        refreshName(this: IFunctionDefinitionBlock) {
+            const fn = getReferencedFunction(vm, this.functionRef ?? undefined);
+            // 找不到 VM 函数时保留序列化里的旧名，避免加载旧档直接空白。
+            if (fn) this.getField('FUNC_NAME')?.setValue(displayNameOf(fn));
+        },
+        saveExtraState(this: IFunctionDefinitionBlock) {
+            return this.functionRef ? { functionRef: { ...this.functionRef } } : {};
+        },
+        loadExtraState(
+            this: IFunctionDefinitionBlock,
+            state: { functionRef?: IFunctionReference },
+        ) {
+            this.functionRef = state.functionRef ?? null;
+            this.refreshName();
+        },
+    } as IFunctionDefinitionBlock;
 
     blockly.Blocks[OPCODES.FUNCTION_RETURN] = {
         init(this: Blockly.Block) {

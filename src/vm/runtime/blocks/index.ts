@@ -141,10 +141,7 @@ class Blocks implements IBlocks {
             const definition = this.workspaceSvg?.newBlock(
                 OPCODES.FUNCTION_DEFINITION,
             ) as unknown as IFunctionDefinition;
-            definition.functionRef = { targetId: data.targetID, functionId: data.id };
-            definition.functionData = this.vm.runtime
-                .getTargetByID(data.targetID)
-                ?.getFunction(data.id);
+            definition.setFunctionRef({ targetId: data.targetID, functionId: data.id });
             if (this.workspaceSvg?.rendered) {
                 const svg = definition as unknown as Blockly.BlockSvg;
                 svg.initSvg();
@@ -164,8 +161,7 @@ class Blocks implements IBlocks {
             const definition = tempWorkspace.newBlock(
                 OPCODES.FUNCTION_DEFINITION,
             ) as IFunctionDefinition;
-            definition.functionRef = { targetId: data.targetID, functionId: data.id };
-            definition.functionData = target.getFunction(data.id);
+            definition.setFunctionRef({ targetId: data.targetID, functionId: data.id });
 
             // 格式直接来自生成，绝对不会为null
             const state = this.Blockly.serialization.blocks.save(
