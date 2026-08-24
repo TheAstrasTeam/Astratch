@@ -19,6 +19,7 @@ import MenuBar from './menubar';
 import { ContextMenuLayer } from './contextMenu';
 import { shortcutManager } from '../lib/ShortcutManager';
 import { SHORTCUTS } from '../types/lib';
+import TabSwitcher from '../tabs/TabSwitcher';
 import { useEffect, useState } from 'react';
 import { guiInterface } from '../types/gui';
 import {
@@ -76,6 +77,7 @@ const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
                 <WorkSpace vm={vm} />
             </div>
             <ContextMenuLayer />
+            <TabSwitcher />
         </div>
     );
 };

@@ -149,6 +149,8 @@
     "shortcut.tabs.switchTab.target": "Switch to Targets Tab",
     "shortcut.tabs.switchTab.addon": "Switch to Addons Tab",
     "shortcut.tabs.switchTab.debug": "Switch to Debug Tab",
+    "shortcut.tabs.quickOpenNext": "Cycle Between Open Tabs (Next)",
+    "shortcut.tabs.quickOpenPrev": "Cycle Between Open Tabs (Previous)",
     "shortcut.blockly.copy": "Copy",
     "shortcut.blockly.cut": "Cut",
     "shortcut.blockly.paste": "Paste",

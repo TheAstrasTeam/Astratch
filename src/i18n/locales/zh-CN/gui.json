@@ -149,6 +149,8 @@
     "shortcut.tabs.switchTab.target": "切换到目标页",
     "shortcut.tabs.switchTab.addon": "切换到插件页",
     "shortcut.tabs.switchTab.debug": "切换到调试页",
+    "shortcut.tabs.quickOpenNext": "在打开的标签页间切换（下一个）",
+    "shortcut.tabs.quickOpenPrev": "在打开的标签页间切换（上一个）",
     "shortcut.blockly.copy": "复制",
     "shortcut.blockly.cut": "剪切",
     "shortcut.blockly.paste": "粘贴",
