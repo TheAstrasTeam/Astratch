@@ -309,6 +309,20 @@ Blockly.Css.register(`
 }
 `);
 
+// 此类由AI生成
+/**
+ * 带背景圆角矩形的静态文本
+ */
+class FieldLabelWithBackground extends Blockly.FieldLabel {
+    override initView() {
+        super.initView();
+        this.createBorderRect_();
+        if (this.borderRect_ && this.textElement_)
+            this.getSvgRoot()?.insertBefore(this.borderRect_, this.textElement_);
+        this.getBorderRect().setAttribute('class', 'blockly-function-value-shadow-bg');
+    }
+}
+
 /**
  * 注册函数类积木
  */
@@ -678,10 +692,7 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                 this.returnType = normalizeReturnType(functionData?.returnType ?? state.returnType);
                 this.setMovable(false);
                 this.setDeletable(false);
-                // 定义帽里的签名直接以返回类型的形状示人（Number→方形、
-                // Boolean→菱形……），直观展示函数返回什么；
-                // 无返回类型时保持 'Function' 万能胶囊。
-                // 引用侧的函数值不受影响，仍输出 'Function'。
+                // 无返回类型时保持 'Function'
                 if (this.returnType !== null) {
                     this.setPreviousStatement(false);
                     this.setNextStatement(false);
@@ -876,8 +887,14 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                         // 作用域宿主会在这个空槽里放入 FUNCTION_PARAM，
                         // 用户拖走后再补一个新的参数源积木。
                     } else {
-                        if (this.isValue) input.appendField(fieldData.text ?? '');
-                        else {
+                        if (this.isValue) {
+                            input.appendField(
+                                new FieldLabelWithBackground(
+                                    fieldData.text ?? '  ',
+                                    'blockly-function-value-shadow',
+                                ),
+                            );
+                        } else {
                             input.setCheck(fieldData.type);
                             input.connection?.setShadowState(
                                 fieldData.type === AllCheckers.BOOLEAN
