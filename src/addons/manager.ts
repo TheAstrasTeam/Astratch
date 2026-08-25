@@ -18,7 +18,10 @@ import {
     downloadAddonContent,
     refreshRegistry,
     registryAddonToIAddon,
+    addonContentCacheKey,
+    compileAddon,
 } from './loader';
+import { cacheGet } from './cache';
 import { importCustomAddon, loadCustomAddons, removeCustomAddonHandle } from './custom';
 import type {
     IAddon,
@@ -382,19 +385,29 @@ class AddonManager {
     /**
      * 选择插件的某个版本。
      * - 已启用：先停用，切换版本并下载编译，再重新启用。
-     * - 已禁用：仅切换版本。若该版本已缓存则标记为已下载可直接启用，
-     *   但 run 需要重新编译，因此不设 downloaded。
+     * - 已禁用：仅切换版本。若该版本已缓存则标记为已下载可直接启用。
      */
     async selectVersion(id: string, version: string) {
         const addon = useAddonStore.getState().addons.find(item => item.id === id);
         if (!addon || !addon.versions.includes(version) || addon.version === version) return;
         const wasEnabled = useAddonStore.getState().enabled.has(id);
         if (wasEnabled) this.disable(id);
+        let downloaded = false;
+        let run: IAddon['run'] | undefined;
+        const cached = await cacheGet(addonContentCacheKey(id, version));
+        if (cached) {
+            try {
+                run = await compileAddon(cached);
+                downloaded = true;
+            } catch {
+                // 缓存内容无法编译，标记为未下载
+            }
+        }
         useAddonStore.setState({
             addons: useAddonStore
                 .getState()
                 .addons.map(item =>
-                    item.id === id ? { ...item, version, downloaded: false, run: undefined } : item,
+                    item.id === id ? { ...item, version, downloaded, run } : item,
                 ),
         });
         this.persistData.versions[id] = version;
