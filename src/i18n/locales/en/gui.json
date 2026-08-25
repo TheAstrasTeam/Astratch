@@ -75,7 +75,7 @@
     "addon.compatibility": "Requires",
     "addon.search": "Search addons...",
     "addon.noResults": "No addons found.",
-    "addon.updateAvailable": "Update",
+    "addon.oldVersion": "Old version",
     "target.folderNameAsk": "Enter the folder name:",
     "target.attr.x": "X",
     "target.attr.y": "Y",

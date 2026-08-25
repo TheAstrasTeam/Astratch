@@ -75,7 +75,7 @@
     "addon.compatibility": "兼容版本",
     "addon.search": "搜索插件...",
     "addon.noResults": "没有找到插件。",
-    "addon.updateAvailable": "有更新",
+    "addon.oldVersion": "老版本",
     "target.folderNameAsk": "输入文件夹的名称：",
     "target.attr.x": "X 坐标",
     "target.attr.y": "Y 坐标",

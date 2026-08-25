@@ -96,7 +96,7 @@ const AddonCard = ({
                     )}
                     {hasUpdate && (
                         <span className={classNames(styles.cardBadge, styles.cardBadgeUpdate)}>
-                            {t('gui:addon.updateAvailable')}
+                            {t('gui:addon.oldVersion')}
                         </span>
                     )}
                 </span>
