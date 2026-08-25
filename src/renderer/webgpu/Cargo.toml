@@ -3,6 +3,9 @@ name = "webgpu"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+crate-type = ["cdylib"]
+
 [dependencies]
 console_error_panic_hook = "0.1.7"
 console_log = "1.1.0"
@@ -12,7 +15,7 @@ log = "0.4.34"
 parking_lot = "0.12.5"
 pollster = "1.0.1"
 resvg = { version = "0.48.1", default-features = false, features = ["text", "system-fonts"] }
-wasm-bindgen = "0.2.127"
+wasm-bindgen = { version = "0.2.127", features = ["strict-macro"] }
 wasm-bindgen-futures = "0.4.77"
 web-sys = { version = "0.3.104", features = [
     "Window",
@@ -30,7 +33,7 @@ web-sys = { version = "0.3.104", features = [
     "GpuRenderPassEncoder",
     "GpuRenderPipeline",
 ] }
-wgpu = { version = "30.0.0", features = ["webgl"] }
+wgpu = { version = "30.0.1", features = ["webgl"] }
 
 [profile.wasm-release]
 inherits = "release"

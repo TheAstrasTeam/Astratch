@@ -1,14 +1,33 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8" />
-        <title>test</title>
-    </head>
-    <body>
-        <script type="module">
-            import init from './pkg/renderer.js';
-            await init();
-        </script>
-    </body>
-</html>
+<head>
+    <meta charset="UTF-8" />
+    <title>test</title>
+</head>
+<body>
+    <script type="module">
+        import init, { app_render, init_app } from './pkg/renderer.js';
 
+        async function main() {
+            console.log("正在加载Wasm模块");
+            await init();
+
+            console.log("开始初始化WebGPU实例");
+            await init_app();
+
+            console.log("初始化完成，启动渲染循环");
+            function loop() {
+                try {
+                    app_render();
+                } catch (err) {
+                    console.error("渲染异常", err);
+                }
+                requestAnimationFrame(loop);
+            }
+            requestAnimationFrame(loop);
+        }
+
+        main().catch(e => console.error("程序启动失败", e));
+    </script>
+</body>
+</html>

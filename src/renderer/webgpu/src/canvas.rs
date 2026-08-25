@@ -41,8 +41,7 @@ impl CanvasWebGPU {
             top: 0; \
             left: 0; \
             margin: 0; \
-            padding: 0; \
-            background: #66ccff;",
+            padding: 0;",
         )?;
         Ok(Self { canvas })
     }

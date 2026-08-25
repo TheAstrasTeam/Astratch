@@ -1,7 +1,9 @@
 // use parking_lot::Mutex;
 use std::cell::RefCell;
 use std::rc::Rc;
+use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
+use wasm_bindgen::JsValue;
 use wasm_bindgen::closure::Closure;
 use web_sys::window;
 pub mod brower_info;
@@ -21,6 +23,7 @@ pub struct WgpuApp {
     pub device: wgpu::Device,
     pub queue: wgpu::Queue,
     pub config: wgpu::SurfaceConfiguration,
+    pub pending_resize: Rc<RefCell<Option<(u32, u32)>>>,
 }
 
 impl WgpuApp {
@@ -46,7 +49,7 @@ impl WgpuApp {
         // type(adapter) = wgpu::Adapter
         let adapter = instance
             .request_adapter(&wgpu::RequestAdapterOptions {
-                power_preference: wgpu::PowerPreference::default(),      
+                power_preference: wgpu::PowerPreference::default(),
                 force_fallback_adapter: false,
                 compatible_surface: Some(&surface),
                 apply_limit_buckets: false,
@@ -67,7 +70,7 @@ impl WgpuApp {
             })
             .await
             .unwrap();
-        
+
         // 获取表面能力和配置
         // type(caps) = wgpu::SurfaceCapabilities
         let caps = surface.get_capabilities(&adapter);
@@ -75,13 +78,15 @@ impl WgpuApp {
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
             format: caps.formats[0],
             color_space: wgpu::SurfaceColorSpace::Auto,
-            width,
-            height,
+            width: width.max(1),
+            height: height.max(1),
             present_mode: wgpu::PresentMode::Fifo,
             desired_maximum_frame_latency: 2,
             alpha_mode: caps.alpha_modes[0],
             view_formats: vec![],
         };
+        
+        let pending_resize = Rc::new(RefCell::new(Some((width, height))));
 
         let mut app = Self {
             canvas,
@@ -90,8 +95,9 @@ impl WgpuApp {
             device,
             queue,
             config,
+            pending_resize,
         };
-        
+        app.surface.configure(&app.device, &app.config);
         app.setup_resize_handler();
         app
     }
@@ -100,10 +106,11 @@ impl WgpuApp {
         let win = window().unwrap();
         let canvas_clone = self.canvas.canvas.clone();
         let size_clone = self.size.clone();
+        let pending_resize = self.pending_resize.clone();
         let value = win.clone();
-
         // 不要对 closure 进行Dorp!!!
         let resize_closure = Closure::wrap(Box::new(move || {
+
             // JsValue -> u32
             let width = value.inner_width().unwrap().as_f64().unwrap() as u32;
             let height = value.inner_height().unwrap().as_f64().unwrap() as u32;
@@ -112,6 +119,8 @@ impl WgpuApp {
             canvas_clone.set_width(width);
             canvas_clone.set_height(height);
             *size_clone.borrow_mut() = (width, height);
+
+            *pending_resize.borrow_mut() = Some((width, height));
 
             // 如果屏幕尺寸变化, 打印变化日志
             console_log!("Resized: {} x {}", width, height);
@@ -122,4 +131,96 @@ impl WgpuApp {
 
         resize_closure.forget();
     }
+
+    pub fn redraw(&mut self) {
+        todo!();
+    }
+    
+    pub fn render(&mut self) -> Result<(), JsValue> {
+        console_log!("Rendering frame...");
+        if let Some((width, height)) = self.pending_resize.borrow_mut().take() {
+            self.config.width = width.max(1);
+            self.config.height = height.max(1);
+            self.surface.configure(&self.device, &self.config);
+            console_log!("Surface reconfigured to: {} x {}", width, height);
+        };
+
+        let texture = match self.surface.get_current_texture() {
+            wgpu::CurrentSurfaceTexture::Success(tx) => tx,
+            _ => {
+                return Err(JsValue::from_str("Surface get texture timeout"));
+            }
+        };
+
+        let view = texture.texture.create_view(&wgpu::TextureViewDescriptor::default());
+        let mut encoder = self
+            .device
+            .create_command_encoder(&wgpu::CommandEncoderDescriptor {
+                label: Some("Render Encoder"),
+            });
+
+        {
+            let _render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+                label: Some("Render Pass"),
+                color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+                    view: &view,
+                    resolve_target: None,
+                    depth_slice: None,
+                    ops: wgpu::Operations {
+                        load: wgpu::LoadOp::Clear(wgpu::Color {
+                            r: 0.3,
+                            g: 0.8,
+                            b: 1.0,
+                            a: 1.0,
+                        }),
+                        store: wgpu::StoreOp::Store,
+                    },
+                })],
+                ..Default::default()
+            });
+        }
+
+        // submit 命令能接受任何实现了 IntoIter trait 的参数
+        self.queue.submit(Some(encoder.finish()));
+        Ok(())
+    }
 }
+
+thread_local! {
+    static APP: RefCell<Option<Rc<RefCell<WgpuApp>>>> = RefCell::new(None);
+}
+
+#[wasm_bindgen]
+pub async fn init_app() -> Result<(),JsValue> {
+        let render_init = r#"
+  _
+ | |
+ | |__  _   _
+ | '_ \| | | |
+ | |_) | |_| |
+ |_.__/ \__, | _              _______
+     /\  __/ || |            |__   __|
+    /  \|___/_| |_ _ __ __ _ ___| | ___  __ _ _ __ ___
+   / /\ \ / __| __| '__/ _` / __| |/ _ \/ _` | '_ ` _ \
+  / ____ \\__ \ |_| | | (_| \__ \ |  __/ (_| | | | | | |
+ /_/    \_\___/\__|_|  \__,_|___/_|\___|\__,_|_| |_| |_|
+    "#;
+    console_log!("{render_init}");
+    let app = WgpuApp::new().await;
+    APP.with(|cell| *cell.borrow_mut() = Some(Rc::new(RefCell::new(app))));
+    Ok(())
+}
+
+
+#[wasm_bindgen]
+pub fn app_render() -> Result<(), JsValue> {
+    APP.with(|cell| {
+        let opt = cell.borrow();
+        match opt.as_ref() {
+            Some(rc) => rc.borrow_mut().render(),
+            None => Err(JsValue::from_str("WgpuApp not initialized")),
+        }
+    })
+}
+
+
