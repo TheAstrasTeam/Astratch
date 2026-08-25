@@ -26,7 +26,8 @@ pub fn run() {
     "#;
     console_log!("{render_init}");
     console_log!("Init canvas");
-    let (width, height) = get_screen_size().unwrap();
-    let canvas = CanvasWebGPU::new((width, height)).unwrap();
-    console_log!("Canvas init done, size: {} x {}.", width, height);
+    wasm_bindgen_futures::spawn_local(async {
+        let mut app = WgpuApp::new().await;
+        app.setup_resize_handler();
+    });
 }
