@@ -1,6 +1,6 @@
 环境准备
 ```bash
-rustup add --target wasm32-unknown-unknown
+rustup target add wasm32-unknown-unknown
 cargo install -f wasm-bindgen-cli
 ```
 
