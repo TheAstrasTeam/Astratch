@@ -4,6 +4,16 @@ rustup add --target wasm32-unknown-unknown
 cargo install -f wasm-bindgen-cli
 ```
 
+构建
+Linux/macOS
+```bash
+./build.sh
+```
+Windows
+```powershell
+.\build.ps1
+```
+
 开启调试服务器
 
 Linux/macOS
