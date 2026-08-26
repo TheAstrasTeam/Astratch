@@ -313,6 +313,8 @@
     "function.return": "返回",
     "function.inline": "行内函数",
     "function.inlineReturnType": "返回值类型",
+    "function.removeParam": "删除参数",
+    "function.paramType": "参数类型",
     "function.param": "参数",
     "function.setDataValue": "将参数 %1 设为 %2",
     "function.value": "函数值",

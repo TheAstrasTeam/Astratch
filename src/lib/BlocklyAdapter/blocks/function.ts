@@ -17,12 +17,11 @@ import type {
     IFunctionValueBlock,
     TFunctionInputField,
     TFunctionReturnType,
+    TFunctionTypeUnion,
     TPreviewFunctionData,
 } from '../../../components/modal_createFunction/functionPreview';
 import { connections, endConnections, hatConnections, returnConnections } from './helpers';
-import { modal } from '../../../components/Modal/modal';
-import { PromptModal } from '../../../components/modal_prompt';
-import { createMinusFieldByKey, createPlusField } from './mutation';
+import { createMinusFieldByKey, createMinusWithSettingsField, createPlusField } from './mutation';
 import {
     scopedSourceBlock,
     scopedSourceHost,
@@ -35,6 +34,8 @@ import moveRightIcon from '../../../assets/blocks/moveRight.svg';
 import removeIcon from '../../../assets/remove.svg';
 import settingsIcon from '../../../assets/settingsFunction.svg';
 import { FieldTypeModal } from '../../../components/modal_createFunction/modal_fieldType';
+import { modal } from '../../../components/Modal/modal';
+import { PromptModal } from '../../../components/modal_prompt';
 
 const CONTROL_BAR_BUTTON_SIZE = 20;
 const CONTROL_BAR_GAP = 10;
@@ -64,6 +65,12 @@ function paramIdOfInput(name: string): string | null {
     return null;
 }
 
+// 此函数由AI生成
+/** 参数类型 → Blockly check：null（未知）即万能，联合直接透传。 */
+const paramTypeToChecks = (
+    type: TFunctionInputField | TFunctionTypeUnion,
+): string | string[] | null => (type === null ? null : Array.isArray(type) ? [...type] : [type]);
+
 /**
  * 从 input 名解析出它属于哪个实参；与实参无关的 input 返回 null。
  */
@@ -84,6 +91,8 @@ interface IFunctionParam {
     id: string;
     /** 显示名，可由用户改。 */
     name: string;
+    /** 参数类型；null（ANY）表示未知万能。 */
+    type: TFunctionInputField | TFunctionTypeUnion;
 }
 
 /** 行内函数积木。 */
@@ -93,6 +102,10 @@ interface IFunctionInlineBlock extends IDynamicScopedHost {
     returnType: TFunctionReturnType;
     plus(): void;
     minusByKey(key: string): void;
+    /** 弹出参数类型选择 Modal（复用创建函数的输入类型 Modal）。 */
+    openParamSettings(key: string): void;
+    /** 把参数槽与参数积木输出一起幂等对齐到参数类型。 */
+    alignParamSlot(inputName: string, param: IFunctionParam): void;
 }
 
 /** 调用积木上缓存的实参信息。 */
@@ -208,9 +221,14 @@ const returnTypeChecks = (returnType: TFunctionReturnType): string | string[] =>
           : [returnType];
 
 // 此函数由AI生成
-/** 逐元素比较两组 check，免去每次 updateShape 的 JSON 序列化开销。 */
-const checksEqual = (a: readonly string[] | null, b: readonly string[] | null): boolean => {
+/** 逐元素比较两组 check（单值或数组），免去每次 updateShape 的 JSON 序列化开销。 */
+const checksEqual = (
+    a: readonly string[] | string | null,
+    b: readonly string[] | string | null,
+): boolean => {
     if (a === null || b === null) return a === b;
+    if (Array.isArray(a) !== Array.isArray(b)) return false;
+    if (!Array.isArray(a) || !Array.isArray(b)) return a === b;
     if (a.length !== b.length) return false;
     return a.every((check, index) => check === b[index]);
 };
@@ -346,6 +364,7 @@ function readParamsFromFunctionInput(block: Blockly.Block): IFunctionParam[] {
     // params[].name 只是创建时的默认名（a、b、c……），改名写的是 scopedNames，
     // 所以显示名必须走 getScopedName，否则调用积木永远显示旧名。
     return host.params.map(param => ({
+        type: param.type,
         id: param.id,
         name: host.getScopedName(param.id),
     }));
@@ -1171,10 +1190,82 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
             const param: IFunctionParam = {
                 id: spawnParamId(),
                 name: defaultParamName(this.params.length),
+                type: null,
             };
             this.params = [...this.params, param];
             this.updateShape();
             this.ensureScopedBlocks();
+        },
+
+        // 此函数由AI生成
+        /** 弹出参数类型选择 Modal（复用创建函数的输入类型 Modal）。 */
+        openParamSettings(this: IFunctionInlineBlock, key: string) {
+            const param = this.params.find(item => item.id === key);
+            if (!param) return;
+            void modal.open(FieldTypeModal, {
+                purpose: 'input',
+                blocking: true,
+                callback: result => {
+                    // 输入类型 Modal 不会返回 NONE（那是返回值语境的占位）。
+                    if (result === 'text' || result === AllCheckers.NONE) return;
+                    if (this.isDeadOrDying()) return;
+                    const target = this.params.find(item => item.id === key);
+                    if (!target || JSON.stringify(target.type) === JSON.stringify(result)) return;
+                    const oldState = JSON.stringify(this.saveExtraState());
+                    target.type = result;
+                    const newState = JSON.stringify(this.saveExtraState());
+                    if (oldState !== newState) {
+                        Blockly.Events.fire(
+                            new Blockly.Events.BlockChange(
+                                this,
+                                'mutation',
+                                null,
+                                oldState,
+                                newState,
+                            ),
+                        );
+                    }
+                    // 槽位与参数输出的两端对齐由 alignParamSlot 幂等完成。
+                    this.updateShape();
+                    this.ensureScopedBlocks();
+                },
+            });
+        },
+
+        // 此函数由AI生成
+        /**
+         * 把参数槽与参数积木的输出一起对齐到参数类型（完全幂等）。
+         *
+         * 槽位与积木输出是同一条连接的两端：任何一端单独进入中间态，
+         * 都会触发 onCheckChanged_ 复检、把参数挤出去。所以先把槽位
+         * 切到万能过渡（setCheck(null) 不触发复检），再在临时开锁下
+         * 对齐参数输出、定型槽位——锁定槽在检查器规则 1 里默认拒绝
+         * 一切复检，不开锁连「两端一致」的合法复检都过不了。
+         */
+        alignParamSlot(this: IFunctionInlineBlock, inputName: string, param: IFunctionParam) {
+            const input = this.getInput(inputName);
+            const connection = input?.connection as AshConnection | undefined;
+            if (!connection) return;
+            const wantedChecks = paramTypeToChecks(param.type);
+            if (checksEqual(connection.getCheck() ?? null, wantedChecks)) return;
+
+            const paramBlock = connection.targetBlock();
+            const paramOut =
+                paramBlock && !paramBlock.isShadow() ? paramBlock.outputConnection : null;
+
+            connection.setCheck(null);
+            if (paramOut) {
+                const previous = connection.allowScopedSource ?? false;
+                connection.allowScopedSource = true;
+                try {
+                    paramOut.setCheck(wantedChecks);
+                    connection.setCheck(wantedChecks);
+                } finally {
+                    connection.allowScopedSource = previous;
+                }
+            } else {
+                connection.setCheck(wantedChecks);
+            }
         },
 
         minusByKey(this: IFunctionInlineBlock, key: string) {
@@ -1213,9 +1304,11 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                 const inputName = `${PARAM_INPUT_PREFIX}${param.id}`;
                 const removeName = `${PARAM_REMOVE_PREFIX}${param.id}`;
                 if (!this.getInput(inputName)) this.appendValueInput(inputName);
+                // 槽位与参数积木输出两端一起对齐到参数类型（null=万能）。
+                this.alignParamSlot(inputName, param);
                 if (!this.getInput(removeName)) {
                     this.appendDummyInput(removeName).appendField(
-                        createMinusFieldByKey({ removeKey: param.id }),
+                        createMinusWithSettingsField({ key: param.id }),
                     );
                 }
             }
@@ -1249,7 +1342,11 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
             this: IFunctionInlineBlock,
             state: { params?: IFunctionParam[]; returnType?: TFunctionReturnType },
         ) {
-            this.params = (state.params ?? []).map(param => ({ ...param }));
+            this.params = (state.params ?? []).map(param => ({
+                ...param,
+                // 旧档没有 type 字段，归一为未知万能。
+                type: param.type ?? null,
+            }));
             this.returnType = state.returnType ?? null;
             this.scopedNames = Object.fromEntries(this.params.map(param => [param.id, param.name]));
             this.updateShape();

@@ -33,7 +33,11 @@ import * as Blockly from 'blockly/core';
 import type { AshConnection } from '../connectionRules';
 import { isInFlyoutInsteadOfTrashCan, OPCODES } from './helpers';
 import type { TAllCheckers } from '../../../types/blocks';
-import type { IFunctionValueBlock } from '../../../components/modal_createFunction/functionPreview';
+import type {
+    IFunctionValueBlock,
+    TFunctionInputField,
+    TFunctionTypeUnion,
+} from '../../../components/modal_createFunction/functionPreview';
 
 /** 源积木上显示名字的字段名。 */
 const NAME_FIELD = 'NAME';
@@ -156,29 +160,41 @@ function alignParamCheckerWithHost(
     slotConnection: Blockly.Connection,
 ): void {
     if (source.type !== OPCODES.FUNCTION_PARAM) return;
-    const fieldData = (host as unknown as Partial<IFunctionValueBlock>).previewData?.[
-        Number(source.slotKey)
-    ];
-    if (!fieldData || fieldData.type === 'text') return;
 
-    const wanted =
-        fieldData.type === null || Array.isArray(fieldData.type)
-            ? fieldData.type
-            : [fieldData.type];
+    let wanted: TFunctionInputField | TFunctionTypeUnion;
+    if (host.type === OPCODES.FUNCTION_VALUE) {
+        // 定义帽签名：类型在 previewData 里，key 是全量字段下标。
+        const fieldData = (host as unknown as Partial<IFunctionValueBlock>).previewData?.[
+            Number(source.slotKey)
+        ];
+        if (!fieldData || fieldData.type === 'text') return;
+        wanted = fieldData.type;
+    } else if (host.type === OPCODES.FUNCTION_INLINE) {
+        // 行内函数：类型在 params 里，key 就是参数 id。
+        // （IFunctionInlineBlock 未导出，这里按结构读取。）
+        const params = (host as unknown as { params?: { id: string; type: unknown }[] }).params;
+        const param = params?.find(item => item.id === source.slotKey);
+        if (!param) return;
+        wanted = param.type as TFunctionInputField | TFunctionTypeUnion;
+    } else {
+        return;
+    }
+
     const output = source.outputConnection;
     if (!output) return;
+    const normalized = wanted === null || Array.isArray(wanted) ? wanted : [wanted];
     const current = output.getCheck();
     const unchanged =
-        wanted === null
+        normalized === null
             ? current === null
-            : Array.isArray(wanted) &&
+            : Array.isArray(normalized) &&
               Array.isArray(current) &&
-              wanted.length === current.length &&
-              wanted.every((check, index) => check === current[index]);
+              normalized.length === current.length &&
+              normalized.every((check, index) => check === current[index]);
     if (unchanged) return;
 
     withUnlocked(slotConnection as AshConnection, () => {
-        output.setCheck(wanted);
+        output.setCheck(normalized);
     });
 }
 
