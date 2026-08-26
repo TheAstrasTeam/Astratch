@@ -7,7 +7,14 @@
 // 此文件由AI生成
 
 import type { IAddon, IAddonRegistry, IRegistryAddon, IRegistryVersion } from './types';
-import { cacheGet, cacheSet, clearFileCache, getRegistryHash, setRegistryHash } from './cache';
+import {
+    cacheGet,
+    cacheSet,
+    cacheDelete,
+    setRegistryHash,
+    getFileHash,
+    setFileHash,
+} from './cache';
 import { registerAddonI18n } from './i18n';
 
 /**
@@ -27,12 +34,20 @@ const REGISTRY_URL = `${ADDONS_REPO_URL}/registry.json`;
 export const addonContentCacheKey = (id: string, version: string): string =>
     `addon:${id}@${version}`;
 
+/** i18n 缓存 key：i18n:<id>@<version>:<locale> */
+const addonI18nCacheKey = (id: string, version: string, locale: string): string =>
+    `i18n:${id}@${version}:${locale}`;
+
 /**
  * 根据插件 id 和版本号派生 addon.js 的下载地址。
  * 例：id="example", version="2.0.0" → .../example@v2.0.0/addon.js
  */
 export const addonFileUrl = (id: string, version: string): string =>
     `${ADDONS_REPO_URL}/${id}@v${version}/addon.js`;
+
+/** hashes.json 的下载地址 */
+const addonHashesUrl = (id: string, version: string): string =>
+    `${ADDONS_REPO_URL}/${id}@v${version}/hashes.json`;
 
 const fetchText = async (url: string): Promise<string> => {
     const response = await fetch(url);
@@ -131,7 +146,7 @@ export const registryAddonToIAddon = (entry: IRegistryAddon): IAddon => {
 
 /**
  * 异步加载插件的 i18n 资源并注册到 i18next。
- * 从版本目录下 i18n/{locale}.json 加载。
+ * 从版本目录下 i18n/{locale}.json 加载，通过 IndexedDB 缓存。
  */
 const loadAddonI18n = async (
     addonId: string,
@@ -142,8 +157,9 @@ const loadAddonI18n = async (
     await Promise.all(
         locales.map(async locale => {
             try {
+                const cacheKey = addonI18nCacheKey(addonId, version, locale);
                 const url = `${ADDONS_REPO_URL}/${addonId}@v${version}/i18n/${locale}.json`;
-                const text = await fetchText(url);
+                const text = await getFile(cacheKey, url);
                 resources[locale] = JSON.parse(text) as Record<string, string>;
             } catch {
                 // 加载失败的 locale 静默跳过，走 fallback
@@ -174,24 +190,52 @@ export async function listRemoteAddons(): Promise<IAddon[]> {
 
 /**
  * 强制从 GitHub 拉取最新 registry.json 并更新本地缓存（绕过缓存）。
- * 如果 registry.json 内容发生变化（哈希不匹配），会清空所有远端插件文件缓存，
- * 下次加载插件时需要重新下载。失败时抛出，由调用方决定如何处理。
+ * 逐文件比对哈希值：只有哈希变更的文件才会重新下载，避免全量清空缓存。
+ * 失败时抛出，由调用方决定如何处理。
  */
 export async function refreshRegistry(): Promise<IAddonRegistry> {
     const text = await fetchText(REGISTRY_URL);
     const registry = parseRegistry(text);
 
-    // 比较哈希，检测 registry.json 是否变化
+    // 更新 registry.json 缓存
     const newHash = await computeHash(text);
-    const oldHash = await getRegistryHash();
-
-    if (oldHash !== null && oldHash !== newHash) {
-        // registry.json 变化，清空所有插件文件缓存
-        await clearFileCache();
-    }
-
     await cacheSet(REGISTRY_CACHE_KEY, text);
     await setRegistryHash(newHash);
+
+    // 逐插件拉取 hashes.json，比对并仅重下载变更文件
+    await Promise.all(
+        registry.addons.map(async addon => {
+            try {
+                const hashesText = await fetchText(addonHashesUrl(addon.id, addon.version));
+                const remoteHashes = JSON.parse(hashesText) as Record<string, string>;
+
+                for (const [relPath, remoteHash] of Object.entries(remoteHashes)) {
+                    // 根据文件类型构造对应的 cacheKey
+                    let cacheKey: string;
+                    if (relPath === 'addon.js') {
+                        cacheKey = addonContentCacheKey(addon.id, addon.version);
+                    } else if (relPath.startsWith('i18n/')) {
+                        const locale = relPath.replace(/^i18n\//, '').replace(/\.json$/, '');
+                        cacheKey = addonI18nCacheKey(addon.id, addon.version, locale);
+                    } else {
+                        // 其他文件（README、info.json 等）暂不追踪哈希
+                        continue;
+                    }
+
+                    const localHash = await getFileHash(cacheKey);
+                    if (localHash !== remoteHash) {
+                        // 哈希变更：删除旧缓存，下次读取时会重新下载
+                        await cacheDelete(cacheKey);
+                    }
+
+                    // 更新本地哈希记录
+                    await setFileHash(cacheKey, remoteHash);
+                }
+            } catch {
+                // 拉取 hashes.json 失败时静默跳过该插件，不影响其他插件
+            }
+        }),
+    );
 
     return registry;
 }
