@@ -64,14 +64,15 @@ await i18nReady.then(async () => {
             void i18next.changeLanguage(state.language);
         }
     });
-    const rootElement = document.getElementById('root')!;
+    const rootElement = document.getElementById('root');
+    if (!rootElement) throw new Error('root element not found');
+    const root: HTMLElement = rootElement;
 
     function RootApp() {
         const [stillEnter, setStillEnter] = useState(false);
         const handleStillEnter = useCallback(() => {
             setStillEnter(true);
         }, []);
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         return (
             <StrictMode>
                 <Suspense fallback='loading...'>
@@ -87,12 +88,12 @@ await i18nReady.then(async () => {
                         {vm.projectManager.isAPIAvailable || stillEnter ? (
                             <GUI vm={vm} />
                         ) : (
-                            <ErrorPage vm={vm} onStillEnter={handleStillEnter} />
+                            <ErrorPage onStillEnter={handleStillEnter} />
                         )}
                     </ModalProvider>
                 </Suspense>
             </StrictMode>
         );
     }
-    createRoot(rootElement).render(<RootApp />);
+    createRoot(root).render(<RootApp />);
 });

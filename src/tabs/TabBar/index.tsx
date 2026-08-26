@@ -81,7 +81,7 @@ const TabBar = (): React.ReactNode => {
 
     const getMenuTrigger = useCallback(
         (tabID: string) => {
-            return createMenuTrigger(point => triggerMenu(tabID, point), {
+            return createMenuTrigger(point => { triggerMenu(tabID, point); }, {
                 mouseButton: 2,
                 longPressDuration: 300,
                 position: 'mouse',
