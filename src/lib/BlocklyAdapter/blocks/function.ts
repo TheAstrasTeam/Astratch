@@ -112,6 +112,8 @@ interface IFunctionInlineBlock extends IDynamicScopedHost {
 interface ICallArg {
     id: string;
     name: string;
+    /** 实参槽类型；null（ANY）表示未知万能。 */
+    type: TFunctionInputField | TFunctionTypeUnion;
 }
 
 /** 调用/执行积木共用的形状同步能力。 */
@@ -1376,6 +1378,22 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
             const target = this.getInput('FUNCTION')?.connection?.targetBlock();
             const isInline = target?.type === OPCODES.FUNCTION_INLINE;
 
+            // 输出 check 跟随行内函数的返回类型：null（未知）/ NONE 都
+            // 归为万能；仅 FUNCTION_CALL 有输出连接（执行块是语句）。
+            // 摘下行内函数后回到手动模式，输出同样回到万能。
+            if (this.outputConnection) {
+                const returnType = isInline ? (target as IFunctionInlineBlock).returnType : null;
+                const wantedChecks =
+                    returnType === null || returnType === AllCheckers.NONE
+                        ? null
+                        : Array.isArray(returnType)
+                          ? [...returnType]
+                          : [returnType];
+                if (!checksEqual(this.outputConnection.getCheck() ?? null, wantedChecks)) {
+                    this.outputConnection.setCheck(wantedChecks);
+                }
+            }
+
             if (!isInline) {
                 // 摘下行内函数：保留现有插槽（里面的实参不丢），把控制权交还用户。
                 if (this.autoSync) {
@@ -1390,7 +1408,10 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                 this.autoSync &&
                 params.length === this.args.length &&
                 params.every(
-                    (param, i) => param.id === this.args[i].id && param.name === this.args[i].name,
+                    (param, i) =>
+                        param.id === this.args[i].id &&
+                        param.name === this.args[i].name &&
+                        checksEqual(param.type, this.args[i].type),
                 );
             if (unchanged) return;
 
@@ -1407,7 +1428,11 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
         plus(this: IFunctionCallerBlock) {
             this.args = [
                 ...this.args,
-                { id: spawnParamId(), name: defaultParamName(this.args.length) },
+                {
+                    id: spawnParamId(),
+                    name: defaultParamName(this.args.length),
+                    type: null,
+                },
             ];
             this.updateShape();
         },
@@ -1450,14 +1475,21 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                 if (!this.getInput(inputName)) {
                     this.appendValueInput(inputName);
                 }
+                // 实参槽 check 跟随参数定义的类型（null=万能）。
+                // 槽里的 hint shadow 是万能 reporter，与任何 check 都兼容，
+                // 不会触发复检拔除；不兼容的真实积木由复检自然挤出。
+                const argConnection = this.getInput(inputName)?.connection;
+                const wantedChecks = paramTypeToChecks(arg.type);
+                if (!checksEqual(argConnection?.getCheck() ?? null, wantedChecks)) {
+                    argConnection?.setCheck(wantedChecks);
+                }
                 // 参数名以半透明提示的形式显示在空槽里（类似输入框 placeholder），
                 // 插入真实积木后自动被盖住，拖走又会重新露出来。
-                const connection = this.getInput(inputName)?.connection;
-                const hint = connection?.getShadowState() as
+                const hint = argConnection?.getShadowState() as
                     { fields?: { HINT?: string } } | undefined;
                 // 名字没变就别重设，setShadowState 会产生一串多余的变更事件。
                 if (hint?.fields?.HINT !== arg.name) {
-                    connection?.setShadowState({
+                    argConnection?.setShadowState({
                         type: OPCODES.FUNCTION_ARG_HINT,
                         fields: { HINT: arg.name },
                     });
