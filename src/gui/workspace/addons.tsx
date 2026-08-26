@@ -155,12 +155,13 @@ const AddonsPanel = ({ vm }: { vm: IVM }) => {
     const enabled = useAddonStore(state => state.enabled);
     const downloading = useAddonStore(state => state.downloading);
     const status = useAddonStore(state => state.status);
+    const storeRefreshing = useAddonStore(state => state.refreshing);
     const [importing, setImporting] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [selectedAddon, setSelectedAddon] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
 
-    const canRefresh = status === 'ready' && !refreshing;
+    const canRefresh = status === 'ready' && !refreshing && !storeRefreshing;
 
     const selected = selectedAddon ? (addons.find(a => a.id === selectedAddon) ?? null) : null;
 
@@ -207,6 +208,8 @@ const AddonsPanel = ({ vm }: { vm: IVM }) => {
                 />
             ) : status !== 'ready' ? (
                 <div className={styles.empty}>{t('gui:addon.loading')}</div>
+            ) : storeRefreshing ? (
+                <div className={styles.empty}>{t('gui:addon.refreshing')}</div>
             ) : addons.length === 0 ? (
                 <div className={styles.empty}>{t('gui:addon.noAddons')}</div>
             ) : (
