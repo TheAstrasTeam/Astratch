@@ -1230,6 +1230,25 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                     // 槽位与参数输出的两端对齐由 alignParamSlot 幂等完成。
                     this.updateShape();
                     this.ensureScopedBlocks();
+
+                    // 被拖出槽位的浮动副本（保留 ownerId/slotKey 的参数
+                    // 积木）不在任何对齐管道里，这里统一同步输出类型；
+                    // 槽内那份由 alignParamSlot 处理，跳过避免重复复检。
+                    const slotConnection = this.getInput(`${PARAM_INPUT_PREFIX}${key}`)?.connection;
+                    const wantedChecks = paramTypeToChecks(result);
+                    for (const block of this.workspace.getAllBlocks(false)) {
+                        const source = block as unknown as IScopedSourceBlock;
+                        if (source.type !== OPCODES.FUNCTION_PARAM) continue;
+                        if (source.ownerId !== this.id || source.slotKey !== key) continue;
+                        if (source.outputConnection?.targetConnection === slotConnection) continue;
+                        const out = source.outputConnection;
+                        if (out && !checksEqual(out.getCheck() ?? null, wantedChecks)) {
+                            out.setCheck(wantedChecks);
+                            if (block.workspace.rendered) {
+                                void (block as unknown as Blockly.BlockSvg).queueRender();
+                            }
+                        }
+                    }
                 },
             });
         },
