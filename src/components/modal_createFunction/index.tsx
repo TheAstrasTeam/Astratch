@@ -108,7 +108,8 @@ export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) =
     };
 
     const returnTypeLabel = () => {
-        if (returnType === null) return t('gui:createFunction.noReturn');
+        if (returnType === null) return t('gui:createFunction.nullReturn');
+        if (returnType === AllCheckers.NONE) return t('gui:createFunction.noneReturn');
         const types: TFunctionInputField[] = Array.isArray(returnType) ? returnType : [returnType];
         // checker 是大写开头（'Boolean'），i18n key 是全小写。
         return types.map(type => t(`gui:createFunction.${type.toLowerCase()}`)).join(' | ');

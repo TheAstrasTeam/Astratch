@@ -214,5 +214,6 @@
     "createFunction.customBlock": "Show as the Direct Run mode.",
     "createFunction.returnType": "Return type",
     "createFunction.selectReturnType": "Choose the function return type",
-    "createFunction.noReturn": "No return value"
+    "createFunction.noneReturn": "No return",
+    "createFunction.nullReturn": "Unknown"
 }

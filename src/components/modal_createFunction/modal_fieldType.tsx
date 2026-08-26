@@ -122,17 +122,30 @@ export const FieldTypeModal = ({
             <div className={styles.fieldTypeMenu}>
                 <div className={styles.fieldTypeGrid}>
                     {purpose === 'return' && (
-                        <div
-                            className={styles.selector}
-                            onClick={() => {
-                                void handleSelectSingle(null);
-                            }}
-                        >
-                            <span className={styles.noTypeIcon} aria-hidden='true'>
-                                -
-                            </span>
-                            <span>{t('gui:createFunction.noReturn')}</span>
-                        </div>
+                        <>
+                            <div
+                                className={styles.selector}
+                                onClick={() => {
+                                    void handleSelectSingle(AllCheckers.NONE);
+                                }}
+                            >
+                                <span className={styles.noTypeIcon} aria-hidden='true'>
+                                    -
+                                </span>
+                                <span>{t('gui:createFunction.noneReturn')}</span>
+                            </div>
+                            <div
+                                className={styles.selector}
+                                onClick={() => {
+                                    void handleSelectSingle(null);
+                                }}
+                            >
+                                <span className={styles.noTypeIcon} aria-hidden='true'>
+                                    ?
+                                </span>
+                                <span>{t('gui:createFunction.nullReturn')}</span>
+                            </div>
+                        </>
                     )}
                     {fieldTypes.map(({ type, icon, label }) => {
                         const isSelected = multiMode && selected.includes(type);

@@ -120,7 +120,7 @@ const CALLER_RESYNC_EVENTS: readonly string[] = [
     Blockly.Events.FINISHED_LOADING,
 ];
 
-/** 输入槽合法类型：AllCheckers 中除万能（null）外的全部 checker。 */
+/** 输入槽合法类型：AllCheckers 中除万能（null）外的全部值（含 NONE，供返回类型校验用）。 */
 const FUNCTION_VALUE_TYPES: readonly TFunctionInputField[] = Object.values(AllCheckers).filter(
     (checker): checker is TFunctionInputField => checker !== null,
 );
@@ -187,11 +187,39 @@ const getReferencedFunction = (vm: IVM, reference?: IFunctionReference) =>
 
 /**
  * 定义帽签名（NAME 槽与签名输出共用）的 check。
- * 返回类型非空时签名直接以返回类型的形状渲染，直观展示函数返回什么；
- * 为 null（无返回值语境）时退回 'Function' 万能胶囊。
+ * 返回类型非空且非 NONE 时签名直接以返回类型的形状渲染，直观展示函数
+ * 返回什么；NONE（无返回值）与 null（未知）暂回退 'Function' 万能胶囊
+ * （语句形态的定义帽需要 NAME 槽结构支持，另行处理）。
  */
 const returnTypeChecks = (returnType: TFunctionReturnType): string | string[] =>
-    returnType === null ? 'Function' : Array.isArray(returnType) ? [...returnType] : [returnType];
+    returnType === null || returnType === AllCheckers.NONE
+        ? 'Function'
+        : Array.isArray(returnType)
+          ? [...returnType]
+          : [returnType];
+
+// 此函数由AI生成
+/**
+ * 返回值槽的类型默认 shadow：与工具箱里的默认值同机制。
+ * Array / Object / Function / 联合类型 / null（未知）没有自然的默认值，
+ * 返回 null 表示保持空槽。
+ */
+const defaultShadowFor = (
+    returnType: TFunctionReturnType,
+): Blockly.serialization.blocks.State | null => {
+    switch (returnType) {
+        case AllCheckers.NUMBER:
+            return { type: OPCODES.math_number, fields: { NUM: 0 } };
+        case AllCheckers.STRING:
+            return { type: OPCODES.text, fields: { TEXT: '' } };
+        case AllCheckers.BOOLEAN:
+            return { type: OPCODES.OPERATOR_LOGIC_BOOLEAN, extraState: { value: true } };
+        case AllCheckers.COLOUR:
+            return { type: OPCODES.colour_picker, fields: { COLOUR: '#ff0000' } };
+        default:
+            return null;
+    }
+};
 
 /**
  * 定义帽中的函数值是一个作用域宿主：每个参数槽里都放着可拖出的参数积木。
@@ -225,7 +253,8 @@ const configureFunctionValueConnections = (
     if (block.previousConnection?.isConnected()) block.previousConnection.disconnect();
     if (block.nextConnection?.isConnected()) block.nextConnection.disconnect();
 
-    if (!isValue && returnType === null) {
+    if (!isValue && returnType === AllCheckers.NONE) {
+        // 无返回值：语句积木，没有输出。
         block.setOutput(false);
         block.setPreviousStatement(true, 'Action');
         block.setNextStatement(true, 'Action');
@@ -234,9 +263,14 @@ const configureFunctionValueConnections = (
 
     block.setPreviousStatement(false);
     block.setNextStatement(false);
-    if (!isValue && returnType !== null) {
-        // checker 字符串本身就是合法的输出类型（'Boolean'、'String'……）。
-        block.setOutput(true, Array.isArray(returnType) ? returnType : [returnType]);
+    if (!isValue) {
+        if (returnType === null) {
+            // 未知：万能输出。
+            block.setOutput(true);
+        } else {
+            // checker 字符串本身就是合法的输出类型（'Boolean'、'String'……）。
+            block.setOutput(true, Array.isArray(returnType) ? returnType : [returnType]);
+        }
     } else {
         block.setOutput(true, 'Function');
     }
@@ -406,6 +440,9 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
     } as IFunctionDefinitionBlock;
 
     interface IFUNCTION_RETURN extends Blockly.Block {
+        dragging: boolean;
+        /** 上次应用到 VALUE 槽的组合标记（check + shadow），防止重复触发事件。 */
+        appliedShadowMarker?: string;
         updateShape(): void;
     }
 
@@ -415,6 +452,13 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                 ...endConnections,
                 colour: BlocksColor.function.primary,
             });
+            // VALUE 槽终生存在，绝不增删：反序列化（读档、flyout 拖出、
+            // 粘贴）在建块后立刻恢复 inputs.VALUE 里的子积木/shadow，
+            // 槽必须此刻就在；NONE 的「不显示」用 setVisible 实现
+            // （Blockly 折叠块同款机制，连接跟踪由它自己维护）。
+            // 槽的可见性 / check / 默认 shadow 由 updateShape 幂等调整。
+            this.appendDummyInput('TEXT').appendField(t('blocks:function.return'));
+            this.appendValueInput('VALUE');
             this.updateShape();
         },
         onchange(this: IFUNCTION_RETURN, event: Blockly.Events.Abstract) {
@@ -428,42 +472,103 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                 ).includes(event.type)
             )
                 return;
-            this.updateShape();
+            // 同步执行（core 的 logic_ternary 模式）；updateShape 完全
+            // 幂等，自身触发的子事件再次进入时全部命中守卫直接返回。
+            // 结构调整产生的事件与起因归入同组，保证撤销行为正确。
+            Blockly.Events.setGroup(event.group);
+            try {
+                this.updateShape();
+            } finally {
+                Blockly.Events.setGroup(false);
+            }
         },
+        // 此函数由AI生成
+        /**
+         * 把 VALUE 槽对齐到所在函数的返回类型（完全幂等）：
+         * - NONE：隐藏槽（setVisible，不销毁，子积木原样保留）；
+         * - 其它：显示槽并同步 check；类型变化时先拔下不兼容的真实
+         *   子积木（带分组）、清掉旧 shadow，再设新 check；
+         * - 最后按类型补默认 shadow（真实积木优先，用户改过值的
+         *   同类型 shadow 保留）。
+         */
         updateShape(this: IFUNCTION_RETURN) {
-            queueMicrotask(() => {
-                if (this.isDeadOrDying()) return;
+            if (this.isDeadOrDying() || this.isInsertionMarker()) return;
 
-                const getValueType = (): TFunctionReturnType => {
-                    if (this.isInsertionMarker()) return AllCheckers.STRING;
-                    // 向上找定义帽；不在任何帽子里时回退字符串。
-                    let block: Blockly.Block | null = this.getParent();
-                    while (block && block.type !== OPCODES.FUNCTION_DEFINITION)
-                        block = block.getParent();
-                    if (!block) return AllCheckers.STRING;
-                    const signature = block
-                        .getInput('NAME')
-                        ?.connection?.targetBlock() as IFunctionValueBlock | null;
-                    return signature?.returnType ?? AllCheckers.STRING;
-                };
+            const getValueType = (): TFunctionReturnType => {
+                if (this.dragging) return AllCheckers.ANY;
+                // 向上找定义帽；不在任何帽子里、或帽子还没补上签名时，
+                // 回退字符串（拖到自由区/工具箱预览的形态）。
+                let block: Blockly.Block | null = this.getParent();
+                while (block && block.type !== OPCODES.FUNCTION_DEFINITION )
+                    block = block.getParent();
+                if (!block) return AllCheckers.ANY;
+                const signature = block
+                    .getInput('NAME')
+                    ?.connection?.targetBlock() as IFunctionValueBlock | null;
+                if (!signature) return AllCheckers.ANY;
+                // 签名的 returnType 必须原样返回：null（未知）不能与
+                // 「没有签名」一起回退 STRING，否则永远切不回万能槽。
+                return signature.returnType;
+            };
 
-                if (!this.getInput('TEXT'))
-                    this.appendDummyInput('TEXT').appendField(t('blocks:function.return'));
+            const wanted = getValueType();
+            const input = this.getInput('VALUE');
+            if (!input) return;
+            const connection = input.connection;
+            if (!connection) return;
 
-                const wanted = getValueType();
-                const wantedChecks =
-                    wanted === null ? null : Array.isArray(wanted) ? [...wanted] : [wanted];
-                const input = this.getInput('VALUE');
-                if (!input) {
-                    this.appendValueInput('VALUE').setCheck(wantedChecks);
-                    return;
+            // NONE：隐藏槽即可，结构不动。
+            const wantVisible = wanted !== AllCheckers.NONE;
+            if (input.isVisible() !== wantVisible) {
+                input.setVisible(wantVisible);
+                if (this.workspace.rendered)
+                    void (this as unknown as Blockly.BlockSvg).queueRender();
+            }
+            if (!wantVisible) return;
+
+            const wantedChecks =
+                wanted === null ? null : Array.isArray(wanted) ? [...wanted] : [wanted];
+            const markerOf = (shadow: Blockly.serialization.blocks.State | null) =>
+                JSON.stringify([wantedChecks, shadow]);
+
+            const target = connection.targetBlock();
+            const hasShadow = !!target && target.isShadow();
+
+            // check 变化：先处理槽内现有内容，再设新 check，
+            // 避免 setCheck 内部复检（onCheckChanged_）替我们做拔除。
+            const current = connection.getCheck() ?? null;
+            if (JSON.stringify(current) !== JSON.stringify(wantedChecks)) {
+                if (target && !hasShadow) {
+                    // 真实子积木与新类型不兼容 → 分组拔下（core 同款）。
+                    const childOut = target.outputConnection;
+                    if (
+                        childOut &&
+                        !target.workspace.connectionChecker.doTypeChecks(connection, childOut)
+                    ) {
+                        target.unplug();
+                    }
+                } else if (hasShadow) {
+                    connection.setShadowState(null);
+                    this.appliedShadowMarker = markerOf(null);
                 }
-                // check 一致就别动：setCheck 会复检已连接的子积木，
-                // 多余的重设可能拔下积木并再次触发本监听。
-                const current = input.connection?.getCheck() ?? null;
-                if (JSON.stringify(current) === JSON.stringify(wantedChecks)) return;
                 input.setCheck(wantedChecks);
-            });
+            }
+
+            // 默认 shadow：真实积木优先；同类型默认（可能被用户改过值）
+            // 保留；其余按类型补默认 / 清空。
+            if (target && !hasShadow) {
+                this.appliedShadowMarker = undefined;
+                return;
+            }
+            const shadow = defaultShadowFor(wanted);
+            const marker = markerOf(shadow);
+            if (this.appliedShadowMarker === marker) return;
+            if (hasShadow && target.type === shadow?.type) {
+                this.appliedShadowMarker = marker;
+                return;
+            }
+            this.appliedShadowMarker = marker;
+            connection.setShadowState(shadow);
         },
     } as IFUNCTION_RETURN;
 
@@ -692,13 +797,22 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                 this.returnType = normalizeReturnType(functionData?.returnType ?? state.returnType);
                 this.setMovable(false);
                 this.setDeletable(false);
-                // 无返回类型时保持 'Function'
-                if (this.returnType !== null) {
+                // 无返回类型时保持 'Function'；NONE（无返回值）同样回退，
+                // 语句形态的定义帽需要 NAME 槽结构支持，另行处理。
+                if (this.returnType !== null && this.returnType !== AllCheckers.NONE) {
+                    this.setOutputShape(null);
                     this.setPreviousStatement(false);
                     this.setNextStatement(false);
                     this.setOutput(true, returnTypeChecks(this.returnType));
                 } else {
                     configureFunctionValueConnections(this, true, null);
+                    if (this.returnType === null) {
+                        // 未知：覆盖为方形「积木」轮廓，与万能胶囊区分。
+                        // zelos 的 shapeFor 会优先尊重 setOutputShape 的覆盖；
+                        // 3 = zelos ConstantProvider.SHAPES.SQUARE（zelos 独有常量，
+                        // Block 上拿不到，直接用值）。
+                        this.setOutputShape(3);
+                    }
                 }
                 this.updateShape();
                 this.initScopedHost();

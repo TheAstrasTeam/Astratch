@@ -575,7 +575,7 @@ export interface ICustomFunction {
     id: string;
     /** 是否显示为可传递的函数值；false 时显示为 Scratch 式积木。 */
     isValue: boolean;
-    /** 返回类型；null 表示无返回值。 */
+    /** 返回类型；'none'（AllCheckers.NONE）表示无返回值，null 表示未知。 */
     returnType?: TFunctionReturnType;
 }
 
@@ -588,5 +588,7 @@ export const AllCheckers = {
     COLOUR: 'Colour',
     BOOLEAN: 'Boolean',
     ANY: null,
+    /** 没有检查，这用于检测函数是否是“无返回值” */
+    NONE: 'none',
 } as const;
 export type TAllCheckers = (typeof AllCheckers)[keyof typeof AllCheckers];

@@ -4,27 +4,34 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import * as Blockly from 'blockly';
-import { BlocksColor, OPCODES, type IBlockColor } from '../../types/blocks';
+import { AllCheckers, BlocksColor, OPCODES, type IBlockColor } from '../../types/blocks';
 import { type TAllCheckers } from '../../types/blocks';
 import type { IFunctionReference } from '../../types/blocks';
 import { t } from 'i18next';
 
 /**
- * 输入槽支持的类型：AllCheckers 中除万能（null）外的全部 checker。
- * 值即 Blockly check 字符串（'Boolean'、'String'……），可直传 setOutput/setCheck。
+ * 输入槽支持的类型：AllCheckers 中除万能（null）和 NONE（无返回值占位，
+ * 不是插槽类型）外的全部 checker。值即 Blockly check 字符串，可直传
+ * setOutput/setCheck。
  */
-export type TFunctionInputField = Exclude<TAllCheckers, null>;
+export type TFunctionInputField = Exclude<TAllCheckers, null | typeof AllCheckers.NONE>;
 
 /**
  * 一个字段的类型：文本标签、单个 checker 或 checker 联合。
- * `null`（AllCheckers.ANY）表示万能；仅返回值语境下表示无返回值。
+ * `null`（AllCheckers.ANY）表示万能。
  */
 export type TFunctionReturnField = 'text' | TAllCheckers;
 
 export type TFunctionFieldType = TFunctionReturnField | TFunctionInputField[];
 
-/** 一个函数的返回类型；null 表示没有返回值。 */
-export type TFunctionReturnType = TFunctionInputField | TFunctionInputField[] | null;
+/**
+ * 一个函数的返回类型：
+ * - checker / checker 联合：返回对应类型的值；
+ * - `'none'`（AllCheckers.NONE）：无返回值，函数表现为语句积木；
+ * - `null`：未知，函数值可以返回任何类型。
+ */
+export type TFunctionReturnType =
+    TFunctionInputField | TFunctionInputField[] | typeof AllCheckers.NONE | null;
 
 export interface TPreviewFunctionData {
     type: TFunctionFieldType;
@@ -94,7 +101,8 @@ const isCurrentPreview = (
 
 const checksForReturnType = (returnType: TFunctionReturnType): string[] | null => {
     // 类型值本身就是 Blockly check 字符串，无需再转换。
-    if (returnType === null) return null;
+    // 'none'（无返回值）与 null（未知）都不产生具体 check。
+    if (returnType === null || returnType === AllCheckers.NONE) return null;
     return Array.isArray(returnType) ? [...returnType] : [returnType];
 };
 
@@ -146,13 +154,15 @@ const configureSignatureConnections = () => {
     }
 
     if (!previewIsValue) {
-        if (previewReturnType === null) {
+        if (previewReturnType === AllCheckers.NONE) {
+            // 无返回值：语句积木，没有输出。
             previewBlock.setOutput(false);
             previewBlock.setPreviousStatement(true, 'Action');
             previewBlock.setNextStatement(true, 'Action');
         } else {
             previewBlock.setPreviousStatement(false);
             previewBlock.setNextStatement(false);
+            // null（未知）经 checksForReturnType 归为万能输出。
             previewBlock.setOutput(true, checksForReturnType(previewReturnType));
         }
     } else {
@@ -175,7 +185,7 @@ const configurePreviewWrapper = () => {
     }
 
     const wrapperType =
-        previewReturnType === null ? OPCODES.FUNCTION_EXECUTE : OPCODES.FUNCTION_CALL;
+        previewReturnType === AllCheckers.NONE ? OPCODES.FUNCTION_EXECUTE : OPCODES.FUNCTION_CALL;
     const wrapper = Blockly.serialization.blocks.append(
         {
             id: previewWrapperId,
@@ -198,9 +208,9 @@ const configurePreviewWrapper = () => {
     }
     functionConnection.connect(previewBlock.outputConnection);
 
-    if (previewReturnType !== null) {
-        wrapper.outputConnection?.setCheck(checksForReturnType(previewReturnType));
-    }
+    // 未知（null）与无返回值都不给包裹块设置具体 check。
+    const wrapperChecks = checksForReturnType(previewReturnType);
+    if (wrapperChecks) wrapper.outputConnection?.setCheck(wrapperChecks);
 
     previewWrapperBlock = wrapper;
     previewRootBlock = wrapper;
