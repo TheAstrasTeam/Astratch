@@ -70,6 +70,8 @@ export interface IAddonStoreState {
     status: TAddonLoadStatus;
     /** 正在下载内容（main.js）的插件 id */
     downloading: ReadonlySet<string>;
+    /** 后台刷新进行中（逐文件哈希比对 + 按需重下载） */
+    refreshing: boolean;
 }
 
 /**
@@ -80,6 +82,7 @@ export const useAddonStore = create<IAddonStoreState>(() => ({
     enabled: new Set<string>(),
     status: 'idle',
     downloading: new Set<string>(),
+    refreshing: false,
 }));
 
 interface IAddonPersist {
@@ -166,9 +169,11 @@ class AddonManager {
 
     /**
      * 后台静默刷新 registry：更新本地缓存并合并商店列表。
+     * 刷新期间设置 refreshing 状态，UI 可据此显示加载提示。
      * 失败的静默忽略（商店继续用旧缓存展示），不影响主流程。
      */
     private async backgroundRefresh() {
+        useAddonStore.setState({ refreshing: true });
         try {
             const registry = await refreshRegistry();
             const freshRemote = registry.addons.map(entry => registryAddonToIAddon(entry));
@@ -196,6 +201,8 @@ class AddonManager {
             this.syncAddonSettings();
         } catch {
             // 后台刷新失败不影响已展示的列表
+        } finally {
+            useAddonStore.setState({ refreshing: false });
         }
     }
 
@@ -236,12 +243,13 @@ class AddonManager {
 
     /**
      * 刷新官方插件列表：强制重新拉取 registry.json（统一商店入口）并更新本地缓存，
-     * 展示最新可用插件与版本。不下载插件内容，内容在用户点击“下载/启用”时按需拉取。
+     * 展示最新可用插件与版本。逐文件哈希比对，仅重下载变更文件。
      * 已挂载的自定义插件保持不变。
      */
     async refreshRemoteAddons() {
         const current = useAddonStore.getState();
         const custom = current.addons.filter(addon => addon.isCustom);
+        useAddonStore.setState({ refreshing: true });
         try {
             const registry = await refreshRegistry();
             const freshRemote = registry.addons.map(entry => registryAddonToIAddon(entry));
@@ -278,6 +286,8 @@ class AddonManager {
                     err: error instanceof Error ? error.message : String(error),
                 }),
             });
+        } finally {
+            useAddonStore.setState({ refreshing: false });
         }
     }
 
