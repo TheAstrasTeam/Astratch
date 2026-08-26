@@ -53,42 +53,55 @@ const TabBar = (): React.ReactNode => {
         );
     });
 
-    const handleContextMenuAction = useCallback((action: 'close' | 'closeOthers' | 'closeAll') => {
-        if (!whereIsInContextMenuID) return;
-        switch (action) {
-            case 'close':
-                closeTab(whereIsInContextMenuID);
-                break;
-            case 'closeOthers':
-                closeOtherTabs(whereIsInContextMenuID);
-                break;
-            case 'closeAll':
-                closeAllTabs();
-                break;
-        }
-    }, [whereIsInContextMenuID, closeTab, closeOtherTabs, closeAllTabs]);
+    const handleContextMenuAction = useCallback(
+        (action: 'close' | 'closeOthers' | 'closeAll') => {
+            if (!whereIsInContextMenuID) return;
+            switch (action) {
+                case 'close':
+                    closeTab(whereIsInContextMenuID);
+                    break;
+                case 'closeOthers':
+                    closeOtherTabs(whereIsInContextMenuID);
+                    break;
+                case 'closeAll':
+                    closeAllTabs();
+                    break;
+            }
+        },
+        [whereIsInContextMenuID, closeTab, closeOtherTabs, closeAllTabs],
+    );
 
-    const triggerMenu = useCallback((tabID: string, point: { x: number; y: number }) => {
-        setWhereIsInContextMenuID(tabID);
-        openTabsMenu(point);
-    }, [openTabsMenu]);
+    const triggerMenu = useCallback(
+        (tabID: string, point: { x: number; y: number }) => {
+            setWhereIsInContextMenuID(tabID);
+            openTabsMenu(point);
+        },
+        [openTabsMenu],
+    );
 
-    const getMenuTrigger = useCallback((tabID: string) => {
-        return createMenuTrigger(
-            (point) => triggerMenu(tabID, point),
-            { mouseButton: 2, longPressDuration: 300, position: 'mouse' }
-        );
-    }, [triggerMenu]);
+    const getMenuTrigger = useCallback(
+        (tabID: string) => {
+            return createMenuTrigger(point => triggerMenu(tabID, point), {
+                mouseButton: 2,
+                longPressDuration: 300,
+                position: 'mouse',
+            });
+        },
+        [triggerMenu],
+    );
 
     // 鼠标左键激活，中键关闭，右键给createMenuTrigger处理
-    const handleMouseDown = useCallback((e: ReactMouseEvent<HTMLDivElement>, tabID: string) => {
-        if (e.button === 0) {
-            setActiveTab(tabID);
-        } else if (e.button === 1) {
-            e.preventDefault();
-            closeTab(tabID);
-        }
-    }, [setActiveTab, closeTab]);
+    const handleMouseDown = useCallback(
+        (e: ReactMouseEvent<HTMLDivElement>, tabID: string) => {
+            if (e.button === 0) {
+                setActiveTab(tabID);
+            } else if (e.button === 1) {
+                e.preventDefault();
+                closeTab(tabID);
+            }
+        },
+        [setActiveTab, closeTab],
+    );
 
     return (
         <div className={styles.tabBar}>
@@ -101,7 +114,7 @@ const TabBar = (): React.ReactNode => {
                             [styles.isActive]: tab.id === activeTabId,
                         })}
                         //左键中键给handleMouseDown处理，右键给menuTrigger.onMouseDown处理
-                        onMouseDown={(e) => {
+                        onMouseDown={e => {
                             if (e.button === 2) {
                                 menuTrigger.onMouseDown(e);
                             } else {

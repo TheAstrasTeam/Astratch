@@ -11,7 +11,7 @@ import errorLogo from '../../assets/errorLogo.svg';
 import styles from './index.module.scss';
 
 interface ErrorProps {
-  onStillEnter?: () => void;
+    onStillEnter?: () => void;
 }
 
 const getBrowserName = (): string => {
@@ -28,19 +28,12 @@ const Error: React.FC<ErrorProps> = ({ onStillEnter }) => {
     return (
         <div className={styles.main}>
             <img className={styles.icon} src={errorLogo} alt='' />
-            <h1 className={styles.title}>
-            {t('gui:error.title')}
-            </h1>
-            <p 
-                className={styles.description}
-            >
+            <h1 className={styles.title}>{t('gui:error.title')}</h1>
+            <p className={styles.description}>
                 {t('gui:error.description', { browser: getBrowserName() })}
             </p>
-            <p
-                className={styles.stillEnter}
-                onClick={onStillEnter}
-            >
-                {t("gui:error.stillEnter")}
+            <p className={styles.stillEnter} onClick={onStillEnter}>
+                {t('gui:error.stillEnter')}
             </p>
         </div>
     );

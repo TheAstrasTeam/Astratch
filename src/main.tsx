@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { StrictMode, Suspense, useState, useCallback} from 'react';
+import { StrictMode, Suspense, useState, useCallback } from 'react';
 import { createRoot } from 'react-dom/client';
 import GUI from './gui/index.tsx';
 import { VM } from './vm/index.ts';
@@ -65,28 +65,34 @@ await i18nReady.then(async () => {
         }
     });
     const rootElement = document.getElementById('root')!;
-    
-    function RootApp(){
-    const [stillEnter,setStillEnter] =useState(false);
-    const handleStillEnter = useCallback(()=>{setStillEnter(true);},[]);
-     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return(
-        <StrictMode>
-            <Suspense fallback='loading...'>
-                {/*  不加延迟会导致错误的关闭 */}
-                <ModalProvider
-                    manager={modal}
-                    defaultLayerOptions={{
-                        closeDelay: 180,
-                        closeOnOutsideClick: false,
-                        dim: false,
-                    }}
-                >
-                    {vm.projectManager.isAPIAvailable || stillEnter ?(<GUI vm={vm} />) : (<ErrorPage vm={vm} onStillEnter={handleStillEnter}/>)}
-                </ModalProvider>
-            </Suspense>
-        </StrictMode>
-    );
-    };
+
+    function RootApp() {
+        const [stillEnter, setStillEnter] = useState(false);
+        const handleStillEnter = useCallback(() => {
+            setStillEnter(true);
+        }, []);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        return (
+            <StrictMode>
+                <Suspense fallback='loading...'>
+                    {/*  不加延迟会导致错误的关闭 */}
+                    <ModalProvider
+                        manager={modal}
+                        defaultLayerOptions={{
+                            closeDelay: 180,
+                            closeOnOutsideClick: false,
+                            dim: false,
+                        }}
+                    >
+                        {vm.projectManager.isAPIAvailable || stillEnter ? (
+                            <GUI vm={vm} />
+                        ) : (
+                            <ErrorPage vm={vm} onStillEnter={handleStillEnter} />
+                        )}
+                    </ModalProvider>
+                </Suspense>
+            </StrictMode>
+        );
+    }
     createRoot(rootElement).render(<RootApp />);
 });
