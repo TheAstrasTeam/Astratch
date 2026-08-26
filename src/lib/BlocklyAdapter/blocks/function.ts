@@ -124,7 +124,7 @@ interface IFunctionCallerBlock extends Blockly.Block {
      * false = 用户已手动增删，插槽由用户掌控。
      */
     autoSync: boolean;
-    /** 读取 FUNCTION 插槽里接的行内函数，同步实参插槽。 */
+    /** 读取 FUNCTION 插槽里接的函数，同步实参插槽。 */
     syncArgs(): void;
     /** 弹出实参类型选择 Modal（仅手动模式，齿轮随 autoSync 隐藏）。 */
     openArgSettings(key: string): void;
@@ -135,7 +135,7 @@ interface IFunctionCallerBlock extends Blockly.Block {
     onchange(event: Blockly.Events.Abstract): void;
 }
 
-/** 调用方需要重新读取行内函数参数表的事件。 */
+/** 调用方需要重新读取函数参数表的事件。 */
 const CALLER_RESYNC_EVENTS: readonly string[] = [
     Blockly.Events.BLOCK_MOVE,
     Blockly.Events.BLOCK_CHANGE,
@@ -364,21 +364,41 @@ const defaultParamName = (index: number): string =>
     index < 26 ? String.fromCharCode(97 + index) : `p${index.toString()}`;
 
 /**
- * 从一个积木出发，找到它接入的行内函数并读出参数表。
- * 没接或接的不是行内函数时返回空数组。
+ * 从调用方的 FUNCTION 槽读取函数签名。
+ *
+ * 行内函数使用带稳定 id 的 params；普通函数值没有独立的参数 id，
+ * 因此使用 previewData 的原始下标生成 id。保留原始下标可以避免固定
+ * 文本项夹在参数之间时，函数签名变化后错误复用已有实参槽。
  */
 function readParamsFromFunctionInput(block: Blockly.Block): IFunctionParam[] {
     const target = block.getInput('FUNCTION')?.connection?.targetBlock();
-    if (target?.type !== OPCODES.FUNCTION_INLINE) return [];
+    if (target?.type === OPCODES.FUNCTION_INLINE) {
+        const host = target as IFunctionInlineBlock;
+        // params[].name 只是创建时的默认名（a、b、c……），改名写的是 scopedNames，
+        // 所以显示名必须走 getScopedName，否则调用积木永远显示旧名。
+        return host.params.map(param => ({
+            type: param.type,
+            id: param.id,
+            name: host.getScopedName(param.id),
+        }));
+    }
 
-    const host = target as IFunctionInlineBlock;
-    // params[].name 只是创建时的默认名（a、b、c……），改名写的是 scopedNames，
-    // 所以显示名必须走 getScopedName，否则调用积木永远显示旧名。
-    return host.params.map(param => ({
-        type: param.type,
-        id: param.id,
-        name: host.getScopedName(param.id),
-    }));
+    if (target?.type === OPCODES.FUNCTION_VALUE) {
+        const value = target as IFunctionValueBlock;
+        return value.previewData.flatMap((fieldData, index) =>
+            fieldData.type === 'text'
+                ? []
+                : [
+                      {
+                          type: fieldData.type,
+                          id: `arg-${String(index)}`,
+                          name: fieldData.text ?? '',
+                      },
+                  ],
+        );
+    }
+
+    return [];
 }
 
 /**
@@ -1407,13 +1427,16 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
             if (this.isDeadOrDying() || this.isInsertionMarker()) return;
 
             const target = this.getInput('FUNCTION')?.connection?.targetBlock();
-            const isInline = target?.type === OPCODES.FUNCTION_INLINE;
+            const isFunction =
+                target?.type === OPCODES.FUNCTION_INLINE || target?.type === OPCODES.FUNCTION_VALUE;
 
-            // 输出 check 跟随行内函数的返回类型：null（未知）/ NONE 都
+            // 输出 check 跟随接入函数的返回类型：null（未知）/ NONE 都
             // 归为万能；仅 FUNCTION_CALL 有输出连接（执行块是语句）。
-            // 摘下行内函数后回到手动模式，输出同样回到万能。
+            // 摘下函数后回到手动模式，输出同样回到万能。
             if (this.outputConnection) {
-                const returnType = isInline ? (target as IFunctionInlineBlock).returnType : null;
+                const returnType = isFunction
+                    ? (target as IFunctionInlineBlock | IFunctionValueBlock).returnType
+                    : null;
                 const wantedChecks =
                     returnType === null || returnType === AllCheckers.NONE
                         ? null
@@ -1425,8 +1448,8 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                 }
             }
 
-            if (!isInline) {
-                // 摘下行内函数：保留现有插槽（里面的实参不丢），把控制权交还用户。
+            if (!isFunction) {
+                // 摘下函数：保留现有插槽（里面的实参不丢），把控制权交还用户。
                 if (this.autoSync) {
                     this.autoSync = false;
                     this.updateShape();
