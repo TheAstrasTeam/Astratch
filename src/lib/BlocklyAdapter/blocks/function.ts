@@ -21,7 +21,7 @@ import type {
     TPreviewFunctionData,
 } from '../../../components/modal_createFunction/functionPreview';
 import { connections, endConnections, hatConnections, returnConnections } from './helpers';
-import { createMinusFieldByKey, createMinusWithSettingsField, createPlusField } from './mutation';
+import { createMinusWithSettingsField, createPlusField } from './mutation';
 import {
     scopedSourceBlock,
     scopedSourceHost,
@@ -126,6 +126,9 @@ interface IFunctionCallerBlock extends Blockly.Block {
     autoSync: boolean;
     /** 读取 FUNCTION 插槽里接的行内函数，同步实参插槽。 */
     syncArgs(): void;
+    /** 弹出实参类型选择 Modal（仅手动模式，齿轮随 autoSync 隐藏）。 */
+    openArgSettings(key: string): void;
+    saveExtraState(): unknown;
     plus(): void;
     minusByKey(key: string): void;
     updateShape(): void;
@@ -233,6 +236,12 @@ const checksEqual = (
     if (!Array.isArray(a) || !Array.isArray(b)) return a === b;
     if (a.length !== b.length) return false;
     return a.every((check, index) => check === b[index]);
+};
+
+/** 立即刷新动态连接形状；使用 BlockSvg 自带实现以保持 Blockly 实例一致。 */
+const renderBlockImmediately = (block: Blockly.Block): void => {
+    if (!block.workspace.rendered) return;
+    (block as unknown as Blockly.BlockSvg).render();
 };
 
 // 此函数由AI生成
@@ -1249,6 +1258,9 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                             }
                         }
                     }
+                    // 浮动副本的 queueRender + 槽内两端的对齐，统一在这里
+                    // 同步 flush（rAF 批处理实测不刷新外形）。
+                    if (this.workspace.rendered) (this as unknown as Blockly.BlockSvg).render();
                 },
             });
         },
@@ -1443,6 +1455,39 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
             if (CALLER_RESYNC_EVENTS.includes(event.type)) this.syncArgs();
         },
 
+        // 此函数由AI生成
+        /** 弹出实参类型选择 Modal（复用创建函数的输入类型 Modal）。 */
+        openArgSettings(this: IFunctionCallerBlock, key: string) {
+            const arg = this.args.find(item => item.id === key);
+            if (!arg) return;
+            void modal.open(FieldTypeModal, {
+                purpose: 'input',
+                blocking: true,
+                callback: result => {
+                    // 输入类型 Modal 不会返回 NONE（那是返回值语境的占位）。
+                    if (result === 'text' || result === AllCheckers.NONE) return;
+                    if (this.isDeadOrDying()) return;
+                    const target = this.args.find(item => item.id === key);
+                    if (!target || checksEqual(target.type, result)) return;
+                    const oldState = JSON.stringify(this.saveExtraState());
+                    target.type = result;
+                    const newState = JSON.stringify(this.saveExtraState());
+                    if (oldState !== newState) {
+                        Blockly.Events.fire(
+                            new Blockly.Events.BlockChange(
+                                this,
+                                'mutation',
+                                null,
+                                oldState,
+                                newState,
+                            ),
+                        );
+                    }
+                    this.updateShape();
+                },
+            });
+        },
+
         // ⊕/⊖ 只在手动模式下渲染，因此这里无需再判断模式。
         plus(this: IFunctionCallerBlock) {
             this.args = [
@@ -1495,13 +1540,10 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                     this.appendValueInput(inputName);
                 }
                 // 实参槽 check 跟随参数定义的类型（null=万能）。
-                // 槽里的 hint shadow 是万能 reporter，与任何 check 都兼容，
-                // 不会触发复检拔除；不兼容的真实积木由复检自然挤出。
+                // hint shadow 的输出 check 会在下面同步，避免类型切换时被拔出；
+                // 不兼容的真实积木仍由复检自然挤出。
                 const argConnection = this.getInput(inputName)?.connection;
                 const wantedChecks = paramTypeToChecks(arg.type);
-                if (!checksEqual(argConnection?.getCheck() ?? null, wantedChecks)) {
-                    argConnection?.setCheck(wantedChecks);
-                }
                 // 参数名以半透明提示的形式显示在空槽里（类似输入框 placeholder），
                 // 插入真实积木后自动被盖住，拖走又会重新露出来。
                 const hint = argConnection?.getShadowState() as
@@ -1513,17 +1555,40 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                         fields: { HINT: arg.name },
                     });
                 }
+                // 父槽与 hint shadow 必须以万能类型作为过渡，避免从旧类型
+                // 切换到新类型时，Blockly 在两端暂时不兼容的瞬间拔出 shadow。
+                const hintBlock = argConnection?.targetBlock();
+                const hintOutput = hintBlock?.isShadow() ? hintBlock.outputConnection : null;
+                const currentChecks = argConnection?.getCheck() ?? null;
+                const hintChecks = hintOutput?.getCheck() ?? null;
+                if (
+                    !checksEqual(currentChecks, wantedChecks) ||
+                    (hintOutput && !checksEqual(hintChecks, wantedChecks))
+                ) {
+                    if (hintOutput) {
+                        argConnection?.setCheck(null);
+                        hintOutput.setCheck(wantedChecks);
+                        argConnection?.setCheck(wantedChecks);
+                    } else {
+                        argConnection?.setCheck(wantedChecks);
+                    }
+                }
 
-                // 自动模式由行内函数决定参数个数，不给 ⊖，避免和上游打架。
+                // 自动模式由行内函数决定参数个数与类型，整个按钮组隐藏；
+                // 手动模式用竖向按钮组：上「−」删除，下「⚙」设置类型。
                 const removeName = `${ARG_REMOVE_PREFIX}${arg.id}`;
                 if (this.autoSync) this.removeInput(removeName, true);
                 else if (!this.getInput(removeName)) {
                     this.appendDummyInput(removeName).appendField(
-                        createMinusFieldByKey({ removeKey: arg.id }),
+                        createMinusWithSettingsField({
+                            key: arg.id,
+                            settingsMethod: 'openArgSettings',
+                        }),
                     );
                 }
             }
             for (const name of order) this.moveInputBefore(name, null);
+            renderBlockImmediately(this);
         },
 
         saveExtraState(this: IFunctionCallerBlock) {

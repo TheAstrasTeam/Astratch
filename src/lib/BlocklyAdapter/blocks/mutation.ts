@@ -256,8 +256,14 @@ export class FieldStackedIcons extends Blockly.FieldImage {
 // 此函数由AI生成
 /**
  * 参数的竖向按钮组：上「−」删除参数，下「⚙」设置参数类型。
+ * `settingsMethod` 为宿主积木上打开类型 Modal 的方法名
+ * （行内函数用 openParamSettings，调用积木用 openArgSettings）。
  */
-export function createMinusWithSettingsField(args: { key: string }): Blockly.FieldImage {
+export function createMinusWithSettingsField(args: {
+    key: string;
+    settingsMethod?: string;
+}): Blockly.FieldImage {
+    const settingsMethod = args.settingsMethod ?? 'openParamSettings';
     return new FieldStackedIcons(
         {
             src: minusImage,
@@ -276,9 +282,9 @@ export function createMinusWithSettingsField(args: { key: string }): Blockly.Fie
             onClick: block => {
                 // 弹窗是异步的：退出 pointer 手势后再打开。
                 queueMicrotask(() => {
-                    (
-                        block as unknown as { openParamSettings: (key: string) => void }
-                    ).openParamSettings(args.key);
+                    (block as unknown as Record<string, ((key: string) => void) | undefined>)[
+                        settingsMethod
+                    ]?.(args.key);
                 });
             },
         },
