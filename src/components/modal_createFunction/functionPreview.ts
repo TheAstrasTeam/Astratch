@@ -10,28 +10,25 @@ import type { IFunctionReference } from '../../types/blocks';
 import { t } from 'i18next';
 
 /**
- * 输入槽支持的类型：AllCheckers 中除万能（null）和 NONE（无返回值占位，
- * 不是插槽类型）外的全部 checker。值即 Blockly check 字符串，可直传
- * setOutput/setCheck。
+ * 参数槽支持的类型：AllCheckers 中除 NONE（无返回值占位，不是插槽
+ * 类型）外的全部值；null（AllCheckers.ANY）即「未知」万能槽。
  */
-export type TFunctionInputField = Exclude<TAllCheckers, null | typeof AllCheckers.NONE>;
+export type TFunctionInputField = Exclude<TAllCheckers, typeof AllCheckers.NONE>;
 
 /**
- * 一个字段的类型：文本标签、单个 checker 或 checker 联合。
- * `null`（AllCheckers.ANY）表示万能。
+ * 类型联合：不含 null——null（万能/未知）只能单独使用，
+ * 这样单个值与联合值都能直接传给 Blockly 的 setCheck/setOutput。
  */
-export type TFunctionReturnField = 'text' | TAllCheckers;
+export type TFunctionTypeUnion = Exclude<TFunctionInputField, null>[];
 
-export type TFunctionFieldType = TFunctionReturnField | TFunctionInputField[];
+/** 一个字段的类型：文本标签、单个类型（null=未知万能）或类型联合。 */
+export type TFunctionFieldType = 'text' | TFunctionInputField | TFunctionTypeUnion;
 
 /**
- * 一个函数的返回类型：
- * - checker / checker 联合：返回对应类型的值；
- * - `'none'`（AllCheckers.NONE）：无返回值，函数表现为语句积木；
- * - `null`：未知，函数值可以返回任何类型。
+ * 一个函数的返回类型：'none'（AllCheckers.NONE）表示无返回值；
+ * null（ANY）表示未知；其余为具体类型或类型联合。
  */
-export type TFunctionReturnType =
-    TFunctionInputField | TFunctionInputField[] | typeof AllCheckers.NONE | null;
+export type TFunctionReturnType = Exclude<TFunctionFieldType, 'text'> | typeof AllCheckers.NONE;
 
 export interface TPreviewFunctionData {
     type: TFunctionFieldType;

@@ -174,7 +174,12 @@ const isFunctionValueType = (value: unknown): value is TFunctionInputField =>
 const normalizeReturnType = (value: unknown): TFunctionReturnType => {
     if (value === null || value === undefined) return null;
     if (isFunctionValueType(value)) return value;
-    if (Array.isArray(value) && value.every(isFunctionValueType)) {
+    // 联合里不允许 null（万能只能单独使用），isFunctionValueType 对
+    // null 恒为 false，恰好同时完成这两个校验。
+    if (
+        Array.isArray(value) &&
+        value.every((v): v is Exclude<TFunctionInputField, null> => isFunctionValueType(v))
+    ) {
         return [...value];
     }
     return null;
@@ -499,7 +504,7 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                 // 向上找定义帽；不在任何帽子里、或帽子还没补上签名时，
                 // 回退字符串（拖到自由区/工具箱预览的形态）。
                 let block: Blockly.Block | null = this.getParent();
-                while (block && block.type !== OPCODES.FUNCTION_DEFINITION )
+                while (block && block.type !== OPCODES.FUNCTION_DEFINITION)
                     block = block.getParent();
                 if (!block) return AllCheckers.ANY;
                 const signature = block

@@ -12,7 +12,15 @@ import { t } from 'i18next';
 import styles from './index.module.scss';
 import { useState } from 'react';
 import classNames from 'classnames';
-import { ArrayIcon, BooleanIcon, FunctionIcon, NumberIcon, ObjectIcon, StringIcon } from './icons';
+import {
+    AnyIcon,
+    ArrayIcon,
+    BooleanIcon,
+    FunctionIcon,
+    NumberIcon,
+    ObjectIcon,
+    StringIcon,
+} from './icons';
 import {
     previewBlockColor,
     type TFunctionFieldType,
@@ -27,7 +35,7 @@ export const FieldTypeModal = ({
     parentWindowID,
     blocking,
 }: {
-    callback?: (result: TFunctionFieldType) => void;
+    callback?: (result: TFunctionFieldType | typeof AllCheckers.NONE) => void;
     purpose?: 'input' | 'return';
     parentWindowID?: string;
     blocking?: boolean;
@@ -38,6 +46,11 @@ export const FieldTypeModal = ({
     const [fieldTypes, _] = useState<
         { type: TFunctionInputField; icon: JSX.Element; label: string }[]
     >([
+        {
+            type: AllCheckers.ANY,
+            icon: <AnyIcon color={previewBlockColor} />,
+            label: t('gui:createFunction.any'),
+        },
         {
             type: AllCheckers.BOOLEAN,
             icon: <BooleanIcon color={previewBlockColor} />,
@@ -70,12 +83,14 @@ export const FieldTypeModal = ({
         },
     ]);
 
-    const handleSelectSingle = async (result: TFunctionFieldType) => {
+    const handleSelectSingle = async (result: TFunctionFieldType | typeof AllCheckers.NONE) => {
         if (callback) callback(result);
         await closeSelf();
     };
 
     const handleToggle = (type: TFunctionInputField) => {
+        // 多类型联合里不允许出现 null（万能只能单独使用，null|X = null）。
+        if (multiMode && type === null) return;
         setSelected(prev =>
             prev.includes(type) ? prev.filter(item => item !== type) : [...prev, type],
         );
@@ -88,7 +103,16 @@ export const FieldTypeModal = ({
 
     const handleConfirm = async () => {
         if (selected.length > 0) {
-            if (callback) callback(selected.length === 1 ? selected[0] : selected);
+            // null（万能）吞并一切：联合里出现 null 就等价于单独的 null；
+            // 否则滤掉 null 得到不含万能的类型联合。
+            const result: TFunctionFieldType = selected.includes(null)
+                ? null
+                : selected.length === 1
+                  ? selected[0]
+                  : selected.filter(
+                        (type): type is Exclude<TFunctionInputField, null> => type !== null,
+                    );
+            if (callback) callback(result);
         }
         await closeSelf();
     };
@@ -149,12 +173,17 @@ export const FieldTypeModal = ({
                     )}
                     {fieldTypes.map(({ type, icon, label }) => {
                         const isSelected = multiMode && selected.includes(type);
+                        // 多类型模式下未知（null）不可选：万能只能单独使用。
+                        const anyBlocked = multiMode && type === null;
                         return (
                             <div
                                 key={type}
                                 className={classNames(styles.selector, {
                                     [styles.selectorSelected]: isSelected,
                                 })}
+                                style={
+                                    anyBlocked ? { opacity: 0.4, cursor: 'not-allowed' } : undefined
+                                }
                                 onClick={() => {
                                     handleItemClick(type);
                                 }}

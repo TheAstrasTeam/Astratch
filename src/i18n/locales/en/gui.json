@@ -207,6 +207,7 @@
     "createFunction.string": "String",
     "createFunction.number": "Number",
     "createFunction.function": "Function",
+    "createFunction.any": "Unknown",
     "createFunction.pickColor": "Custom block color",
     "createFunction.addField": "Add input",
     "createFunction.setColor": "Set block color",

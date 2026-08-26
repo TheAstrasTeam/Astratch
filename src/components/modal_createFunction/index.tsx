@@ -26,11 +26,7 @@ import {
 import { DropDownIcon, StringIcon, TextIcon } from './icons';
 import { ColorPickerButton } from '../colorPickerButton';
 import { AllCheckers, type IBlockColor, type ICustomFunction } from '../../types/blocks';
-import type {
-    TFunctionFieldType,
-    TFunctionInputField,
-    TFunctionReturnType,
-} from './functionPreview';
+import type { TFunctionFieldType, TFunctionReturnType } from './functionPreview';
 import type { JSX } from 'react/jsx-dev-runtime';
 import * as Blockly from 'blockly/core';
 
@@ -74,7 +70,9 @@ export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) =
         [closeSelf],
     );
 
-    const handleAddFieldButtonClick = (result: TFunctionFieldType) => {
+    const handleAddFieldButtonClick = (result: TFunctionFieldType | typeof AllCheckers.NONE) => {
+        // 输入类型 Modal 不会返回 NONE（那是返回值语境的占位），防御一下。
+        if (result === 'text' || result === AllCheckers.NONE) return;
         addFieldForFunctionPreview({
             type: result,
         });
@@ -98,8 +96,8 @@ export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) =
         setPreviewConfig({ isValue: nextIsValue, returnType });
     };
 
-    const handleSetReturnType = (result: TFunctionFieldType) => {
-        // 返回类型 Modal 只会返回值类型、联合值类型或 null；
+    const handleSetReturnType = (result: TFunctionFieldType | typeof AllCheckers.NONE) => {
+        // 返回类型 Modal 只会返回值类型、联合值类型、null（未知）或 NONE；
         // text 是旧字段类型，为避免把它误当成 Blockly check，明确拒绝。
         if (result === 'text') return;
         const nextReturnType = result;
@@ -110,8 +108,9 @@ export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) =
     const returnTypeLabel = () => {
         if (returnType === null) return t('gui:createFunction.nullReturn');
         if (returnType === AllCheckers.NONE) return t('gui:createFunction.noneReturn');
-        const types: TFunctionInputField[] = Array.isArray(returnType) ? returnType : [returnType];
         // checker 是大写开头（'Boolean'），i18n key 是全小写。
+        // 联合类型 TFunctionTypeUnion 不含 null，无需过滤。
+        const types = Array.isArray(returnType) ? returnType : [returnType];
         return types.map(type => t(`gui:createFunction.${type.toLowerCase()}`)).join(' | ');
     };
 
