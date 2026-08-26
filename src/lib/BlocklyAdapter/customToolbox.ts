@@ -128,9 +128,6 @@ export function setFunctionCategory(_blockly: typeof Blockly, vm: IVM): IRegiste
                 gap: 12,
                 kind: 'block',
                 type: OPCODES.FUNCTION_SETDATAVALUE,
-                inputs: {
-                    VALUE: txt(t('blocks:example.data')),
-                },
             },
         ];
         basicItems.forEach(item => items.push(item));

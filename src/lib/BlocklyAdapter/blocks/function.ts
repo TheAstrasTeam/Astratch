@@ -33,6 +33,8 @@ import {
 import moveLeftIcon from '../../../assets/blocks/moveLeft.svg';
 import moveRightIcon from '../../../assets/blocks/moveRight.svg';
 import removeIcon from '../../../assets/remove.svg';
+import settingsIcon from '../../../assets/settingsFunction.svg';
+import { FieldTypeModal } from '../../../components/modal_createFunction/modal_fieldType';
 
 const CONTROL_BAR_BUTTON_SIZE = 20;
 const CONTROL_BAR_GAP = 10;
@@ -87,6 +89,8 @@ interface IFunctionParam {
 /** 行内函数积木。 */
 interface IFunctionInlineBlock extends IDynamicScopedHost {
     params: IFunctionParam[];
+    /** 行内函数的返回类型；null（ANY）表示未知。 */
+    returnType: TFunctionReturnType;
     plus(): void;
     minusByKey(key: string): void;
 }
@@ -202,6 +206,14 @@ const returnTypeChecks = (returnType: TFunctionReturnType): string | string[] =>
         : Array.isArray(returnType)
           ? [...returnType]
           : [returnType];
+
+// 此函数由AI生成
+/** 逐元素比较两组 check，免去每次 updateShape 的 JSON 序列化开销。 */
+const checksEqual = (a: readonly string[] | null, b: readonly string[] | null): boolean => {
+    if (a === null || b === null) return a === b;
+    if (a.length !== b.length) return false;
+    return a.every((check, index) => check === b[index]);
+};
 
 // 此函数由AI生成
 /**
@@ -448,6 +460,8 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
         dragging: boolean;
         /** 上次应用到 VALUE 槽的组合标记（check + shadow），防止重复触发事件。 */
         appliedShadowMarker?: string;
+        /** 带事件分组的槽位刷新：调整与起因同组，保证撤销正确。 */
+        refreshValueSlot(event: Blockly.Events.Abstract): void;
         updateShape(): void;
     }
 
@@ -466,7 +480,32 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
             this.appendValueInput('VALUE');
             this.updateShape();
         },
+        // 此函数由AI生成
         onchange(this: IFUNCTION_RETURN, event: Blockly.Events.Abstract) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+            if (event.type === Blockly.Events.BLOCK_CHANGE) {
+                const change = event as Blockly.Events.BlockChange;
+                const changed = this.workspace.getBlockById(change.blockId ?? '');
+                if (!changed) return;
+
+                const isStatementAncestor = (candidate: Blockly.Block): boolean => {
+                    let cursor: Blockly.Block | null = this.getParent();
+                    while (cursor) {
+                        if (cursor === candidate) return true;
+                        cursor = cursor.getParent();
+                    }
+                    return false;
+                };
+
+                if (changed.type === OPCODES.FUNCTION_INLINE) {
+                    if (isStatementAncestor(changed)) this.refreshValueSlot(event);
+                } else if (changed.type === OPCODES.FUNCTION_VALUE) {
+                    const hat = changed.getParent();
+                    if (hat && isStatementAncestor(hat)) this.refreshValueSlot(event);
+                }
+                return;
+            }
+
             if (
                 !(
                     [
@@ -477,9 +516,12 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                 ).includes(event.type)
             )
                 return;
+            this.refreshValueSlot(event);
+        },
+        refreshValueSlot(this: IFUNCTION_RETURN, event: Blockly.Events.Abstract) {
             // 同步执行（core 的 logic_ternary 模式）；updateShape 完全
             // 幂等，自身触发的子事件再次进入时全部命中守卫直接返回。
-            // 结构调整产生的事件与起因归入同组，保证撤销行为正确。
+            // 调整产生的事件与起因归入同组，保证撤销行为正确。
             Blockly.Events.setGroup(event.group);
             try {
                 this.updateShape();
@@ -487,33 +529,25 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                 Blockly.Events.setGroup(false);
             }
         },
-        // 此函数由AI生成
-        /**
-         * 把 VALUE 槽对齐到所在函数的返回类型（完全幂等）：
-         * - NONE：隐藏槽（setVisible，不销毁，子积木原样保留）；
-         * - 其它：显示槽并同步 check；类型变化时先拔下不兼容的真实
-         *   子积木（带分组）、清掉旧 shadow，再设新 check；
-         * - 最后按类型补默认 shadow（真实积木优先，用户改过值的
-         *   同类型 shadow 保留）。
-         */
         updateShape(this: IFUNCTION_RETURN) {
             if (this.isDeadOrDying() || this.isInsertionMarker()) return;
 
             const getValueType = (): TFunctionReturnType => {
                 if (this.dragging) return AllCheckers.ANY;
-                // 向上找定义帽；不在任何帽子里、或帽子还没补上签名时，
-                // 回退字符串（拖到自由区/工具箱预览的形态）。
+                // 向上找最近的函数容器
                 let block: Blockly.Block | null = this.getParent();
-                while (block && block.type !== OPCODES.FUNCTION_DEFINITION)
+                while (block) {
+                    if (block.type === OPCODES.FUNCTION_INLINE)
+                        return (block as IFunctionInlineBlock).returnType;
+                    if (block.type === OPCODES.FUNCTION_DEFINITION) {
+                        const signature = block
+                            .getInput('NAME')
+                            ?.connection?.targetBlock() as IFunctionValueBlock | null;
+                        return signature?.returnType ?? AllCheckers.ANY;
+                    }
                     block = block.getParent();
-                if (!block) return AllCheckers.ANY;
-                const signature = block
-                    .getInput('NAME')
-                    ?.connection?.targetBlock() as IFunctionValueBlock | null;
-                if (!signature) return AllCheckers.ANY;
-                // 签名的 returnType 必须原样返回：null（未知）不能与
-                // 「没有签名」一起回退 STRING，否则永远切不回万能槽。
-                return signature.returnType;
+                }
+                return AllCheckers.ANY;
             };
 
             const wanted = getValueType();
@@ -533,16 +567,21 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
 
             const wantedChecks =
                 wanted === null ? null : Array.isArray(wanted) ? [...wanted] : [wanted];
-            const markerOf = (shadow: Blockly.serialization.blocks.State | null) =>
-                JSON.stringify([wantedChecks, shadow]);
+            // 以 wanted 本身作标记：check 与默认 shadow 都由它唯一确定，
+            // 不必每次 updateShape 都 JSON 序列化一遍。
+            const marker = Array.isArray(wanted) ? wanted.join('|') : String(wanted);
 
             const target = connection.targetBlock();
             const hasShadow = !!target && target.isShadow();
 
-            // check 变化：先处理槽内现有内容，再设新 check，
-            // 避免 setCheck 内部复检（onCheckChanged_）替我们做拔除。
+            // check 变化：先清掉保留的 shadow（含槽内的旧 shadow 本体），
+            // 再处理子积木、设新 check。否则拔下不兼容的真实子积木时，
+            // disconnect 会用残留的 shadowDom 立刻 respawn 旧类型 shadow，
+            // 撞上新 check 直接抛 ConnectionFailure（expected X, found Y）。
             const current = connection.getCheck() ?? null;
-            if (JSON.stringify(current) !== JSON.stringify(wantedChecks)) {
+            if (!checksEqual(current, wantedChecks)) {
+                connection.setShadowState(null);
+                this.appliedShadowMarker = '';
                 if (target && !hasShadow) {
                     // 真实子积木与新类型不兼容 → 分组拔下（core 同款）。
                     const childOut = target.outputConnection;
@@ -552,9 +591,6 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                     ) {
                         target.unplug();
                     }
-                } else if (hasShadow) {
-                    connection.setShadowState(null);
-                    this.appliedShadowMarker = markerOf(null);
                 }
                 input.setCheck(wantedChecks);
             }
@@ -565,9 +601,8 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                 this.appliedShadowMarker = undefined;
                 return;
             }
-            const shadow = defaultShadowFor(wanted);
-            const marker = markerOf(shadow);
             if (this.appliedShadowMarker === marker) return;
+            const shadow = defaultShadowFor(wanted);
             if (hasShadow && target.type === shadow?.type) {
                 this.appliedShadowMarker = marker;
                 return;
@@ -1067,9 +1102,49 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
         },
     } as IDefinitionFunctionValueBlock;
 
-    // ── 行内函数 ──────────────────────────────────────────────
-    // 形如 `行内函数 (a)⊖ (b)⊖ ⊕ { ... }`，
-    // 括号里是可以拖出去反复使用的参数积木。
+    // 此函数由AI生成
+    /**
+     * 行内函数的「返回值类型」按钮：样式同 +/− 按钮，点击弹出
+     * 创建函数同款的返回值选择 Modal。选择结果作为 mutation 记录，
+     * 可随存档保存与撤销。
+     */
+    const createInlineReturnTypeField = (): Blockly.FieldImage =>
+        new Blockly.FieldImage(
+            settingsIcon,
+            15,
+            15,
+            t('blocks:function.inlineReturnType'),
+            field => {
+                const block = field.getSourceBlock() as IFunctionInlineBlock | null;
+                if (!block || block.isInFlyout) return;
+                // FieldImage 回调位于 Blockly 的 pointerup 手势中，弹窗延后打开。
+                queueMicrotask(() => {
+                    if (block.isDeadOrDying()) return;
+                    void modal.open(FieldTypeModal, {
+                        purpose: 'return',
+                        blocking: true,
+                        callback: result => {
+                            if (result === 'text' || block.isDeadOrDying()) return;
+                            if (block.returnType === result) return;
+                            const oldState = JSON.stringify(block.saveExtraState());
+                            block.returnType = result;
+                            const newState = JSON.stringify(block.saveExtraState());
+                            if (oldState !== newState) {
+                                Blockly.Events.fire(
+                                    new Blockly.Events.BlockChange(
+                                        block,
+                                        'mutation',
+                                        null,
+                                        oldState,
+                                        newState,
+                                    ),
+                                );
+                            }
+                        },
+                    });
+                });
+            },
+        );
 
     blockly.Blocks[OPCODES.FUNCTION_INLINE] = {
         ...scopedSourceHost({
@@ -1084,6 +1159,7 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
 
         init(this: IFunctionInlineBlock) {
             this.params = [];
+            this.returnType = null;
             this.setColour(BlocksColor.function.primary);
             this.setOutput(true, 'Function');
             this.setInputsInline(true);
@@ -1128,7 +1204,9 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
             }
 
             if (!this.getInput('LABEL')) {
-                this.appendDummyInput('LABEL').appendField(t('blocks:function.inline'));
+                this.appendDummyInput('LABEL')
+                    .appendField(createInlineReturnTypeField())
+                    .appendField(t('blocks:function.inline'));
             }
 
             for (const param of this.params) {
@@ -1158,6 +1236,7 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
 
         saveExtraState(this: IFunctionInlineBlock) {
             return {
+                returnType: this.returnType,
                 params: this.params.map(param => ({
                     ...param,
                     // 名字以 scopedNames 为准（改名走的是那条路）。
@@ -1166,8 +1245,12 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
             };
         },
 
-        loadExtraState(this: IFunctionInlineBlock, state: { params?: IFunctionParam[] }) {
+        loadExtraState(
+            this: IFunctionInlineBlock,
+            state: { params?: IFunctionParam[]; returnType?: TFunctionReturnType },
+        ) {
             this.params = (state.params ?? []).map(param => ({ ...param }));
+            this.returnType = state.returnType ?? null;
             this.scopedNames = Object.fromEntries(this.params.map(param => [param.id, param.name]));
             this.updateShape();
             this.updateScopedLabels();

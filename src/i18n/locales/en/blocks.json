@@ -312,6 +312,7 @@
     "function.execute": "execute",
     "function.return": "return",
     "function.inline": "inline function",
+    "function.inlineReturnType": "return type",
     "function.param": "parameter",
     "function.setDataValue": "set parameter %1 to %2",
     "function.value": "function Value",
