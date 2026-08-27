@@ -276,7 +276,7 @@ const setupWorkspace = (
         setupFrame = null;
         if (!isCurrentPreview(session, workspace, block)) return;
         centerPreviewRoot(workspace);
-        addFieldForFunctionPreview({
+        if (!initial) addFieldForFunctionPreview({
             type: 'text',
             text: t('blocks:function.defaultTitle'),
         });
