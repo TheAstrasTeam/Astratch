@@ -93,7 +93,7 @@ export interface IScopedSourceHost extends Blockly.Block {
     fillScopedSlot(slot: IScopedSlot): void;
     /** 把子孙中仍指向旧宿主的源积木改绑到自己。 */
     rebindDescendants(previousOwnerId: string): void;
-    /** 把工作区内所有属于本宿主的源积木标签刷新一遍。 */
+    /** 把工作区内所有属于本宿主的源积木标签与类型刷新一遍。 */
     updateScopedLabels(): void;
     /** 重命名某个插槽发放的源积木，并广播到所有副本。 */
     renameScoped(key: string, name: string): void;
@@ -347,11 +347,29 @@ export function scopedSourceHost(options: IScopedSourceHostOptions) {
         },
 
         updateScopedLabels(this: IScopedSourceHost): void {
+            const slots = new Map(
+                this.getScopedSlots().map(slot => [slot.key ?? slot.inputName, slot]),
+            );
             for (const block of this.workspace.getAllBlocks(false)) {
                 const source = block as unknown as IScopedSourceBlock;
-                if (source.type === sourceType && source.ownerId === this.id && source.slotKey) {
-                    source.updateLabel(this.getScopedName(source.slotKey));
+                if (source.type !== sourceType || source.ownerId !== this.id) continue;
+                const key = source.slotKey;
+                if (key === undefined) continue;
+
+                const slot = slots.get(key);
+                if (!slot) {
+                    // 动态宿主（函数定义签名）的参数可能从 VM 中被删除；
+                    // 该参数已经没有合法归属，不能留下一个空白源积木。
+                    source.dispose(false);
+                    continue;
                 }
+
+                source.updateLabel(this.getScopedName(key));
+
+                // 源积木拖出宿主后不再经过宿主槽位的对齐逻辑；参数类型
+                // 改变时也必须更新这些浮动副本的 output checker。
+                const slotConnection = getSlotConnection(this, slot.inputName);
+                if (slotConnection) alignParamCheckerWithHost(source, this, slotConnection);
             }
         },
 

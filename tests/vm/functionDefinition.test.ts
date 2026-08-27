@@ -9,7 +9,7 @@ import { initFunctionBlocks } from '../../src/lib/BlocklyAdapter/blocks/function
 import { AshConnectionChecker } from '../../src/lib/BlocklyAdapter/connectionRules';
 import type { AshConnection } from '../../src/lib/BlocklyAdapter/connectionRules';
 import type { ICustomFunction } from '../../src/types/blocks';
-import { OPCODES } from '../../src/types/blocks';
+import { AllCheckers, OPCODES } from '../../src/types/blocks';
 
 const makeFunction = (id: string): ICustomFunction => ({
     body: [{ type: 'text', text: `攻击-${id}` }],
@@ -18,13 +18,15 @@ const makeFunction = (id: string): ICustomFunction => ({
     isValue: true,
 });
 
+const referencedFunction = makeFunction('fn-1');
+
 const vmStub = {
     runtime: {
         getTargetByID: (targetId: string) =>
             targetId === 't1'
                 ? {
                       getFunction: (functionId: string) =>
-                          functionId === 'fn-1' ? makeFunction('fn-1') : null,
+                          functionId === 'fn-1' ? referencedFunction : null,
                   }
                 : null,
     },
@@ -143,5 +145,39 @@ describe('函数定义帽：数据持有、锁定槽与自动嵌入', () => {
 
         const loaded = ws.getTopBlocks(true)[0] as unknown as HatBlock;
         expect(loaded.functionRef).toEqual({ targetId: 't1', functionId: 'fn-1' });
+    });
+
+    it('修改函数参数后同步已拖出的参数积木；删除参数时销毁副本', async () => {
+        referencedFunction.body = [
+            { type: 'text', text: '函数' },
+            { type: AllCheckers.STRING, text: '旧参数' },
+        ];
+
+        const ws = new Blockly.Workspace();
+        const hat = newHat(ws);
+        hat.setFunctionRef({ targetId: 't1', functionId: 'fn-1' });
+        await Promise.resolve();
+        await Promise.resolve();
+
+        const value = slotOf(hat).targetBlock() as Blockly.Block & {
+            refreshFromFunctionData(): void;
+        };
+        const slot = value.getInput('ARG1')?.connection;
+        const floating = slot?.targetBlock();
+        expect(floating?.type).toBe(OPCODES.FUNCTION_PARAM);
+        floating?.unplug();
+
+        referencedFunction.body = [
+            { type: 'text', text: '函数' },
+            { type: AllCheckers.NUMBER, text: '新参数' },
+        ];
+        value.refreshFromFunctionData();
+
+        expect(floating?.getFieldValue('NAME')).toBe('新参数');
+        expect(floating?.outputConnection?.getCheck()).toEqual([AllCheckers.NUMBER]);
+
+        referencedFunction.body = [{ type: 'text', text: '函数' }];
+        value.refreshFromFunctionData();
+        expect(floating?.isDeadOrDying()).toBe(true);
     });
 });

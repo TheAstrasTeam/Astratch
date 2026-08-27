@@ -976,7 +976,12 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                 output.setCheck(wanted);
 
             this.updateShape();
-            if (this.definitionMode) this.ensureScopedBlocks();
+            if (this.definitionMode) {
+                this.ensureScopedBlocks();
+                // ensureScopedBlocks 只处理签名槽内的源积木；已经拖出
+                // 槽位的参数副本也要跟随最新函数参数名称和类型。
+                this.updateScopedLabels();
+            }
         },
         saveExtraState(this: IDefinitionFunctionValueBlock) {
             return saveFunctionValueState(this);
