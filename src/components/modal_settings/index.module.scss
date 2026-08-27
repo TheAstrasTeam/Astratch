@@ -3,7 +3,6 @@
 
 .content {
     width: 75vw;
-    height: 75vh;
     display: flex;
     min-width: 0;
     min-height: 0;
@@ -45,9 +44,7 @@
     flex: 1;
     flex-direction: column;
     min-width: 0;
-    min-height: 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
+    overflow: hidden;
 }
 .settings-title {
     flex: 0 0 auto;
@@ -78,10 +75,12 @@
 
 .settings-content {
     display: flex;
-    flex: 1;
+    flex: 1 1 0;
     flex-direction: column;
     min-width: 0;
-    min-height: 0;
+    height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
 }
 
 .group-title {
