@@ -67,11 +67,13 @@ const AddonCard = ({
     const latestVersion = versions[versions.length - 1];
     const hasUpdate = !isCustom && version !== latestVersion;
     return (
-        <div className={styles.card} onClick={onSelectAddon} role='button' tabIndex={0}>
+        <div className={classNames(styles.card, {
+            [styles.disabled]: !enabled && downloaded
+        })} onClick={onSelectAddon} role='button' tabIndex={0} >
             {icon && <img className={styles.cardIcon} src={icon} alt='' />}
             <div className={styles.cardInfo}>
                 <span className={styles.cardName}>
-                    {name}
+                    <span className={styles.cardNameTitle}>{name}</span>
                     {isCustom && <span className={styles.cardBadge}>{t('gui:addon.custom')}</span>}
                     {!isCustom && !showVersionSelect && (
                         <span className={styles.cardBadge}>v{version}</span>
@@ -155,7 +157,7 @@ const AddonsPanel = ({ vm }: { vm: IVM }) => {
     const enabled = useAddonStore(state => state.enabled);
     const downloading = useAddonStore(state => state.downloading);
     const status = useAddonStore(state => state.status);
-    const storeRefreshing = useAddonStore(state => state.refreshing);
+    const storeRefreshing: boolean = useAddonStore(state => state.refreshing);
     const [importing, setImporting] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [selectedAddon, setSelectedAddon] = useState<string | null>(null);
