@@ -11,6 +11,7 @@ import { useEffect, useMemo, useState, type FunctionComponent, type SVGProps } f
 import classNames from 'classnames';
 
 import SpriteIcon from '../../assets/sprite.svg?react';
+import AddonsIcon from '../../assets/addons.svg?react';
 import DebuggerIcon from '../../assets/debugger.svg?react';
 import EmptyTip from '../../assets/empty.svg?react';
 import EmptyTip2 from '../../assets/empty2.svg?react';
@@ -22,6 +23,7 @@ import { guiInterface } from '../../types/gui';
 import Start from '../start';
 import CreateProject from '../createProjet';
 import TargetsPanel from './targets';
+import AddonsPanel from './addons';
 import SplitPane from '../../components/splitPane';
 import { debounce } from '../../utils/ash-debounce';
 import { BottomBar } from '../bottomBar';
@@ -95,6 +97,9 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
             [SHORTCUTS.SWITCH_TAB_TARGET.id]: () => {
                 setTabSelect(allBuiltInTabs.TARGETS);
             },
+            [SHORTCUTS.SWITCH_TAB_ADDON.id]: () => {
+                setTabSelect(allBuiltInTabs.ADDONS);
+            },
             [SHORTCUTS.SWITCH_TAB_DEBUG.id]: () => {
                 setTabSelect(allBuiltInTabs.DEBUG);
             },
@@ -144,6 +149,12 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
                     <TargetsPanel vm={vm} />
                 </SelectBar>
             );
+        if (tabSelected === allBuiltInTabs.ADDONS)
+            return (
+                <SelectBar title={t('gui:addon.title')}>
+                    <AddonsPanel vm={vm} />
+                </SelectBar>
+            );
     };
 
     return (
@@ -162,6 +173,12 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
                                         selected={tabSelected}
                                         id={allBuiltInTabs.TARGETS}
                                         ICON={SpriteIcon}
+                                        callback={setTabSelect}
+                                    />
+                                    <TabButton
+                                        selected={tabSelected}
+                                        id={allBuiltInTabs.ADDONS}
+                                        ICON={AddonsIcon}
                                         callback={setTabSelect}
                                     />
                                     <TabButton

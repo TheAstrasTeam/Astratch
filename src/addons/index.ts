@@ -1,0 +1,23 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+// 此文件由AI生成
+
+export { addonManager, useAddonStore } from './manager';
+export { buildAddonContext } from './context';
+export type {
+    IAddon,
+    IAddonContext,
+    IAddonInfo,
+    IAddonStorage,
+    IAddonSettingDefinition,
+    IAddonSettingsApi,
+    IAddonRegistry,
+    IRegistryAddon,
+    IRegistryVersion,
+    TAddonSettingType,
+} from './types';
+export type { IAddonStoreState, TAddonLoadStatus } from './manager';

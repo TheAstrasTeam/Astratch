@@ -100,6 +100,11 @@ export const SHORTCUTS = {
         defaultKey: 'mod+1',
         scope: 'global',
     },
+    SWITCH_TAB_ADDON: {
+        id: 'tabs.switchTab.addon',
+        defaultKey: 'mod+2',
+        scope: 'global',
+    },
     SWITCH_TAB_DEBUG: {
         id: 'tabs.switchTab.debug',
         defaultKey: 'mod+3',

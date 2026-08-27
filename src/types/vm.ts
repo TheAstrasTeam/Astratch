@@ -26,6 +26,7 @@ export type TallTarget = (typeof targets)[keyof typeof targets];
  */
 export const allBuiltInTabs = {
     TARGETS: 'targets',
+    ADDONS: 'addons',
     DEBUG: 'debug',
 } as const;
 export type TallBuiltInTabs = (typeof allBuiltInTabs)[keyof typeof allBuiltInTabs];
@@ -595,4 +596,14 @@ export interface IProjectMetaJSON {
     projectSaveVersion: number;
     meta: IProjectMeta;
     folders: Record<TTargetMode, IFolder[]>;
+    /**
+     * 项目启用/禁用的远端插件（不含自定义插件），打开项目时据此恢复插件环境。
+     * versions 记录每个插件在项目保存时的版本，加载时下载该版本而非最新版本。
+     * 若最新版本更高，UI 会显示更新提示。
+     */
+    addonState?: {
+        enabled: string[];
+        disabled: string[];
+        versions?: Record<string, string>;
+    };
 }
