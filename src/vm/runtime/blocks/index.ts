@@ -177,6 +177,34 @@ class Blocks implements IBlocks {
         }
     };
 
+    private handleFunctionEdited = (rawData: object) => {
+        const data = rawData as { id?: string; targetID?: string };
+        if (!data.id || !data.targetID) return;
+
+        if (data.targetID === this.vm.runtime.editingTargetID)
+            this.workspaceSvg?.refreshToolboxSelection();
+        const blocks = this.workspaceSvg?.getAllBlocks(false) ?? [];
+        for (const block of blocks) {
+            if (block.type !== OPCODES.FUNCTION_VALUE) continue;
+            const value = block as unknown as {
+                functionRef?: { targetId: string; functionId: string } | null;
+                refreshFromFunctionData?: () => void;
+            };
+            if (
+                value.functionRef?.targetId !== data.targetID ||
+                value.functionRef.functionId !== data.id ||
+                !value.refreshFromFunctionData
+            )
+                continue;
+            value.refreshFromFunctionData();
+        }
+        for (const block of blocks) {
+            if (block.type === OPCODES.FUNCTION_CALL || block.type === OPCODES.FUNCTION_EXECUTE) {
+                (block as unknown as { syncArgs?: () => void }).syncArgs?.();
+            }
+        }
+    };
+
     constructor(BlocklySelf: typeof Blockly, vm: IVM) {
         this.vm = vm;
         this._DOM = null;
@@ -321,6 +349,7 @@ class Blocks implements IBlocks {
                 this.vm.on(events.UPDATE_THEME, this.handleThemeUpdate);
                 this.vm.on(events.CREATE_DATA, this.handleVariableCreated);
                 this.vm.on(events.CREATE_CUSTOM_FUNCTION, this.handleFunctionCreated);
+                this.vm.on(events.EDIT_CUSTOM_FUNCTION, this.handleFunctionEdited);
             }
 
             const nowTarget = this.vm.runtime.getTargetByID(this.vm.runtime.editingTargetID);
@@ -362,6 +391,7 @@ class Blocks implements IBlocks {
         this.vm.off(events.UPDATE_THEME, this.handleThemeUpdate);
         this.vm.off(events.CREATE_DATA, this.handleVariableCreated);
         this.vm.off(events.CREATE_CUSTOM_FUNCTION, this.handleFunctionCreated);
+        this.vm.off(events.EDIT_CUSTOM_FUNCTION, this.handleFunctionEdited);
         if (this.workspaceSvg) {
             this.workspaceSvg.removeChangeListener(this.handleWorkspaceChange);
             this.workspaceSvg.dispose();

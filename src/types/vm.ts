@@ -150,11 +150,24 @@ export interface ITarget {
      * @returns 是否创建成功
      */
     addCustomFunction: (id: string, meta: ICustomFunction) => boolean;
+    /**
+     * 替换一个自定义函数配置
+     * @returns 是否替换成功
+     */
+    replaceCustomFunction: (id: string, meta: ICustomFunction) => boolean;
+    /**
+     * 删除一个自定义函数配置
+     * @returns 是否删除成功
+     */
+    removeCustomFunction: (id: string) => boolean;
+    flatBlocks: () => TFlatBlocks[];
     /** 根据稳定 ID 获取一个自定义函数，不存在时返回 null。 */
     getFunction: (id: string) => ICustomFunction | null;
     /** 获取自定义函数的只读快照，供动态工具箱生成内容。 */
     listFunctions: () => readonly ICustomFunction[];
 }
+
+export type TFlatBlocks = Blockly.serialization.blocks.State & { parentID?: string };
 
 /**
  * 纯字段的目标结构（用于默认值模板与序列化）
@@ -175,6 +188,9 @@ export type TTargetInfo = Omit<
     | 'cloneAsNode'
     | 'toJSON'
     | 'addCustomFunction'
+    | 'replaceCustomFunction'
+    | 'removeCustomFunction'
+    | 'flatBlocks'
     | 'data'
     | 'function'
     | 'getFunction'
@@ -562,6 +578,8 @@ export const events = {
     UPDATE_TARGET_STRUCTURE: 'update_target_structure',
     CREATE_DATA: 'create_data',
     CREATE_CUSTOM_FUNCTION: 'create_custom_function',
+    EDIT_CUSTOM_FUNCTION: 'edit_custom_function',
+    REMOVE_CUSTOM_FUNCTION: 'remove_custom_function',
 } as const;
 
 export type TEvents = (typeof events)[keyof typeof events];

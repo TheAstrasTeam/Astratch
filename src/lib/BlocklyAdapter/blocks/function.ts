@@ -34,7 +34,7 @@ import moveRightIcon from '../../../assets/blocks/moveRight.svg';
 import removeIcon from '../../../assets/remove.svg';
 import settingsIcon from '../../../assets/settingsFunction.svg';
 import { FieldTypeModal } from '../../../components/modal_createFunction/modal_fieldType';
-import { modal } from '../../../components/Modal/modal';
+import { isModalOpen, modal } from '../../../components/Modal/modal';
 import { PromptModal } from '../../../components/modal_prompt';
 
 const CONTROL_BAR_BUTTON_SIZE = 20;
@@ -163,6 +163,7 @@ type IDefinitionFunctionValueBlock = IFunctionValueBlock &
     Omit<IScopedSourceHost, 'loadExtraState' | 'saveExtraState'> & {
         definitionMode: boolean;
         definitionScopedSourceReady: boolean;
+        refreshFromFunctionData(): void;
     };
 
 interface IFunctionDefinitionBlock extends Blockly.Block {
@@ -236,6 +237,38 @@ const checksEqual = (
     if (!Array.isArray(a) || !Array.isArray(b)) return a === b;
     if (a.length !== b.length) return false;
     return a.every((check, index) => check === b[index]);
+};
+
+/**
+ * 原地更新一对已连接连接的 check，并兼容作用域锁定槽。
+ *
+ * Blockly 的 setCheck 会立即复检现有连接；ASH 的作用域槽默认拒绝
+ * 一切复检，因此更新期间必须临时解锁，否则即使两端类型最终一致，
+ * 子积木也会在中间状态被拔出。
+ */
+const alignConnectedChecks = (
+    parent: Blockly.Connection,
+    child: Blockly.Connection | null,
+    wanted: string | string[] | null,
+): void => {
+    const parentCurrent = parent.getCheck() ?? null;
+    const childCurrent = child?.getCheck() ?? null;
+    if (
+        checksEqual(parentCurrent, wanted) &&
+        (!child || checksEqual(childCurrent, wanted))
+    )
+        return;
+
+    const scopedParent = parent as AshConnection;
+    const previous = scopedParent.allowScopedSource ?? false;
+    scopedParent.allowScopedSource = true;
+    try {
+        parent.setCheck(null);
+        if (child && !checksEqual(childCurrent, wanted)) child.setCheck(wanted);
+        parent.setCheck(wanted);
+    } finally {
+        scopedParent.allowScopedSource = previous;
+    }
 };
 
 /** 立即刷新动态连接形状；使用 BlockSvg 自带实现以保持 Blockly 实例一致。 */
@@ -924,6 +957,31 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
             configureFunctionValueConnections(this, this.isValue, this.returnType);
             this.updateShape();
         },
+        refreshFromFunctionData(this: IDefinitionFunctionValueBlock) {
+            if (this.isDeadOrDying() || !this.functionRef) return;
+            const functionData = getReferencedFunction(vm, this.functionRef);
+            if (!functionData) return;
+
+            this.previewData = structuredClone(functionData.body);
+            this.colors = structuredClone(functionData.color);
+            this.returnType = normalizeReturnType(functionData.returnType);
+
+            // 更新输出 checker 时暂时放宽父槽，避免新旧返回类型切换时
+            // Blockly 将仍然兼容的函数值从调用处拔出。
+            const output = this.outputConnection;
+            const parent = output?.targetConnection;
+            const wanted = this.definitionMode
+                ? returnTypeChecks(this.returnType)
+                : this.isValue
+                  ? ['Function']
+                  : returnTypeChecks(this.returnType);
+            if (output && parent) alignConnectedChecks(parent, output, wanted);
+            else if (output && !checksEqual(output.getCheck() ?? null, wanted))
+                output.setCheck(wanted);
+
+            this.updateShape();
+            if (this.definitionMode) this.ensureScopedBlocks();
+        },
         saveExtraState(this: IDefinitionFunctionValueBlock) {
             return saveFunctionValueState(this);
         },
@@ -934,10 +992,32 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                 | Blockly.ContextMenuRegistry.LegacyContextMenuOption
             )[],
         ) {
-            if (this.definitionMode || this.isInFlyout || this.editMode || !this.functionRef)
-                return;
+            if (this.definitionMode || this.editMode || !this.functionRef) return;
 
             const block = this as unknown as Blockly.BlockSvg;
+            if (this.isInFlyout) {
+                options.unshift({
+                    id: 'functionValueEdit',
+                    text: t('blocks:function.edit'),
+                    enabled: true,
+                    scope: { block, focusedNode: block },
+                    weight: 10,
+                    callback: () => {
+                        // 防止循环依赖
+                        void import('../../../components/modal_createFunction').then(
+                            ({ CreateFunctionModal }) => {
+                                if (isModalOpen(CreateFunctionModal)) return;
+                                void modal.open(CreateFunctionModal, {
+                                    vm,
+                                    addID: this.functionRef?.targetId ?? vm.runtime.editingTargetID,
+                                    editFunctionId: this.functionRef?.functionId,
+                                });
+                            },
+                        );
+                    },
+                });
+                return;
+            }
             options.unshift({
                 separator: true,
             } as Blockly.ContextMenuRegistry.SeparatorContextMenuOption);
@@ -1025,7 +1105,12 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                         input = null;
                     }
                     input ??= this.appendValueInput(inputName);
-                    input.setCheck(fieldData.type);
+                    const connection = input.connection;
+                    const wantedChecks = paramTypeToChecks(fieldData.type);
+                    const source = connection?.targetBlock();
+                    const sourceOutput =
+                        source?.type === OPCODES.FUNCTION_PARAM ? source.outputConnection : null;
+                    if (connection) alignConnectedChecks(connection, sourceOutput, wantedChecks);
                 });
 
                 for (let index = 0; index < this.previewData.length; index++) {

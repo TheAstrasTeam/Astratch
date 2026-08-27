@@ -234,8 +234,22 @@ const applyPreviewConfig = () => {
     schedulePreviewLayout(previewWorkspace, previewSession, previewBlock);
 };
 
-const setupWorkspace = (workspace: Blockly.WorkspaceSvg) => {
+export interface IFunctionPreviewInitialState {
+    data: TPreviewFunctionData[];
+    color: IBlockColor;
+    isValue: boolean;
+    returnType: TFunctionReturnType;
+}
+
+const setupWorkspace = (
+    workspace: Blockly.WorkspaceSvg,
+    initial?: IFunctionPreviewInitialState,
+) => {
     const session = ++previewSession;
+    previewFunctionData = structuredClone(initial?.data ?? []);
+    previewBlockColor = structuredClone(initial?.color ?? BlocksColor.function);
+    previewIsValue = initial?.isValue ?? true;
+    previewReturnType = initial?.returnType ?? null;
     previewWorkspace = workspace;
     workspace.configureContextMenu = options => {
         options.length = 0;
@@ -245,7 +259,7 @@ const setupWorkspace = (workspace: Blockly.WorkspaceSvg) => {
         {
             id: previewBlockId,
             type: OPCODES.FUNCTION_VALUE,
-            extraState: { params: previewFunctionData, isValue: true },
+            extraState: { params: previewFunctionData, isValue: previewIsValue },
         },
         previewWorkspace,
     ) as IFunctionValueBlock;

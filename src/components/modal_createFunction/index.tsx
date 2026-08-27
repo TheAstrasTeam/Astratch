@@ -10,7 +10,7 @@ import { modal } from '../Modal/modal';
 import { isModalOpen } from '../Modal/modal';
 import { t } from 'i18next';
 import styles from './index.module.scss';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { type IVM } from '../../types/vm';
 import { CreateFunctionWorkspace } from './blockWorkspace';
 import { FieldTypeModal } from './modal_fieldType';
@@ -22,6 +22,7 @@ import {
     setPreviewConfig,
     setPreviewBlockColor,
     previewFunctionData,
+    type IFunctionPreviewInitialState,
 } from './functionPreview';
 import { DropDownIcon, StringIcon, TextIcon } from './icons';
 import { ColorPickerButton } from '../colorPickerButton';
@@ -57,11 +58,32 @@ const BigSelector = ({
     );
 };
 
-export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) => {
+export interface ICreateFunctionModalProps {
+    vm: IVM;
+    addID: string;
+    editFunctionId?: string;
+}
+
+export const CreateFunctionModal = ({ vm, addID, editFunctionId }: ICreateFunctionModalProps) => {
     const { closeSelf } = useModalInstance();
-    const [blockColor, setBlockColor] = useState<IBlockColor>(previewBlockColor);
-    const [isValue, setIsValue] = useState(true);
-    const [returnType, setReturnType] = useState<TFunctionReturnType>(null);
+    const existingFunction = editFunctionId
+        ? vm.runtime.getTargetByID(addID)?.getFunction(editFunctionId)
+        : null;
+    const initial = useMemo<IFunctionPreviewInitialState | undefined>(
+        () =>
+            existingFunction
+                ? {
+                      data: existingFunction.body,
+                      color: existingFunction.color,
+                      isValue: existingFunction.isValue,
+                      returnType: existingFunction.returnType ?? null,
+                  }
+                : undefined,
+        [existingFunction],
+    );
+    const [blockColor, setBlockColor] = useState<IBlockColor>(initial?.color ?? previewBlockColor);
+    const [isValue, setIsValue] = useState(initial?.isValue ?? true);
+    const [returnType, setReturnType] = useState<TFunctionReturnType>(initial?.returnType ?? null);
 
     const handleButtonClick = useCallback(
         async (close: unknown = null) => {
@@ -115,18 +137,21 @@ export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) =
     };
 
     const doneCreateFunction = () => {
-        const id = spawnRandomString();
+        const id = editFunctionId ?? spawnRandomString();
         const functionData: ICustomFunction = {
             body: structuredClone(previewFunctionData),
             color: structuredClone(previewBlockColor),
             id,
-            isValue: true,
+            // 保持新建函数原有的默认值语义；编辑时保存用户在弹窗里选择的显示模式。
+            isValue: editFunctionId ? isValue : true,
             returnType: Array.isArray(returnType) ? [...returnType] : returnType,
         };
         const target = vm.runtime.getTargetByID(addID);
         if (target) {
-            target.addCustomFunction(id, functionData);
-            void closeSelf();
+            const saved = editFunctionId
+                ? target.replaceCustomFunction(id, functionData)
+                : target.addCustomFunction(id, functionData);
+            if (saved) void closeSelf();
         } else sendError(t('vm:err.target.undefined'), 'warn');
     };
 
@@ -152,13 +177,13 @@ export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) =
             close={async () => {
                 await handleButtonClick();
             }}
-            title={t('gui:createFunction.title')}
+            title={t(editFunctionId ? 'gui:createFunction.editTitle' : 'gui:createFunction.title')}
             description={t('gui:createFunction.description')}
             minWidth={780}
             minHeight={570}
         >
             <div className={styles.content}>
-                <CreateFunctionWorkspace vm={vm} />
+                <CreateFunctionWorkspace vm={vm} initial={initial} />
                 <span className={styles.mainTitle}>{t('gui:createFunction.addField')}</span>
                 <div className={styles.addFieldContent}>
                     <BigSelector
