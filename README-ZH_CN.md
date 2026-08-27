@@ -25,7 +25,7 @@
 
 ## Blockly
 
-`Astratch` 克隆&修改&使用了 [blockly-examples](https://github.com/RaspberryPiFoundation/blockly-samples) 其中的部分插件：
+`Astratch` 克隆&修改&使用了 [blockly-samples](https://github.com/RaspberryPiFoundation/blockly-samples) 其中的部分插件：
 
 - [Continuous Toolbox](./plugins/astratch-toolbox/)（改名为了 Astratch Toolbox）
 - [field-angle](./plugins/field-angle/)
