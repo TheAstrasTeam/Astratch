@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// 
+//
 
 // QuickOpen 搜索面板的状态（纯搜索面板，与 Ctrl+Tab 快速切换解耦）。
 // 通过 mod+p 或点击菜单栏搜索框打开；输入框可编辑，query 实时过滤 Target / 命令。

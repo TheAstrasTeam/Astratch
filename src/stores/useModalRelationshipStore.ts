@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 // 此文件由AI生成：模态框父子关系、阻塞模式与关闭传播
 
 import { create, type UseBoundStore, type StoreApi } from 'zustand';
