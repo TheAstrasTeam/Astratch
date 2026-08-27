@@ -163,8 +163,8 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
                 <SplitPane
                     direction='horizontal'
                     defaultRatio={0.2}
-                    minFirst={50}
-                    minSecond={150}
+                    minFirst={300}
+                    minSecond={400}
                     first={
                         <div className={styles.sidebarCol}>
                             <div className={styles.sidebarHeader}>

@@ -118,7 +118,6 @@ export function setFunctionCategory(_blockly: typeof Blockly, vm: IVM): IRegiste
                 gap: 12,
                 kind: 'block',
                 type: OPCODES.FUNCTION_RETURN,
-                inputs: { VALUE: txt(t('blocks:example.value')) },
             },
             {
                 gap: 12,
@@ -129,9 +128,6 @@ export function setFunctionCategory(_blockly: typeof Blockly, vm: IVM): IRegiste
                 gap: 12,
                 kind: 'block',
                 type: OPCODES.FUNCTION_SETDATAVALUE,
-                inputs: {
-                    VALUE: txt(t('blocks:example.data')),
-                },
             },
         ];
         basicItems.forEach(item => items.push(item));

@@ -10,7 +10,7 @@ import { modal } from '../Modal/modal';
 import { isModalOpen } from '../Modal/modal';
 import { t } from 'i18next';
 import styles from './index.module.scss';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { type IVM } from '../../types/vm';
 import { CreateFunctionWorkspace } from './blockWorkspace';
 import { FieldTypeModal } from './modal_fieldType';
@@ -22,15 +22,12 @@ import {
     setPreviewConfig,
     setPreviewBlockColor,
     previewFunctionData,
+    type IFunctionPreviewInitialState,
 } from './functionPreview';
 import { DropDownIcon, StringIcon, TextIcon } from './icons';
 import { ColorPickerButton } from '../colorPickerButton';
-import type { IBlockColor, ICustomFunction } from '../../types/blocks';
-import type {
-    TFunctionFieldType,
-    TFunctionInputField,
-    TFunctionReturnType,
-} from './functionPreview';
+import { AllCheckers, type IBlockColor, type ICustomFunction } from '../../types/blocks';
+import type { TFunctionFieldType, TFunctionReturnType } from './functionPreview';
 import type { JSX } from 'react/jsx-dev-runtime';
 import * as Blockly from 'blockly/core';
 
@@ -61,11 +58,32 @@ const BigSelector = ({
     );
 };
 
-export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) => {
+export interface ICreateFunctionModalProps {
+    vm: IVM;
+    addID: string;
+    editFunctionId?: string;
+}
+
+export const CreateFunctionModal = ({ vm, addID, editFunctionId }: ICreateFunctionModalProps) => {
     const { closeSelf } = useModalInstance();
-    const [blockColor, setBlockColor] = useState<IBlockColor>(previewBlockColor);
-    const [isValue, setIsValue] = useState(true);
-    const [returnType, setReturnType] = useState<TFunctionReturnType>(null);
+    const existingFunction = editFunctionId
+        ? vm.runtime.getTargetByID(addID)?.getFunction(editFunctionId)
+        : null;
+    const initial = useMemo<IFunctionPreviewInitialState | undefined>(
+        () =>
+            existingFunction
+                ? {
+                      data: existingFunction.body,
+                      color: existingFunction.color,
+                      isValue: existingFunction.isValue,
+                      returnType: existingFunction.returnType ?? null,
+                  }
+                : undefined,
+        [existingFunction],
+    );
+    const [blockColor, setBlockColor] = useState<IBlockColor>(initial?.color ?? previewBlockColor);
+    const [isValue, setIsValue] = useState(initial?.isValue ?? true);
+    const [returnType, setReturnType] = useState<TFunctionReturnType>(initial?.returnType ?? null);
 
     const handleButtonClick = useCallback(
         async (close: unknown = null) => {
@@ -74,7 +92,9 @@ export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) =
         [closeSelf],
     );
 
-    const handleAddFieldButtonClick = (result: TFunctionFieldType) => {
+    const handleAddFieldButtonClick = (result: TFunctionFieldType | typeof AllCheckers.NONE) => {
+        // 输入类型 Modal 不会返回 NONE（那是返回值语境的占位），防御一下。
+        if (result === 'text' || result === AllCheckers.NONE) return;
         addFieldForFunctionPreview({
             type: result,
         });
@@ -98,34 +118,40 @@ export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) =
         setPreviewConfig({ isValue: nextIsValue, returnType });
     };
 
-    const handleSetReturnType = (result: TFunctionFieldType) => {
-        // 返回类型 Modal 只会返回值类型、联合值类型或 null；text/dropdown
-        // 是旧字段类型，为避免把它们误当成 Blockly check，明确拒绝。
-        if (result === 'text' || result === 'dropdown') return;
+    const handleSetReturnType = (result: TFunctionFieldType | typeof AllCheckers.NONE) => {
+        // 返回类型 Modal 只会返回值类型、联合值类型、null（未知）或 NONE；
+        // text 是旧字段类型，为避免把它误当成 Blockly check，明确拒绝。
+        if (result === 'text') return;
         const nextReturnType = result;
         setReturnType(nextReturnType);
         setPreviewConfig({ isValue, returnType: nextReturnType });
     };
 
     const returnTypeLabel = () => {
-        if (returnType === null) return t('gui:createFunction.noReturn');
-        const types: TFunctionInputField[] = Array.isArray(returnType) ? returnType : [returnType];
-        return types.map(type => t(`gui:createFunction.${type}`)).join(' | ');
+        if (returnType === null) return t('gui:createFunction.nullReturn');
+        if (returnType === AllCheckers.NONE) return t('gui:createFunction.noneReturn');
+        // checker 是大写开头（'Boolean'），i18n key 是全小写。
+        // 联合类型 TFunctionTypeUnion 不含 null，无需过滤。
+        const types = Array.isArray(returnType) ? returnType : [returnType];
+        return types.map(type => t(`gui:createFunction.${type.toLowerCase()}`)).join(' | ');
     };
 
     const doneCreateFunction = () => {
-        const id = spawnRandomString();
+        const id = editFunctionId ?? spawnRandomString();
         const functionData: ICustomFunction = {
             body: structuredClone(previewFunctionData),
             color: structuredClone(previewBlockColor),
             id,
-            isValue: true,
+            // 保持新建函数原有的默认值语义；编辑时保存用户在弹窗里选择的显示模式。
+            isValue: editFunctionId ? isValue : true,
             returnType: Array.isArray(returnType) ? [...returnType] : returnType,
         };
         const target = vm.runtime.getTargetByID(addID);
         if (target) {
-            target.addCustomFunction(id, functionData);
-            void closeSelf();
+            const saved = editFunctionId
+                ? target.replaceCustomFunction(id, functionData)
+                : target.addCustomFunction(id, functionData);
+            if (saved) void closeSelf();
         } else sendError(t('vm:err.target.undefined'), 'warn');
     };
 
@@ -151,20 +177,21 @@ export const CreateFunctionModal = ({ vm, addID }: { vm: IVM; addID: string }) =
             close={async () => {
                 await handleButtonClick();
             }}
-            title={t('gui:createFunction.title')}
+            title={t(editFunctionId ? 'gui:createFunction.editTitle' : 'gui:createFunction.title')}
             description={t('gui:createFunction.description')}
             minWidth={780}
             minHeight={570}
         >
             <div className={styles.content}>
-                <CreateFunctionWorkspace vm={vm} />
+                <CreateFunctionWorkspace vm={vm} initial={initial} />
                 <span className={styles.mainTitle}>{t('gui:createFunction.addField')}</span>
                 <div className={styles.addFieldContent}>
                     <BigSelector
                         icon={<DropDownIcon color={blockColor} />}
                         label={t('gui:createFunction.dropdown')}
                         onClick={() => {
-                            handleAddFieldButtonClick('dropdown');
+                            // 下拉框定义还没做完，暂时按字符串输入处理。
+                            handleAddFieldButtonClick(AllCheckers.STRING);
                         }}
                     />
                     <BigSelector

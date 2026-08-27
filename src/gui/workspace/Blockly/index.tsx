@@ -15,6 +15,7 @@ import { getBlocklyMenuOptions, getBlocklyMenuEvent } from '../../../lib/Blockly
 
 const BlocklyWorkspace = ({ vm, targetId }: { vm: IVM; targetId: string }): React.ReactNode => {
     const workspaceDiv = useRef<HTMLDivElement>(null);
+    const disposeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useContextMenu(AllContextMenu.BLOCKLY, closeMenu => {
         const options = getBlocklyMenuOptions();
@@ -57,16 +58,23 @@ const BlocklyWorkspace = ({ vm, targetId }: { vm: IVM; targetId: string }): Reac
     useEffect(() => {
         if (!workspaceDiv.current) return;
 
-        if (vm.runtime.editingTargetID !== targetId) {
-            vm.runtime.switchTarget(targetId);
+        if (disposeTimer.current) {
+            clearTimeout(disposeTimer.current);
+            disposeTimer.current = null;
         }
 
+        if (vm.runtime.editingTargetID !== targetId) vm.runtime.switchTarget(targetId);
         void vm.runtime.blocks.createWorkspace(workspaceDiv.current, false);
 
         return () => {
-            vm.runtime.blocks.dispose();
+            // React 会在下一个 targetId effect 之前运行清理
+            // 延迟释放以便目标切换时保持现有的 Blockly 工作区活着
+            disposeTimer.current = setTimeout(() => {
+                disposeTimer.current = null;
+                vm.runtime.blocks.dispose();
+            }, 0);
         };
-    }, [vm, vm.on, targetId]);
+    }, [vm, targetId]);
 
     return (
         <div className={styles.root}>

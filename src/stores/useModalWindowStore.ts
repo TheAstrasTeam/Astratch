@@ -28,7 +28,7 @@ export interface IModalWindowState extends IModalWindowRect {
 /**
  * 窗口ID的持久化 key
  */
-const STORAGE_KEY = 'astratch.modalWindows';
+const STORAGE_KEY = 'ash_modalCache';
 
 /** 与 @reactleaf/modal 的 .modal-layer 默认 z-index 保持一致 */
 const BASE_Z = 1001;

@@ -196,6 +196,7 @@
     "tab.closeRight": "Close Tabs to the Right",
     "tab.newTab": "New Tab",
     "createFunction.title": "Create a Function",
+    "createFunction.editTitle": "Edit Function",
     "createFunction.description": "Strangely, you are looking at the Modal title",
     "createFunction.dropdown": "Dropdown",
     "createFunction.input": "Input",
@@ -208,6 +209,7 @@
     "createFunction.string": "String",
     "createFunction.number": "Number",
     "createFunction.function": "Function",
+    "createFunction.any": "Unknown",
     "createFunction.pickColor": "Custom block color",
     "createFunction.addField": "Add input",
     "createFunction.setColor": "Set block color",
@@ -215,5 +217,6 @@
     "createFunction.customBlock": "Show as the Direct Run mode.",
     "createFunction.returnType": "Return type",
     "createFunction.selectReturnType": "Choose the function return type",
-    "createFunction.noReturn": "No return value"
+    "createFunction.noneReturn": "No return",
+    "createFunction.nullReturn": "Unknown"
 }

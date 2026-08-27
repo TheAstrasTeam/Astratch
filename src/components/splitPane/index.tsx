@@ -88,6 +88,7 @@ const SplitPane = ({
                 style={{
                     [isHorizontal ? 'width' : 'height']: `${String(ratio * 100)}%`,
                     flexShrink: 0,
+                    [isHorizontal ? 'minWidth' : 'minHeight']: `${String(minFirst)}px`,
                 }}
             >
                 {first}
@@ -100,7 +101,12 @@ const SplitPane = ({
                 })}
                 onMouseDown={handleMouseDown}
             />
-            <div className={classNames(styles.pane, styles.paneFlex)}>{second}</div>
+            <div
+                className={classNames(styles.pane, styles.paneFlex)}
+                style={{ [isHorizontal ? 'minWidth' : 'minHeight']: `${String(minFirst)}px` }}
+            >
+                {second}
+            </div>
         </div>
     );
 };
