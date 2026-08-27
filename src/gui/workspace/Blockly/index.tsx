@@ -15,6 +15,7 @@ import { getBlocklyMenuOptions, getBlocklyMenuEvent } from '../../../lib/Blockly
 
 const BlocklyWorkspace = ({ vm, targetId }: { vm: IVM; targetId: string }): React.ReactNode => {
     const workspaceDiv = useRef<HTMLDivElement>(null);
+    const initialTargetId = useRef(targetId);
 
     useContextMenu(AllContextMenu.BLOCKLY, closeMenu => {
         const options = getBlocklyMenuOptions();
@@ -57,16 +58,20 @@ const BlocklyWorkspace = ({ vm, targetId }: { vm: IVM; targetId: string }): Reac
     useEffect(() => {
         if (!workspaceDiv.current) return;
 
-        if (vm.runtime.editingTargetID !== targetId) {
-            vm.runtime.switchTarget(targetId);
-        }
-
+        if (vm.runtime.editingTargetID !== initialTargetId.current)
+            vm.runtime.switchTarget(initialTargetId.current);
         void vm.runtime.blocks.createWorkspace(workspaceDiv.current, false);
 
         return () => {
             vm.runtime.blocks.dispose();
         };
-    }, [vm, vm.on, targetId]);
+    }, [vm, vm.on]);
+
+    useEffect(() => {
+        if (!workspaceDiv.current || targetId === initialTargetId.current) return;
+        if (vm.runtime.editingTargetID !== targetId) vm.runtime.switchTarget(targetId);
+        void vm.runtime.blocks.createWorkspace(workspaceDiv.current, false);
+    }, [vm, targetId]);
 
     return (
         <div className={styles.root}>
