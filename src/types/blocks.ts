@@ -236,6 +236,8 @@ const OPCODES = {
     FUNCTION_SETDATAVALUE: 'function_setDataValue',
     FUNCTION_VALUE: 'function_value',
     FUNCTION_VALUE_ID: 'function_value_id',
+    FUNCTION_DROPDOWN: 'function_dropdown',
+    FUNCTION_ENUM: 'function_enum',
 
     // 画布
     CANVAS_CLEANALL: 'canvas_cleanAll',

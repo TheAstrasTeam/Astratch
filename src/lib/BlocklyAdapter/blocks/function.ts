@@ -14,18 +14,27 @@ import { AllCheckers, BlocksColor, OPCODES } from '../../../types/blocks';
 import type { ICustomFunction, IFunctionReference } from '../../../types/blocks';
 import type { IVM } from '../../../types/vm';
 import type {
+    IFunctionDropdownField,
     IFunctionValueBlock,
     TFunctionInputField,
     TFunctionReturnType,
     TFunctionTypeUnion,
     TPreviewFunctionData,
 } from '../../../components/modal_createFunction/functionPreview';
+import {
+    createDropdownField,
+    isDropdownField,
+    normalizedDropdownOptions,
+    selectedDropdownValue,
+} from '../../../components/modal_createFunction/functionPreview';
+import { CreateDropdownModal } from '../../../components/modal_createDropdown';
 import { connections, endConnections, hatConnections, returnConnections } from './helpers';
 import { createMinusWithSettingsField, createPlusField } from './mutation';
 import {
     scopedSourceBlock,
     scopedSourceHost,
     type IDynamicScopedHost,
+    type IScopedSlot,
     type IScopedSourceHost,
     type IScopedSourceBlock,
 } from './scopedSource';
@@ -40,6 +49,7 @@ import { PromptModal } from '../../../components/modal_prompt';
 const CONTROL_BAR_BUTTON_SIZE = 20;
 const CONTROL_BAR_GAP = 10;
 const CONTROL_BAR_WIDTH = CONTROL_BAR_BUTTON_SIZE * 3 + CONTROL_BAR_GAP * 2;
+const CONTROL_BAR_CONFIG_WIDTH = CONTROL_BAR_BUTTON_SIZE * 4 + CONTROL_BAR_GAP * 3;
 const CONTROL_BAR_HEIGHT = CONTROL_BAR_BUTTON_SIZE;
 
 /** 参数插槽的 input 名前缀，后接稳定 id。 */
@@ -93,6 +103,7 @@ interface IFunctionParam {
     name: string;
     /** 参数类型；null（ANY）表示未知万能。 */
     type: TFunctionInputField | TFunctionTypeUnion;
+    dropdown?: IFunctionDropdownField;
 }
 
 /** 行内函数积木。 */
@@ -114,6 +125,7 @@ interface ICallArg {
     name: string;
     /** 实参槽类型；null（ANY）表示未知万能。 */
     type: TFunctionInputField | TFunctionTypeUnion;
+    dropdown?: IFunctionDropdownField;
 }
 
 /** 调用/执行积木共用的形状同步能力。 */
@@ -164,6 +176,8 @@ type IDefinitionFunctionValueBlock = IFunctionValueBlock &
         definitionMode: boolean;
         definitionScopedSourceReady: boolean;
         refreshFromFunctionData(): void;
+        /** 下拉参数分组背景矩形，按字段下标索引（仅渲染工作区使用）。 */
+        dropdownGroupRects?: Map<number, SVGRectElement>;
     };
 
 interface IFunctionDefinitionBlock extends Blockly.Block {
@@ -273,6 +287,262 @@ const renderBlockImmediately = (block: Blockly.Block): void => {
     (block as unknown as Blockly.BlockSvg).render();
 };
 
+const dropdownShadowState = (
+    field: IFunctionDropdownField,
+): Blockly.serialization.blocks.State => ({
+    type: OPCODES.FUNCTION_DROPDOWN,
+    fields: { VALUE: selectedDropdownValue(field) },
+    extraState: {
+        options: normalizedDropdownOptions(field).map(([label, value]) => ({ label, value })),
+    },
+});
+
+const bindDropdownSelection = (
+    block: IFunctionValueBlock,
+    field: Blockly.Field,
+    index: number,
+): void => {
+    const showEditor = field.showEditor.bind(field);
+    field.showEditor = (event?: Event) => {
+        showEditor(event);
+        block.selectInput(index);
+    };
+};
+
+// 此函数由AI生成
+/**
+ * 取到（或新建）定义帽签名里的作用域值槽，并打上锁定标记。
+ *
+ * 锁定槽由宿主自动补块、对用户拖拽放行免疫（见 AshConnectionChecker
+ * 规则 1）；新建的槽顺便定型 check，已存在的槽交由调用方对齐。
+ */
+const ensureLockedValueInput = (
+    block: Blockly.Block,
+    name: string,
+    checks: string | string[] | null,
+): Blockly.Input => {
+    let input = block.getInput(name);
+    if (input && !input.connection) {
+        block.removeInput(name, true);
+        input = null;
+    }
+    if (!input) {
+        input = block.appendValueInput(name);
+        input.setCheck(checks);
+        (input.connection as AshConnection).isScopedSourceSlot = true;
+    }
+    return input;
+};
+
+// 此函数由AI生成
+/**
+ * 幂等同步实参槽上的下拉框影子。
+ *
+ * setShadowState 每次都会销毁重建影子块；而调用积木的 updateShape 会因
+ * 各种无关原因（增删别的参数等）反复触发。选项没变就不重设，才能保留
+ * 用户在该调用积木上已选的值——签名上的默认值只作为新建影子的初值。
+ */
+const syncDropdownShadowState = (
+    connection: Blockly.Connection | null | undefined,
+    field: IFunctionDropdownField,
+): void => {
+    if (!connection) return;
+    const existing = connection.targetBlock();
+    if (existing?.isShadow() && existing.type === OPCODES.FUNCTION_DROPDOWN) {
+        const menuField = existing.getField('VALUE') as unknown as {
+            getOptions(useCache?: boolean): Blockly.MenuOption[];
+        } | null;
+        const current = menuField?.getOptions(false);
+        const wanted = normalizedDropdownOptions(field);
+        if (
+            current?.length === wanted.length &&
+            wanted.every(([, value], index) => current[index][1] === value)
+        ) {
+            return;
+        }
+    }
+    connection.setShadowState(dropdownShadowState(field));
+};
+
+// 此段由AI生成
+/**
+ * 枚举源积木（输入选择器）：定义帽签名里每个下拉参数除了参数槽（数据）
+ * 外还有一个枚举槽，由作用域宿主自动补块、可无限拖出。拖出的枚举积木
+ * 用于在函数体里选择具体选项（与 Scratch 的输入选择器一致）；仍住在
+ * 枚举槽里的那枚改选会写回该参数的默认值。
+ */
+
+/** 枚举槽在宿主签名里的 input 名前缀，后接字段下标。 */
+const ENUM_INPUT_PREFIX = 'ENUM_';
+/** 枚举槽 key：enum-<字段下标>。 */
+const ENUM_SLOT_KEY_PREFIX = 'enum-';
+
+/** 枚举源积木；身份语义与参数积木一致（ownerId + slotKey 认亲）。 */
+interface IFunctionEnumBlock extends Blockly.Block {
+    ownerId?: string;
+    slotKey?: string;
+    updateLabel(name: string): void;
+}
+
+/** 读取枚举积木对应的宿主下拉配置；宿主丢失或字段已删时返回 null。 */
+const enumFieldConfigOf = (block: IFunctionEnumBlock): IFunctionDropdownField | null => {
+    if (!block.ownerId) return null;
+    const key = block.slotKey ?? '';
+    if (!key.startsWith(ENUM_SLOT_KEY_PREFIX)) return null;
+    const index = Number(key.slice(ENUM_SLOT_KEY_PREFIX.length));
+    if (!Number.isInteger(index)) return null;
+
+    const host = block.workspace.getBlockById(block.ownerId);
+    if (host?.type !== OPCODES.FUNCTION_VALUE) return null;
+    const fieldData = (host as { previewData?: TPreviewFunctionData[] }).previewData?.[index];
+    if (!fieldData || !isDropdownField(fieldData)) return null;
+    return fieldData.type;
+};
+
+/** 枚举积木是否仍住在宿主的枚举槽里（区别于拖出的副本）。 */
+const enumInHostSlot = (block: IFunctionEnumBlock): boolean =>
+    block.getParent()?.id === block.ownerId;
+
+/** 以给定配置重建枚举积木的下拉框；槽内改选会写回默认值。 */
+const rebuildEnumField = (block: IFunctionEnumBlock, config: IFunctionDropdownField): void => {
+    const input = block.getInput('MENU');
+    if (!input) return;
+    input.removeField('VALUE');
+    input.appendField(
+        createDropdownField(config, value => {
+            // 只有住在枚举槽里的那枚改选才写默认值；拖出的副本各自持有选择。
+            if (!enumInHostSlot(block)) return value;
+            // 宿主数据可能被整体替换过（refreshFromFunctionData），必须现查。
+            const live = enumFieldConfigOf(block);
+            if (live) live.value = value;
+            return value;
+        }),
+        'VALUE',
+    );
+};
+
+/**
+ * 幂等同步枚举积木的下拉选项。
+ *
+ * 选项没变时完全不重建（保留各副本已选的值）；选项变化时整体重建，
+ * 槽内那枚显示（可能更新过的）默认值，拖出的副本保留仍然有效的选择。
+ */
+const syncEnumOptions = (block: IFunctionEnumBlock): void => {
+    const config = enumFieldConfigOf(block);
+    if (!config) return;
+    const field = block.getField('VALUE') as unknown as {
+        getOptions(useCache?: boolean): Blockly.MenuOption[];
+        getValue(): string;
+        setValue(newValue: string): void;
+    } | null;
+    if (!field) return;
+
+    const wanted = normalizedDropdownOptions(config);
+    const current = field.getOptions(false);
+    const optionsEqual =
+        current.length === wanted.length &&
+        wanted.every(([, value], index) => current[index][1] === value);
+    const previous = field.getValue();
+    const inSlot = enumInHostSlot(block);
+
+    if (optionsEqual) {
+        // 选项没变：仅槽内那枚需要跟随可能被整体替换过的默认值。
+        if (inSlot && previous !== selectedDropdownValue(config)) {
+            field.setValue(selectedDropdownValue(config));
+        }
+        return;
+    }
+
+    rebuildEnumField(block, config);
+    if (!inSlot) {
+        const rebuilt = block.getField('VALUE');
+        if (rebuilt && wanted.some(([, value]) => value === previous)) rebuilt.setValue(previous);
+    }
+};
+
+/** 枚举积木的初始空配置；真实选项在宿主绑定（updateLabel）时同步。 */
+const EMPTY_DROPDOWN_FIELD: IFunctionDropdownField = {
+    type: 'dropdown',
+    options: [{ value: '' }],
+    allowBlocks: false,
+};
+
+// 此段由AI生成
+/**
+ * 下拉参数的分组背景：把签名里的参数积木与枚举积木包进同一块
+ * 半透明圆角矩形（样式同函数值参数的文本提示背景），表明两者
+ * 共同描述一个下拉参数。
+ *
+ * 背景矩形挂在宿主 svgGroup 里、插在两个子积木中 DOM 靠前者之前
+ * （Blockly 的 setParent 只会 appendChild，子积木永远位于末尾），
+ * 因此它稳定位于宿主路径之上、子积木之下。
+ */
+const DROPDOWN_GROUP_PADDING = 4;
+const DROPDOWN_GROUP_RADIUS = 8;
+
+const syncDropdownGroupBackgrounds = (host: Blockly.BlockSvg): void => {
+    if (!host.workspace.rendered || host.isDeadOrDying()) return;
+    const block = host as Blockly.BlockSvg & IDefinitionFunctionValueBlock;
+    if (!block.definitionMode) return;
+    // initSvg 之前 svgGroup 尚未创建（反序列化中途），跳过。
+    const svgRoot = block.getSvgRoot() as SVGElement | undefined;
+    if (!svgRoot) return;
+
+    const rects = (block.dropdownGroupRects ??= new Map<number, SVGRectElement>());
+    const alive = new Set<number>();
+
+    block.previewData.forEach((fieldData, index) => {
+        if (!isDropdownField(fieldData)) return;
+        const argBlock = block.getInput(`ARG${String(index)}`)?.connection?.targetBlock() as
+            Blockly.BlockSvg | undefined;
+        const enumBlock = block
+            .getInput(`${ENUM_INPUT_PREFIX}${String(index)}`)
+            ?.connection?.targetBlock() as Blockly.BlockSvg | undefined;
+        const argRoot = argBlock?.getSvgRoot();
+        const enumRoot = enumBlock?.getSvgRoot();
+        if (!argBlock || !enumBlock || !argRoot || !enumRoot) return;
+
+        const hostXY = block.getRelativeToSurfaceXY();
+        const argXY = argBlock.getRelativeToSurfaceXY();
+        const argHW = argBlock.getHeightWidth();
+        const enumXY = enumBlock.getRelativeToSurfaceXY();
+        const enumHW = enumBlock.getHeightWidth();
+
+        const left = Math.min(argXY.x, enumXY.x) - hostXY.x;
+        const top = Math.min(argXY.y, enumXY.y) - hostXY.y;
+        const right = Math.max(argXY.x + argHW.width, enumXY.x + enumHW.width) - hostXY.x;
+        const bottom = Math.max(argXY.y + argHW.height, enumXY.y + enumHW.height) - hostXY.y;
+
+        let rect = rects.get(index);
+        if (!rect || !svgRoot.contains(rect)) {
+            rect = Blockly.utils.dom.createSvgElement(Blockly.utils.Svg.RECT, {
+                class: 'blockly-function-dropdown-group-bg',
+                'pointer-events': 'none',
+            });
+            rects.set(index, rect);
+            // 插到两个子积木中 DOM 靠前的那个之前。
+            const [first] = [argRoot, enumRoot].sort((a, b) =>
+                a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1,
+            );
+            svgRoot.insertBefore(rect, first);
+        }
+        rect.setAttribute('x', String(left - DROPDOWN_GROUP_PADDING));
+        rect.setAttribute('y', String(top - DROPDOWN_GROUP_PADDING));
+        rect.setAttribute('width', String(right - left + DROPDOWN_GROUP_PADDING * 2));
+        rect.setAttribute('height', String(bottom - top + DROPDOWN_GROUP_PADDING * 2));
+        rect.setAttribute('rx', String(DROPDOWN_GROUP_RADIUS));
+        rect.setAttribute('ry', String(DROPDOWN_GROUP_RADIUS));
+        alive.add(index);
+    });
+
+    for (const [index, rect] of [...rects]) {
+        if (!alive.has(index)) {
+            rect.remove();
+            rects.delete(index);
+        }
+    }
+};
+
 // 此函数由AI生成
 /**
  * 返回值槽的类型默认 shadow：与工具箱里的默认值同机制。
@@ -299,22 +569,33 @@ const defaultShadowFor = (
 /**
  * 定义帽中的函数值是一个作用域宿主：每个参数槽里都放着可拖出的参数积木。
  * 普通 FUNCTION_VALUE 不使用这些槽，因此不会改变普通函数值的交互。
+ * 下拉参数发放两种源积木：参数积木（值 = 各调用积木上选择的选项）与
+ * 枚举积木（在函数体里选择具体选项用），都可无限拖出。
  */
 const functionDefinitionValueScopedHost = scopedSourceHost({
     sourceType: OPCODES.FUNCTION_PARAM,
+    extraSourceTypes: [OPCODES.FUNCTION_ENUM],
     slots: host => {
         const block = host as IDefinitionFunctionValueBlock;
-        return block.previewData.flatMap((fieldData, index) =>
-            fieldData.type === 'text'
-                ? []
-                : [
-                      {
-                          inputName: `ARG${String(index)}`,
-                          key: String(index),
-                          defaultName: fieldData.text ?? '',
-                      },
-                  ],
-        );
+        return block.previewData.flatMap((fieldData, index): IScopedSlot[] => {
+            if (fieldData.type === 'text') return [];
+            const slots: IScopedSlot[] = [
+                {
+                    inputName: `ARG${String(index)}`,
+                    key: String(index),
+                    defaultName: fieldData.text ?? '',
+                },
+            ];
+            if (isDropdownField(fieldData)) {
+                slots.push({
+                    inputName: `${ENUM_INPUT_PREFIX}${String(index)}`,
+                    key: `${ENUM_SLOT_KEY_PREFIX}${String(index)}`,
+                    sourceType: OPCODES.FUNCTION_ENUM,
+                    defaultName: '',
+                });
+            }
+            return slots;
+        });
     },
 });
 
@@ -414,16 +695,31 @@ function readParamsFromFunctionInput(block: Blockly.Block): IFunctionParam[] {
 
     if (target?.type === OPCODES.FUNCTION_VALUE) {
         const value = target as IFunctionValueBlock;
+        // 下拉框参数（无论是否允许填积木）都在调用积木上生成一个
+        // 带选择框的实参槽，选中值由各调用积木自己持有。
         return value.previewData.flatMap((fieldData, index) =>
             fieldData.type === 'text'
                 ? []
-                : [
-                      {
-                          type: fieldData.type,
-                          id: `arg-${String(index)}`,
-                          name: fieldData.text ?? '',
-                      },
-                  ],
+                : isDropdownField(fieldData)
+                  ? [
+                        {
+                            type: AllCheckers.STRING,
+                            id: `arg-${String(index)}`,
+                            name:
+                                normalizedDropdownOptions(fieldData.type).find(
+                                    ([, optionValue]) =>
+                                        optionValue === selectedDropdownValue(fieldData.type),
+                                )?.[0] ?? selectedDropdownValue(fieldData.type),
+                            dropdown: fieldData.type,
+                        },
+                    ]
+                  : [
+                        {
+                            type: fieldData.type as TFunctionInputField | TFunctionTypeUnion,
+                            id: `arg-${String(index)}`,
+                            name: fieldData.text ?? '',
+                        },
+                    ],
         );
     }
 
@@ -790,12 +1086,15 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
         const index = this.activeInputIndex ?? -1;
         const anchor = index >= 0 ? inputAnchorOf.call(this, index) : null;
         if (!anchor) return;
+        const activeData = this.previewData[index];
+        const hasConfig = isDropdownField(activeData);
+        const controlBarWidth = hasConfig ? CONTROL_BAR_CONFIG_WIDTH : CONTROL_BAR_WIDTH;
 
         const fo = Blockly.utils.dom.createSvgElement(
             Blockly.utils.Svg.FOREIGNOBJECT,
             {
                 class: 'blockly-function-previewBlock-controlBar',
-                width: CONTROL_BAR_WIDTH,
+                width: controlBarWidth,
                 height: CONTROL_BAR_HEIGHT,
             },
             (this.workspace as Blockly.WorkspaceSvg).getCanvas(),
@@ -816,6 +1115,20 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
             // 左移后移动方法内部会重新选中这个输入框。
             this.moveField(index, -1);
         });
+
+        let configure;
+        if (hasConfig) {
+            configure = document.createElement('img');
+            configure.src = settingsIcon;
+            configure.style.filter = 'invert(1) var(--svg-filter)';
+            configure.className = 'blockly-function-previewBlock-controlBar-button';
+            configure.title = t('gui:createFunction.dropdownConfigure');
+            configure.addEventListener('pointerdown', event => {
+                event.stopPropagation();
+                event.preventDefault();
+                this.openDropdownSettings(index);
+            });
+        }
 
         const remove = document.createElement('img');
         remove.src = removeIcon;
@@ -838,11 +1151,12 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
             this.moveField(index, 1);
         });
         controlBar.appendChild(goLeft);
+        if (hasConfig) controlBar.appendChild(configure as unknown as HTMLImageElement);
         controlBar.appendChild(remove);
         controlBar.appendChild(goRight);
 
         // 水平居中在输入框上方。
-        fo.setAttribute('x', String(anchor.x - CONTROL_BAR_WIDTH / 2));
+        fo.setAttribute('x', String(anchor.x - controlBarWidth / 2));
         fo.setAttribute('y', String(anchor.y - CONTROL_BAR_HEIGHT - 6));
     }
 
@@ -882,6 +1196,99 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
         },
     } as Blockly.Block;
 
+    /** 自定义选择框积木；通常作为允许填积木的函数字段 shadow。 */
+    blockly.Blocks[OPCODES.FUNCTION_DROPDOWN] = {
+        init(this: Blockly.Block) {
+            this.setOutput(true, 'String');
+            this.setColour(BlocksColor.function.secondary);
+            this.appendDummyInput('MENU').appendField(
+                createDropdownField(EMPTY_DROPDOWN_FIELD),
+                'VALUE',
+            );
+        },
+        saveExtraState(this: Blockly.Block) {
+            const field = this.getField('VALUE');
+            const dropdown = field as unknown as {
+                getOptions(useCache?: boolean): Blockly.MenuOption[];
+            };
+            return {
+                options: dropdown.getOptions(false).map(([label, value]) => ({
+                    label: typeof label === 'string' ? label : value,
+                    value,
+                })),
+            };
+        },
+        loadExtraState(
+            this: Blockly.Block,
+            state: { options?: IFunctionDropdownField['options'] },
+        ) {
+            const options = state.options?.length ? state.options : [{ value: '' }];
+            const input = this.getInput('MENU');
+            if (!input) return;
+            input.removeField('VALUE');
+            input.appendField(
+                createDropdownField({ type: 'dropdown', options, allowBlocks: false }),
+                'VALUE',
+            );
+        },
+    } as Blockly.Block;
+
+    // 此积木由AI生成
+    /**
+     * 枚举源积木（输入选择器）：住在定义帽签名的枚举槽里，可无限拖出。
+     * 拖出的副本是带选择框的字符串常量；宿主的选项变化会同步到所有副本，
+     * 参数删除时副本一并销毁（走作用域源的 updateScopedLabels 通道）。
+     */
+    blockly.Blocks[OPCODES.FUNCTION_ENUM] = {
+        init(this: IFunctionEnumBlock) {
+            this.ownerId = undefined;
+            this.slotKey = undefined;
+            this.setOutput(true, AllCheckers.STRING);
+            this.setColour(BlocksColor.function.secondary);
+            this.appendDummyInput('MENU').appendField(
+                createDropdownField(EMPTY_DROPDOWN_FIELD),
+                'VALUE',
+            );
+        },
+        updateLabel(this: IFunctionEnumBlock, _name: string) {
+            // 枚举积木没有名字标签；这里按作用域源协议同步下拉选项。
+            syncEnumOptions(this);
+        },
+        saveExtraState(this: IFunctionEnumBlock) {
+            const dropdown = this.getField('VALUE') as unknown as {
+                getOptions(useCache?: boolean): Blockly.MenuOption[];
+            } | null;
+            return {
+                ...(this.ownerId ? { ownerId: this.ownerId, slotKey: this.slotKey ?? '' } : {}),
+                options: (dropdown?.getOptions(false) ?? []).map(([label, value]) => ({
+                    label: typeof label === 'string' ? label : value,
+                    value,
+                })),
+            };
+        },
+        loadExtraState(
+            this: IFunctionEnumBlock,
+            state: {
+                ownerId?: string;
+                slotKey?: string;
+                options?: IFunctionDropdownField['options'];
+            },
+        ) {
+            this.ownerId = state.ownerId;
+            this.slotKey = state.slotKey;
+            // 优先用宿主的最新配置；宿主尚未载入（浮动副本先于定义帽加载）
+            // 时回退到自带的选项快照，之后 updateScopedLabels 会再校正。
+            const config =
+                enumFieldConfigOf(this) ??
+                ({
+                    type: 'dropdown',
+                    options: state.options?.length ? state.options : [{ value: '' }],
+                    allowBlocks: false,
+                } satisfies IFunctionDropdownField);
+            rebuildEnumField(this, config);
+        },
+    } as IFunctionEnumBlock;
+
     blockly.Blocks[OPCODES.FUNCTION_VALUE] = {
         ...functionDefinitionValueScopedHost,
         init(this: IDefinitionFunctionValueBlock) {
@@ -895,11 +1302,22 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
             this.returnType = null;
             this.definitionMode = false;
             this.definitionScopedSourceReady = false;
+            this.dropdownGroupRects = new Map();
             this.jsonInit({
                 ...returnConnections,
                 colour: BlocksColor.function.primary,
                 output: 'Function',
             });
+            // 所有渲染最终都汇经 renderEfficiently：字段变化（枚举改选）、
+            // 形状变化、补块等触发的重排都在这里刷新下拉参数的分组背景。
+            if (this.workspace.rendered) {
+                const svgBlock = this as unknown as Blockly.BlockSvg;
+                const baseRenderEfficiently = svgBlock.renderEfficiently.bind(svgBlock);
+                svgBlock.renderEfficiently = () => {
+                    baseRenderEfficiently();
+                    syncDropdownGroupBackgrounds(svgBlock);
+                };
+            }
         },
         loadExtraState(this: IDefinitionFunctionValueBlock, state: IFunctionValueExtraState) {
             if (state.definitionMode) {
@@ -1067,6 +1485,24 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
             this.activeInputIndex = index;
             updateControlBar.call(this);
         },
+        openDropdownSettings(this: IFunctionValueBlock, index: number) {
+            if (!this.editMode || this.isDeadOrDying()) return;
+            const data = this.previewData[index];
+            if (!isDropdownField(data)) return;
+
+            void modal.open(CreateDropdownModal, {
+                initial: structuredClone(data.type),
+                parentWindowID: 'createFunction',
+                blocking: true,
+                callback: next => {
+                    if (this.isDeadOrDying()) return;
+                    // 只更新选择框配置，保留已输入的 ID（text）。
+                    this.previewData[index] = { type: next, text: data.text };
+                    this.updateShape();
+                    this.selectInput(index);
+                },
+            });
+        },
         /** 取消选中当前输入框，销毁控制栏。 */
         deselectInput(this: IFunctionValueBlock) {
             if (!this.editMode || this.isDeadOrDying()) return;
@@ -1098,8 +1534,20 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
         updateShape(this: IDefinitionFunctionValueBlock) {
             if (this.definitionMode) {
                 const wanted = new Set(this.previewData.map((_, index) => `ARG${String(index)}`));
+                const wantedEnums = new Set(
+                    this.previewData.flatMap((fieldData, index) =>
+                        isDropdownField(fieldData) ? [`${ENUM_INPUT_PREFIX}${String(index)}`] : [],
+                    ),
+                );
                 for (const input of [...this.inputList]) {
                     if (input.name.startsWith('ARG') && !wanted.has(input.name)) {
+                        this.removeInput(input.name, true);
+                    } else if (
+                        input.name.startsWith(ENUM_INPUT_PREFIX) &&
+                        !wantedEnums.has(input.name)
+                    ) {
+                        // 字段不再是下拉参数（或已被删除）时，枚举槽一并清理；
+                        // 槽内与散落的枚举积木由 updateScopedLabels 负责销毁。
                         this.removeInput(input.name, true);
                     }
                 }
@@ -1110,6 +1558,49 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                 this.previewData.forEach((fieldData, index) => {
                     const inputName = `ARG${String(index)}`;
                     let input = this.getInput(inputName);
+
+                    if (isDropdownField(fieldData)) {
+                        // 数据槽：与普通参数一致，参数源积木可无限拖出，
+                        // 运行值 = 各调用积木上选择的选项。
+                        input = ensureLockedValueInput(
+                            this,
+                            inputName,
+                            paramTypeToChecks(AllCheckers.STRING),
+                        );
+                        const connection = input.connection;
+                        const source = connection?.targetBlock();
+                        const sourceOutput =
+                            source?.type === OPCODES.FUNCTION_PARAM
+                                ? source.outputConnection
+                                : null;
+                        if (connection)
+                            alignConnectedChecks(
+                                connection,
+                                sourceOutput,
+                                paramTypeToChecks(AllCheckers.STRING),
+                            );
+
+                        // 枚举槽：同样由作用域宿主补块，枚举积木可无限拖出，
+                        // 供函数体选择具体选项（Scratch 的输入选择器）。
+                        const enumInput = ensureLockedValueInput(
+                            this,
+                            `${ENUM_INPUT_PREFIX}${String(index)}`,
+                            paramTypeToChecks(AllCheckers.STRING),
+                        );
+                        const enumConnection = enumInput.connection;
+                        const enumSource = enumConnection?.targetBlock();
+                        const enumSourceOutput =
+                            enumSource?.type === OPCODES.FUNCTION_ENUM
+                                ? enumSource.outputConnection
+                                : null;
+                        if (enumConnection)
+                            alignConnectedChecks(
+                                enumConnection,
+                                enumSourceOutput,
+                                paramTypeToChecks(AllCheckers.STRING),
+                            );
+                        return;
+                    }
 
                     if (fieldData.type === 'text') {
                         if (input?.connection) {
@@ -1133,7 +1624,9 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                     }
                     input ??= this.appendValueInput(inputName);
                     const connection = input.connection;
-                    const wantedChecks = paramTypeToChecks(fieldData.type);
+                    const wantedChecks = paramTypeToChecks(
+                        fieldData.type as TFunctionInputField | TFunctionTypeUnion,
+                    );
                     const source = connection?.targetBlock();
                     const sourceOutput =
                         source?.type === OPCODES.FUNCTION_PARAM ? source.outputConnection : null;
@@ -1142,7 +1635,13 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
 
                 for (let index = 0; index < this.previewData.length; index++) {
                     this.moveInputBefore(`ARG${String(index)}`, null);
+                    // 枚举槽紧跟在对应参数槽后面。
+                    const enumName = `${ENUM_INPUT_PREFIX}${String(index)}`;
+                    if (this.getInput(enumName)) this.moveInputBefore(enumName, null);
                 }
+                // 删除参数等形状变化未必触发宿主重渲染，这里兜底清理
+                // 分组背景（坐标最终以 renderEfficiently 里的同步为准）。
+                syncDropdownGroupBackgrounds(this as unknown as Blockly.BlockSvg);
                 updateControlBar.call(this);
                 return;
             }
@@ -1178,15 +1677,58 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                             `TEXT_${String(index)}`,
                         );
                     }
+                } else if (isDropdownField(fieldData)) {
+                    if (this.editMode) {
+                        // 编辑页：下拉框参数与普通参数一致显示可编辑 ID；
+                        // 选项配置走控制栏的 ⚙ 按钮。
+                        const input = this.appendValueInput(inputID);
+                        input.setCheck('String');
+                        input.connection?.setShadowState({
+                            type: OPCODES.FUNCTION_VALUE_ID,
+                            fields: { ID: fieldData.text ?? '' },
+                        });
+                        const shadowText = input.connection
+                            ?.targetBlock()
+                            ?.getField('ID') as Blockly.FieldTextInput | null;
+                        shadowText?.setValidator((value: string) => {
+                            fieldData.text = value;
+                            return value;
+                        });
+                        if (shadowText) bindShadowSelection.call(this, shadowText, index);
+                    } else if (this.isValue) {
+                        // 函数值模式：与普通参数一致，仅展示 ID 标签。
+                        this.appendDummyInput(inputID).appendField(
+                            new FieldLabelWithBackground(
+                                fieldData.text ?? '  ',
+                                'blockly-function-value-shadow',
+                            ),
+                        );
+                    } else {
+                        // Scratch 模式：选择框在函数积木上。
+                        const input = fieldData.type.allowBlocks
+                            ? this.appendValueInput(inputID)
+                            : this.appendDummyInput(inputID);
+                        if (input.connection) {
+                            input.setCheck('String');
+                            input.connection.setShadowState(dropdownShadowState(fieldData.type));
+                        } else {
+                            const dropdown = createDropdownField(fieldData.type, value => {
+                                fieldData.type.value = value;
+                            });
+                            input.appendField(dropdown, `DROPDOWN_${String(index)}`);
+                            bindDropdownSelection(this, dropdown, index);
+                        }
+                    }
                 } else {
                     let input: Blockly.Input;
                     if (this.definitionMode) input = this.appendValueInput(inputID);
                     else if (!this.isValue || this.editMode) input = this.appendValueInput(inputID);
                     else input = this.appendDummyInput(inputID);
 
-                    if (this.definitionMode) input.setCheck(fieldData.type);
+                    const fieldType = fieldData.type as TFunctionInputField | TFunctionTypeUnion;
+                    if (this.definitionMode) input.setCheck(fieldType);
                     if (this.editMode && !this.definitionMode) {
-                        input.setCheck(fieldData.type);
+                        input.setCheck(fieldType);
                         input.connection?.setShadowState({
                             type: OPCODES.FUNCTION_VALUE_ID,
                             fields: { ID: fieldData.text ?? '' },
@@ -1211,7 +1753,7 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                                 ),
                             );
                         } else {
-                            input.setCheck(fieldData.type);
+                            input.setCheck(fieldType);
                             input.connection?.setShadowState(
                                 fieldData.type === AllCheckers.BOOLEAN
                                     ? {
@@ -1577,7 +2119,8 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                     (param, i) =>
                         param.id === this.args[i].id &&
                         param.name === this.args[i].name &&
-                        checksEqual(param.type, this.args[i].type),
+                        checksEqual(param.type, this.args[i].type) &&
+                        JSON.stringify(param.dropdown) === JSON.stringify(this.args[i].dropdown),
                 );
             if (unchanged) return;
 
@@ -1671,41 +2214,69 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
 
             for (const arg of this.args) {
                 const inputName = `${ARG_INPUT_PREFIX}${arg.id}`;
-                if (!this.getInput(inputName)) {
-                    this.appendValueInput(inputName);
-                }
-                // 实参槽 check 跟随参数定义的类型（null=万能）。
-                // hint shadow 的输出 check 会在下面同步，避免类型切换时被拔出；
-                // 不兼容的真实积木仍由复检自然挤出。
-                const argConnection = this.getInput(inputName)?.connection;
                 const wantedChecks = paramTypeToChecks(arg.type);
-                // 参数名以半透明提示的形式显示在空槽里（类似输入框 placeholder），
-                // 插入真实积木后自动被盖住，拖走又会重新露出来。
-                const hint = argConnection?.getShadowState() as
-                    { fields?: { HINT?: string } } | undefined;
-                // 名字没变就别重设，setShadowState 会产生一串多余的变更事件。
-                if (hint?.fields?.HINT !== arg.name) {
-                    argConnection?.setShadowState({
-                        type: OPCODES.FUNCTION_ARG_HINT,
-                        fields: { HINT: arg.name },
-                    });
-                }
-                // 父槽与 hint shadow 必须以万能类型作为过渡，避免从旧类型
-                // 切换到新类型时，Blockly 在两端暂时不兼容的瞬间拔出 shadow。
-                const hintBlock = argConnection?.targetBlock();
-                const hintOutput = hintBlock?.isShadow() ? hintBlock.outputConnection : null;
-                const currentChecks = argConnection?.getCheck() ?? null;
-                const hintChecks = hintOutput?.getCheck() ?? null;
-                if (
-                    !checksEqual(currentChecks, wantedChecks) ||
-                    (hintOutput && !checksEqual(hintChecks, wantedChecks))
-                ) {
-                    if (hintOutput) {
-                        argConnection?.setCheck(null);
-                        hintOutput.setCheck(wantedChecks);
-                        argConnection?.setCheck(wantedChecks);
+
+                if (arg.dropdown && !arg.dropdown.allowBlocks) {
+                    // 纯下拉框：选择框直接作为积木自身的字段（不是影子积木），
+                    // 选中值随调用积木的字段状态持久化，各调用点互不影响。
+                    if (this.getInput(inputName)?.connection) this.removeInput(inputName, true);
+                    const dummy = this.getInput(inputName) ?? this.appendDummyInput(inputName);
+                    const fieldName = `DROPDOWN_${arg.id}`;
+                    const field = this.getField(fieldName) as unknown as {
+                        getOptions(useCache?: boolean): Blockly.MenuOption[];
+                    } | null;
+                    const wanted = normalizedDropdownOptions(arg.dropdown);
+                    const current = field?.getOptions(false);
+                    const sameOptions =
+                        current?.length === wanted.length &&
+                        wanted.every(([, value], index) => current[index][1] === value);
+                    // 选项没变就不重建，保留该调用积木上已选的值。
+                    if (!sameOptions) {
+                        dummy.removeField(fieldName, true);
+                        dummy.appendField(createDropdownField(arg.dropdown), fieldName);
+                    }
+                } else {
+                    // 允许填积木的下拉框与普通参数一样使用值槽。
+                    const input = this.getInput(inputName);
+                    if (input && !input.connection) this.removeInput(inputName, true);
+                    if (!this.getInput(inputName)) this.appendValueInput(inputName);
+                    const argConnection = this.getInput(inputName)?.connection;
+
+                    // 实参槽 check 跟随参数定义的类型（null=万能）。
+                    // hint shadow 的输出 check 会在下面同步，避免类型切换时被拔出；
+                    // 不兼容的真实积木仍由复检自然挤出。
+                    // 参数名以半透明提示的形式显示在空槽里（类似输入框 placeholder），
+                    // 插入真实积木后自动被盖住，拖走又会重新露出来。
+                    if (arg.dropdown) {
+                        syncDropdownShadowState(argConnection, arg.dropdown);
                     } else {
-                        argConnection?.setCheck(wantedChecks);
+                        const hint = argConnection?.getShadowState() as
+                            { fields?: { HINT?: string } } | undefined;
+                        // 名字没变就别重设，setShadowState 会产生一串多余的变更事件。
+                        if (hint?.fields?.HINT !== arg.name) {
+                            argConnection?.setShadowState({
+                                type: OPCODES.FUNCTION_ARG_HINT,
+                                fields: { HINT: arg.name },
+                            });
+                        }
+                    }
+                    // 父槽与 hint shadow 必须以万能类型作为过渡，避免从旧类型
+                    // 切换到新类型时，Blockly 在两端暂时不兼容的瞬间拔出 shadow。
+                    const hintBlock = argConnection?.targetBlock();
+                    const hintOutput = hintBlock?.isShadow() ? hintBlock.outputConnection : null;
+                    const currentChecks = argConnection?.getCheck() ?? null;
+                    const hintChecks = hintOutput?.getCheck() ?? null;
+                    if (
+                        !checksEqual(currentChecks, wantedChecks) ||
+                        (hintOutput && !checksEqual(hintChecks, wantedChecks))
+                    ) {
+                        if (hintOutput) {
+                            argConnection?.setCheck(null);
+                            hintOutput.setCheck(wantedChecks);
+                            argConnection?.setCheck(wantedChecks);
+                        } else {
+                            argConnection?.setCheck(wantedChecks);
+                        }
                     }
                 }
 

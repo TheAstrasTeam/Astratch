@@ -1,0 +1,75 @@
+@use '../../gui/styles/color.scss' as *;
+
+.content {
+    min-width: 500px;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+}
+
+.options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    overflow: auto;
+}
+
+.header,
+.row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: center;
+}
+
+.header {
+    color: $text-primary;
+    font-size: 0.85rem;
+}
+
+.row input {
+    min-width: 0;
+    padding: 6px 8px;
+}
+
+.row button,
+.add,
+.content > button {
+    padding: 6px 12px;
+}
+
+.remove {
+    white-space: nowrap;
+}
+
+.add {
+    align-self: flex-start;
+}
+
+.allow-blocks {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+@media (max-width: 600px) {
+    .content {
+        min-width: 0;
+    }
+
+    .header {
+        display: none;
+    }
+
+    .row {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+
+    .remove {
+        grid-column: 1 / -1;
+        justify-self: end;
+    }
+}

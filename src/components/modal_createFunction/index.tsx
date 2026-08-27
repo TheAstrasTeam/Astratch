@@ -14,6 +14,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { type IVM } from '../../types/vm';
 import { CreateFunctionWorkspace } from './blockWorkspace';
 import { FieldTypeModal } from './modal_fieldType';
+import { CreateDropdownModal } from '../modal_createDropdown';
 import {
     addFieldForFunctionPreview,
     previewBlockColor,
@@ -27,7 +28,11 @@ import {
 import { DropDownIcon, StringIcon, TextIcon } from './icons';
 import { ColorPickerButton } from '../colorPickerButton';
 import { AllCheckers, type IBlockColor, type ICustomFunction } from '../../types/blocks';
-import type { TFunctionFieldType, TFunctionReturnType } from './functionPreview';
+import type {
+    IFunctionDropdownField,
+    TFunctionFieldType,
+    TFunctionReturnType,
+} from './functionPreview';
 import type { JSX } from 'react/jsx-dev-runtime';
 import * as Blockly from 'blockly/core';
 
@@ -190,8 +195,14 @@ export const CreateFunctionModal = ({ vm, addID, editFunctionId }: ICreateFuncti
                         icon={<DropDownIcon color={blockColor} />}
                         label={t('gui:createFunction.dropdown')}
                         onClick={() => {
-                            // 下拉框定义还没做完，暂时按字符串输入处理。
-                            handleAddFieldButtonClick(AllCheckers.STRING);
+                            if (isModalOpen(CreateDropdownModal)) return;
+                            void modal.open(CreateDropdownModal, {
+                                parentWindowID: 'createFunction',
+                                blocking: true,
+                                callback: (field: IFunctionDropdownField) => {
+                                    addFieldForFunctionPreview({ type: field });
+                                },
+                            });
                         }}
                     />
                     <BigSelector

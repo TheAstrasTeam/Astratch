@@ -63,6 +63,12 @@ export interface IScopedSlot {
     key?: string;
     /** 该插槽发放的源积木默认显示名。 */
     defaultName: string;
+    /**
+     * 该插槽发放的源积木 opcode；缺省回退到宿主级 `sourceType`。
+     * 一个宿主发放多种源积木时（如函数签名同时发放参数积木与枚举积木）
+     * 由每个插槽自行声明。
+     */
+    sourceType?: string;
 }
 
 /**
@@ -168,7 +174,12 @@ function alignParamCheckerWithHost(
             Number(source.slotKey)
         ];
         if (!fieldData || fieldData.type === 'text') return;
-        wanted = fieldData.type;
+        wanted =
+            typeof fieldData.type === 'object' &&
+            !Array.isArray(fieldData.type) &&
+            fieldData.type !== null
+                ? 'String'
+                : fieldData.type;
     } else if (host.type === OPCODES.FUNCTION_INLINE) {
         // 行内函数：类型在 params 里，key 就是参数 id。
         // （IFunctionInlineBlock 未导出，这里按结构读取。）
@@ -200,8 +211,14 @@ function alignParamCheckerWithHost(
 
 /** {@link scopedSourceHost} 的配置。 */
 export interface IScopedSourceHostOptions {
-    /** 该宿主发放的源积木 opcode。 */
+    /** 该宿主发放的默认源积木 opcode（未在插槽上声明 sourceType 时使用）。 */
     sourceType: string;
+    /**
+     * 宿主可能发放的其它源积木 opcode，由插槽通过 `slot.sourceType` 指定。
+     * 必须穷举所有可能发放的类型：同步与销毁逻辑靠它识别全部源积木，
+     * 即使当前插槽列表里已经没有某种类型的插槽（否则其残留副本会漏销毁）。
+     */
+    extraSourceTypes?: string[];
     /** 声明插槽。传数组表示固定不变；传函数表示形状可变（如函数参数）。 */
     slots: IScopedSlot[] | ((host: IScopedSourceHost) => IScopedSlot[]);
 }
@@ -228,6 +245,8 @@ export interface IScopedSourceHostOptions {
  */
 export function scopedSourceHost(options: IScopedSourceHostOptions) {
     const { sourceType } = options;
+    /** 宿主可能发放的全部源积木类型（含默认）。 */
+    const allSourceTypes = new Set<string>([sourceType, ...(options.extraSourceTypes ?? [])]);
 
     return {
         getScopedSlots(this: IScopedSourceHost): IScopedSlot[] {
@@ -295,11 +314,12 @@ export function scopedSourceHost(options: IScopedSourceHostOptions) {
             const connection = getSlotConnection(this, slot.inputName);
             if (!connection) return;
 
+            const slotSourceType = slot.sourceType ?? sourceType;
             const key = slot.key ?? slot.inputName;
             const name = this.getScopedName(key);
             const current = connection.targetBlock() as IScopedSourceBlock | null;
 
-            if (current?.type === sourceType) {
+            if (current?.type === slotSourceType) {
                 connection.allowScopedSource = false;
                 const previousOwnerId = current.ownerId;
                 current.ownerId = this.id;
@@ -317,7 +337,7 @@ export function scopedSourceHost(options: IScopedSourceHostOptions) {
             connection.allowScopedSource = false;
             if (current) connection.disconnect();
 
-            const source = this.workspace.newBlock(sourceType) as IScopedSourceBlock;
+            const source = this.workspace.newBlock(slotSourceType) as IScopedSourceBlock;
             source.ownerId = this.id;
             source.slotKey = key;
             source.updateLabel(name);
@@ -339,7 +359,7 @@ export function scopedSourceHost(options: IScopedSourceHostOptions) {
         rebindDescendants(this: IScopedSourceHost, previousOwnerId: string): void {
             for (const block of this.getDescendants(false)) {
                 const source = block as unknown as IScopedSourceBlock;
-                if (source.type === sourceType && source.ownerId === previousOwnerId) {
+                if (allSourceTypes.has(source.type) && source.ownerId === previousOwnerId) {
                     source.ownerId = this.id;
                     if (source.slotKey) source.updateLabel(this.getScopedName(source.slotKey));
                 }
@@ -352,7 +372,7 @@ export function scopedSourceHost(options: IScopedSourceHostOptions) {
             );
             for (const block of this.workspace.getAllBlocks(false)) {
                 const source = block as unknown as IScopedSourceBlock;
-                if (source.type !== sourceType || source.ownerId !== this.id) continue;
+                if (!allSourceTypes.has(source.type) || source.ownerId !== this.id) continue;
                 const key = source.slotKey;
                 if (key === undefined) continue;
 
@@ -395,7 +415,7 @@ export function scopedSourceHost(options: IScopedSourceHostOptions) {
             // 留着只会让用户困惑，直接销毁。
             for (const block of this.workspace.getAllBlocks(false)) {
                 const source = block as unknown as IScopedSourceBlock;
-                if (source.type === sourceType && source.ownerId === this.id) {
+                if (allSourceTypes.has(source.type) && source.ownerId === this.id) {
                     if (source.slotKey === key) source.dispose(false);
                 }
             }
