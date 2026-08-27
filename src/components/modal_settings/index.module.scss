@@ -18,8 +18,7 @@
     display: flex;
     flex: 0 0 20%;
     flex-direction: column;
-    height: 100%;
-    min-width: 0;
+    min-height: 0;
     overflow-y: auto;
     background-color: $ui-modal-header-background;
     & button {
@@ -47,6 +46,7 @@
     flex-direction: column;
     min-width: 0;
     min-height: 0;
+    overflow: hidden;
 }
 .settings-title {
     flex: 0 0 auto;
