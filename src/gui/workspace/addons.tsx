@@ -163,7 +163,7 @@ const AddonsPanel = ({ vm }: { vm: IVM }) => {
     const [selectedAddon, setSelectedAddon] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
 
-    const canRefresh = status === 'ready' && !refreshing && !storeRefreshing;
+    const canRefresh = status === 'ready' && !refreshing && !storeRefreshing && enabled.size === 0;
 
     const selected = selectedAddon ? (addons.find(a => a.id === selectedAddon) ?? null) : null;
 
