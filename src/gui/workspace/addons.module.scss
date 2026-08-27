@@ -57,6 +57,10 @@
 }
 
 .empty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: $text-primary;
     opacity: 0.5;
     font-size: small;
