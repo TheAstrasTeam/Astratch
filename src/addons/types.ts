@@ -42,6 +42,8 @@ export interface IAddonSettingDefinition {
     max?: number;
     /** string 类型：是否允许多行输入（渲染为 textarea，高度约为单行的两倍），默认 false */
     allowLines?: boolean;
+    /** 设置描述（可选，Settings 页渲染为 label 下方的灰色提示文本，通过 @settings/<id>.description 翻译） */
+    description?: string;
 }
 
 /**

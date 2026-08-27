@@ -562,6 +562,9 @@ class AddonManager {
                     defaultValue: normalizeSettingDefault(setting),
                     category: ADDON_SETTINGS_CATEGORY,
                     label: `${addon.i18nNamespace}:@settings/${setting.id}`,
+                    description: setting.description
+                        ? `${addon.i18nNamespace}:@settings/${setting.id}.description`
+                        : undefined,
                     type: ADDON_SETTING_TYPE_MAP[setting.type],
                     min: setting.min,
                     max: setting.max,
