@@ -28,7 +28,6 @@ import {
     saveCurrentProjectAs,
     selectProjectThenJump,
 } from '../utils/ash-gui';
-import { addonManager, buildAddonContext } from '../addons';
 
 const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
     // 多数 GUI 组件直接调用 i18next.t；以 language 作为 key 可让整棵界面重新计算文本。
@@ -46,10 +45,6 @@ const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
             i18next.off('languageChanged', handleLanguageChanged);
         };
     }, []);
-
-    useEffect(() => {
-        void addonManager.init(buildAddonContext(vm));
-    }, [vm]);
 
     useEffect(() => {
         const unbindShortcutCommands = shortcutManager.bindCommands({

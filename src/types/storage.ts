@@ -17,10 +17,6 @@ export const localStorageIDs = {
      * 快捷键配置
      */
     Shortcuts: 'ash_shortcuts',
-    /**
-     * 插件（Addon）配置
-     */
-    Addons: 'ash_addons',
 } as const;
 
 export type TLocalStorageIDs = (typeof localStorageIDs)[keyof typeof localStorageIDs];

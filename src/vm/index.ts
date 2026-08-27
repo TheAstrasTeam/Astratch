@@ -24,7 +24,6 @@ import {
     type TTargetInfo,
 } from '../types/vm';
 import { ProjectManager } from './project';
-import { addonManager } from '../addons/manager';
 import { t } from 'i18next';
 import { modal } from '../components/Modal/modal';
 import { ConfirmModal } from '../components/modal_confirm';
@@ -169,7 +168,6 @@ export class VM implements IVM {
                 entity: entitysFolder,
                 module: modulesFolder,
             },
-            addonState: addonManager.getProjectAddonState(),
         };
 
         await this.projectManager.createFile(
@@ -286,9 +284,6 @@ export class VM implements IVM {
         try {
             const projectMeta = JSON.parse(metaFileContent) as IProjectMetaJSON;
             this.runtime.settings.setProjectMeta(projectMeta.meta);
-            if (projectMeta.addonState) {
-                await addonManager.loadProjectAddonState(projectMeta.addonState);
-            }
             for (const mode of Object.values(TargetModes)) {
                 this.runtime.folders.set(
                     mode,
