@@ -205,6 +205,53 @@ class Blocks implements IBlocks {
         }
     };
 
+    private handleFunctionRemoved = (rawData: object) => {
+        const data = rawData as { id?: string; targetID?: string };
+        if (!data.id || !data.targetID) return;
+
+        if (data.targetID === this.vm.runtime.editingTargetID)
+            this.workspaceSvg?.refreshToolboxSelection();
+
+        const blocks = this.workspaceSvg?.getAllBlocks(false) ?? [];
+        const matchingBlocks = blocks.filter(block => {
+            if (
+                !([OPCODES.FUNCTION_VALUE, OPCODES.FUNCTION_DEFINITION] as string[]).includes(
+                    block.type,
+                )
+            )
+                return false;
+            const value = block as Blockly.Block & {
+                functionRef?: { targetId: string; functionId: string } | null;
+            };
+            const ref = value.functionRef;
+            return !!ref && ref.targetId === data.targetID && ref.functionId === data.id;
+        });
+        const matchingIds = new Set(matchingBlocks.map(block => block.id));
+        // 定义帽销毁时会递归销毁自己的签名 FUNCTION_VALUE；只处理最外层
+        // 匹配块，避免随后对已销毁的子块再次 dispose。
+        const blocksToDispose = matchingBlocks.filter(block => {
+            let parent = block.getParent();
+            while (parent) {
+                if (matchingIds.has(parent.id)) return false;
+                parent = parent.getParent();
+            }
+            return true;
+        });
+        const wasEnabled = this.Blockly.Events.isEnabled();
+        if (wasEnabled) this.Blockly.Events.disable();
+        try {
+            for (const block of blocksToDispose) block.dispose(true);
+        } finally {
+            if (wasEnabled) this.Blockly.Events.enable();
+        }
+        this.handleWorkspaceChange(null, true);
+        for (const block of blocks) {
+            if (block.type === OPCODES.FUNCTION_CALL || block.type === OPCODES.FUNCTION_EXECUTE) {
+                (block as Blockly.Block & { syncArgs?: () => void }).syncArgs?.();
+            }
+        }
+    };
+
     constructor(BlocklySelf: typeof Blockly, vm: IVM) {
         this.vm = vm;
         this._DOM = null;
@@ -350,6 +397,7 @@ class Blocks implements IBlocks {
                 this.vm.on(events.CREATE_DATA, this.handleVariableCreated);
                 this.vm.on(events.CREATE_CUSTOM_FUNCTION, this.handleFunctionCreated);
                 this.vm.on(events.EDIT_CUSTOM_FUNCTION, this.handleFunctionEdited);
+                this.vm.on(events.REMOVE_CUSTOM_FUNCTION, this.handleFunctionRemoved);
             }
 
             const nowTarget = this.vm.runtime.getTargetByID(this.vm.runtime.editingTargetID);
@@ -392,6 +440,7 @@ class Blocks implements IBlocks {
         this.vm.off(events.CREATE_DATA, this.handleVariableCreated);
         this.vm.off(events.CREATE_CUSTOM_FUNCTION, this.handleFunctionCreated);
         this.vm.off(events.EDIT_CUSTOM_FUNCTION, this.handleFunctionEdited);
+        this.vm.off(events.REMOVE_CUSTOM_FUNCTION, this.handleFunctionRemoved);
         if (this.workspaceSvg) {
             this.workspaceSvg.removeChangeListener(this.handleWorkspaceChange);
             this.workspaceSvg.dispose();

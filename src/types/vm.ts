@@ -160,6 +160,10 @@ export interface ITarget {
      * @returns 是否删除成功
      */
     removeCustomFunction: (id: string) => boolean;
+    /**
+     * 扁平化返回所有序列化的积木，和 `workspaceSvg.getAllBlocks()`不同，这里返回的是**序列化的积木**
+     * @returns 所有序列化的积木
+     */
     flatBlocks: () => TFlatBlocks[];
     /** 根据稳定 ID 获取一个自定义函数，不存在时返回 null。 */
     getFunction: (id: string) => ICustomFunction | null;

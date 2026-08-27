@@ -253,11 +253,7 @@ const alignConnectedChecks = (
 ): void => {
     const parentCurrent = parent.getCheck() ?? null;
     const childCurrent = child?.getCheck() ?? null;
-    if (
-        checksEqual(parentCurrent, wanted) &&
-        (!child || checksEqual(childCurrent, wanted))
-    )
-        return;
+    if (checksEqual(parentCurrent, wanted) && (!child || checksEqual(childCurrent, wanted))) return;
 
     const scopedParent = parent as AshConnection;
     const previous = scopedParent.allowScopedSource ?? false;
@@ -1011,6 +1007,32 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                                     vm,
                                     addID: this.functionRef?.targetId ?? vm.runtime.editingTargetID,
                                     editFunctionId: this.functionRef?.functionId,
+                                });
+                            },
+                        );
+                    },
+                });
+                options.unshift({
+                    id: 'functionValueRemove',
+                    text: t('blocks:function.remove'),
+                    enabled: true,
+                    scope: { block, focusedNode: block },
+                    weight: 10,
+                    callback: () => {
+                        // 防止循环依赖
+                        void import('../../../components/modal_confirm').then(
+                            ({ ConfirmModal }) => {
+                                if (isModalOpen(ConfirmModal)) return;
+                                void modal.open(ConfirmModal, {
+                                    message: t('blocks:function.remove.tip'),
+                                    callback: result => {
+                                        if (result)
+                                            vm.runtime
+                                                .getTargetByID(this.functionRef?.targetId ?? '')
+                                                ?.removeCustomFunction(
+                                                    this.functionRef?.functionId ?? '',
+                                                );
+                                    },
                                 });
                             },
                         );
