@@ -13,17 +13,17 @@
 
 > _搭建起玩具和工具的桥梁。_
 
-`Astratch` 是一个图形化IDE（集成开发环境），它希望可以让您以“搭积木”的方式搭出*任何东西*，就像Scratch一样。
+`Astratch` 是一个图形化集成开发环境，它希望可以让您以“搭积木”的方式搭出 _任何东西* ，就像Scratch一样。
 
 # Astratch 做了什么？
 
-简而言之，`Astratch`集百家之长，采用`JIT`（**即时编译**）技术来**编译**您的项目脚本为`JavaScript`并运行，这能让项目的运行速度*快如闪电*。同时，`Astratch`重新设计了**项目模型**，让项目变得更可维护、更为迅速，并增加了更多在**编程语言中常见的特性**。
+简而言之，`Astratch`集百家之长，采用`JIT`（**即时编译**）技术来**编译**您的项目脚本为`JavaScript`并运行，这能让项目的运行速度 _快如闪电_。同时，`Astratch`重新设计了**项目模型**，让项目变得更可维护、更为迅速，并增加了更多在**编程语言中常见的特性** ( 详见 [features.md](./docs/features.md) )。
 
 `Astratch`依然使用与`Scratch`相同的编辑器——`Blockly`，并扩展加入了许多`Scratch`不曾有的功能，这使`Astratch`在`Scratch`的少儿语言和真正的游戏引擎/编程语言等搭建起了**缓冲桥**。
 
 # 感谢
 
-### Blockly
+## Blockly
 
 `Astratch` 克隆&修改&使用了 [blockly-examples](https://github.com/RaspberryPiFoundation/blockly-samples) 其中的部分插件：
 
@@ -33,9 +33,9 @@
 - [field-colour](./plugins/field-colour/)
 - [field-grid-dropdown](./plugins/field-grid-dropdown/)
 
-我们对其中的插件进行了部分修改使其更加适配 `Astratch` 的*设想*，我们遵守`Apache License v2.0`，在每个更改的文件开头均有标注。
+我们对其中的插件进行了部分修改使其更加适配 `Astratch` 的_设想_，我们遵守`Apache License v2.0`，在每个更改的文件开头均有标注。
 
-### ICONS
+## ICONS
 
 `Astratch` 使用了以下开源仓库的图标：
 
