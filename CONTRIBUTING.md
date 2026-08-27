@@ -9,7 +9,13 @@ We warmly welcome community contributions! Whether it's **fixing bugs, improving
 We are not against AI — your contributions can, of course, be partly written by AI, but we will review whether the AI-generated changes are **appropriate**. We strongly suggest that you add a comment before AI-generated code indicating that this feature was made by AI, for example:
 
 ```ts
-// This feature was made by AI
+Multi - line;
+/**
+ * ...
+ * @author AI
+ */
+Single - line;
+/** @author AI */
 ```
 
 You need to make sure it passes the merge checks.
