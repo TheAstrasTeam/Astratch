@@ -196,6 +196,7 @@
     "tab.closeRight": "Close Tabs to the Right",
     "tab.newTab": "New Tab",
     "createFunction.title": "Create a Function",
+    "createFunction.editTitle": "Edit Function",
     "createFunction.description": "Strangely, you are looking at the Modal title",
     "createFunction.dropdown": "Dropdown",
     "createFunction.input": "Input",

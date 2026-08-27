@@ -321,6 +321,9 @@
     "function.defaultTitle": "function name",
     "function.showAsScratch": "Switch to Scratch mode",
     "function.showAsValue": "Switch to function value mode",
+    "function.edit": "Edit function",
+    "function.remove": "Delete function",
+    "function.remove.tip": "Are you sure you want to delete this function?",
 
     "canvas.cleanAll": "erase all",
     "canvas.color": "set drawing color to %1",

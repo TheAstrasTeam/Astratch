@@ -321,6 +321,9 @@
     "function.defaultTitle": "函数名称",
     "function.showAsScratch": "切换为 Scratch 模式",
     "function.showAsValue": "切换为函数值模式",
+    "function.edit": "编辑函数",
+    "function.remove": "删除函数",
+    "function.remove.tip": "确定要删除这个函数吗？",
 
     "canvas.cleanAll": "擦除全部",
     "canvas.color": "设置绘制颜色为 %1",
