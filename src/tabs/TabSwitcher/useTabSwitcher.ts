@@ -6,7 +6,7 @@
 
 // 此文件由AI生成
 
-// VSCode 式 Ctrl+Tab 标签快速切换的键盘控制器。
+// VSCode 式 Ctrl+Tab 标签快速切换的键盘控制器（与 QuickOpen 解耦）。
 // mousetrap 无法表达“按住修饰键循环、松开后才提交”的语义，
 // 因此这里用原生 keydown/keyup（capture 阶段）自行匹配组合键：
 // - 按下组合键：按 MRU 快照打开浮层，正向高亮第 2 位、反向高亮队尾
@@ -15,11 +15,11 @@
 // 组合键每次按键时从 shortcutManager 读取，用户在设置里改键后立即生效。
 
 import { useEffect } from 'react';
-import { shortcutManager } from '../lib/ShortcutManager';
-import { SHORTCUTS } from '../types/lib';
-import { ALL_PLATFORMS, getPlatfrom } from '../utils/ash-navigator';
-import { useTabsStore } from '../stores/useTabsStore';
-import { useTabSwitcherStore } from '../stores/useTabSwitcherStore';
+import { shortcutManager } from '../../lib/ShortcutManager';
+import { SHORTCUTS } from '../../types/lib';
+import { ALL_PLATFORMS, getPlatfrom } from '../../utils/ash-navigator';
+import { useTabsStore } from '../../stores/useTabsStore';
+import { useTabSwitcherStore } from '../../stores/useTabSwitcherStore';
 
 interface IParsedCombo {
     /** 主键名（小写），如 'tab' */

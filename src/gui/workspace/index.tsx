@@ -5,6 +5,7 @@
  */
 
 import { allBuiltInTabs, events, type IVM, type TallBuiltInTabs } from '../../types/vm';
+import { useSidebarStore } from '../../stores/useSidebarStore';
 import styles from './index.module.scss';
 import BlocklyWorkspace from './Blockly/index';
 import { useEffect, useMemo, useState, type FunctionComponent, type SVGProps } from 'react';
@@ -35,12 +36,10 @@ import { useTabsStore } from '../../stores/useTabsStore';
 const TabButton = ({
     id,
     selected,
-    callback,
     ICON,
 }: {
     id: TallBuiltInTabs;
     selected: string;
-    callback?: (id: TallBuiltInTabs) => void;
     ICON: FunctionComponent<SVGProps<SVGSVGElement>>;
 }) => {
     return (
@@ -48,7 +47,9 @@ const TabButton = ({
             className={classNames(styles.switchTab, {
                 [styles.enabled]: id === selected,
             })}
-            onClick={() => callback?.(id)}
+            onClick={() => {
+                useSidebarStore.getState().select(id);
+            }}
         >
             <ICON />
         </button>
@@ -58,7 +59,7 @@ const TabButton = ({
 const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
     const nowGuiInterface = useGUIStore(state => state.guiInterface);
     const [, setTargetsRevision] = useState(0);
-    const [tabSelected, setTabSelect] = useState<TallBuiltInTabs>(allBuiltInTabs.TARGETS);
+    const tabSelected = useSidebarStore(state => state.selectedTab);
     const tabs = useTabsStore(state => state.tabs);
     const activeTabId = useTabsStore(state => state.activeTabId);
 
@@ -95,13 +96,13 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
         vm.on(events.SWITCH_TARGET, handleSwitchTarget);
         const unbindShortcutCommands = shortcutManager.bindCommands({
             [SHORTCUTS.SWITCH_TAB_TARGET.id]: () => {
-                setTabSelect(allBuiltInTabs.TARGETS);
+                useSidebarStore.getState().select(allBuiltInTabs.TARGETS);
             },
             [SHORTCUTS.SWITCH_TAB_ADDON.id]: () => {
-                setTabSelect(allBuiltInTabs.ADDONS);
+                useSidebarStore.getState().select(allBuiltInTabs.ADDONS);
             },
             [SHORTCUTS.SWITCH_TAB_DEBUG.id]: () => {
-                setTabSelect(allBuiltInTabs.DEBUG);
+                useSidebarStore.getState().select(allBuiltInTabs.DEBUG);
             },
         });
         return () => {
@@ -173,19 +174,16 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
                                         selected={tabSelected}
                                         id={allBuiltInTabs.TARGETS}
                                         ICON={SpriteIcon}
-                                        callback={setTabSelect}
                                     />
                                     <TabButton
                                         selected={tabSelected}
                                         id={allBuiltInTabs.ADDONS}
                                         ICON={AddonsIcon}
-                                        callback={setTabSelect}
                                     />
                                     <TabButton
                                         selected={tabSelected}
                                         id={allBuiltInTabs.DEBUG}
                                         ICON={DebuggerIcon}
-                                        callback={setTabSelect}
                                     />
                                 </div>
                             </div>

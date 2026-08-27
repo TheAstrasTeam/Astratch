@@ -6,7 +6,7 @@
 
 // 此文件由AI生成
 
-// Ctrl+Tab 快速切换浮层的会话状态。
+// Ctrl+Tab 快速切换浮层的会话状态（与 QuickOpen 解耦）。
 // entries 是按下组合键那一刻的 MRU 快照（队首 = 最近激活），
 // index 是当前高亮的条目；提交时才真正调用 setActiveTab。
 

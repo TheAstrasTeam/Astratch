@@ -79,3 +79,26 @@ export const AllContextMenu = {
     TABS_EDIT: 'tabs_edit',
 };
 export type TAllContextMenu = (typeof AllContextMenu)[keyof typeof AllContextMenu];
+
+/**
+ * QuickOpen 命令面板的一条命令
+ */
+export interface IQuickOpenCommand {
+    /**
+     * 完整唯一 ID：内置命令为 `builtin.<id>`，插件命令为 `<插件ID>.<命令ID>`
+     */
+    id: string;
+    /**
+     * 标题：i18n key 或纯文本。
+     * 渲染时经 t() 解析，key 不存在时回退显示原文，因此插件可直接传纯文本。
+     */
+    title: string;
+    /**
+     * 附加搜索关键词（空格分隔），参与过滤但不显示
+     */
+    keywords?: string;
+    /**
+     * 执行命令；vm 由调用方（QuickOpen 组件）在执行时传入
+     */
+    run: (vm: import('./vm').IVM) => void | Promise<void>;
+}

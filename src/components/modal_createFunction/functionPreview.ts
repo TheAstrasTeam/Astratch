@@ -276,10 +276,11 @@ const setupWorkspace = (
         setupFrame = null;
         if (!isCurrentPreview(session, workspace, block)) return;
         centerPreviewRoot(workspace);
-        if (!initial) addFieldForFunctionPreview({
-            type: 'text',
-            text: t('blocks:function.defaultTitle'),
-        });
+        if (!initial)
+            addFieldForFunctionPreview({
+                type: 'text',
+                text: t('blocks:function.defaultTitle'),
+            });
     });
 };
 

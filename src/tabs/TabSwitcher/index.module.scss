@@ -1,27 +1,8 @@
 // 此文件由AI生成
 @use '../../gui/styles/color' as *;
-@use '../../gui/styles/constants' as *;
-@use '../../gui/styles/zIndex' as *;
 
-// 顶部居中浮层：对齐菜单栏中间搜索框的轴线与宽度
-// （菜单栏左/中/右三列 flex:1 均分，搜索框填满中列，即视口宽度的 1/3）
-.tabSwitcher {
-    position: fixed;
-    top: 2.25rem;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100vw / 3);
-    max-height: min(50vh, 24rem);
-    overflow-y: auto;
-    // 必须压在所有可拖动模态框之上（见 zIndex.scss 中 $tabSwitcher 的说明）
-    z-index: $tabSwitcher;
-    padding: 0.25rem 0;
-    background-color: $ui-secondary;
-    border: $border-width solid $ui-black-transparent;
-    border-radius: 8px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-}
-
+// Tab 切换列表条目样式（容器外壳由 QuickOpen 提供）。
+// 容器定位 / 层级 / 滚动均由 QuickOpen 的 .quickOpen / .resultList 负责。
 .entry {
     display: flex;
     align-items: center;

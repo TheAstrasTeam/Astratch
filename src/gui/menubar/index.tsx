@@ -21,6 +21,7 @@ import {
 } from '../../utils/ash-gui';
 import { shortcutManager } from '../../lib/ShortcutManager';
 import { SHORTCUTS } from '../../types/lib';
+import { useQuickOpenStore } from '../../stores/useQuickOpenStore';
 
 export const MenuTextWithShortCut = ({ text, shortcut }: { text: string; shortcut: string }) => (
     <span style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
@@ -154,7 +155,18 @@ const MenuBar = ({ vm }: { vm: IVM }): React.ReactNode => {
                 </div>
             </div>
             <div className={styles.menubarContentsCenter}>
-                <input className={styles.search} placeholder={t('gui:search.tip')}></input>
+                {/* 占位搜索框：点击唤起 QuickOpen 面板，自身不接收输入。
+                    id 供 QuickOpen 测量锚定位置使用 */}
+                <input
+                    id='menubar-search'
+                    className={styles.search}
+                    placeholder={t('gui:quickOpen.placeholder')}
+                    readOnly
+                    onFocus={e => {
+                        e.currentTarget.blur();
+                        useQuickOpenStore.getState().open();
+                    }}
+                />
             </div>
             <div className={styles.menubarContentsRight}>Right</div>
         </div>

@@ -67,9 +67,14 @@ const AddonCard = ({
     const latestVersion = versions[versions.length - 1];
     const hasUpdate = !isCustom && version !== latestVersion;
     return (
-        <div className={classNames(styles.card, {
-            [styles.disabled]: !enabled && downloaded
-        })} onClick={onSelectAddon} role='button' tabIndex={0} >
+        <div
+            className={classNames(styles.card, {
+                [styles.disabled]: !enabled && downloaded,
+            })}
+            onClick={onSelectAddon}
+            role='button'
+            tabIndex={0}
+        >
             {icon && <img className={styles.cardIcon} src={icon} alt='' />}
             <div className={styles.cardInfo}>
                 <span className={styles.cardName}>

@@ -10,6 +10,7 @@ import type { IVM } from '../types/vm';
 import type * as Blockly from 'blockly';
 import type { TFunction } from 'i18next';
 import type { IToastManger } from '../types/lib';
+import type { IQuickOpenCommand } from '../types/gui';
 
 /**
  * 提供给插件的命名空间存储
@@ -59,6 +60,20 @@ export interface IAddonSettingsApi {
 }
 
 /**
+ * 提供给插件的 QuickOpen 命令注册 API。
+ * 注册的命令出现在 QuickOpen 命令面板（输入 > 前缀）中，
+ * ID 自动加上 `<插件ID>.` 前缀；插件禁用/卸载时自动注销全部命令。
+ */
+export interface IAddonQuickOpenApi {
+    /**
+     * 注册一条命令
+     * @param command 命令定义，id 只需在插件内唯一（无需带插件前缀）
+     * @returns 注销函数
+     */
+    registerCommand: (command: Omit<IQuickOpenCommand, 'id'> & { id: string }) => () => void;
+}
+
+/**
  * 插件运行时可用的上下文（userscript 风格 API）
  */
 export interface IAddonContext {
@@ -74,6 +89,8 @@ export interface IAddonContext {
     storage: IAddonStorage;
     /** 该插件在 Settings 页声明的设置 */
     settings: IAddonSettingsApi;
+    /** QuickOpen 命令面板的命令注册 */
+    quickOpen: IAddonQuickOpenApi;
 }
 
 /**

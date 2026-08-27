@@ -6,14 +6,13 @@
 
 // 此文件由AI生成
 
-// Ctrl+Tab 快速切换浮层：按 MRU 快照列出标签，高亮当前选中项。
+// Ctrl+Tab 快速切换的内容列表：按 MRU 快照列出标签，高亮当前选中项。
 // 仅高亮不实际切换（避免 Blockly 工作区反复销毁重建），松开修饰键时由
-// useTabSwitcher 提交。层级压在所有可拖动模态框之上。
+// useTabSwitcher 提交。不再自带容器，由 QuickOpen 统一外壳承载。
 
 import { useEffect, useRef } from 'react';
 import classNames from 'classnames';
 import styles from './index.module.scss';
-import { useTabSwitcher } from '../useTabSwitcher';
 import { useTabSwitcherStore } from '../../stores/useTabSwitcherStore';
 import { useTabsStore } from '../../stores/useTabsStore';
 import { TargetModes } from '../../types/vm';
@@ -51,8 +50,11 @@ const Entry = ({ tabID, selected }: { tabID: string; selected: boolean }): React
     );
 };
 
-const TabSwitcher = (): React.ReactNode => {
-    useTabSwitcher();
+/**
+ * Tab 切换列表内容（不含外壳容器），由 QuickOpen 容器装入渲染。
+ * 键盘逻辑由 QuickOpen 容器统一挂载的 useTabSwitcher 负责。
+ */
+const TabSwitcherList = (): React.ReactNode => {
     const isOpen = useTabSwitcherStore(state => state.isOpen);
     const entries = useTabSwitcherStore(state => state.entries);
     const index = useTabSwitcherStore(state => state.index);
@@ -60,12 +62,12 @@ const TabSwitcher = (): React.ReactNode => {
     if (!isOpen) return null;
 
     return (
-        <div className={styles.tabSwitcher}>
+        <>
             {entries.map((tabID, i) => (
                 <Entry key={tabID} tabID={tabID} selected={i === index} />
             ))}
-        </div>
+        </>
     );
 };
 
-export default TabSwitcher;
+export { TabSwitcherList };

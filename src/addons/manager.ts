@@ -31,6 +31,8 @@ import type {
     IAddonStorage,
     TAddonSettingType,
 } from './types';
+import type { IQuickOpenCommand } from '../types/gui';
+import { useQuickOpenCommandsStore } from '../stores/useQuickOpenCommandsStore';
 
 /** 插件设置项在 Settings 里的 key 前缀（`addon.<addonId>.<settingId>`） */
 const ADDON_SETTINGS_CATEGORY = 'addons';
@@ -544,7 +546,15 @@ class AddonManager {
             },
             defs: addon?.settings ?? [],
         };
-        return { ...base, storage, settings };
+        // 命令 ID 自动加插件前缀，保证跨插件不冲突
+        const quickOpen = {
+            registerCommand: (command: Omit<IQuickOpenCommand, 'id'> & { id: string }) =>
+                useQuickOpenCommandsStore.getState().registerCommand(addonID, {
+                    ...command,
+                    id: `${addonID}.${command.id}`,
+                }),
+        };
+        return { ...base, storage, settings, quickOpen };
     }
 
     /**
@@ -576,6 +586,8 @@ class AddonManager {
     }
 
     private cleanup(id: string) {
+        // 先注销插件注册的 QuickOpen 命令：即使插件清理函数遗漏也不会泄漏
+        useQuickOpenCommandsStore.getState().unregisterByOwner(id);
         const cleanup = this.cleanups.get(id);
         this.cleanups.delete(id);
         try {

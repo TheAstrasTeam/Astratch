@@ -33,5 +33,9 @@ export function buildAddonContext(vm: IVM): IAddonContext {
             set: () => undefined,
             defs: [],
         },
+        // 占位实现，真正的命令注册 API 由 AddonManager.makeContext 按插件注入
+        quickOpen: {
+            registerCommand: () => () => undefined,
+        },
     };
 }

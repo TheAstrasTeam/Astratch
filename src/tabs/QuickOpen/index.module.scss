@@ -1,0 +1,96 @@
+// 此文件由AI生成
+@use '../../gui/styles/color' as *;
+@use '../../gui/styles/constants' as *;
+@use '../../gui/styles/zIndex' as *;
+
+// 顶部浮层：默认居中兜底；打开时会由组件测量菜单栏搜索框（#menubar-search）
+// 并通过内联样式锚定——面板与搜索框同宽，内部输入框与其完全重合
+.quickOpen {
+    position: fixed;
+    top: 2.25rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    width: calc(100vw / 3);
+    max-height: min(50vh, 24rem);
+    // 必须压在所有可拖动模态框之上（见 zIndex.scss 中 $quickOpen 的说明）
+    z-index: $quickOpen;
+    background-color: $ui-secondary;
+    border: $border-width solid $ui-black-transparent;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+// 布局属性对齐锚点；外观（背景/边框/圆角/内边距）直接沿用 public.scss
+// 对全局 input 的规则（其选择器优先级更高），保证与菜单栏搜索框渲染度量一致。
+// 高度由组件内联样式设为锚点高度，实现视觉重合
+.searchInput {
+    flex-shrink: 0;
+    width: 100%;
+    margin: 0;
+}
+
+.resultList {
+    overflow-y: auto;
+    padding: 0.25rem 0;
+}
+
+.entry {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.3rem 1rem;
+    font-size: small;
+    color: $text-primary;
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+        background-color: $ui-tertiary;
+    }
+
+    &.isSelected {
+        background-color: $ui-primary;
+        box-shadow: inset 2px 0 0 $looks-secondary;
+    }
+}
+
+.entryIcon {
+    width: 1.1rem;
+    height: 1.1rem;
+    flex-shrink: 0;
+    color: $text-primary;
+}
+
+// 命令条目的前缀符号（与输入的 > 呼应）
+.entryPrefix {
+    flex-shrink: 0;
+    width: 1.1rem;
+    text-align: center;
+    opacity: 0.7;
+}
+
+.entryTitle {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+// “未打开”标记：提示该 Target 会被新建标签打开
+.entryBadge {
+    flex-shrink: 0;
+    padding: 0 0.4rem;
+    font-size: x-small;
+    opacity: 0.65;
+    border: 1px solid currentcolor;
+    border-radius: 4px;
+}
+
+.empty {
+    padding: 0.5rem 1rem;
+    font-size: small;
+    color: $text-primary;
+    opacity: 0.6;
+}
