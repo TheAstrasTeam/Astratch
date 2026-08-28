@@ -551,6 +551,14 @@ export interface IBlocks {
      */
     restartWorkspace: () => Promise<void>;
     /**
+     * 延迟释放工作区（供 React 组件 cleanup 调用）
+     */
+    scheduleDispose: () => void;
+    /**
+     * 取消 scheduleDispose 调度的释放
+     */
+    cancelScheduledDispose: () => void;
+    /**
      * 初始化 Blockly，载入插件什么的
      */
     init: () => Promise<void>;

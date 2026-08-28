@@ -32,6 +32,7 @@
 - [field-colour-hsv-sliders](./plugins/field-colour-hsv-sliders/)
 - [field-colour](./plugins/field-colour/)
 - [field-grid-dropdown](./plugins/field-grid-dropdown/)
+- [workspace-search](./plugins/workspace-search/)
 
 我们对其中的插件进行了部分修改使其更加适配 `Astratch` 的_设想_，我们遵守`Apache License v2.0`，在每个更改的文件开头均有标注。
 

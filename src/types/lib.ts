@@ -95,6 +95,11 @@ export const SHORTCUTS = {
         scope: 'blockly',
         blocklyName: 'collapseOtherCategories',
     },
+    WORKSPACE_SEARCH: {
+        id: 'blockly.workspaceSearch',
+        defaultKey: 'mod+f',
+        scope: 'blockly',
+    },
     SWITCH_TAB_TARGET: {
         id: 'tabs.switchTab.target',
         defaultKey: 'mod+1',

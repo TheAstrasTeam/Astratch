@@ -15,7 +15,6 @@ import { getBlocklyMenuOptions, getBlocklyMenuEvent } from '../../../lib/Blockly
 
 const BlocklyWorkspace = ({ vm, targetId }: { vm: IVM; targetId: string }): React.ReactNode => {
     const workspaceDiv = useRef<HTMLDivElement>(null);
-    const disposeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useContextMenu(AllContextMenu.BLOCKLY, closeMenu => {
         const options = getBlocklyMenuOptions();
@@ -58,10 +57,9 @@ const BlocklyWorkspace = ({ vm, targetId }: { vm: IVM; targetId: string }): Reac
     useEffect(() => {
         if (!workspaceDiv.current) return;
 
-        if (disposeTimer.current) {
-            clearTimeout(disposeTimer.current);
-            disposeTimer.current = null;
-        }
+        // 定时器由 Blocks 持有：整棵树重挂（如语言切换）后新实例也能
+        // 取消旧实例调度好的释放。
+        vm.runtime.blocks.cancelScheduledDispose();
 
         if (vm.runtime.editingTargetID !== targetId) vm.runtime.switchTarget(targetId);
         void vm.runtime.blocks.createWorkspace(workspaceDiv.current, false);
@@ -69,10 +67,7 @@ const BlocklyWorkspace = ({ vm, targetId }: { vm: IVM; targetId: string }): Reac
         return () => {
             // React 会在下一个 targetId effect 之前运行清理
             // 延迟释放以便目标切换时保持现有的 Blockly 工作区活着
-            disposeTimer.current = setTimeout(() => {
-                disposeTimer.current = null;
-                vm.runtime.blocks.dispose();
-            }, 0);
+            vm.runtime.blocks.scheduleDispose();
         };
     }, [vm, targetId]);
 

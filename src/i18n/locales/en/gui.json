@@ -168,6 +168,7 @@
     "shortcut.blockly.cleanup": "Clean Up Blocks",
     "shortcut.blockly.disconnect": "Disconnect",
     "shortcut.blockly.collapseOtherCategories": "Collapse other categories",
+    "shortcut.blockly.workspaceSearch": "Search blocks",
     "loading.title": "Loading",
     "modal.ask.entity": "Create an entity named:",
     "modal.ask.module": "Create a module named:",
@@ -233,5 +234,9 @@
     "createFunction.returnType": "Return type",
     "createFunction.selectReturnType": "Choose the function return type",
     "createFunction.noneReturn": "No return",
-    "createFunction.nullReturn": "Unknown"
+    "createFunction.nullReturn": "Unknown",
+    "workspaceSearch.placeholder": "Search",
+    "workspaceSearch.findNext": "Find next",
+    "workspaceSearch.findPrevious": "Find previous",
+    "workspaceSearch.close": "Close search bar"
 }

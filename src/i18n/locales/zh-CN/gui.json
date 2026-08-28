@@ -167,6 +167,7 @@
     "shortcut.blockly.cleanup": "整理积木",
     "shortcut.blockly.disconnect": "断开连接",
     "shortcut.blockly.collapseOtherCategories": "收起其它分类",
+    "shortcut.blockly.workspaceSearch": "搜索积木",
     "loading.title": "加载中",
     "modal.ask.entity": "创建一个实体，命名为：",
     "modal.ask.module": "创建一个模块，命名为：",
@@ -216,5 +217,9 @@
     "tab.closeAll": "关闭全部",
     "tab.closeRight": "关闭右侧标签页",
     "tab.newTab": "新建标签页",
-    "target.rename": "重命名目标"
+    "target.rename": "重命名目标",
+    "workspaceSearch.placeholder": "搜索",
+    "workspaceSearch.findNext": "查找下一个",
+    "workspaceSearch.findPrevious": "查找上一个",
+    "workspaceSearch.close": "关闭搜索栏"
 }

@@ -2,11 +2,80 @@
  * @license
  * Copyright 2020 Google LLC
  * SPDX-License-Identifier: Apache-2.0
+ *
+ * 由 AstrasTeam 修改于 2026/8/28:
+ * - 新增搜索位置文字（1/N），随当前选中项更新
+ * - 监听积木增删改事件，100ms 防抖自动重搜
+ * - searchAndHighlight / setCurrentBlock 增加 needLocate 参数，自动刷新不抢占视口
+ * - 监听 FINISHED_LOADING，切 target 整体替换积木后重搜并丢弃旧积木引用
+ * - 修复 dispose：clearTimeout 防抖定时器、以稳定引用移除监听、清空积木引用
+ * - 位置文字 span 改存成员引用，clearBlocks 后同步归零
+ * - 文案接入 i18n：注册时注入翻译函数（placeholder 与按钮 aria-label）
+ * - 打开搜索的快捷键改为注入式（setWorkspaceSearchShortcut），
+ *   由宿主的快捷键管理器统一配置，不再硬编码 Ctrl/Cmd+F
  */
 
 import * as Blockly from 'blockly/core';
 
 import { injectSearchCss } from './css';
+
+/** 翻译搜索栏文案使用的函数；默认直接回显 key。 */
+export type WorkspaceSearchTranslator = (key: string) => string;
+
+/** 由宿主注入的翻译函数（同 Astratch Toolbox 的注入约定）。 */
+let translate: WorkspaceSearchTranslator = key => key;
+
+/** 注入翻译函数；应在 init() 之前调用。 */
+export function setWorkspaceSearchTranslator(translator?: WorkspaceSearchTranslator) {
+    translate = translator ?? (key => key);
+}
+
+/** 打开搜索栏的快捷键（mousetrap 风格键串）；默认 Ctrl/Cmd+F。 */
+let openShortcut = 'mod+f';
+
+/** 注入打开搜索栏的快捷键；键位变化即时生效（已创建的搜索栏共用）。 */
+export function setWorkspaceSearchShortcut(combo?: string) {
+    openShortcut = combo?.trim() || 'mod+f';
+}
+
+/**
+ * 解析 mousetrap 风格的快捷键串（如 `mod+f`、`ctrl+shift+f`）。
+ * mod 在 macOS 上匹配 Cmd，其余平台匹配 Ctrl。
+ */
+const matchesShortcut = (combo: string, e: KeyboardEvent): boolean => {
+    const parts = combo
+        .toLowerCase()
+        .split('+')
+        .map(part => part.trim())
+        .filter(Boolean);
+    if (!parts.length) return false;
+
+    const isMac = navigator.platform.toLowerCase().includes('mac');
+    let wantCtrl = false;
+    let wantMeta = false;
+    let wantShift = false;
+    let wantAlt = false;
+    for (const part of parts.slice(0, -1)) {
+        if (part === 'mod') {
+            if (isMac) wantMeta = true;
+            else wantCtrl = true;
+        } else if (part === 'ctrl' || part === 'control') wantCtrl = true;
+        else if (part === 'meta' || part === 'cmd' || part === 'command') wantMeta = true;
+        else if (part === 'shift') wantShift = true;
+        else if (part === 'alt' || part === 'option') wantAlt = true;
+    }
+    const mainKey = parts[parts.length - 1];
+    if (
+        e.ctrlKey !== wantCtrl ||
+        e.metaKey !== wantMeta ||
+        e.shiftKey !== wantShift ||
+        e.altKey !== wantAlt
+    ) {
+        return false;
+    }
+    // 主键：字母键不区分大小写，其余（数字/符号）直接比较。
+    return e.key.toLowerCase() === mainKey;
+};
 
 /**
  * Class for workspace search.
@@ -35,7 +104,7 @@ export class WorkspaceSearch implements Blockly.IPositionable {
     /**
      * The placeholder text for the search bar input.
      */
-    private textInputPlaceholder = 'Search';
+    private textInputPlaceholder = translate('gui:workspaceSearch.placeholder');
 
     /**
      * A list of blocks that came up in the search.
@@ -82,12 +151,22 @@ export class WorkspaceSearch implements Blockly.IPositionable {
      */
     private boundEvents: Blockly.browserEvents.Data[] = [];
 
+    /** 搜索自动更新的防抖 */
+    private searchTimeout: ReturnType<typeof setTimeout> | null = null;
+
+    private searchPositionElement: HTMLElement | null = null;
+
+    /** The workspace the search bar sits in. */
+    private workspace: Blockly.WorkspaceSvg;
+
     /**
      * Class for workspace search.
      *
      * @param workspace The workspace the search bar sits in.
      */
-    constructor(private workspace: Blockly.WorkspaceSvg) {}
+    constructor(workspace: Blockly.WorkspaceSvg) {
+        this.workspace = workspace;
+    }
 
     /**
      * Initializes the workspace search bar.
@@ -102,7 +181,36 @@ export class WorkspaceSearch implements Blockly.IPositionable {
         this.createDom();
         this.setVisible(false);
 
+        this.workspace.addChangeListener(this.boundHandleEvents);
+
         this.workspace.resize();
+    }
+
+    private readonly boundHandleEvents = (e: Blockly.Events.Abstract) => {
+        this.handleEvents(e);
+    };
+
+    handleEvents(e: Blockly.Events.Abstract) {
+        if (
+            (
+                [
+                    Blockly.Events.BLOCK_CHANGE,
+                    Blockly.Events.BLOCK_CREATE,
+                    Blockly.Events.BLOCK_DELETE,
+
+                    Blockly.Events.FINISHED_LOADING,
+                ] as string[]
+            ).indexOf(e.type) !== -1
+        ) {
+            if (this.searchTimeout) clearTimeout(this.searchTimeout);
+            this.searchTimeout = setTimeout(() => {
+                this.searchTimeout = null;
+                // 切换不保留
+                const preserve =
+                    e.type === Blockly.Events.FINISHED_LOADING ? false : this.preserveSelected;
+                this.searchAndHighlight(this.searchText, preserve, false);
+            }, 100);
+        }
     }
 
     /**
@@ -111,6 +219,10 @@ export class WorkspaceSearch implements Blockly.IPositionable {
      * to prevent memory leaks.
      */
     dispose() {
+        if (this.searchTimeout) {
+            clearTimeout(this.searchTimeout);
+            this.searchTimeout = null;
+        }
         for (const event of this.boundEvents) {
             Blockly.browserEvents.unbind(event);
         }
@@ -121,6 +233,23 @@ export class WorkspaceSearch implements Blockly.IPositionable {
         }
         this.actionDiv = null;
         this.inputElement = null;
+        this.searchPositionElement = null;
+        this.blocks = [];
+        this.currentBlockIndex = -1;
+        this.lastHighlighted = null;
+        this.workspace.removeChangeListener(this.boundHandleEvents);
+    }
+
+    /** 获取当前的位置文字 */
+    private getSearchPositionText() {
+        return `${String(this.currentBlockIndex + 1)}/${String(this.blocks.length)}`;
+    }
+
+    /** 同步位置文字；搜索结果为空时显示 0/0。 */
+    private updateSearchPositionText() {
+        if (this.searchPositionElement) {
+            this.searchPositionElement.textContent = this.getSearchPositionText();
+        }
     }
 
     /**
@@ -168,8 +297,14 @@ export class WorkspaceSearch implements Blockly.IPositionable {
             this.inputElement?.select();
         });
 
+        const searchPosition = document.createElement('span');
+        Blockly.utils.dom.addClass(searchPosition, 'blockly-ws-search-position');
+        searchPosition.textContent = this.getSearchPositionText();
+        this.searchPositionElement = searchPosition;
+
         inputWrapper.appendChild(this.inputElement);
         searchContent.appendChild(inputWrapper);
+        searchContent.appendChild(searchPosition);
 
         this.actionDiv = document.createElement('div');
         Blockly.utils.dom.addClass(this.actionDiv, 'blockly-ws-search-actions');
@@ -245,7 +380,10 @@ export class WorkspaceSearch implements Blockly.IPositionable {
      * @returns The next button.
      */
     protected createNextBtn(): HTMLButtonElement {
-        return this.createBtn('blockly-ws-search-next-btn', 'Find next');
+        return this.createBtn(
+            'blockly-ws-search-next-btn',
+            translate('gui:workspaceSearch.findNext'),
+        );
     }
 
     /**
@@ -254,7 +392,10 @@ export class WorkspaceSearch implements Blockly.IPositionable {
      * @returns The previous button.
      */
     protected createPreviousBtn(): HTMLButtonElement {
-        return this.createBtn('blockly-ws-search-previous-btn', 'Find previous');
+        return this.createBtn(
+            'blockly-ws-search-previous-btn',
+            translate('gui:workspaceSearch.findPrevious'),
+        );
     }
 
     /**
@@ -263,7 +404,10 @@ export class WorkspaceSearch implements Blockly.IPositionable {
      * @returns A button for closing the search bar.
      */
     protected createCloseBtn(): HTMLButtonElement {
-        return this.createBtn('blockly-ws-search-close-btn', 'Close search bar');
+        return this.createBtn(
+            'blockly-ws-search-close-btn',
+            translate('gui:workspaceSearch.close'),
+        );
     }
 
     /**
@@ -325,7 +469,7 @@ export class WorkspaceSearch implements Blockly.IPositionable {
      * @param savedPositions List of rectangles that
      *     are already on the workspace.
      */
-    position(metrics: Blockly.MetricsManager.UiMetrics, savedPositions: Blockly.utils.Rect[]) {
+    position(metrics: Blockly.MetricsManager.UiMetrics, _savedPositions: Blockly.utils.Rect[]) {
         if (!this.htmlDiv) return;
         if (this.workspace.RTL) {
             this.htmlDiv.style.left = metrics.absoluteMetrics.left + 'px';
@@ -377,13 +521,13 @@ export class WorkspaceSearch implements Blockly.IPositionable {
     }
 
     /**
-     * Opens the search bar when Control F or Command F are used on the workspace.
+     * Opens the search bar when the configured open shortcut is used on the
+     * workspace.
      *
      * @param e The key down event.
      */
     private onWorkspaceKeyDown(e: KeyboardEvent) {
-        // TODO: Look into handling keyboard shortcuts on workspace in Blockly.
-        if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+        if (matchesShortcut(openShortcut, e)) {
             this.open();
             e.preventDefault();
             e.stopPropagation();
@@ -420,9 +564,11 @@ export class WorkspaceSearch implements Blockly.IPositionable {
      * Changes the currently "selected" block and adds extra highlight.
      *
      * @param index Index of block to set as current. Number is wrapped.
+     * @param needLocate Whether to automatically focus on the block
      */
-    protected setCurrentBlock(index: number) {
+    protected setCurrentBlock(index: number, needLocate = true) {
         if (!this.blocks.length) {
+            this.updateSearchPositionText();
             return;
         }
         let currentBlock = this.blocks[this.currentBlockIndex];
@@ -433,8 +579,10 @@ export class WorkspaceSearch implements Blockly.IPositionable {
             ((index % this.blocks.length) + this.blocks.length) % this.blocks.length;
         currentBlock = this.blocks[this.currentBlockIndex];
 
+        this.updateSearchPositionText();
+
         this.highlightCurrentSelection(currentBlock);
-        this.workspace.centerOnBlock(currentBlock.id, false);
+        if (needLocate) this.workspace.centerOnBlock(currentBlock.id, false);
         this.lastHighlighted = currentBlock;
     }
 
@@ -483,8 +631,9 @@ export class WorkspaceSearch implements Blockly.IPositionable {
      * @param searchText The search text.
      * @param preserveCurrent Whether to preserve the current block
      *    if it is included in the new matching blocks.
+     * @param needLocate Whether to automatically focus on the block
      */
-    searchAndHighlight(searchText: string, preserveCurrent?: boolean) {
+    searchAndHighlight(searchText: string, preserveCurrent?: boolean, needLocate = true) {
         const oldCurrentBlock = this.blocks[this.currentBlockIndex];
         this.searchText = searchText.trim();
         this.clearBlocks();
@@ -495,7 +644,7 @@ export class WorkspaceSearch implements Blockly.IPositionable {
             currentIdx = this.blocks.indexOf(oldCurrentBlock);
             currentIdx = currentIdx > -1 ? currentIdx : 0;
         }
-        this.setCurrentBlock(currentIdx);
+        this.setCurrentBlock(currentIdx, needLocate);
     }
 
     /**
@@ -581,6 +730,7 @@ export class WorkspaceSearch implements Blockly.IPositionable {
         }
         this.currentBlockIndex = -1;
         this.blocks = [];
+        this.updateSearchPositionText();
     }
 
     /**
