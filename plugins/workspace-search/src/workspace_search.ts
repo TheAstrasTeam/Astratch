@@ -11,6 +11,8 @@
  * - 修复 dispose：clearTimeout 防抖定时器、以稳定引用移除监听、清空积木引用
  * - 位置文字 span 改存成员引用，clearBlocks 后同步归零
  * - 文案接入 i18n：注册时注入翻译函数（placeholder 与按钮 aria-label）
+ * - 打开搜索的快捷键改为注入式（setWorkspaceSearchShortcut），
+ *   由宿主的快捷键管理器统一配置，不再硬编码 Ctrl/Cmd+F
  */
 
 import * as Blockly from 'blockly/core';
@@ -27,6 +29,53 @@ let translate: WorkspaceSearchTranslator = key => key;
 export function setWorkspaceSearchTranslator(translator?: WorkspaceSearchTranslator) {
     translate = translator ?? (key => key);
 }
+
+/** 打开搜索栏的快捷键（mousetrap 风格键串）；默认 Ctrl/Cmd+F。 */
+let openShortcut = 'mod+f';
+
+/** 注入打开搜索栏的快捷键；键位变化即时生效（已创建的搜索栏共用）。 */
+export function setWorkspaceSearchShortcut(combo?: string) {
+    openShortcut = combo?.trim() || 'mod+f';
+}
+
+/**
+ * 解析 mousetrap 风格的快捷键串（如 `mod+f`、`ctrl+shift+f`）。
+ * mod 在 macOS 上匹配 Cmd，其余平台匹配 Ctrl。
+ */
+const matchesShortcut = (combo: string, e: KeyboardEvent): boolean => {
+    const parts = combo
+        .toLowerCase()
+        .split('+')
+        .map(part => part.trim())
+        .filter(Boolean);
+    if (!parts.length) return false;
+
+    const isMac = navigator.platform.toLowerCase().includes('mac');
+    let wantCtrl = false;
+    let wantMeta = false;
+    let wantShift = false;
+    let wantAlt = false;
+    for (const part of parts.slice(0, -1)) {
+        if (part === 'mod') {
+            if (isMac) wantMeta = true;
+            else wantCtrl = true;
+        } else if (part === 'ctrl' || part === 'control') wantCtrl = true;
+        else if (part === 'meta' || part === 'cmd' || part === 'command') wantMeta = true;
+        else if (part === 'shift') wantShift = true;
+        else if (part === 'alt' || part === 'option') wantAlt = true;
+    }
+    const mainKey = parts[parts.length - 1];
+    if (
+        e.ctrlKey !== wantCtrl ||
+        e.metaKey !== wantMeta ||
+        e.shiftKey !== wantShift ||
+        e.altKey !== wantAlt
+    ) {
+        return false;
+    }
+    // 主键：字母键不区分大小写，其余（数字/符号）直接比较。
+    return e.key.toLowerCase() === mainKey;
+};
 
 /**
  * Class for workspace search.
@@ -472,13 +521,13 @@ export class WorkspaceSearch implements Blockly.IPositionable {
     }
 
     /**
-     * Opens the search bar when Control F or Command F are used on the workspace.
+     * Opens the search bar when the configured open shortcut is used on the
+     * workspace.
      *
      * @param e The key down event.
      */
     private onWorkspaceKeyDown(e: KeyboardEvent) {
-        // TODO: Look into handling keyboard shortcuts on workspace in Blockly.
-        if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+        if (matchesShortcut(openShortcut, e)) {
             this.open();
             e.preventDefault();
             e.stopPropagation();

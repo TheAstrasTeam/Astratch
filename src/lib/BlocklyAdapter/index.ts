@@ -31,6 +31,7 @@ import {
     setContextMenuHandler,
 } from '../../../plugins/context-menu-patch';
 import { registerAstratchToolbox } from '../../../plugins/astratch-toolbox/src';
+import { setWorkspaceSearchShortcut } from '../../../plugins/workspace-search/src';
 import i18next from 'i18next';
 import i18nReady from '../../i18n';
 import { SNAP_RADIUS } from '../../types/blocks';
@@ -169,7 +170,13 @@ function installBlocklyPatches(blockly: typeof BlocklyType): () => void {
 
     function sync(id: ShortcutIds, newKey: string | undefined): void {
         const definition = shortcutManager.getDefinition(id);
-        if (definition.scope !== 'blockly' || !definition.blocklyName) return;
+        if (definition.scope !== 'blockly') return;
+
+        // 工作区搜索监听的是 injectionDiv 的 keydown，键位由插件自己解析。
+        if (!definition.blocklyName) {
+            if (newKey !== undefined) setWorkspaceSearchShortcut(newKey);
+            return;
+        }
 
         registry.removeAllKeyMappings(definition.blocklyName);
         if (newKey !== undefined) {

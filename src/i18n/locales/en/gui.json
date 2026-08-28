@@ -168,6 +168,7 @@
     "shortcut.blockly.cleanup": "Clean Up Blocks",
     "shortcut.blockly.disconnect": "Disconnect",
     "shortcut.blockly.collapseOtherCategories": "Collapse other categories",
+    "shortcut.blockly.workspaceSearch": "Search blocks",
     "loading.title": "Loading",
     "modal.ask.entity": "Create an entity named:",
     "modal.ask.module": "Create a module named:",
