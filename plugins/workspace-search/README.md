@@ -14,7 +14,7 @@ npm install @blockly/plugin-workspace-search --save
 
 ```js
 import * as Blockly from 'blockly';
-import {WorkspaceSearch} from '@blockly/plugin-workspace-search';
+import { WorkspaceSearch } from '@blockly/plugin-workspace-search';
 
 const workspace = Blockly.inject('blocklyDiv');
 const workspaceSearch = new WorkspaceSearch(workspace);
@@ -25,7 +25,7 @@ workspaceSearch.init();
 ### Script Tag
 
 ```js
-<script src="./node_modules/@blockly/plugin-workspace-search/dist/index.js"></script>
+<script src='./node_modules/@blockly/plugin-workspace-search/dist/index.js'></script>
 ```
 
 To open workspace search use either command + f or control + f. To close the search bar hit escape or the 'x' in the top right corner.
@@ -64,18 +64,18 @@ The generated search bar looks like:
 Here are additional CSS classes to style your search bar:
 
 - `blockly-ws-search`: Applies to the outer-most div.
-  - Default styling:
-    ```css
-    '.blockly-ws-search {',
-      'background: white;',
-      'border: solid lightgrey 0.5px;',
-      'box-shadow: 0px 10px 20px grey;',
-      'justify-content: center;',
-      'padding: 0.25em;',
-      'position: absolute;',
-      'z-index: 70;',
-    '}'
-    ```
+    - Default styling:
+        ```css
+        '.blockly-ws-search {',
+          'background: white;',
+          'border: solid lightgrey 0.5px;',
+          'box-shadow: 0px 10px 20px grey;',
+          'justify-content: center;',
+          'padding: 0.25em;',
+          'position: absolute;',
+          'z-index: 70;',
+        '}'
+        ```
 - `blockly-ws-search-container`: Applies to the search container.
 - `blockly-ws-search-content`: Applies to the search content.
 - `blockly-ws-search-input`: Applies to the input wrapper. (Default: `border: none;`)
