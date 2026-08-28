@@ -8,6 +8,7 @@ import { OPCODES, type IBlocks, type IWorkspaceState, type Language } from '../.
 import * as Blockly from 'blockly';
 // 导入两个插件试试
 import * as AstratchToolbox from '../../../../plugins/astratch-toolbox/src';
+import { WorkspaceSearch } from '../../../../plugins/workspace-search/src';
 import * as En from 'blockly/msg/en';
 import * as ZhHans from 'blockly/msg/zh-hans';
 import { setupBlockly } from '../../../lib/BlocklyAdapter';
@@ -375,6 +376,10 @@ class Blocks implements IBlocks {
                 this._DOM = DOM;
                 await this.init();
                 this.workspaceSvg = this.Blockly.inject(DOM, this.workspaceConfig);
+
+                const workspaceSearch = new WorkspaceSearch(this.workspaceSvg);
+                workspaceSearch.init();
+
                 // 注册动态工作区
                 const { registerCategory } = await setupBlockly(this.Blockly, this.vm);
                 registerCategory.forEach(category => {

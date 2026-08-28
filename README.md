@@ -32,6 +32,7 @@ In short, `Astratch` draws on the strengths of other `Scratch editors`, using **
 - [field-colour-hsv-sliders](./plugins/field-colour-hsv-sliders/)
 - [field-colour](./plugins/field-colour/)
 - [field-grid-dropdown](./plugins/field-grid-dropdown/)
+- [workspace-search](./plugins/workspace-search/)
 
 We have modified some of these plugins to better fit the _vision_ of `Astratch`. We comply with the `Apache License v2.0`, and each modified file is annotated at the beginning.
 

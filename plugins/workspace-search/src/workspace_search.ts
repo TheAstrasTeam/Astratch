@@ -82,6 +82,9 @@ export class WorkspaceSearch implements Blockly.IPositionable {
      */
     private boundEvents: Blockly.browserEvents.Data[] = [];
 
+    /** 搜索自动更新的防抖 */
+    private searchTimeout: ReturnType<typeof setTimeout> | null = null;
+
     /**
      * Class for workspace search.
      *
@@ -102,7 +105,26 @@ export class WorkspaceSearch implements Blockly.IPositionable {
         this.createDom();
         this.setVisible(false);
 
+        this.workspace.addChangeListener(this.handleEvents.bind(this));
+
         this.workspace.resize();
+    }
+
+    handleEvents(e: Blockly.Events.Abstract) {
+        if (
+            (
+                [
+                    Blockly.Events.BLOCK_CHANGE,
+                    Blockly.Events.BLOCK_CREATE,
+                    Blockly.Events.BLOCK_DELETE,
+                ] as string[]
+            ).indexOf(e.type) !== -1
+        ) {
+            if (this.searchTimeout) clearTimeout(this.searchTimeout);
+            this.searchTimeout = setTimeout(() => {
+                this.searchAndHighlight(this.searchText, this.preserveSelected, false);
+            }, 100);
+        }
     }
 
     /**
@@ -121,6 +143,11 @@ export class WorkspaceSearch implements Blockly.IPositionable {
         }
         this.actionDiv = null;
         this.inputElement = null;
+    }
+
+    /** 获取当前的位置文字 */
+    private getSearchPositionText() {
+        return `${String(this.currentBlockIndex + 1)}/${String(this.blocks.length)}`;
     }
 
     /**
@@ -168,8 +195,13 @@ export class WorkspaceSearch implements Blockly.IPositionable {
             this.inputElement?.select();
         });
 
+        const searchPosition = document.createElement('span');
+        Blockly.utils.dom.addClass(searchPosition, 'blockly-ws-search-position');
+        searchPosition.textContent = this.getSearchPositionText();
+
         inputWrapper.appendChild(this.inputElement);
         searchContent.appendChild(inputWrapper);
+        searchContent.appendChild(searchPosition);
 
         this.actionDiv = document.createElement('div');
         Blockly.utils.dom.addClass(this.actionDiv, 'blockly-ws-search-actions');
@@ -420,8 +452,9 @@ export class WorkspaceSearch implements Blockly.IPositionable {
      * Changes the currently "selected" block and adds extra highlight.
      *
      * @param index Index of block to set as current. Number is wrapped.
+     * @param needLocate Whether to automatically focus on the block
      */
-    protected setCurrentBlock(index: number) {
+    protected setCurrentBlock(index: number, needLocate = true) {
         if (!this.blocks.length) {
             return;
         }
@@ -433,8 +466,11 @@ export class WorkspaceSearch implements Blockly.IPositionable {
             ((index % this.blocks.length) + this.blocks.length) % this.blocks.length;
         currentBlock = this.blocks[this.currentBlockIndex];
 
+        const searchPosition = document.querySelector('.blockly-ws-search-position');
+        if (searchPosition) searchPosition.textContent = this.getSearchPositionText();
+
         this.highlightCurrentSelection(currentBlock);
-        this.workspace.centerOnBlock(currentBlock.id, false);
+        if (needLocate) this.workspace.centerOnBlock(currentBlock.id, false);
         this.lastHighlighted = currentBlock;
     }
 
@@ -483,8 +519,9 @@ export class WorkspaceSearch implements Blockly.IPositionable {
      * @param searchText The search text.
      * @param preserveCurrent Whether to preserve the current block
      *    if it is included in the new matching blocks.
+     * @param needLocate Whether to automatically focus on the block
      */
-    searchAndHighlight(searchText: string, preserveCurrent?: boolean) {
+    searchAndHighlight(searchText: string, preserveCurrent?: boolean, needLocate = true) {
         const oldCurrentBlock = this.blocks[this.currentBlockIndex];
         this.searchText = searchText.trim();
         this.clearBlocks();
@@ -495,7 +532,7 @@ export class WorkspaceSearch implements Blockly.IPositionable {
             currentIdx = this.blocks.indexOf(oldCurrentBlock);
             currentIdx = currentIdx > -1 ? currentIdx : 0;
         }
-        this.setCurrentBlock(currentIdx);
+        this.setCurrentBlock(currentIdx, needLocate);
     }
 
     /**

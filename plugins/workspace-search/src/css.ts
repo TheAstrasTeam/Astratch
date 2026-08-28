@@ -2,6 +2,9 @@
  * @license
  * Copyright 2020 Google LLC
  * SPDX-License-Identifier: Apache-2.0
+ * 
+ * 由 AstrasTeam 修改于 2026/8/28:
+ * - 修改CSS样式
  */
 
 /**
@@ -41,25 +44,43 @@ const arrowUpSvgDataUri =
 /**
  * CSS for workspace search.
  */
-const cssContent = `path.blocklyPath.blockly-ws-search-highlight {
-    fill: #000;
+const cssContent = `
+  @keyframes highlight {
+    0% {
+        filter: brightness(1);
+    }
+    25% {
+        filter: brightness(1.4);
+    }
+    50% {
+        filter: brightness(0.6);
+    }
+    100% {
+        filter: brightness(1);
+    }
+  }
+  .blockly-ws-search-position {
+    padding: 0 10px;
   }
   path.blocklyPath.blockly-ws-search-highlight.blockly-ws-search-current {
-    fill: grey;
+    animation: highlight 3s ease forwards infinite;
+    stroke-width: 3px
   }
   .blockly-ws-search-close-btn {
-    background: url(${closeSvgDataUri}) no-repeat top left;
+    background: url(${closeSvgDataUri}) no-repeat center center;
+    background-size: cover;
   }
   .blockly-ws-search-next-btn {
-    background: url(${arrowDownSvgDataUri}) no-repeat top left;
+    background: url(${arrowDownSvgDataUri}) no-repeat center center;
+    background-size: cover;
   }
   .blockly-ws-search-previous-btn {
-    background: url(${arrowUpSvgDataUri}) no-repeat top left;
+    background: url(${arrowUpSvgDataUri}) no-repeat center center;
+    background-size: cover;
   }
   .blockly-ws-search {
-    background: #fff;
-    border: solid lightgrey 0.5px;
-    box-shadow: 0px 10px 20px grey;
+    background: var(--ui-tertiary);
+    border: 1px solid var(--ui-black-transparent);
     justify-content: center;
     padding: 0.25em;
     position: absolute;
@@ -67,20 +88,31 @@ const cssContent = `path.blocklyPath.blockly-ws-search-highlight {
   }
   .blockly-ws-search-input input {
     border: none;
+    background-color: var(--ui-secondary) !important;
   }
   .blockly-ws-search button {
-    border: none;
-    padding-left: 6px;
-    padding-right: 6px;
+    filter: var(--svg-filter) !important;
+    border: 1px solid transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 20px;
+    height: 20px
+  }
+  .blockly-ws-search button:hover {
+    border: color-mix(in srgb, var(--ui-tertiary) 30%, transparent 30%) 1px solid !important;
   }
   .blockly-ws-search-actions {
     display: flex;
+    align-items: center
   }
   .blockly-ws-search-container {
     display: flex;
+    align-items: center
   }
   .blockly-ws-search-content {
     display: flex;
+    align-items: center
   }`;
 
 /**
