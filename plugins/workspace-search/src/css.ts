@@ -79,7 +79,7 @@ const cssContent = `
     background-size: cover;
   }
   .blockly-ws-search {
-    background: var(--ui-tertiary);
+    background: var(--ui-secondary);
     border: 1px solid var(--ui-black-transparent);
     justify-content: center;
     padding: 0.25em;
