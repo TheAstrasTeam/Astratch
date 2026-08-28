@@ -85,12 +85,19 @@ export class WorkspaceSearch implements Blockly.IPositionable {
     /** 搜索自动更新的防抖 */
     private searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
+    private searchPositionElement: HTMLElement | null = null;
+
+    /** The workspace the search bar sits in. */
+    private workspace: Blockly.WorkspaceSvg;
+
     /**
      * Class for workspace search.
      *
      * @param workspace The workspace the search bar sits in.
      */
-    constructor(private workspace: Blockly.WorkspaceSvg) {}
+    constructor(workspace: Blockly.WorkspaceSvg) {
+        this.workspace = workspace;
+    }
 
     /**
      * Initializes the workspace search bar.
@@ -105,10 +112,14 @@ export class WorkspaceSearch implements Blockly.IPositionable {
         this.createDom();
         this.setVisible(false);
 
-        this.workspace.addChangeListener(this.handleEvents.bind(this));
+        this.workspace.addChangeListener(this.boundHandleEvents);
 
         this.workspace.resize();
     }
+
+    private readonly boundHandleEvents = (e: Blockly.Events.Abstract) => {
+        this.handleEvents(e);
+    };
 
     handleEvents(e: Blockly.Events.Abstract) {
         if (
@@ -117,12 +128,18 @@ export class WorkspaceSearch implements Blockly.IPositionable {
                     Blockly.Events.BLOCK_CHANGE,
                     Blockly.Events.BLOCK_CREATE,
                     Blockly.Events.BLOCK_DELETE,
+
+                    Blockly.Events.FINISHED_LOADING,
                 ] as string[]
             ).indexOf(e.type) !== -1
         ) {
             if (this.searchTimeout) clearTimeout(this.searchTimeout);
             this.searchTimeout = setTimeout(() => {
-                this.searchAndHighlight(this.searchText, this.preserveSelected, false);
+                this.searchTimeout = null;
+                // 切换不保留
+                const preserve =
+                    e.type === Blockly.Events.FINISHED_LOADING ? false : this.preserveSelected;
+                this.searchAndHighlight(this.searchText, preserve, false);
             }, 100);
         }
     }
@@ -133,6 +150,10 @@ export class WorkspaceSearch implements Blockly.IPositionable {
      * to prevent memory leaks.
      */
     dispose() {
+        if (this.searchTimeout) {
+            clearTimeout(this.searchTimeout);
+            this.searchTimeout = null;
+        }
         for (const event of this.boundEvents) {
             Blockly.browserEvents.unbind(event);
         }
@@ -143,13 +164,23 @@ export class WorkspaceSearch implements Blockly.IPositionable {
         }
         this.actionDiv = null;
         this.inputElement = null;
-        this.workspace.removeChangeListener(this.handleEvents);
-        this.searchTimeout = null;
+        this.searchPositionElement = null;
+        this.blocks = [];
+        this.currentBlockIndex = -1;
+        this.lastHighlighted = null;
+        this.workspace.removeChangeListener(this.boundHandleEvents);
     }
 
     /** 获取当前的位置文字 */
     private getSearchPositionText() {
         return `${String(this.currentBlockIndex + 1)}/${String(this.blocks.length)}`;
+    }
+
+    /** 同步位置文字；搜索结果为空时显示 0/0。 */
+    private updateSearchPositionText() {
+        if (this.searchPositionElement) {
+            this.searchPositionElement.textContent = this.getSearchPositionText();
+        }
     }
 
     /**
@@ -200,6 +231,7 @@ export class WorkspaceSearch implements Blockly.IPositionable {
         const searchPosition = document.createElement('span');
         Blockly.utils.dom.addClass(searchPosition, 'blockly-ws-search-position');
         searchPosition.textContent = this.getSearchPositionText();
+        this.searchPositionElement = searchPosition;
 
         inputWrapper.appendChild(this.inputElement);
         searchContent.appendChild(inputWrapper);
@@ -359,7 +391,7 @@ export class WorkspaceSearch implements Blockly.IPositionable {
      * @param savedPositions List of rectangles that
      *     are already on the workspace.
      */
-    position(metrics: Blockly.MetricsManager.UiMetrics, savedPositions: Blockly.utils.Rect[]) {
+    position(metrics: Blockly.MetricsManager.UiMetrics, _savedPositions: Blockly.utils.Rect[]) {
         if (!this.htmlDiv) return;
         if (this.workspace.RTL) {
             this.htmlDiv.style.left = metrics.absoluteMetrics.left + 'px';
@@ -458,6 +490,7 @@ export class WorkspaceSearch implements Blockly.IPositionable {
      */
     protected setCurrentBlock(index: number, needLocate = true) {
         if (!this.blocks.length) {
+            this.updateSearchPositionText();
             return;
         }
         let currentBlock = this.blocks[this.currentBlockIndex];
@@ -468,8 +501,7 @@ export class WorkspaceSearch implements Blockly.IPositionable {
             ((index % this.blocks.length) + this.blocks.length) % this.blocks.length;
         currentBlock = this.blocks[this.currentBlockIndex];
 
-        const searchPosition = document.querySelector('.blockly-ws-search-position');
-        if (searchPosition) searchPosition.textContent = this.getSearchPositionText();
+        this.updateSearchPositionText();
 
         this.highlightCurrentSelection(currentBlock);
         if (needLocate) this.workspace.centerOnBlock(currentBlock.id, false);
@@ -620,6 +652,7 @@ export class WorkspaceSearch implements Blockly.IPositionable {
         }
         this.currentBlockIndex = -1;
         this.blocks = [];
+        this.updateSearchPositionText();
     }
 
     /**

@@ -52,6 +52,10 @@ class Blocks implements IBlocks {
      */
     private _isCreating = false;
     /**
+     * 当前工作区绑定的搜索组件；随工作区一同创建与销毁。
+     */
+    private workspaceSearch: WorkspaceSearch | null = null;
+    /**
      * 在工作区出现事件时需要同步积木，
      * 但是不是所有事件都会修改工作区，
      * 所以需要过滤掉一些防止更改过于频繁
@@ -377,8 +381,8 @@ class Blocks implements IBlocks {
                 await this.init();
                 this.workspaceSvg = this.Blockly.inject(DOM, this.workspaceConfig);
 
-                const workspaceSearch = new WorkspaceSearch(this.workspaceSvg);
-                workspaceSearch.init();
+                this.workspaceSearch = new WorkspaceSearch(this.workspaceSvg);
+                this.workspaceSearch.init();
 
                 // 注册动态工作区
                 const { registerCategory } = await setupBlockly(this.Blockly, this.vm);
@@ -435,6 +439,12 @@ class Blocks implements IBlocks {
         } finally {
             this._isCreating = false;
             this.Blockly.Events.enable();
+            // 重发一个切换事件
+            if (this.workspaceSvg) {
+                this.Blockly.Events.fire(
+                    new this.Blockly.Events.FinishedLoading(this.workspaceSvg),
+                );
+            }
         }
 
         return !!this.workspaceSvg;
@@ -446,6 +456,8 @@ class Blocks implements IBlocks {
         this.vm.off(events.CREATE_CUSTOM_FUNCTION, this.handleFunctionCreated);
         this.vm.off(events.EDIT_CUSTOM_FUNCTION, this.handleFunctionEdited);
         this.vm.off(events.REMOVE_CUSTOM_FUNCTION, this.handleFunctionRemoved);
+        this.workspaceSearch?.dispose();
+        this.workspaceSearch = null;
         if (this.workspaceSvg) {
             this.workspaceSvg.removeChangeListener(this.handleWorkspaceChange);
             this.workspaceSvg.dispose();
