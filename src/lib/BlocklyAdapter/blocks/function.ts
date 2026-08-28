@@ -501,17 +501,17 @@ const syncDropdownGroupBackgrounds = (host: Blockly.BlockSvg): void => {
         const argRoot = argBlock?.getSvgRoot();
         const enumRoot = enumBlock?.getSvgRoot();
         if (!argBlock || !enumBlock || !argRoot || !enumRoot) return;
+        if (argBlock.getParent() !== block || enumBlock.getParent() !== block) return;
 
-        const hostXY = block.getRelativeToSurfaceXY();
-        const argXY = argBlock.getRelativeToSurfaceXY();
+        const argXY = argBlock.relativeCoords;
+        const enumXY = enumBlock.relativeCoords;
         const argHW = argBlock.getHeightWidth();
-        const enumXY = enumBlock.getRelativeToSurfaceXY();
         const enumHW = enumBlock.getHeightWidth();
 
-        const left = Math.min(argXY.x, enumXY.x) - hostXY.x;
-        const top = Math.min(argXY.y, enumXY.y) - hostXY.y;
-        const right = Math.max(argXY.x + argHW.width, enumXY.x + enumHW.width) - hostXY.x;
-        const bottom = Math.max(argXY.y + argHW.height, enumXY.y + enumHW.height) - hostXY.y;
+        const left = Math.min(argXY.x, enumXY.x);
+        const top = Math.min(argXY.y, enumXY.y);
+        const right = Math.max(argXY.x + argHW.width, enumXY.x + enumHW.width);
+        const bottom = Math.max(argXY.y + argHW.height, enumXY.y + enumHW.height);
 
         let rect = rects.get(index);
         if (!rect || !svgRoot.contains(rect)) {
@@ -1344,10 +1344,7 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
                 } else {
                     configureFunctionValueConnections(this, true, null);
                     if (this.returnType === null) {
-                        // 未知：覆盖为方形「积木」轮廓，与万能胶囊区分。
-                        // zelos 的 shapeFor 会优先尊重 setOutputShape 的覆盖；
                         // 3 = zelos ConstantProvider.SHAPES.SQUARE（zelos 独有常量，
-                        // Block 上拿不到，直接用值）。
                         this.setOutputShape(3);
                     }
                 }
