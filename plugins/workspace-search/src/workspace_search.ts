@@ -2,6 +2,14 @@
  * @license
  * Copyright 2020 Google LLC
  * SPDX-License-Identifier: Apache-2.0
+ *
+ * 由 AstrasTeam 修改于 2026/8/28:
+ * - 新增搜索位置文字（1/N），随当前选中项更新
+ * - 监听积木增删改事件，100ms 防抖自动重搜
+ * - searchAndHighlight / setCurrentBlock 增加 needLocate 参数，自动刷新不抢占视口
+ * - 监听 FINISHED_LOADING，切 target 整体替换积木后重搜并丢弃旧积木引用
+ * - 修复 dispose：clearTimeout 防抖定时器、以稳定引用移除监听、清空积木引用
+ * - 位置文字 span 改存成员引用，clearBlocks 后同步归零
  */
 
 import * as Blockly from 'blockly/core';
