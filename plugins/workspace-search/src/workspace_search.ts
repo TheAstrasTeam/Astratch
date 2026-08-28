@@ -10,11 +10,23 @@
  * - 监听 FINISHED_LOADING，切 target 整体替换积木后重搜并丢弃旧积木引用
  * - 修复 dispose：clearTimeout 防抖定时器、以稳定引用移除监听、清空积木引用
  * - 位置文字 span 改存成员引用，clearBlocks 后同步归零
+ * - 文案接入 i18n：注册时注入翻译函数（placeholder 与按钮 aria-label）
  */
 
 import * as Blockly from 'blockly/core';
 
 import { injectSearchCss } from './css';
+
+/** 翻译搜索栏文案使用的函数；默认直接回显 key。 */
+export type WorkspaceSearchTranslator = (key: string) => string;
+
+/** 由宿主注入的翻译函数（同 Astratch Toolbox 的注入约定）。 */
+let translate: WorkspaceSearchTranslator = key => key;
+
+/** 注入翻译函数；应在 init() 之前调用。 */
+export function setWorkspaceSearchTranslator(translator?: WorkspaceSearchTranslator) {
+    translate = translator ?? (key => key);
+}
 
 /**
  * Class for workspace search.
@@ -43,7 +55,7 @@ export class WorkspaceSearch implements Blockly.IPositionable {
     /**
      * The placeholder text for the search bar input.
      */
-    private textInputPlaceholder = 'Search';
+    private textInputPlaceholder = translate('gui:workspaceSearch.placeholder');
 
     /**
      * A list of blocks that came up in the search.
@@ -319,7 +331,10 @@ export class WorkspaceSearch implements Blockly.IPositionable {
      * @returns The next button.
      */
     protected createNextBtn(): HTMLButtonElement {
-        return this.createBtn('blockly-ws-search-next-btn', 'Find next');
+        return this.createBtn(
+            'blockly-ws-search-next-btn',
+            translate('gui:workspaceSearch.findNext'),
+        );
     }
 
     /**
@@ -328,7 +343,10 @@ export class WorkspaceSearch implements Blockly.IPositionable {
      * @returns The previous button.
      */
     protected createPreviousBtn(): HTMLButtonElement {
-        return this.createBtn('blockly-ws-search-previous-btn', 'Find previous');
+        return this.createBtn(
+            'blockly-ws-search-previous-btn',
+            translate('gui:workspaceSearch.findPrevious'),
+        );
     }
 
     /**
@@ -337,7 +355,10 @@ export class WorkspaceSearch implements Blockly.IPositionable {
      * @returns A button for closing the search bar.
      */
     protected createCloseBtn(): HTMLButtonElement {
-        return this.createBtn('blockly-ws-search-close-btn', 'Close search bar');
+        return this.createBtn(
+            'blockly-ws-search-close-btn',
+            translate('gui:workspaceSearch.close'),
+        );
     }
 
     /**

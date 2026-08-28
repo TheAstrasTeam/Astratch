@@ -233,5 +233,9 @@
     "createFunction.returnType": "Return type",
     "createFunction.selectReturnType": "Choose the function return type",
     "createFunction.noneReturn": "No return",
-    "createFunction.nullReturn": "Unknown"
+    "createFunction.nullReturn": "Unknown",
+    "workspaceSearch.placeholder": "Search",
+    "workspaceSearch.findNext": "Find next",
+    "workspaceSearch.findPrevious": "Find previous",
+    "workspaceSearch.close": "Close search bar"
 }

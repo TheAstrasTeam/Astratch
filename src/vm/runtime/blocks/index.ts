@@ -8,7 +8,10 @@ import { OPCODES, type IBlocks, type IWorkspaceState, type Language } from '../.
 import * as Blockly from 'blockly';
 // 导入两个插件试试
 import * as AstratchToolbox from '../../../../plugins/astratch-toolbox/src';
-import { WorkspaceSearch } from '../../../../plugins/workspace-search/src';
+import {
+    setWorkspaceSearchTranslator,
+    WorkspaceSearch,
+} from '../../../../plugins/workspace-search/src';
 import * as En from 'blockly/msg/en';
 import * as ZhHans from 'blockly/msg/zh-hans';
 import { setupBlockly } from '../../../lib/BlocklyAdapter';
@@ -78,6 +81,12 @@ class Blocks implements IBlocks {
         // 选择工具箱
         Blockly.Events.TOOLBOX_ITEM_SELECT,
     ];
+    /**
+     * 延迟释放的定时器。必须由 Blocks 持有而非 React ref：
+     * 语言切换等场景整棵组件树重挂（key 变化），新组件实例的 ref
+     * 是空的，清不掉旧实例调度好的释放，工作区会被延迟 dispose 杀掉。
+     */
+    private _disposeTimer: ReturnType<typeof setTimeout> | null = null;
 
     private handleWorkspaceChange = (event: Blockly.Events.Abstract | null, byHand = false) => {
         // 检测更新，并检查这个事件是否需要忽略
@@ -355,7 +364,29 @@ class Blocks implements IBlocks {
         if (lang === 'zh-Hans') {
             replaceChineseI18n(this.Blockly);
         }
-        // await this.restartWorkspace();
+    }
+
+    /**
+     * 延迟释放工作区（供 React 组件 cleanup 调用）。
+     *
+     * 定时器由 Blocks 实例持有：组件树重挂（如语言切换的 key 变化）
+     * 后，新组件实例调用 {@link cancelScheduledDispose} 依然能取消
+     * 旧实例调度好的释放。
+     */
+    scheduleDispose(): void {
+        this.cancelScheduledDispose();
+        this._disposeTimer = setTimeout(() => {
+            this._disposeTimer = null;
+            this.dispose();
+        }, 0);
+    }
+
+    /** 取消 {@link scheduleDispose} 调度的释放。 */
+    cancelScheduledDispose(): void {
+        if (this._disposeTimer) {
+            clearTimeout(this._disposeTimer);
+            this._disposeTimer = null;
+        }
     }
 
     async createWorkspace(DOM: HTMLDivElement, restart = true): Promise<boolean> {
@@ -365,12 +396,23 @@ class Blocks implements IBlocks {
         if (this._isCreating) return false;
 
         this._isCreating = true;
+        // 取消组件 cleanup 调度好的延迟释放：本次调用要么复用、要么
+        // 重建工作区，任何挂起的 dispose 都只会帮倒忙。
+        this.cancelScheduledDispose();
         // 禁止发送事件，切换target的时候
         // 会广播大量`delete`和`create`
         // flyout 会被这些处理搞炸
         this.Blockly.Events.disable();
         try {
-            if (this.workspaceSvg && restart) {
+            // 容器 DOM 变了（如语言切换导致整棵组件树重挂）就必须重建：
+            // 旧 workspaceSvg 的 injectionDiv 挂在已卸载的旧 div 上，
+            // 复用它只会得到一份脱节的死 DOM。
+            const domChanged = this.workspaceSvg !== null && this._DOM !== DOM;
+            if (this.workspaceSvg && (restart || domChanged)) {
+                if (domChanged) {
+                    // DOM 已脱节，dispose 前最后保存一次现场。
+                    this.handleWorkspaceChange(null, true);
+                }
                 // 若已有存在的工作区，*即刻重启*
                 this.dispose();
             }
@@ -381,6 +423,7 @@ class Blocks implements IBlocks {
                 await this.init();
                 this.workspaceSvg = this.Blockly.inject(DOM, this.workspaceConfig);
 
+                setWorkspaceSearchTranslator(i18next.t);
                 this.workspaceSearch = new WorkspaceSearch(this.workspaceSvg);
                 this.workspaceSearch.init();
 
