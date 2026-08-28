@@ -143,6 +143,8 @@ export class WorkspaceSearch implements Blockly.IPositionable {
         }
         this.actionDiv = null;
         this.inputElement = null;
+        this.workspace.removeChangeListener(this.handleEvents);
+        this.searchTimeout = null;
     }
 
     /** 获取当前的位置文字 */
