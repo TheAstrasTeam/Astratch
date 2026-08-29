@@ -154,5 +154,7 @@
     width: 100%;
     svg {
         filter: $svg-filter;
+        height: 25vw;
+        width: auto;
     }
 }

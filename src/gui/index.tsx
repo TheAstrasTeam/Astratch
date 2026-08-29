@@ -51,6 +51,22 @@ const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
     }, [vm]);
 
     useEffect(() => {
+        // 全局禁用浏览器默认右键菜单，有些时候莫名其妙弹出浏览器右键菜单很让人绝望你知道吗
+        const handleContextMenu = (event: MouseEvent) => {
+            const target = event.target as Element | null;
+            const editable = target?.closest(
+                'input, textarea, select, [contenteditable="true"]',
+            );
+            if (editable) return;
+            event.preventDefault();
+        };
+        document.addEventListener('contextmenu', handleContextMenu);
+        return () => {
+            document.removeEventListener('contextmenu', handleContextMenu);
+        };
+    }, []);
+
+    useEffect(() => {
         const unbindShortcutCommands = shortcutManager.bindCommands({
             [SHORTCUTS.SAVE_PROJECT.id]: () => saveCurrentProject(vm),
             [SHORTCUTS.SAVE_PROJECT_AS.id]: () => saveCurrentProjectAs(vm),

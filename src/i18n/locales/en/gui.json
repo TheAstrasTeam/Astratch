@@ -174,7 +174,7 @@
     "modal.ask.entity": "Create an entity named:",
     "modal.ask.module": "Create a module named:",
     "rename.tip": "Rename target \"{{name}}\" to:",
-    "selectNothing": "Why is there nothing here...",
+    "selectNothing": "But nothing here...",
     "attribute": "Attribute",
     "link": "Link",
     "data.forPublic": "Entire target",
