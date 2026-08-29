@@ -3,7 +3,6 @@
 
 .content {
     width: 75vw;
-    height: 75vh;
     display: flex;
     min-width: 0;
     min-height: 0;
@@ -18,8 +17,7 @@
     display: flex;
     flex: 0 0 20%;
     flex-direction: column;
-    height: 100%;
-    min-width: 0;
+    min-height: 0;
     overflow-y: auto;
     background-color: $ui-modal-header-background;
     & button {
@@ -46,7 +44,7 @@
     flex: 1;
     flex-direction: column;
     min-width: 0;
-    min-height: 0;
+    overflow: hidden;
 }
 .settings-title {
     flex: 0 0 auto;
@@ -77,14 +75,12 @@
 
 .settings-content {
     display: flex;
-    flex: 1;
+    flex: 1 1 0;
     flex-direction: column;
     min-width: 0;
-    min-height: 0;
-    overflow-x: hidden;
+    height: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
-    scrollbar-gutter: stable;
 }
 
 .group-title {

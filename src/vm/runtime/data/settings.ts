@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { targets, type IProjectMeta, type IVMSettings, type IVM } from '../../../types/vm';
+import { targets, type IProjectMeta, type IVMSettings, type IVM } from '../../../types/vm/vm';
 
 /**
  * 设置，管理关于项目的一些设置

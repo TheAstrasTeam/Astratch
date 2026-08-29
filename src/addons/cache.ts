@@ -14,7 +14,8 @@ const DB_NAME = 'astratch_addons_cache';
 const FILES_STORE = 'files';
 const HANDLES_STORE = 'handles';
 const SETTINGS_STORE = 'settings';
-const DB_VERSION = 3;
+const FILE_HASHES_STORE = 'fileHashes';
+const DB_VERSION = 4;
 
 function openDB(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
@@ -29,6 +30,9 @@ function openDB(): Promise<IDBDatabase> {
             }
             if (!db.objectStoreNames.contains(SETTINGS_STORE)) {
                 db.createObjectStore(SETTINGS_STORE);
+            }
+            if (!db.objectStoreNames.contains(FILE_HASHES_STORE)) {
+                db.createObjectStore(FILE_HASHES_STORE);
             }
         };
         request.onsuccess = () => {
@@ -245,5 +249,110 @@ export async function setRegistryHash(hash: string): Promise<void> {
         });
     } catch {
         // 缓存失败不影响功能
+    }
+}
+
+/**
+ * 读取单个文件的哈希值，不存在时返回 null
+ */
+export async function getFileHash(key: string): Promise<string | null> {
+    try {
+        const db = await openDB();
+        return await new Promise<string | null>((resolve, reject) => {
+            const transaction = db.transaction(FILE_HASHES_STORE, 'readonly');
+            const request = transaction.objectStore(FILE_HASHES_STORE).get(key);
+            request.onsuccess = () => {
+                resolve((request.result as string | undefined) ?? null);
+            };
+            request.onerror = () => {
+                reject(new Error('Failed to read file hash'));
+            };
+        });
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * 保存单个文件的哈希值
+ */
+export async function setFileHash(key: string, hash: string): Promise<void> {
+    try {
+        const db = await openDB();
+        await new Promise<void>((resolve, reject) => {
+            const transaction = db.transaction(FILE_HASHES_STORE, 'readwrite');
+            transaction.objectStore(FILE_HASHES_STORE).put(hash, key);
+            transaction.oncomplete = () => {
+                resolve();
+            };
+            transaction.onerror = () => {
+                reject(new Error('Failed to write file hash'));
+            };
+        });
+    } catch {
+        // 缓存失败不影响功能
+    }
+}
+
+/**
+ * 批量更新文件哈希值（合并写入，不删除旧条目）
+ */
+export async function setAllFileHashes(hashes: Record<string, string>): Promise<void> {
+    try {
+        const db = await openDB();
+        await new Promise<void>((resolve, reject) => {
+            const transaction = db.transaction(FILE_HASHES_STORE, 'readwrite');
+            const store = transaction.objectStore(FILE_HASHES_STORE);
+            for (const [key, hash] of Object.entries(hashes)) {
+                store.put(hash, key);
+            }
+            transaction.oncomplete = () => {
+                resolve();
+            };
+            transaction.onerror = () => {
+                reject(new Error('Failed to write file hashes'));
+            };
+        });
+    } catch {
+        // 缓存失败不影响功能
+    }
+}
+
+/**
+ * 读取所有文件哈希值
+ */
+export async function getAllFileHashes(): Promise<Record<string, string>> {
+    try {
+        const db = await openDB();
+        return await new Promise<Record<string, string>>((resolve, reject) => {
+            const transaction = db.transaction(FILE_HASHES_STORE, 'readonly');
+            const request = transaction.objectStore(FILE_HASHES_STORE).getAllKeys();
+            request.onsuccess = () => {
+                const keys = request.result.map(String);
+                if (keys.length === 0) {
+                    resolve({});
+                    return;
+                }
+                const transaction2 = db.transaction(FILE_HASHES_STORE, 'readonly');
+                const store2 = transaction2.objectStore(FILE_HASHES_STORE);
+                const result: Record<string, string> = {};
+                let pending = keys.length;
+                for (const key of keys) {
+                    const req = store2.get(key);
+                    req.onsuccess = () => {
+                        result[key] = req.result as string;
+                        if (--pending === 0) resolve(result);
+                    };
+                    req.onerror = () => {
+                        if (--pending === 0) resolve(result);
+                    };
+                }
+            };
+            request.onerror = () => {
+                reject(new Error('Failed to list file hashes'));
+            };
+        });
+    } catch {
+        return {};
     }
 }

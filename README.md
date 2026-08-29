@@ -13,17 +13,17 @@
 
 > _Bridging the gap between toys and tools._
 
-`Astratch` is a graphical IDE (Integrated Development Environment) that aims to let you build _anything_ by "snapping blocks together," just like Scratch.
+`Astratch` is a graphical IDE that aims to let you build _anything_ by "snapping blocks together," just like Scratch.
 
 # What does Astratch do?
 
-In short, `Astratch` draws on the strengths of other `Scratch editors`, using **JIT** (**Just-In-Time**) compilation technology to **compile** your project scripts into `JavaScript` and run them, making project execution _lightning fast_. At the same time, `Astratch` redesigns the **project model** to make projects more maintainable and faster, while adding more **features commonly found in programming languages**.
+In short, `Astratch` draws on the strengths of other `Scratch editors`, using **JIT** (**Just-In-Time**) compilation technology to **compile** your project scripts into `JavaScript` and run them, making project execution _lightning fast_. At the same time, `Astratch` redesigns the **project model** to make projects more maintainable and faster, while adding more **features commonly found in programming languages** ( See [features.md](./docs/features.md) ).
 
 `Astratch` still uses the same editor as `Scratch` — `Blockly` — and extends it with many features that `Scratch` does not have, building a **bridging buffer** between Scratch's children-oriented language and real game engines / programming languages.
 
 # Acknowledgments
 
-### Blockly
+## Blockly
 
 `Astratch` clones, modifies, and uses several plugins from [blockly-examples](https://github.com/RaspberryPiFoundation/blockly-samples):
 
@@ -32,6 +32,7 @@ In short, `Astratch` draws on the strengths of other `Scratch editors`, using **
 - [field-colour-hsv-sliders](./plugins/field-colour-hsv-sliders/)
 - [field-colour](./plugins/field-colour/)
 - [field-grid-dropdown](./plugins/field-grid-dropdown/)
+- [workspace-search](./plugins/workspace-search/)
 
 We have modified some of these plugins to better fit the _vision_ of `Astratch`. We comply with the `Apache License v2.0`, and each modified file is annotated at the beginning.
 

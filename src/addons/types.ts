@@ -6,10 +6,11 @@
 
 // 此文件由AI生成
 
-import type { IVM } from '../types/vm';
+import type { IVM } from '../types/vm/vm';
 import type * as Blockly from 'blockly';
 import type { TFunction } from 'i18next';
 import type { IToastManger } from '../types/lib';
+import type { IQuickOpenCommand } from '../types/gui';
 
 /**
  * 提供给插件的命名空间存储
@@ -42,6 +43,8 @@ export interface IAddonSettingDefinition {
     max?: number;
     /** string 类型：是否允许多行输入（渲染为 textarea，高度约为单行的两倍），默认 false */
     allowLines?: boolean;
+    /** 设置描述（可选，Settings 页渲染为 label 下方的灰色提示文本，通过 @settings/<id>.description 翻译） */
+    description?: string;
 }
 
 /**
@@ -54,6 +57,20 @@ export interface IAddonSettingsApi {
     set: (id: string, value: unknown) => void;
     /** 本插件声明的全部设置定义（来自 info.yaml） */
     defs: IAddonSettingDefinition[];
+}
+
+/**
+ * 提供给插件的 QuickOpen 命令注册 API。
+ * 注册的命令出现在 QuickOpen 命令面板（输入 > 前缀）中，
+ * ID 自动加上 `<插件ID>.` 前缀；插件禁用/卸载时自动注销全部命令。
+ */
+export interface IAddonQuickOpenApi {
+    /**
+     * 注册一条命令
+     * @param command 命令定义，id 只需在插件内唯一（无需带插件前缀）
+     * @returns 注销函数
+     */
+    registerCommand: (command: Omit<IQuickOpenCommand, 'id'> & { id: string }) => () => void;
 }
 
 /**
@@ -72,6 +89,8 @@ export interface IAddonContext {
     storage: IAddonStorage;
     /** 该插件在 Settings 页声明的设置 */
     settings: IAddonSettingsApi;
+    /** QuickOpen 命令面板的命令注册 */
+    quickOpen: IAddonQuickOpenApi;
 }
 
 /**

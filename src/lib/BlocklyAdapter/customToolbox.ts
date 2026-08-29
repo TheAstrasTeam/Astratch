@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import type * as Blockly from 'blockly/core';
-import type { IVM } from '../../types/vm';
+import type { IVM } from '../../types/vm/vm';
 import { OPCODES, getEditingDataList } from './blocks/helpers';
 import { menu, num, txt } from './toolbox';
 import { t } from 'i18next';
@@ -118,7 +118,6 @@ export function setFunctionCategory(_blockly: typeof Blockly, vm: IVM): IRegiste
                 gap: 12,
                 kind: 'block',
                 type: OPCODES.FUNCTION_RETURN,
-                inputs: { VALUE: txt(t('blocks:example.value')) },
             },
             {
                 gap: 12,
@@ -129,9 +128,6 @@ export function setFunctionCategory(_blockly: typeof Blockly, vm: IVM): IRegiste
                 gap: 12,
                 kind: 'block',
                 type: OPCODES.FUNCTION_SETDATAVALUE,
-                inputs: {
-                    VALUE: txt(t('blocks:example.data')),
-                },
             },
         ];
         basicItems.forEach(item => items.push(item));

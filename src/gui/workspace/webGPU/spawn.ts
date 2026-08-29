@@ -6,7 +6,7 @@
 
 // 生成积木SVG
 
-import type { IBlocksConfig } from '../../../types/blocks';
+import type { IBlocksConfig } from '../../../types/vm/blocks';
 
 // @ts-expect-error 待定，未完成
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

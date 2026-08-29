@@ -9,7 +9,7 @@ import type { IVM } from './vm';
 import type {
     TFunctionReturnType,
     TPreviewFunctionData,
-} from '../components/modal_createFunction/functionPreview';
+} from '../../components/modal_createFunction/functionPreview';
 
 const OPCODES = {
     // 菜单
@@ -236,6 +236,8 @@ const OPCODES = {
     FUNCTION_SETDATAVALUE: 'function_setDataValue',
     FUNCTION_VALUE: 'function_value',
     FUNCTION_VALUE_ID: 'function_value_id',
+    FUNCTION_DROPDOWN: 'function_dropdown',
+    FUNCTION_ENUM: 'function_enum',
 
     // 画布
     CANVAS_CLEANALL: 'canvas_cleanAll',
@@ -530,32 +532,40 @@ export interface IBlocks {
      * 设置一个语言
      * @param lang ASH 兼容的 i18n
      */
-    setLanguage: (lang: 'en' | 'zh-Hans') => void;
+    setLanguage(lang: 'en' | 'zh-Hans'): void;
     /**
      * 销毁工作区
      *
      * @returns 是否销毁成功
      */
-    dispose: () => boolean;
+    dispose(): boolean;
     /**
      * 创建一个工作区
      *
      * @param restore 是否重置，若为 `false` 则若已初始化则不重置
      * @returns 是否创建成功
      */
-    createWorkspace: (DOM: HTMLDivElement, restart?: boolean) => Promise<boolean>;
+    createWorkspace(DOM: HTMLDivElement, restart?: boolean): Promise<boolean>;
     /**
      * 重启工作区
      */
-    restartWorkspace: () => Promise<void>;
+    restartWorkspace(): Promise<void>;
+    /**
+     * 延迟释放工作区（供 React 组件 cleanup 调用）
+     */
+    scheduleDispose(): void;
+    /**
+     * 取消 scheduleDispose 调度的释放
+     */
+    cancelScheduledDispose(): void;
     /**
      * 初始化 Blockly，载入插件什么的
      */
-    init: () => Promise<void>;
+    init(): Promise<void>;
     /**
      * 刷新工作区的大小
      */
-    refreshBlocklySize: () => void;
+    refreshBlocklySize(): void;
 }
 
 // 设置吸附半径，48来自源码
@@ -575,6 +585,20 @@ export interface ICustomFunction {
     id: string;
     /** 是否显示为可传递的函数值；false 时显示为 Scratch 式积木。 */
     isValue: boolean;
-    /** 返回类型；null 表示无返回值。 */
+    /** 返回类型；'none'（AllCheckers.NONE）表示无返回值，null 表示未知。 */
     returnType?: TFunctionReturnType;
 }
+
+export const AllCheckers = {
+    FUNCTION: 'Function',
+    STRING: 'String',
+    ARRAY: 'Array',
+    NUMBER: 'Number',
+    OBJECT: 'Object',
+    COLOUR: 'Colour',
+    BOOLEAN: 'Boolean',
+    ANY: null,
+    /** 没有检查，这用于检测函数是否是“无返回值” */
+    NONE: 'none',
+} as const;
+export type TAllCheckers = (typeof AllCheckers)[keyof typeof AllCheckers];

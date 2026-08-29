@@ -6,6 +6,7 @@
 
 import type { IBlocks, ICustomFunction, IWorkspaceState } from './blocks';
 import * as Blockly from 'blockly/core';
+import type { TGuiAccent, TGuiTheme } from '../gui';
 
 export const DATA_VISIBILITY = {
     PUBLIC: 'public',
@@ -46,7 +47,7 @@ export interface IProjectMeta {
 export interface IVMSettings {
     enableTurboMode: boolean;
     projectMeta: IProjectMeta;
-    setProjectMeta: (meta: Partial<IProjectMeta>) => void;
+    setProjectMeta(meta: Partial<IProjectMeta>): void;
 }
 
 export interface ITargetBlocks {
@@ -105,55 +106,72 @@ export interface ITarget {
     /**
      * 重命名目标
      */
-    rename: (name: string) => void;
+    rename(name: string): void;
     /**
      * 设置父文件夹
      */
-    setParent: (parentID: string | null) => void;
+    setParent(parentID: string | null): void;
     /**
      * 链接一个模块，自链接会失败并返回false
      */
-    addLink: (linkTargetID: string) => boolean;
+    addLink(linkTargetID: string): boolean;
     /**
      * 解除与模块的链接
      */
-    removeLink: (linkTargetID: string) => void;
+    removeLink(linkTargetID: string): void;
     /**
      * 设置目标的所有块
      * @param state 块的AST
      */
-    setBlocks: (state: IWorkspaceState) => void;
+    setBlocks(state: IWorkspaceState): void;
     /**
      * 更新视口（位置/缩放）
      */
-    setViewport: (data: TViewportUpdateEvent) => void;
+    setViewport(data: TViewportUpdateEvent): void;
     /**
      * 创建一个数据，名字重复会警告但仍会创建
      * @returns 数据的ID
      */
-    createData: (name: string, data: unknown, isPrivate?: boolean, isConst?: boolean) => string;
+    createData(name: string, data: unknown, isPrivate?: boolean, isConst?: boolean): string;
     /**
      * 获取数据，不存在则返回null
      */
-    getData: (dataID: string) => IVariable | null;
+    getData(dataID: string): IVariable | null;
     /**
      * 生成一个带原型（方法）的树节点副本
      */
-    cloneAsNode: () => ITarget & { type: 'target' };
+    cloneAsNode(): ITarget & { type: 'target' };
     /**
      * 序列化为纯字段对象（不含blocks）
      */
-    toJSON: () => TTargetInfo;
+    toJSON(): TTargetInfo;
     /**
      * 添加一个自定义函数配置
      * @returns 是否创建成功
      */
-    addCustomFunction: (id: string, meta: ICustomFunction) => boolean;
+    addCustomFunction(id: string, meta: ICustomFunction): boolean;
+    /**
+     * 替换一个自定义函数配置
+     * @returns 是否替换成功
+     */
+    replaceCustomFunction(id: string, meta: ICustomFunction): boolean;
+    /**
+     * 删除一个自定义函数配置
+     * @returns 是否删除成功
+     */
+    removeCustomFunction(id: string): boolean;
+    /**
+     * 扁平化返回所有序列化的积木，和 `workspaceSvg.getAllBlocks()`不同，这里返回的是**序列化的积木**
+     * @returns 所有序列化的积木
+     */
+    flatBlocks(): TFlatBlocks[];
     /** 根据稳定 ID 获取一个自定义函数，不存在时返回 null。 */
-    getFunction: (id: string) => ICustomFunction | null;
+    getFunction(id: string): ICustomFunction | null;
     /** 获取自定义函数的只读快照，供动态工具箱生成内容。 */
-    listFunctions: () => readonly ICustomFunction[];
+    listFunctions(): readonly ICustomFunction[];
 }
+
+export type TFlatBlocks = Blockly.serialization.blocks.State & { parentID?: string };
 
 /**
  * 纯字段的目标结构（用于默认值模板与序列化）
@@ -174,6 +192,9 @@ export type TTargetInfo = Omit<
     | 'cloneAsNode'
     | 'toJSON'
     | 'addCustomFunction'
+    | 'replaceCustomFunction'
+    | 'removeCustomFunction'
+    | 'flatBlocks'
     | 'data'
     | 'function'
     | 'getFunction'
@@ -240,19 +261,19 @@ export interface IFolder {
     /**
      * 重命名文件夹
      */
-    rename: (name: string) => void;
+    rename(name: string): void;
     /**
      * 设置文件夹颜色
      */
-    setColor: (color: string) => void;
+    setColor(color: string): void;
     /**
      * 设置父文件夹
      */
-    setParent: (parentID: string | null) => void;
+    setParent(parentID: string | null): void;
     /**
      * 生成一个带原型（方法）的树节点副本
      */
-    cloneAsNode: () => IFolder & { type: 'folder' };
+    cloneAsNode(): IFolder & { type: 'folder' };
 }
 
 /**
@@ -298,11 +319,11 @@ export interface IRuntime {
     /**
      * 创建一个新的target，并返回他的ID
      */
-    createTarget: (meta: ITargetMeta) => string;
+    createTarget(meta: ITargetMeta): string;
     /**
      * 切换target
      */
-    switchTarget: (id: string) => void;
+    switchTarget(id: string): void;
     /**
      * 当前的编辑目标ID
      */
@@ -310,11 +331,11 @@ export interface IRuntime {
     /**
      * 通过ID获取这个target
      */
-    getTargetByID: (id: string) => ITarget | undefined;
+    getTargetByID(id: string): ITarget | undefined;
     /**
      * 获取当前编辑中的目标
      */
-    getEditingTarget: () => ITarget | undefined;
+    getEditingTarget(): ITarget | undefined;
 
     /**
      * 根据id获取文件夹
@@ -322,28 +343,28 @@ export interface IRuntime {
      * @param id
      * @returns
      */
-    getFolderByID: (mode: TTargetMode, id: string) => IFolder | null;
+    getFolderByID(mode: TTargetMode, id: string): IFolder | null;
     /**
      * 添加一个新的文件夹
      * @param mode "entity" | "module"
      * @param meta
      * @returns
      */
-    addFolder: (mode: TTargetMode, meta: TFolderInfo) => void;
+    addFolder(mode: TTargetMode, meta: TFolderInfo): void;
     /**
      * 获取父文件夹（如果有，否则返回 null）
      * @param mode "entity" | "module"
      * @param id
      * @returns
      */
-    getFolderParent: (mode: TTargetMode, id: string) => IFolder | null;
+    getFolderParent(mode: TTargetMode, id: string): IFolder | null;
     /**
      * 删除文件夹
      * @param mode "entity" | "module"
      * @param id
      * @returns
      */
-    removeFolder: (mode: TTargetMode, id: string) => void;
+    removeFolder(mode: TTargetMode, id: string): void;
     /**
      * 获取文件夹的所有子项
      * 只会获取第一层
@@ -351,7 +372,7 @@ export interface IRuntime {
      * @param id
      * @returns
      */
-    getFolderChildren: (mode: TTargetMode, id: string | null) => IFolder[];
+    getFolderChildren(mode: TTargetMode, id: string | null): IFolder[];
     /**
      * 获取文件夹的所有子项
      * 会获取依赖它的所有文件夹及其子文件夹
@@ -359,19 +380,19 @@ export interface IRuntime {
      * @param id
      * @returns 文件夹的所有子项
      */
-    getFolderDescendants: (mode: TTargetMode, id: string | null) => IFolder[];
+    getFolderDescendants(mode: TTargetMode, id: string | null): IFolder[];
     /**
      * 生成此界面的文件树，以树形式输出项目结构（包括targets和文件夹）
      * @param mode "entity" | "module"
      * @returns 树形式的项目结构
      */
-    generateTargetsTree: (mode: TTargetMode) => TTargetTree;
+    generateTargetsTree(mode: TTargetMode): TTargetTree;
     /**
      * 删除一个目标
      * @param id 目标的id
      * @returns 是否成功删除
      */
-    removeTarget: (id: string) => boolean;
+    removeTarget(id: string): boolean;
     /**
      * 修改一个目标的父id
      * @param mode "entity" | "module"
@@ -379,7 +400,7 @@ export interface IRuntime {
      * @param newParentID 新的父id
      * @returns 是否修改成功
      */
-    moveTarget: (mode: TTargetMode, targetID: string, newParentID: string | null) => boolean;
+    moveTarget(mode: TTargetMode, targetID: string, newParentID: string | null): boolean;
     /**
      * 修改一个文件夹的父id
      * @param mode "entity" | "module"
@@ -387,7 +408,7 @@ export interface IRuntime {
      * @param newParentID 新的父id
      * @returns 是否修改成功
      */
-    moveFolder: (mode: TTargetMode, folderID: string, newParentID: string | null) => boolean;
+    moveFolder(mode: TTargetMode, folderID: string, newParentID: string | null): boolean;
     /**
      * 让目标引用一个模块，并返回是否引用成功
      */
@@ -397,7 +418,7 @@ export interface IRuntime {
      * @param linkTargetID 链接到的目标id
      * @returns 是否链接成功
      */
-    linkTarget: (targetID: string, linkTargetID: string) => boolean;
+    linkTarget(targetID: string, linkTargetID: string): boolean;
 }
 
 /**
@@ -416,17 +437,14 @@ export interface IProjectManager {
     /**
      * 选择一个文件夹
      */
-    selectFolder: () => Promise<void>;
+    selectFolder(): Promise<void>;
     /**
      * 创建文件夹（如果这个文件夹不存在），并返回它的句柄
      * @param path 文件夹的句柄
      * @param name 文件夹的名称
      * @returns 这个文件夹的对应句柄，如果错误则返回 false
      */
-    createFolder: (
-        path: DirectoryHandle,
-        name: string,
-    ) => Promise<FileSystemDirectoryHandle | false>;
+    createFolder(path: DirectoryHandle, name: string): Promise<FileSystemDirectoryHandle | false>;
     /**
      * 创建个文件
      * @param path 文件的句柄
@@ -434,34 +452,34 @@ export interface IProjectManager {
      * @param content 文件内容
      * @returns 这个文件对应句柄，如果错误则返回 false
      */
-    createFile: (
+    createFile(
         path: DirectoryHandle,
         name: string,
         content: string,
-    ) => Promise<FileSystemFileHandle | false>;
+    ): Promise<FileSystemFileHandle | false>;
     /**
      * 返回这个文件夹内是不是空的
      * @returns 是否有文件
      */
-    isEmpty: (path: DirectoryHandle) => Promise<boolean>;
+    isEmpty(path: DirectoryHandle): Promise<boolean>;
     /**
      * 获取一个文件
      * @param path 文件夹句柄
      * @param name 文件名称
      * @returns
      */
-    getFile: (path: DirectoryHandle, name: string) => Promise<FileSystemFileHandle | false>;
+    getFile(path: DirectoryHandle, name: string): Promise<FileSystemFileHandle | false>;
     /**
      * 获取一个文件夹
      * @param path 文件夹句柄
      * @param name 文件夹名称
      * @returns
      */
-    getFolder: (path: DirectoryHandle, name: string) => Promise<FileSystemDirectoryHandle | false>;
+    getFolder(path: DirectoryHandle, name: string): Promise<FileSystemDirectoryHandle | false>;
     /**
      * 检查项目是否是可以保存的
      */
-    checkProjectCanSave: () => Promise<{
+    checkProjectCanSave(): Promise<{
         pass: boolean;
         result?: string;
         error?: TAllProjectCheckError;
@@ -472,13 +490,13 @@ export interface IProjectManager {
      * @param name 文件名称
      * @returns
      */
-    removeFile: (path: DirectoryHandle, name: string) => Promise<boolean>;
+    removeFile(path: DirectoryHandle, name: string): Promise<boolean>;
     /**
      * 列出所有文件/文件夹
      * @param path 路径句柄
      * @returns
      */
-    listAllFileName: (path: DirectoryHandle) => Promise<string[] | false>;
+    listAllFileName(path: DirectoryHandle): Promise<string[] | false>;
 }
 
 export const allProjectCheckError = {
@@ -501,44 +519,44 @@ export interface IVM {
     /**
      * 选择一个文件夹打开作为项目
      */
-    selectProject: () => Promise<void>;
+    selectProject(): Promise<void>;
     /**
      * 保存项目
      */
-    saveProject: () => Promise<void>;
+    saveProject(): Promise<void>;
     /**
      * 另存为：重新选择文件夹后保存项目
      */
-    saveProjectAs: () => Promise<void>;
+    saveProjectAs(): Promise<void>;
     /**
      * 初始化项目
      */
-    initProject: () => Promise<void>;
+    initProject(): Promise<void>;
     /**
      * 订阅事件
      * @param id 订阅的事件
      * @param callback 回调
      * @param once 是否只探测一次
      */
-    on: (id: TEvents, callback: (data: object) => void, once?: boolean) => void;
+    on(id: TEvents, callback: (data: object) => void, once?: boolean): void;
     /**
      * 取消订阅事件
      * @param id 取消订阅的事件
      * @param callback 回调
      */
-    off: (id: TEvents, callback: (data: object) => void) => void;
+    off(id: TEvents, callback: (data: object) => void): void;
     /**
      * 发送事件
      * @param id 发送的事件
      * @param data 数据
      * @returns
      */
-    emit: (id: TEvents, data?: object) => void;
+    emit(id: TEvents, data?: object): void;
     /**
      * 加载项目
      * @returns 是否加载成功
      */
-    loadProject: () => Promise<boolean>;
+    loadProject(): Promise<boolean>;
     /**
      * 正在编辑项目
      * 如果已经打开了一个项目，则返回true
@@ -548,7 +566,7 @@ export interface IVM {
 }
 
 export interface IEvent {
-    callback?: (data: object) => void;
+    callback?(data: object): void;
     once?: boolean;
 }
 
@@ -561,6 +579,8 @@ export const events = {
     UPDATE_TARGET_STRUCTURE: 'update_target_structure',
     CREATE_DATA: 'create_data',
     CREATE_CUSTOM_FUNCTION: 'create_custom_function',
+    EDIT_CUSTOM_FUNCTION: 'edit_custom_function',
+    REMOVE_CUSTOM_FUNCTION: 'remove_custom_function',
 } as const;
 
 export type TEvents = (typeof events)[keyof typeof events];
@@ -585,12 +605,24 @@ export interface IFunctionCreatedEvent {
     id: string;
     targetID: string;
 }
+export interface IUpdateThemeEvent {
+    guiThemeMode: TGuiTheme;
+    guiThemeAccent: TGuiAccent;
+}
 
 export interface IProjectMetaJSON {
     // 截至目前，1 为最新
     projectSaveVersion: number;
     meta: IProjectMeta;
     folders: Record<TTargetMode, IFolder[]>;
-    /** 项目启用/禁用的远端插件（不含自定义插件），打开项目时据此恢复插件环境 */
-    addonState?: { enabled: string[]; disabled: string[] };
+    /**
+     * 项目启用/禁用的远端插件（不含自定义插件），打开项目时据此恢复插件环境。
+     * versions 记录每个插件在项目保存时的版本，加载时下载该版本而非最新版本。
+     * 若最新版本更高，UI 会显示更新提示。
+     */
+    addonState?: {
+        enabled: string[];
+        disabled: string[];
+        versions?: Record<string, string>;
+    };
 }

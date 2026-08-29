@@ -9,7 +9,7 @@
 import * as Blockly from 'blockly';
 import { t } from 'i18next';
 import { Toast } from '../lib/ToastManager';
-import type { IVM } from '../types/vm';
+import type { IVM } from '../types/vm/vm';
 import type { IAddonContext } from './types';
 
 /**
@@ -32,6 +32,10 @@ export function buildAddonContext(vm: IVM): IAddonContext {
             get: () => undefined,
             set: () => undefined,
             defs: [],
+        },
+        // 占位实现，真正的命令注册 API 由 AddonManager.makeContext 按插件注入
+        quickOpen: {
+            registerCommand: () => () => undefined,
         },
     };
 }

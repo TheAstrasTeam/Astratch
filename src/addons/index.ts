@@ -15,6 +15,7 @@ export type {
     IAddonStorage,
     IAddonSettingDefinition,
     IAddonSettingsApi,
+    IAddonQuickOpenApi,
     IAddonRegistry,
     IRegistryAddon,
     IRegistryVersion,

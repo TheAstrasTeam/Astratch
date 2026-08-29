@@ -11,14 +11,21 @@ import {
     type ITargetMeta,
     type IVariable,
     type TEmit,
+    type TFlatBlocks,
     type TTargetInfo,
     type TTargetMode,
     type TViewportUpdateEvent,
-} from '../../types/vm';
-import type { ICustomFunction, IWorkspaceState } from '../../types/blocks';
+} from '../../types/vm/vm';
+import {
+    OPCODES,
+    type ICustomFunction,
+    type IFunctionReference,
+    type IWorkspaceState,
+} from '../../types/vm/blocks';
 import { spawnRandomString } from '../../utils/ash-data';
 import { sendError } from '../../utils/debug';
 import { t } from 'i18next';
+import type * as Blockly from 'blockly/core';
 
 /**
  * 目标
@@ -45,6 +52,23 @@ class Target implements ITarget {
     function: Map<string, ICustomFunction>;
 
     private emit: TEmit;
+
+    private isUsingCustomFunction(id: string): boolean {
+        const blocks = this.flatBlocks();
+        const blockMap = new Map(blocks.map(b => [b.id, b]));
+
+        return blocks.some(block => {
+            if (block.type !== OPCODES.FUNCTION_VALUE) return false;
+            const functionRef = (
+                block.extraState as { functionRef?: IFunctionReference } | null | undefined
+            )?.functionRef;
+            if (functionRef?.functionId !== id) return false;
+
+            const parentBlock = blockMap.get(block.parentID ?? '');
+            // 孤儿也是未使用，得有爸爸才不让删
+            return parentBlock ? parentBlock.type !== OPCODES.FUNCTION_DEFINITION : false;
+        });
+    }
 
     constructor(emit: TEmit) {
         this.emit = emit;
@@ -161,12 +185,67 @@ class Target implements ITarget {
         return true;
     }
 
+    replaceCustomFunction(id: string, meta: ICustomFunction) {
+        if (!this.function.has(id)) {
+            sendError(t('vm:err.customFunction.inexistent'));
+            return false;
+        }
+        this.function.set(id, meta);
+        this.emit(events.UPDATE_PROJECT);
+        this.emit(events.EDIT_CUSTOM_FUNCTION, {
+            id,
+            targetID: this.id,
+        });
+        return true;
+    }
+
+    removeCustomFunction(id: string) {
+        if (!this.function.has(id)) {
+            sendError(t('vm:err.customFunction.inexistent'));
+            return false;
+        }
+        if (this.isUsingCustomFunction(id)) {
+            sendError(t('vm:err.customFunction.using'), 'warn');
+            return false;
+        }
+        this.function.delete(id);
+        this.emit(events.UPDATE_PROJECT);
+        this.emit(events.REMOVE_CUSTOM_FUNCTION, {
+            id,
+            targetID: this.id,
+        });
+        return true;
+    }
+
     getFunction(id: string) {
         return this.function.get(id) ?? null;
     }
 
     listFunctions() {
         return [...this.function.values()] as readonly ICustomFunction[];
+    }
+
+    flatBlocks() {
+        const result: TFlatBlocks[] = [];
+        const flatBlock = (
+            block: Partial<Blockly.serialization.blocks.State> & { parentID?: string },
+        ) => {
+            if (!block.type || !block.id) return;
+            result.push(block as TFlatBlocks);
+            if (block.inputs) {
+                Object.values(block.inputs).forEach(input => {
+                    flatBlock({ ...(input.block ?? {}), parentID: block.id ?? '' });
+                });
+            }
+            if (block.next) {
+                flatBlock({ ...block.next, parentID: block.id ?? '' });
+            }
+        };
+        const blocks = this.blocks._workspace.blocks.blocks;
+        blocks.forEach(blockGroup => {
+            flatBlock(blockGroup);
+        });
+        return result;
     }
 
     static fromMeta(

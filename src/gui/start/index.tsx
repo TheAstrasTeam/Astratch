@@ -19,7 +19,7 @@ import DebugIcon from '../../assets/bug.svg?react';
 
 import { useGUIStore } from '../../stores/useGUIStore';
 import { debug } from '../../utils/debug';
-import { type IVM } from '../../types/vm';
+import { type IVM } from '../../types/vm/vm';
 import { selectProjectThenJump } from '../../utils/ash-gui';
 
 // 通过此处获取一个句子😋
@@ -63,7 +63,6 @@ const Start = ({ vm }: { vm: IVM }): React.ReactNode => {
                 {t('gui:start.loadProject')}
             </button>
 
-            {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
             {debug && (
                 <>
                     <h4>DEBUG TOOLS</h4>

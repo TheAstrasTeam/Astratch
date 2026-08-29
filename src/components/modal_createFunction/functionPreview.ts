@@ -4,22 +4,52 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import * as Blockly from 'blockly';
-import { BlocksColor, OPCODES, type IBlockColor } from '../../types/blocks';
-import type { ICustomFunction, IFunctionReference } from '../../types/blocks';
+import { AllCheckers, BlocksColor, OPCODES, type IBlockColor } from '../../types/vm/blocks';
+import { type TAllCheckers } from '../../types/vm/blocks';
+import type { IFunctionReference } from '../../types/vm/blocks';
 import { t } from 'i18next';
+import { dropdownWithInput } from '../../../plugins/fieldDropdown';
 
-export type TFunctionReturnField =
-    'text' | 'dropdown' | 'boolean' | 'array' | 'object' | 'string' | 'number' | 'function' | null;
+/**
+ * 参数槽支持的类型：AllCheckers 中除 NONE（无返回值占位，不是插槽
+ * 类型）外的全部值；null（AllCheckers.ANY）即「未知」万能槽。
+ */
+export type TFunctionInputField = Exclude<TAllCheckers, typeof AllCheckers.NONE>;
 
-export type TFunctionInputField = 'boolean' | 'array' | 'object' | 'string' | 'number' | 'function';
+/**
+ * 类型联合：不含 null——null（万能/未知）只能单独使用，
+ * 这样单个值与联合值都能直接传给 Blockly 的 setCheck/setOutput。
+ */
+export type TFunctionTypeUnion = Exclude<TFunctionInputField, null>[];
 
-export type TFunctionFieldType = TFunctionReturnField | TFunctionInputField[];
+/** 一个字段的类型：文本标签、单个类型（null=未知万能）或类型联合。 */
+export type TFunctionFieldType = 'text' | TFunctionInputField | TFunctionTypeUnion;
 
-/** 一个函数的返回类型；null 表示没有返回值。 */
-export type TFunctionReturnType = TFunctionInputField | TFunctionInputField[] | null;
+/**
+ * 一个函数的返回类型：'none'（AllCheckers.NONE）表示无返回值；
+ * null（ANY）表示未知；其余为具体类型或类型联合。
+ */
+export type TFunctionReturnType =
+    TFunctionInputField | TFunctionTypeUnion | typeof AllCheckers.NONE;
+
+/** 自定义选择框的一项；实际值始终按字符串保存。 */
+export interface IFunctionDropdownOption {
+    label?: string;
+    value: string;
+}
+
+/** 函数字段中的自定义选择框。 */
+export interface IFunctionDropdownField {
+    type: 'dropdown';
+    options: IFunctionDropdownOption[];
+    allowBlocks: boolean;
+    value?: string;
+}
+
+export type TFunctionPreviewFieldType = TFunctionFieldType | IFunctionDropdownField;
 
 export interface TPreviewFunctionData {
-    type: TFunctionFieldType;
+    type: TFunctionPreviewFieldType;
     text?: string;
 }
 export interface IFunctionValueBlock extends Blockly.Block {
@@ -42,6 +72,7 @@ export interface IFunctionValueBlock extends Blockly.Block {
     selectInput(index: number): void;
     deselectInput(): void;
     updateControlBar(): void;
+    openDropdownSettings(index: number): void;
     onchange(): void;
     customContextMenu(
         this: IFunctionValueBlock,
@@ -53,9 +84,8 @@ export interface IFunctionValueBlock extends Blockly.Block {
 }
 
 export interface IFunctionDefinition extends Blockly.Block {
-    functionData: ICustomFunction | null | undefined;
     functionRef: IFunctionReference | null;
-    refreshFunctionValue(): void;
+    setFunctionRef(ref: IFunctionReference | null): void;
 }
 
 const previewBlockId = 'preview-function';
@@ -86,9 +116,45 @@ const isCurrentPreview = (
     !previewRootBlock?.isDeadOrDying();
 
 const checksForReturnType = (returnType: TFunctionReturnType): string[] | null => {
-    if (returnType === null) return null;
-    const types = Array.isArray(returnType) ? returnType : [returnType];
-    return types.map(type => `${type.charAt(0).toUpperCase()}${type.slice(1)}`);
+    // 类型值本身就是 Blockly check 字符串，无需再转换。
+    // 'none'（无返回值）与 null（未知）都不产生具体 check。
+    if (returnType === null || returnType === AllCheckers.NONE) return null;
+    return Array.isArray(returnType) ? [...returnType] : [returnType];
+};
+
+export const isDropdownField = (
+    data: TPreviewFunctionData,
+): data is TPreviewFunctionData & {
+    type: IFunctionDropdownField;
+} => typeof data.type === 'object' && data.type !== null && !Array.isArray(data.type);
+
+export const normalizedDropdownOptions = (field: IFunctionDropdownField): [string, string][] => {
+    const options = field.options
+        .filter(option => typeof option.value === 'string' && option.value.trim())
+        .map(option => [option.label?.trim() ?? option.value, option.value] as [string, string]);
+    return options.length > 0 ? options : [['', '']];
+};
+
+export const selectedDropdownValue = (field: IFunctionDropdownField): string => {
+    const options = normalizedDropdownOptions(field);
+    return options.some(([, value]) => value === field.value)
+        ? (field.value ?? options[0][1])
+        : options[0][1];
+};
+
+export const createDropdownField = (
+    field: IFunctionDropdownField,
+    onValue?: (value: string) => void,
+): dropdownWithInput => {
+    const dropdown = new dropdownWithInput(normalizedDropdownOptions(field));
+    dropdown.setValue(selectedDropdownValue(field));
+    if (onValue) {
+        dropdown.setValidator(value => {
+            onValue(value);
+            return value;
+        });
+    }
+    return dropdown;
 };
 
 const centerPreviewRoot = (workspace: Blockly.WorkspaceSvg) => {
@@ -139,13 +205,15 @@ const configureSignatureConnections = () => {
     }
 
     if (!previewIsValue) {
-        if (previewReturnType === null) {
+        if (previewReturnType === AllCheckers.NONE) {
+            // 无返回值：语句积木，没有输出。
             previewBlock.setOutput(false);
             previewBlock.setPreviousStatement(true, 'Action');
             previewBlock.setNextStatement(true, 'Action');
         } else {
             previewBlock.setPreviousStatement(false);
             previewBlock.setNextStatement(false);
+            // null（未知）经 checksForReturnType 归为万能输出。
             previewBlock.setOutput(true, checksForReturnType(previewReturnType));
         }
     } else {
@@ -168,7 +236,7 @@ const configurePreviewWrapper = () => {
     }
 
     const wrapperType =
-        previewReturnType === null ? OPCODES.FUNCTION_EXECUTE : OPCODES.FUNCTION_CALL;
+        previewReturnType === AllCheckers.NONE ? OPCODES.FUNCTION_EXECUTE : OPCODES.FUNCTION_CALL;
     const wrapper = Blockly.serialization.blocks.append(
         {
             id: previewWrapperId,
@@ -191,9 +259,9 @@ const configurePreviewWrapper = () => {
     }
     functionConnection.connect(previewBlock.outputConnection);
 
-    if (previewReturnType !== null) {
-        wrapper.outputConnection?.setCheck(checksForReturnType(previewReturnType));
-    }
+    // 未知（null）与无返回值都不给包裹块设置具体 check。
+    const wrapperChecks = checksForReturnType(previewReturnType);
+    if (wrapperChecks) wrapper.outputConnection?.setCheck(wrapperChecks);
 
     previewWrapperBlock = wrapper;
     previewRootBlock = wrapper;
@@ -220,8 +288,22 @@ const applyPreviewConfig = () => {
     schedulePreviewLayout(previewWorkspace, previewSession, previewBlock);
 };
 
-const setupWorkspace = (workspace: Blockly.WorkspaceSvg) => {
+export interface IFunctionPreviewInitialState {
+    data: TPreviewFunctionData[];
+    color: IBlockColor;
+    isValue: boolean;
+    returnType: TFunctionReturnType;
+}
+
+const setupWorkspace = (
+    workspace: Blockly.WorkspaceSvg,
+    initial?: IFunctionPreviewInitialState,
+) => {
     const session = ++previewSession;
+    previewFunctionData = structuredClone(initial?.data ?? []);
+    previewBlockColor = structuredClone(initial?.color ?? BlocksColor.function);
+    previewIsValue = initial?.isValue ?? true;
+    previewReturnType = initial?.returnType ?? null;
     previewWorkspace = workspace;
     workspace.configureContextMenu = options => {
         options.length = 0;
@@ -231,7 +313,7 @@ const setupWorkspace = (workspace: Blockly.WorkspaceSvg) => {
         {
             id: previewBlockId,
             type: OPCODES.FUNCTION_VALUE,
-            extraState: { params: previewFunctionData, isValue: true },
+            extraState: { params: previewFunctionData, isValue: previewIsValue },
         },
         previewWorkspace,
     ) as IFunctionValueBlock;
@@ -248,10 +330,11 @@ const setupWorkspace = (workspace: Blockly.WorkspaceSvg) => {
         setupFrame = null;
         if (!isCurrentPreview(session, workspace, block)) return;
         centerPreviewRoot(workspace);
-        addFieldForFunctionPreview({
-            type: 'text',
-            text: t('blocks:function.defaultTitle'),
-        });
+        if (!initial)
+            addFieldForFunctionPreview({
+                type: 'text',
+                text: t('blocks:function.defaultTitle'),
+            });
     });
 };
 
@@ -323,10 +406,20 @@ const addFieldForFunctionPreview = (data: TPreviewFunctionData) => {
             const field =
                 data.type === 'text'
                     ? block.getField(`TEXT_${String(index)}`)
-                    : block
-                          .getInput(`ARG${String(index)}`)
-                          ?.connection?.targetBlock()
-                          ?.getField('ID');
+                    : isDropdownField(data)
+                      ? (block.getField(`DROPDOWN_${String(index)}`) ??
+                        block
+                            .getInput(`ARG${String(index)}`)
+                            ?.connection?.targetBlock()
+                            ?.getField('VALUE') ??
+                        block
+                            .getInput(`ARG${String(index)}`)
+                            ?.connection?.targetBlock()
+                            ?.getField('ID'))
+                      : block
+                            .getInput(`ARG${String(index)}`)
+                            ?.connection?.targetBlock()
+                            ?.getField('ID');
 
             field?.showEditor();
             // 自动编辑不应只依赖字段覆写来同步 controlbar；这里显式确认选中状态。

@@ -6,8 +6,8 @@
 
 import * as Blockly from 'blockly/core';
 import { t } from 'i18next';
-import { BlocksColor, OPCODES } from '../../../types/blocks';
-import { type IVM, type IVariable } from '../../../types/vm';
+import { BlocksColor, OPCODES } from '../../../types/vm/blocks';
+import { type IVM, type IVariable } from '../../../types/vm/vm';
 import { dropdownWithInput } from '../../../../plugins/fieldDropdown';
 
 export const BLOCKLY_CUSTOM_CSS = 'BLOCKLY_CUSTOM_CSS' as const;

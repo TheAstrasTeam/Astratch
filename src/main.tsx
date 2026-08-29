@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { StrictMode, Suspense } from 'react';
+import { StrictMode, Suspense, useState, useCallback } from 'react';
 import { createRoot } from 'react-dom/client';
 import GUI from './gui/index.tsx';
 import { VM } from './vm/index.ts';
@@ -17,10 +17,11 @@ import { modal } from './components/Modal/modal.ts';
 import { ModalProvider } from '@reactleaf/modal';
 import { initBuiltInSettings } from './settings/index.ts';
 import { Settings } from './settings/SettingsRegistry.ts';
-import { events } from './types/vm.ts';
+import { events } from './types/vm/vm.ts';
 import { Toast } from './lib/ToastManager/index.ts';
 import i18next from 'i18next';
 import { isSupportedLanguage } from './i18n/index.ts';
+import { debug } from './utils/debug.ts';
 
 // 等待国际化初始化
 await i18nReady.then(async () => {
@@ -30,7 +31,7 @@ await i18nReady.then(async () => {
     const Loading: HTMLElement | null = document.querySelector('.loading');
     if (Loading) {
         // 热加载没必要播放动画
-        if (import.meta.hot) {
+        if (debug) {
             Loading.remove();
         } else {
             Loading.style.animation = 'loadingOut 0.3s forwards';
@@ -56,30 +57,43 @@ await i18nReady.then(async () => {
             state.guiThemeAccent !== prevState.guiThemeAccent
         ) {
             applyGuiTheme();
-            vm.emit(events.UPDATE_THEME);
+            vm.emit(events.UPDATE_THEME, state);
         }
 
         if (state.language !== prevState.language && isSupportedLanguage(state.language)) {
             void i18next.changeLanguage(state.language);
         }
     });
+    const rootElement = document.getElementById('root');
+    if (!rootElement) throw new Error('root element not found');
+    const root: HTMLElement = rootElement;
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    createRoot(document.getElementById('root')!).render(
-        <StrictMode>
-            <Suspense fallback='loading...'>
-                {/*  不加延迟会导致错误的关闭 */}
-                <ModalProvider
-                    manager={modal}
-                    defaultLayerOptions={{
-                        closeDelay: 180,
-                        closeOnOutsideClick: false,
-                        dim: false,
-                    }}
-                >
-                    {vm.projectManager.isAPIAvailable ? <GUI vm={vm} /> : <ErrorPage />}
-                </ModalProvider>
-            </Suspense>
-        </StrictMode>,
-    );
+    function RootApp() {
+        const [stillEnter, setStillEnter] = useState(false);
+        const handleStillEnter = useCallback(() => {
+            setStillEnter(true);
+        }, []);
+        return (
+            <StrictMode>
+                <Suspense fallback='loading...'>
+                    {/*  不加延迟会导致错误的关闭 */}
+                    <ModalProvider
+                        manager={modal}
+                        defaultLayerOptions={{
+                            closeDelay: 180,
+                            closeOnOutsideClick: false,
+                            dim: false,
+                        }}
+                    >
+                        {vm.projectManager.isAPIAvailable || stillEnter ? (
+                            <GUI vm={vm} />
+                        ) : (
+                            <ErrorPage onStillEnter={handleStillEnter} />
+                        )}
+                    </ModalProvider>
+                </Suspense>
+            </StrictMode>
+        );
+    }
+    createRoot(root).render(<RootApp />);
 });

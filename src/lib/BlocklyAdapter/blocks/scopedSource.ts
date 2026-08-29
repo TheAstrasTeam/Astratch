@@ -31,7 +31,13 @@
 
 import * as Blockly from 'blockly/core';
 import type { AshConnection } from '../connectionRules';
-import { isInFlyoutInsteadOfTrashCan } from './helpers';
+import { isInFlyoutInsteadOfTrashCan, OPCODES } from './helpers';
+import type { TAllCheckers } from '../../../types/vm/blocks';
+import type {
+    IFunctionValueBlock,
+    TFunctionInputField,
+    TFunctionTypeUnion,
+} from '../../../components/modal_createFunction/functionPreview';
 
 /** 源积木上显示名字的字段名。 */
 const NAME_FIELD = 'NAME';
@@ -57,6 +63,12 @@ export interface IScopedSlot {
     key?: string;
     /** 该插槽发放的源积木默认显示名。 */
     defaultName: string;
+    /**
+     * 该插槽发放的源积木 opcode；缺省回退到宿主级 `sourceType`。
+     * 一个宿主发放多种源积木时（如函数签名同时发放参数积木与枚举积木）
+     * 由每个插槽自行声明。
+     */
+    sourceType?: string;
 }
 
 /**
@@ -87,7 +99,7 @@ export interface IScopedSourceHost extends Blockly.Block {
     fillScopedSlot(slot: IScopedSlot): void;
     /** 把子孙中仍指向旧宿主的源积木改绑到自己。 */
     rebindDescendants(previousOwnerId: string): void;
-    /** 把工作区内所有属于本宿主的源积木标签刷新一遍。 */
+    /** 把工作区内所有属于本宿主的源积木标签与类型刷新一遍。 */
     updateScopedLabels(): void;
     /** 重命名某个插槽发放的源积木，并广播到所有副本。 */
     renameScoped(key: string, name: string): void;
@@ -137,10 +149,76 @@ function withUnlocked<T>(connection: AshConnection, action: () => T): T {
     }
 }
 
+/**
+ * 把函数参数积木的输出对齐到宿主签名里对应字段的 checker。
+ *
+ * 参数积木的 init 跑在 ownerId / slotKey 赋值之前（newBlock 内部就会调
+ * init），在那里读不到宿主；因此统一在宿主绑定时调用本函数。
+ *
+ * setCheck 会触发 onCheckChanged_ 复检现有连接，而锁定的作用域插槽
+ * 在检查器里默认拒绝一切连接，所以必须在临时开锁下进行；
+ * 且目标 check 与现状一致时绝不能动，否则每次重绑都会把参数拔下来，
+ * 拔下又触发补块事件，陷入无限生成。
+ */
+function alignParamCheckerWithHost(
+    source: IScopedSourceBlock,
+    host: IScopedSourceHost,
+    slotConnection: Blockly.Connection,
+): void {
+    if (source.type !== OPCODES.FUNCTION_PARAM) return;
+
+    let wanted: TFunctionInputField | TFunctionTypeUnion;
+    if (host.type === OPCODES.FUNCTION_VALUE) {
+        // 定义帽签名：类型在 previewData 里，key 是全量字段下标。
+        const fieldData = (host as unknown as Partial<IFunctionValueBlock>).previewData?.[
+            Number(source.slotKey)
+        ];
+        if (!fieldData || fieldData.type === 'text') return;
+        wanted =
+            typeof fieldData.type === 'object' &&
+            !Array.isArray(fieldData.type) &&
+            fieldData.type !== null
+                ? 'String'
+                : fieldData.type;
+    } else if (host.type === OPCODES.FUNCTION_INLINE) {
+        // 行内函数：类型在 params 里，key 就是参数 id。
+        // （IFunctionInlineBlock 未导出，这里按结构读取。）
+        const params = (host as unknown as { params?: { id: string; type: unknown }[] }).params;
+        const param = params?.find(item => item.id === source.slotKey);
+        if (!param) return;
+        wanted = param.type as TFunctionInputField | TFunctionTypeUnion;
+    } else {
+        return;
+    }
+
+    const output = source.outputConnection;
+    if (!output) return;
+    const normalized = wanted === null || Array.isArray(wanted) ? wanted : [wanted];
+    const current = output.getCheck();
+    const unchanged =
+        normalized === null
+            ? current === null
+            : Array.isArray(normalized) &&
+              Array.isArray(current) &&
+              normalized.length === current.length &&
+              normalized.every((check, index) => check === current[index]);
+    if (unchanged) return;
+
+    withUnlocked(slotConnection as AshConnection, () => {
+        output.setCheck(normalized);
+    });
+}
+
 /** {@link scopedSourceHost} 的配置。 */
 export interface IScopedSourceHostOptions {
-    /** 该宿主发放的源积木 opcode。 */
+    /** 该宿主发放的默认源积木 opcode（未在插槽上声明 sourceType 时使用）。 */
     sourceType: string;
+    /**
+     * 宿主可能发放的其它源积木 opcode，由插槽通过 `slot.sourceType` 指定。
+     * 必须穷举所有可能发放的类型：同步与销毁逻辑靠它识别全部源积木，
+     * 即使当前插槽列表里已经没有某种类型的插槽（否则其残留副本会漏销毁）。
+     */
+    extraSourceTypes?: string[];
     /** 声明插槽。传数组表示固定不变；传函数表示形状可变（如函数参数）。 */
     slots: IScopedSlot[] | ((host: IScopedSourceHost) => IScopedSlot[]);
 }
@@ -167,6 +245,8 @@ export interface IScopedSourceHostOptions {
  */
 export function scopedSourceHost(options: IScopedSourceHostOptions) {
     const { sourceType } = options;
+    /** 宿主可能发放的全部源积木类型（含默认）。 */
+    const allSourceTypes = new Set<string>([sourceType, ...(options.extraSourceTypes ?? [])]);
 
     return {
         getScopedSlots(this: IScopedSourceHost): IScopedSlot[] {
@@ -234,16 +314,18 @@ export function scopedSourceHost(options: IScopedSourceHostOptions) {
             const connection = getSlotConnection(this, slot.inputName);
             if (!connection) return;
 
+            const slotSourceType = slot.sourceType ?? sourceType;
             const key = slot.key ?? slot.inputName;
             const name = this.getScopedName(key);
             const current = connection.targetBlock() as IScopedSourceBlock | null;
 
-            if (current?.type === sourceType) {
+            if (current?.type === slotSourceType) {
                 connection.allowScopedSource = false;
                 const previousOwnerId = current.ownerId;
                 current.ownerId = this.id;
                 current.slotKey = key;
                 current.updateLabel(name);
+                alignParamCheckerWithHost(current, this, connection);
 
                 // 复制整个宿主时，副本内部的源积木仍指向旧宿主，需一并改绑。
                 if (previousOwnerId && previousOwnerId !== this.id) {
@@ -255,10 +337,11 @@ export function scopedSourceHost(options: IScopedSourceHostOptions) {
             connection.allowScopedSource = false;
             if (current) connection.disconnect();
 
-            const source = this.workspace.newBlock(sourceType) as IScopedSourceBlock;
+            const source = this.workspace.newBlock(slotSourceType) as IScopedSourceBlock;
             source.ownerId = this.id;
             source.slotKey = key;
             source.updateLabel(name);
+            alignParamCheckerWithHost(source, this, connection);
 
             if (this.workspace.rendered) (source as unknown as Blockly.BlockSvg).initSvg();
 
@@ -276,7 +359,7 @@ export function scopedSourceHost(options: IScopedSourceHostOptions) {
         rebindDescendants(this: IScopedSourceHost, previousOwnerId: string): void {
             for (const block of this.getDescendants(false)) {
                 const source = block as unknown as IScopedSourceBlock;
-                if (source.type === sourceType && source.ownerId === previousOwnerId) {
+                if (allSourceTypes.has(source.type) && source.ownerId === previousOwnerId) {
                     source.ownerId = this.id;
                     if (source.slotKey) source.updateLabel(this.getScopedName(source.slotKey));
                 }
@@ -284,11 +367,29 @@ export function scopedSourceHost(options: IScopedSourceHostOptions) {
         },
 
         updateScopedLabels(this: IScopedSourceHost): void {
+            const slots = new Map(
+                this.getScopedSlots().map(slot => [slot.key ?? slot.inputName, slot]),
+            );
             for (const block of this.workspace.getAllBlocks(false)) {
                 const source = block as unknown as IScopedSourceBlock;
-                if (source.type === sourceType && source.ownerId === this.id && source.slotKey) {
-                    source.updateLabel(this.getScopedName(source.slotKey));
+                if (!allSourceTypes.has(source.type) || source.ownerId !== this.id) continue;
+                const key = source.slotKey;
+                if (key === undefined) continue;
+
+                const slot = slots.get(key);
+                if (!slot) {
+                    // 动态宿主（函数定义签名）的参数可能从 VM 中被删除；
+                    // 该参数已经没有合法归属，不能留下一个空白源积木。
+                    source.dispose(false);
+                    continue;
                 }
+
+                source.updateLabel(this.getScopedName(key));
+
+                // 源积木拖出宿主后不再经过宿主槽位的对齐逻辑；参数类型
+                // 改变时也必须更新这些浮动副本的 output checker。
+                const slotConnection = getSlotConnection(this, slot.inputName);
+                if (slotConnection) alignParamCheckerWithHost(source, this, slotConnection);
             }
         },
 
@@ -314,7 +415,7 @@ export function scopedSourceHost(options: IScopedSourceHostOptions) {
             // 留着只会让用户困惑，直接销毁。
             for (const block of this.workspace.getAllBlocks(false)) {
                 const source = block as unknown as IScopedSourceBlock;
-                if (source.type === sourceType && source.ownerId === this.id) {
+                if (allSourceTypes.has(source.type) && source.ownerId === this.id) {
                     if (source.slotKey === key) source.dispose(false);
                 }
             }
@@ -360,12 +461,9 @@ export interface IScopedSourceBlockOptions {
     /** 积木颜色。 */
     colour: string;
     /** 输出类型；`null` 表示万能 reporter。 */
-    output?: string | null;
+    output?: TAllCheckers | null;
     /**
      * 初始显示名。
-     *
-     * 源积木在工具箱（flyout）里是**没有宿主**的，不会有人调用 `updateLabel`，
-     * 因此必须自带一个默认文本，否则会显示为空白积木。
      */
     defaultLabel: () => string;
     /** 允许作为宿主的 opcode 列表，用于校验 `ownerId` 指向的积木。 */

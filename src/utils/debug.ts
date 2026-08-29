@@ -9,7 +9,8 @@
 import { Toast } from '../lib/ToastManager';
 import { spawnRandomString } from './ash-data';
 
-export const debug = true;
+// 是否正在开发服务器
+export const debug = import.meta.env.DEV;
 
 export const sendError = (error: unknown, type: 'error' | 'warn' = 'error') => {
     Toast.create({
@@ -23,4 +24,9 @@ export const sendError = (error: unknown, type: 'error' | 'warn' = 'error') => {
     }
     if (typeof error === 'string') throw new Error(error);
     else throw error;
+};
+
+export const log = (message: unknown) => {
+    // eslint-disable-next-line no-console
+    if (debug) console.log(message);
 };

@@ -95,6 +95,11 @@ export const SHORTCUTS = {
         scope: 'blockly',
         blocklyName: 'collapseOtherCategories',
     },
+    WORKSPACE_SEARCH: {
+        id: 'blockly.workspaceSearch',
+        defaultKey: 'mod+f',
+        scope: 'blockly',
+    },
     SWITCH_TAB_TARGET: {
         id: 'tabs.switchTab.target',
         defaultKey: 'mod+1',
@@ -108,6 +113,21 @@ export const SHORTCUTS = {
     SWITCH_TAB_DEBUG: {
         id: 'tabs.switchTab.debug',
         defaultKey: 'mod+3',
+        scope: 'global',
+    },
+    QUICK_OPEN: {
+        id: 'quickOpen.open',
+        defaultKey: 'mod+p',
+        scope: 'global',
+    },
+    QUICK_OPEN_NEXT_TAB: {
+        id: 'tabs.quickOpenNext',
+        defaultKey: 'mod+tab',
+        scope: 'global',
+    },
+    QUICK_OPEN_PREV_TAB: {
+        id: 'tabs.quickOpenPrev',
+        defaultKey: 'mod+shift+tab',
         scope: 'global',
     },
 } as const satisfies Record<string, ShortcutDefinition>;
@@ -136,16 +156,16 @@ export type ShortcutChangeListener = (event: ShortcutChangeEvent) => void;
 
 export interface IShortcut {
     readonly shortcuts: ReadonlyMap<ShortcutIds, ResolvedShortcutDefinition>;
-    registerSettings: () => void;
-    bindCommands: (commands: ShortcutCommands) => () => void;
-    getDefinition: (id: ShortcutIds) => ResolvedShortcutDefinition;
-    getDefinitions: () => readonly ResolvedShortcutDefinition[];
-    getDefaultHotKey: (id: ShortcutIds) => string;
-    getHotKey: (id: ShortcutIds) => string;
-    formatHotKey: (key: string) => string;
-    setHotKey: (id: ShortcutIds, hotKey: string) => SetShortcutResult;
-    resetHotKey: (id: ShortcutIds) => void;
-    onChange: (listener: ShortcutChangeListener) => () => void;
+    registerSettings(): void;
+    bindCommands(commands: ShortcutCommands): () => void;
+    getDefinition(id: ShortcutIds): ResolvedShortcutDefinition;
+    getDefinitions(): readonly ResolvedShortcutDefinition[];
+    getDefaultHotKey(id: ShortcutIds): string;
+    getHotKey(id: ShortcutIds): string;
+    formatHotKey(key: string): string;
+    setHotKey(id: ShortcutIds, hotKey: string): SetShortcutResult;
+    resetHotKey(id: ShortcutIds): void;
+    onChange(listener: ShortcutChangeListener): () => void;
 }
 
 // toastManager
@@ -155,44 +175,40 @@ export interface IToastManger {
      * 创建一个通知
      * 并返回是否创建成功
      */
-    create: (meta: IToast) => boolean;
-    emit: (data: TToastEvent) => void;
-    on: (
-        id: string,
-        callback: (data: TToastEvent) => void,
-        opts?: { once?: boolean },
-    ) => () => void;
-    off: (id: string) => void;
+    create(meta: IToast): boolean;
+    emit(data: TToastEvent): void;
+    on(id: string, callback: (data: TToastEvent) => void, opts?: { once?: boolean }): () => void;
+    off(id: string): void;
     /**
      * 当前活跃的通知（未归档）
      */
-    getAllHistory: () => ReadonlyMap<string, IToast>;
+    getAllHistory(): ReadonlyMap<string, IToast>;
     /**
      * 完整历史（活跃 + 已归档），按 createdAt 倒序
      */
-    getFullHistory: () => IToast[];
+    getFullHistory(): IToast[];
     /**
      * 删除一个通知（程序移除，不会触发 action）
      * 归档到完整历史中
      * @param id 通知id
      * @returns 是否成功删除
      */
-    removeToast: (id: string) => boolean;
+    removeToast(id: string): boolean;
     /**
      * 用户点击通知时调用，会触发 action 并归档
      * @returns 是否成功（通知存在时为 true）
      */
-    interact: (id: string) => boolean;
+    interact(id: string): boolean;
     /**
      * 仅触发 action，不归档（供历史面板使用）
      * @returns 是否成功
      */
-    trigger: (id: string) => boolean;
+    trigger(id: string): boolean;
     /**
      * 设置 progress 类型通知的进度
      * @returns 是否成功
      */
-    setProgress: (id: string, progress: number) => boolean;
+    setProgress(id: string, progress: number): boolean;
 }
 
 export type TToastMode = 'info' | 'error' | 'warn' | 'spinner' | 'progress';
@@ -206,7 +222,7 @@ export interface IToast {
      * 用户点击通知时触发的回调
      * 仅在 interact/trigger 时被调用，result 恒为 true
      */
-    action?: (result: boolean) => void;
+    action?(result: boolean): void;
     /**
      * 进度值，仅 type === 'progress' 时有效
      * spinner 类型不应使用此字段（永远显示滚动动画）
@@ -230,7 +246,7 @@ export interface IToast {
 export type TToastEvent = { type: 'refresh' } | { type: 'progress'; id: string; progress: number };
 
 export interface IEvent {
-    callback?: (data: TToastEvent) => void;
+    callback?(data: TToastEvent): void;
     once?: boolean;
     id: string;
 }

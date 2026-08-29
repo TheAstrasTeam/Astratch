@@ -17,7 +17,7 @@ import light from './gui/light';
 
 import blue from './accent/blue';
 import pink from './accent/pink';
-import { BlocksColor } from '../../types/blocks';
+import { BlocksColor } from '../../types/vm/blocks';
 import { flattenObject } from '../../utils/ash-data';
 
 const DEFAULT_BLOCKLY_SPRITES_STYLE_ID = 'blockly_sprites_style';

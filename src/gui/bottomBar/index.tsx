@@ -5,7 +5,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
-import { events, type IVM, type TViewportUpdateEvent } from '../../types/vm';
+import { events, type IVM, type TViewportUpdateEvent } from '../../types/vm/vm';
 import styles from './index.module.scss';
 import { t } from 'i18next';
 import { ToastLayer } from '../../components/toastLayer';

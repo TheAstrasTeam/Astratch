@@ -27,4 +27,3 @@ Windows
 cd src\renderer\webgpu
 python -m http.server 8080
 ```
-

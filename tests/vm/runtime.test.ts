@@ -8,9 +8,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import Runtime from '../../src/vm/runtime/runtime';
 import Folder from '../../src/vm/runtime/folder';
-import { events } from '../../src/types/vm';
+import { events } from '../../src/types/vm/vm';
 import { sendError } from '../../src/utils/debug';
-import type { IVM, IFolder, TTargetTreeNode } from '../../src/types/vm';
+import type { IVM, IFolder, TTargetTreeNode } from '../../src/types/vm/vm';
 
 // Runtime 依赖 Blockly 工作区管理，测试只关心数据逻辑，直接替换为桩类
 vi.mock('../../src/vm/runtime/blocks', () => ({

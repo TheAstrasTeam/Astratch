@@ -50,4 +50,11 @@ export default defineConfig([
             'no-console': ['warn', { allow: ['warn', 'error'] }],
         },
     },
+    {
+        // vitest 的 mock 断言（vi.mocked(vm.emit)）会分离方法，与该规则冲突
+        files: ['tests/**/*.ts'],
+        rules: {
+            '@typescript-eslint/unbound-method': 'off',
+        },
+    },
 ]);

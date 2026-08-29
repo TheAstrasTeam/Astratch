@@ -5,7 +5,7 @@
  */
 
 import type * as Blockly from 'blockly/core';
-import type { IVM } from '../../../types/vm';
+import type { IVM } from '../../../types/vm/vm';
 import { clearRegisteredBlocks } from './helpers';
 import { initPrimitiveBlocks } from './primitives';
 import { initMenuBlocks } from './menus';

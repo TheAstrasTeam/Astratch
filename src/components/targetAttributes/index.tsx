@@ -5,8 +5,8 @@
  */
 
 import { useState, type ComponentType, type SVGProps } from 'react';
-import type { IVM, ITarget } from '../../types/vm';
-import { events } from '../../types/vm';
+import type { IVM, ITarget } from '../../types/vm/vm';
+import { events } from '../../types/vm/vm';
 import { t } from 'i18next';
 import classNames from 'classnames';
 import styles from './index.module.scss';
@@ -28,10 +28,10 @@ interface IAttributeConfig {
 }
 
 const ATTRIBUTES: IAttributeConfig[] = [
-    { key: 'x', label: t('gui:target.attr.x'), step: 10, Icon: ArrowIcon },
-    { key: 'y', label: t('gui:target.attr.y'), step: 10, rotatedIcon: true, Icon: ArrowIcon },
-    { key: 'direction', label: t('gui:target.attr.direction'), step: 15, Icon: DirectionIcon },
-    { key: 'size', label: t('gui:target.attr.size'), step: 10, min: 0, Icon: SizeIcon },
+    { key: 'x', label: 'gui:target.attr.x', step: 10, Icon: ArrowIcon },
+    { key: 'y', label: 'gui:target.attr.y', step: 10, rotatedIcon: true, Icon: ArrowIcon },
+    { key: 'direction', label: 'gui:target.attr.direction', step: 15, Icon: DirectionIcon },
+    { key: 'size', label: 'gui:target.attr.size', step: 10, min: 0, Icon: SizeIcon },
 ];
 
 const AttributeRow = ({
@@ -78,7 +78,7 @@ const AttributeRow = ({
                             : {}
                     }
                 />
-                <span>{config.label}</span>
+                <span>{t(config.label)}</span>
             </div>
             <input
                 className={styles.attributeInput}

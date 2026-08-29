@@ -5,7 +5,7 @@
  */
 
 import * as Blockly from 'blockly/core';
-import { BlocksColor, OPCODES } from '../../../types/blocks';
+import { BlocksColor, OPCODES } from '../../../types/vm/blocks';
 import { StringInputField } from '../fields/stringInput';
 
 /**

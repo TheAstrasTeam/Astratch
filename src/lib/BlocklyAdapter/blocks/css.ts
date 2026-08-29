@@ -26,6 +26,15 @@ export const registerBlocksCSS = () => {
         display: block;
         cursor: pointer
     }
+    .blockly-function-value-shadow{
+        font-style: italic !important;
+    }
+    .blockly-function-value-shadow-bg {
+        fill: #ffffff1a;
+    }
+    .blockly-function-dropdown-group-bg {
+        fill: #ffffff1a;
+    }
     `;
 
     document.head.appendChild(css);

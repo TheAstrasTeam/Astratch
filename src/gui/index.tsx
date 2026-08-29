@@ -5,7 +5,7 @@
  */
 
 import i18next from 'i18next';
-import type { IVM } from '../types/vm';
+import type { IVM } from '../types/vm/vm';
 import WorkSpace from './workspace';
 // import { useState, useCallback } from 'react';
 // import { localStorageIDs } from '../../utils/localstorage';
@@ -19,6 +19,7 @@ import MenuBar from './menubar';
 import { ContextMenuLayer } from './contextMenu';
 import { shortcutManager } from '../lib/ShortcutManager';
 import { SHORTCUTS } from '../types/lib';
+import QuickOpen from '../tabs/QuickOpen';
 import { useEffect, useState } from 'react';
 import { guiInterface } from '../types/gui';
 import {
@@ -76,6 +77,7 @@ const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
                 <WorkSpace vm={vm} />
             </div>
             <ContextMenuLayer />
+            <QuickOpen vm={vm} />
         </div>
     );
 };

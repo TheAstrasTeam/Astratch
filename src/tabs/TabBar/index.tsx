@@ -1,12 +1,22 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { t } from 'i18next';
 import classNames from 'classnames';
 import styles from './index.module.scss';
 import { useTabsStore } from '../../stores/useTabsStore';
-import { TargetModes } from '../../types/vm';
+import { TargetModes } from '../../types/vm/vm';
 import CloseIcon from '../../assets/close.svg?react';
 import SpriteIcon from '../../assets/sprite.svg?react';
 import ModuleIcon from '../../assets/module.svg?react';
-import { useState, useRef, useEffect, type MouseEvent as ReactMouseEvent } from 'react'; 
+import { useState, useCallback, type MouseEvent as ReactMouseEvent } from 'react';
+import { useContextMenu } from '../../gui/contextMenu';
+import { AllContextMenu } from '../../types/gui';
+import { MenuItem } from '@szhsin/react-menu';
+import { createMenuTrigger } from '../../utils/ash-gui';
 
 const TabBar = (): React.ReactNode => {
     const tabs = useTabsStore(state => state.tabs);
@@ -19,122 +29,136 @@ const TabBar = (): React.ReactNode => {
     const orderedTabs = tabOrder
         .map(id => tabs.find(tab => tab.id === id))
         .filter((tab): tab is NonNullable<typeof tab> => tab !== undefined);
-    const [menuState, setMenuState] = useState<{
-        visible:boolean;
-        x:number;
-        y:number;
-        tabId:string|null;
-    }>({
-        visible:false,
-        x:0,
-        y:0,
-        tabId: null,
+    const [whereIsInContextMenuID, setWhereIsInContextMenuID] = useState('');
+
+    const { openMenu: openTabsMenu } = useContextMenu(AllContextMenu.TABS_EDIT, () => {
+        return (
+            <>
+                <MenuItem
+                    onClick={() => {
+                        handleContextMenuAction('close');
+                    }}
+                >
+                    {t('gui:tab.close')}
+                </MenuItem>
+                <MenuItem
+                    onClick={() => {
+                        handleContextMenuAction('closeOthers');
+                    }}
+                >
+                    {t('gui:tab.closeOthers')}
+                </MenuItem>
+                <MenuItem
+                    onClick={() => {
+                        handleContextMenuAction('closeAll');
+                    }}
+                >
+                    {t('gui:tab.closeAll')}
+                </MenuItem>
+            </>
+        );
     });
-    const contextMenuRef = useRef<HTMLDivElement>(null);
 
-    const handleContextMenu = (e: ReactMouseEvent<HTMLDivElement>, tabId: string) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setMenuState({
-            visible: true,
-            x: e.clientX,
-            y: e.clientY,
-            tabId: tabId,
-        });
-    };
-
-    useEffect(() => {
-        const handleClickOutside = (event: globalThis.MouseEvent) => {
-            if (contextMenuRef.current && !contextMenuRef.current.contains(event.target as Node)) {
-                setMenuState(prevState => ({ ...prevState, visible: false }));
+    const handleContextMenuAction = useCallback(
+        (action: 'close' | 'closeOthers' | 'closeAll') => {
+            if (!whereIsInContextMenuID) return;
+            switch (action) {
+                case 'close':
+                    closeTab(whereIsInContextMenuID);
+                    break;
+                case 'closeOthers':
+                    closeOtherTabs(whereIsInContextMenuID);
+                    break;
+                case 'closeAll':
+                    closeAllTabs();
+                    break;
             }
-        };
-    //滚动也关闭
-        const handleScroll = () => {
-            setMenuState(prevState => ({ ...prevState, visible: false }));
-        };
-        if (menuState.visible) {
-            document.addEventListener('mousedown', handleClickOutside);
-            window.addEventListener('scroll', handleScroll, true);
-        }
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-            window.removeEventListener('scroll', handleScroll, true);
-        };
-    }, [menuState.visible]);
+        },
+        [whereIsInContextMenuID, closeTab, closeOtherTabs, closeAllTabs],
+    );
 
+    const triggerMenu = useCallback(
+        (tabID: string, point: { x: number; y: number }) => {
+            setWhereIsInContextMenuID(tabID);
+            openTabsMenu(point);
+        },
+        [openTabsMenu],
+    );
 
+    const getMenuTrigger = useCallback(
+        (tabID: string) => {
+            return createMenuTrigger(
+                point => {
+                    triggerMenu(tabID, point);
+                },
+                {
+                    mouseButton: 2,
+                    longPressDuration: 300,
+                    position: 'mouse',
+                },
+            );
+        },
+        [triggerMenu],
+    );
 
-    //电击
-    const handleContextMenuAction = (action: 'close' | 'closeOthers' | 'closeAll') => {
-        const tabId = menuState.tabId;
-        if (!tabId) return;
-        switch (action) {
-            case 'close':
-                closeTab(tabId);
-                break;
-            case 'closeOthers':
-                closeOtherTabs(tabId);
-                break;
-            case 'closeAll':
-                closeAllTabs();
-                break;
-        }
-        
-        setMenuState(prevState => ({ ...prevState, visible: false }));
-    };
+    // 鼠标左键激活，中键关闭，右键给createMenuTrigger处理
+    const handleMouseDown = useCallback(
+        (e: ReactMouseEvent<HTMLDivElement>, tabID: string) => {
+            if (e.button === 0) {
+                setActiveTab(tabID);
+            } else if (e.button === 1) {
+                e.preventDefault();
+                closeTab(tabID);
+            }
+        },
+        [setActiveTab, closeTab],
+    );
 
     return (
         <div className={styles.tabBar}>
-            {orderedTabs.map(tab => (
-                <div
-                    key={tab.id}
-                    className={classNames(styles.tabItem, {
-                        [styles.isActive]: tab.id === activeTabId,
-                    })}
-                    onContextMenu={(e: ReactMouseEvent<HTMLDivElement>) => handleContextMenu(e, tab.id)}
-                    onClick={() => {
-                        setActiveTab(tab.id);
-                    }}
-                >
-                    {tab.mode === TargetModes.ENTITY ? (
-                        <SpriteIcon className={styles.tabIcon} />
-                    ) : (
-                        <ModuleIcon className={styles.tabIcon} />
-                    )}
-                    <span className={styles.tabTitle} title={tab.title}>
-                        {tab.title}
-                    </span>
-                    <button
-                        className={styles.closeButton}
-                        title={t('gui:tab.close')}
-                        onClick={e => {
-                            e.stopPropagation();
-                            closeTab(tab.id);
+            {orderedTabs.map(tab => {
+                const menuTrigger = getMenuTrigger(tab.id);
+                return (
+                    <div
+                        key={tab.id}
+                        className={classNames(styles.tabItem, {
+                            [styles.isActive]: tab.id === activeTabId,
+                        })}
+                        //左键中键给handleMouseDown处理，右键给menuTrigger.onMouseDown处理
+                        onMouseDown={e => {
+                            if (e.button === 2) {
+                                menuTrigger.onMouseDown(e);
+                            } else {
+                                handleMouseDown(e, tab.id);
+                            }
                         }}
+                        onTouchStart={menuTrigger.onTouchStart}
+                        onTouchMove={menuTrigger.onTouchMove}
+                        onTouchEnd={menuTrigger.onTouchEnd}
                     >
-                        <CloseIcon />
-                    </button>
-                </div>
-            ))}
-            {menuState.visible && menuState.tabId && (
-                <div
-                    ref={contextMenuRef}
-                    className={styles.contextMenu}
-                    style={{
-                        position: 'fixed',
-                        top: menuState.y,
-                        left: menuState.x,
-                        zIndex: 114514,
-                    }}
-                >
-                    <button onClick={() => handleContextMenuAction('close')}>{t('gui:tab.close')}</button>
-                    <button onClick={() => handleContextMenuAction('closeOthers')}>{t('gui:tab.closeOthers')}</button>
-                    <button onClick={() => handleContextMenuAction('closeAll')}>{t('gui:tab.closeAll')}</button>
-                </div>
-            )}
+                        {tab.mode === TargetModes.ENTITY ? (
+                            <SpriteIcon className={styles.tabIcon} />
+                        ) : (
+                            <ModuleIcon className={styles.tabIcon} />
+                        )}
+                        <span className={styles.tabTitle} title={tab.title}>
+                            {tab.title}
+                        </span>
+                        <button
+                            className={styles.closeButton}
+                            title={t('gui:tab.close')}
+                            onClick={e => {
+                                e.stopPropagation();
+                                closeTab(tab.id);
+                            }}
+                        >
+                            <CloseIcon />
+                        </button>
+                    </div>
+                );
+            })}
         </div>
     );
-}
-export default TabBar;
+};
 
+export default TabBar;

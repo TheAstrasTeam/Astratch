@@ -5,7 +5,7 @@
  */
 
 import { useRef, useState } from 'react';
-import { type IVM, type TallTarget, targets } from '../../types/vm';
+import { type IVM, type TallTarget, targets } from '../../types/vm/vm';
 import styles from './index.module.scss';
 
 import ashIcon from '../../assets/projectScheme/ASH.svg';

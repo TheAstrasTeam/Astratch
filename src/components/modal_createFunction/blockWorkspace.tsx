@@ -7,12 +7,22 @@
 // 此文件由 AI 生成
 import { useEffect, useRef } from 'react';
 import * as Blockly from 'blockly';
-import { type IVM } from '../../types/vm';
+import { type IVM } from '../../types/vm/vm';
 import { setupBlockly } from '../../lib/BlocklyAdapter';
 import styles from './index.module.scss';
-import { disposePreviewWorkspace, setupWorkspace } from './functionPreview';
+import {
+    disposePreviewWorkspace,
+    setupWorkspace,
+    type IFunctionPreviewInitialState,
+} from './functionPreview';
 
-const CreateFunctionWorkspace = ({ vm }: { vm: IVM }) => {
+const CreateFunctionWorkspace = ({
+    vm,
+    initial,
+}: {
+    vm: IVM;
+    initial?: IFunctionPreviewInitialState;
+}) => {
     const workspaceDiv = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -39,6 +49,7 @@ const CreateFunctionWorkspace = ({ vm }: { vm: IVM }) => {
                         pinch: false,
                     },
                 }),
+                initial,
             );
         });
 
@@ -46,7 +57,7 @@ const CreateFunctionWorkspace = ({ vm }: { vm: IVM }) => {
             disposed = true;
             disposePreviewWorkspace();
         };
-    }, [vm]);
+    }, [initial, vm]);
 
     return (
         <div className={styles.createPreview}>

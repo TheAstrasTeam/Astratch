@@ -18,7 +18,10 @@ import {
     downloadAddonContent,
     refreshRegistry,
     registryAddonToIAddon,
+    addonContentCacheKey,
+    compileAddon,
 } from './loader';
+import { cacheGet } from './cache';
 import { importCustomAddon, loadCustomAddons, removeCustomAddonHandle } from './custom';
 import type {
     IAddon,
@@ -28,6 +31,8 @@ import type {
     IAddonStorage,
     TAddonSettingType,
 } from './types';
+import type { IQuickOpenCommand } from '../types/gui';
+import { useQuickOpenCommandsStore } from '../stores/useQuickOpenCommandsStore';
 
 /** 插件设置项在 Settings 里的 key 前缀（`addon.<addonId>.<settingId>`） */
 const ADDON_SETTINGS_CATEGORY = 'addons';
@@ -67,6 +72,8 @@ export interface IAddonStoreState {
     status: TAddonLoadStatus;
     /** 正在下载内容（main.js）的插件 id */
     downloading: ReadonlySet<string>;
+    /** 后台刷新进行中（逐文件哈希比对 + 按需重下载） */
+    refreshing: boolean;
 }
 
 /**
@@ -77,6 +84,7 @@ export const useAddonStore = create<IAddonStoreState>(() => ({
     enabled: new Set<string>(),
     status: 'idle',
     downloading: new Set<string>(),
+    refreshing: false,
 }));
 
 interface IAddonPersist {
@@ -163,9 +171,11 @@ class AddonManager {
 
     /**
      * 后台静默刷新 registry：更新本地缓存并合并商店列表。
+     * 刷新期间设置 refreshing 状态，UI 可据此显示加载提示。
      * 失败的静默忽略（商店继续用旧缓存展示），不影响主流程。
      */
     private async backgroundRefresh() {
+        useAddonStore.setState({ refreshing: true });
         try {
             const registry = await refreshRegistry();
             const freshRemote = registry.addons.map(entry => registryAddonToIAddon(entry));
@@ -193,6 +203,8 @@ class AddonManager {
             this.syncAddonSettings();
         } catch {
             // 后台刷新失败不影响已展示的列表
+        } finally {
+            useAddonStore.setState({ refreshing: false });
         }
     }
 
@@ -233,12 +245,13 @@ class AddonManager {
 
     /**
      * 刷新官方插件列表：强制重新拉取 registry.json（统一商店入口）并更新本地缓存，
-     * 展示最新可用插件与版本。不下载插件内容，内容在用户点击“下载/启用”时按需拉取。
+     * 展示最新可用插件与版本。逐文件哈希比对，仅重下载变更文件。
      * 已挂载的自定义插件保持不变。
      */
     async refreshRemoteAddons() {
         const current = useAddonStore.getState();
         const custom = current.addons.filter(addon => addon.isCustom);
+        useAddonStore.setState({ refreshing: true });
         try {
             const registry = await refreshRegistry();
             const freshRemote = registry.addons.map(entry => registryAddonToIAddon(entry));
@@ -275,6 +288,8 @@ class AddonManager {
                     err: error instanceof Error ? error.message : String(error),
                 }),
             });
+        } finally {
+            useAddonStore.setState({ refreshing: false });
         }
     }
 
@@ -296,32 +311,63 @@ class AddonManager {
     }
 
     /**
-     * 返回当前远端插件的启用/禁用状态（不含自定义插件）。
+     * 返回当前远端插件的启用/禁用状态及版本（不含自定义插件）。
      * 供项目保存时记录，以便下次打开项目时恢复一致的插件环境。
      */
-    getProjectAddonState(): { enabled: string[]; disabled: string[] } {
+    getProjectAddonState(): {
+        enabled: string[];
+        disabled: string[];
+        versions: Record<string, string>;
+    } {
         const { addons, enabled } = useAddonStore.getState();
         const enabledList: string[] = [];
         const disabledList: string[] = [];
+        const versions: Record<string, string> = {};
         for (const addon of addons) {
             if (addon.isCustom) continue;
             if (enabled.has(addon.id)) enabledList.push(addon.id);
             else disabledList.push(addon.id);
+            versions[addon.id] = addon.version;
         }
-        return { enabled: enabledList, disabled: disabledList };
+        return { enabled: enabledList, disabled: disabledList, versions };
     }
 
     /**
-     * 恢复项目保存的远端插件启用/禁用状态。
+     * 恢复项目保存的远端插件启用/禁用状态及版本。
      * 自定义插件不受影响；不在列表中的插件保持默认状态。
+     * 若记录的版本在可用版本列表中，则选择该版本；否则保留当前版本。
+     * 版本切换完成后，再按项目记录的启用/禁用状态恢复。
      */
-    loadProjectAddonState(state: { enabled: string[]; disabled: string[] }) {
+    async loadProjectAddonState(state: {
+        enabled: string[];
+        disabled: string[];
+        versions?: Record<string, string>;
+    }) {
         const { addons } = useAddonStore.getState();
         const remoteIds = new Set(addons.filter(a => !a.isCustom).map(a => a.id));
         const projectEnabled = new Set(state.enabled.filter(id => remoteIds.has(id)));
         const projectDisabled = new Set(state.disabled.filter(id => remoteIds.has(id)));
+        const versions = state.versions ?? {};
 
-        // 先禁用所有当前启用的远端插件
+        // 先选择项目记录的版本并下载，等待所有版本切换完成
+        await Promise.all(
+            addons
+                .filter(addon => {
+                    if (addon.isCustom) return false;
+                    const recordedVersion = versions[addon.id];
+                    return (
+                        recordedVersion &&
+                        addon.versions.includes(recordedVersion) &&
+                        addon.version !== recordedVersion
+                    );
+                })
+                .map(addon => {
+                    const recordedVersion = versions[addon.id];
+                    return this.selectVersion(addon.id, recordedVersion);
+                }),
+        );
+
+        // 禁用所有当前启用的远端插件（除了项目中需要启用的）
         for (const addon of addons) {
             if (addon.isCustom) continue;
             if (projectEnabled.has(addon.id)) continue;
@@ -330,11 +376,14 @@ class AddonManager {
             }
         }
 
-        // 启用项目中启用的远端插件
+        // 启用项目中启用的远端插件（需要先下载编译）
         for (const addon of addons) {
             if (addon.isCustom) continue;
             if (!projectEnabled.has(addon.id)) continue;
             if (!useAddonStore.getState().enabled.has(addon.id)) {
+                if (!useAddonStore.getState().addons.find(a => a.id === addon.id)?.downloaded) {
+                    await this.download(addon.id);
+                }
                 this.enable(addon.id);
             }
         }
@@ -346,19 +395,31 @@ class AddonManager {
     }
 
     /**
-     * 选择插件的某个版本。已启用的插件会先停用旧版本，
-     * 再下载并重新启用新版本。
+     * 选择插件的某个版本。
+     * - 已启用：先停用，切换版本并下载编译，再重新启用。
+     * - 已禁用：仅切换版本。若该版本已缓存则标记为已下载可直接启用。
      */
     async selectVersion(id: string, version: string) {
         const addon = useAddonStore.getState().addons.find(item => item.id === id);
         if (!addon || !addon.versions.includes(version) || addon.version === version) return;
         const wasEnabled = useAddonStore.getState().enabled.has(id);
         if (wasEnabled) this.disable(id);
+        let downloaded = false;
+        let run: IAddon['run'] | undefined;
+        const cached = await cacheGet(addonContentCacheKey(id, version));
+        if (cached) {
+            try {
+                run = await compileAddon(cached);
+                downloaded = true;
+            } catch {
+                // 缓存内容无法编译，标记为未下载
+            }
+        }
         useAddonStore.setState({
             addons: useAddonStore
                 .getState()
                 .addons.map(item =>
-                    item.id === id ? { ...item, version, downloaded: false, run: undefined } : item,
+                    item.id === id ? { ...item, version, downloaded, run } : item,
                 ),
         });
         this.persistData.versions[id] = version;
@@ -485,7 +546,15 @@ class AddonManager {
             },
             defs: addon?.settings ?? [],
         };
-        return { ...base, storage, settings };
+        // 命令 ID 自动加插件前缀，保证跨插件不冲突
+        const quickOpen = {
+            registerCommand: (command: Omit<IQuickOpenCommand, 'id'> & { id: string }) =>
+                useQuickOpenCommandsStore.getState().registerCommand(addonID, {
+                    ...command,
+                    id: `${addonID}.${command.id}`,
+                }),
+        };
+        return { ...base, storage, settings, quickOpen };
     }
 
     /**
@@ -503,6 +572,9 @@ class AddonManager {
                     defaultValue: normalizeSettingDefault(setting),
                     category: ADDON_SETTINGS_CATEGORY,
                     label: `${addon.i18nNamespace}:@settings/${setting.id}`,
+                    description: setting.description
+                        ? `${addon.i18nNamespace}:@settings/${setting.id}.description`
+                        : undefined,
                     type: ADDON_SETTING_TYPE_MAP[setting.type],
                     min: setting.min,
                     max: setting.max,
@@ -514,6 +586,8 @@ class AddonManager {
     }
 
     private cleanup(id: string) {
+        // 先注销插件注册的 QuickOpen 命令：即使插件清理函数遗漏也不会泄漏
+        useQuickOpenCommandsStore.getState().unregisterByOwner(id);
         const cleanup = this.cleanups.get(id);
         this.cleanups.delete(id);
         try {

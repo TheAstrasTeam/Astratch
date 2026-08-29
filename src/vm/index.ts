@@ -22,8 +22,8 @@ import {
     type ITargetBlocks,
     TargetModes,
     type TTargetInfo,
-} from '../types/vm';
-import { ProjectManager } from './project';
+} from '../types/vm/vm.ts';
+import { ProjectManager } from './project/projectManager';
 import { addonManager } from '../addons/manager';
 import { t } from 'i18next';
 import { modal } from '../components/Modal/modal';
@@ -169,7 +169,7 @@ export class VM implements IVM {
                 entity: entitysFolder,
                 module: modulesFolder,
             },
-            addons: addonManager.getProjectAddonState(),
+            addonState: addonManager.getProjectAddonState(),
         };
 
         await this.projectManager.createFile(
@@ -193,7 +193,7 @@ export class VM implements IVM {
                 const userWantRemoveAllFile = await new Promise(resolve => {
                     void modal.open(ConfirmModal, {
                         message: t('vm:project.removeAllFileAsk'),
-                        callback: result => {
+                        callback: (result: boolean) => {
                             resolve(result);
                         },
                     });
@@ -287,7 +287,7 @@ export class VM implements IVM {
             const projectMeta = JSON.parse(metaFileContent) as IProjectMetaJSON;
             this.runtime.settings.setProjectMeta(projectMeta.meta);
             if (projectMeta.addonState) {
-                addonManager.loadProjectAddonState(projectMeta.addonState);
+                await addonManager.loadProjectAddonState(projectMeta.addonState);
             }
             for (const mode of Object.values(TargetModes)) {
                 this.runtime.folders.set(
