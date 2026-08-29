@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import * as Blockly from 'blockly';
-import { AllCheckers, BlocksColor, OPCODES, type IBlockColor } from '../../types/blocks';
-import { type TAllCheckers } from '../../types/blocks';
-import type { IFunctionReference } from '../../types/blocks';
+import { AllCheckers, BlocksColor, OPCODES, type IBlockColor } from '../../types/vm/blocks';
+import { type TAllCheckers } from '../../types/vm/blocks';
+import type { IFunctionReference } from '../../types/vm/blocks';
 import { t } from 'i18next';
 import { dropdownWithInput } from '../../../plugins/fieldDropdown';
 

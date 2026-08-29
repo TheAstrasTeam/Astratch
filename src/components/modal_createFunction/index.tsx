@@ -11,7 +11,7 @@ import { isModalOpen } from '../Modal/modal';
 import { t } from 'i18next';
 import styles from './index.module.scss';
 import { useCallback, useMemo, useState } from 'react';
-import { type IVM } from '../../types/vm';
+import { type IVM } from '../../types/vm/vm';
 import { CreateFunctionWorkspace } from './blockWorkspace';
 import { FieldTypeModal } from './modal_fieldType';
 import { CreateDropdownModal } from '../modal_createDropdown';
@@ -27,7 +27,7 @@ import {
 } from './functionPreview';
 import { DropDownIcon, StringIcon, TextIcon } from './icons';
 import { ColorPickerButton } from '../colorPickerButton';
-import { AllCheckers, type IBlockColor, type ICustomFunction } from '../../types/blocks';
+import { AllCheckers, type IBlockColor, type ICustomFunction } from '../../types/vm/blocks';
 import type {
     IFunctionDropdownField,
     TFunctionFieldType,

@@ -15,13 +15,13 @@ import {
     type TTargetInfo,
     type TTargetMode,
     type TViewportUpdateEvent,
-} from '../../types/vm';
+} from '../../types/vm/vm';
 import {
     OPCODES,
     type ICustomFunction,
     type IFunctionReference,
     type IWorkspaceState,
-} from '../../types/blocks';
+} from '../../types/vm/blocks';
 import { spawnRandomString } from '../../utils/ash-data';
 import { sendError } from '../../utils/debug';
 import { t } from 'i18next';

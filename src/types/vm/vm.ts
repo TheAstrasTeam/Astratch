@@ -6,7 +6,7 @@
 
 import type { IBlocks, ICustomFunction, IWorkspaceState } from './blocks';
 import * as Blockly from 'blockly/core';
-import type { TGuiAccent, TGuiTheme } from './gui';
+import type { TGuiAccent, TGuiTheme } from '../gui';
 
 export const DATA_VISIBILITY = {
     PUBLIC: 'public',

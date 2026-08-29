@@ -5,7 +5,7 @@
  */
 
 import { useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react';
-import type { IVM, TTargetMode, TTargetTree, TTargetTreeNode } from '../../types/vm';
+import type { IVM, TTargetMode, TTargetTree, TTargetTreeNode } from '../../types/vm/vm';
 import styles from './index.module.scss';
 import classNames from 'classnames';
 

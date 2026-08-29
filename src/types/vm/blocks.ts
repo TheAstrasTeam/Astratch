@@ -9,7 +9,7 @@ import type { IVM } from './vm';
 import type {
     TFunctionReturnType,
     TPreviewFunctionData,
-} from '../components/modal_createFunction/functionPreview';
+} from '../../components/modal_createFunction/functionPreview';
 
 const OPCODES = {
     // 菜单

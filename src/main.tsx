@@ -17,7 +17,7 @@ import { modal } from './components/Modal/modal.ts';
 import { ModalProvider } from '@reactleaf/modal';
 import { initBuiltInSettings } from './settings/index.ts';
 import { Settings } from './settings/SettingsRegistry.ts';
-import { events } from './types/vm.ts';
+import { events } from './types/vm/vm.ts';
 import { Toast } from './lib/ToastManager/index.ts';
 import i18next from 'i18next';
 import { isSupportedLanguage } from './i18n/index.ts';

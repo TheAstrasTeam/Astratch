@@ -19,7 +19,7 @@ import DebugIcon from '../../assets/bug.svg?react';
 
 import { useGUIStore } from '../../stores/useGUIStore';
 import { debug } from '../../utils/debug';
-import { type IVM } from '../../types/vm';
+import { type IVM } from '../../types/vm/vm';
 import { selectProjectThenJump } from '../../utils/ash-gui';
 
 // 通过此处获取一个句子😋

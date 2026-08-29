@@ -10,7 +10,7 @@ import {
     type IVM,
     allProjectCheckError,
     projectFileNames,
-} from '../../types/vm';
+} from '../../types/vm/vm';
 import { t } from 'i18next';
 
 /**

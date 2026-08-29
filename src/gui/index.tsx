@@ -5,7 +5,7 @@
  */
 
 import i18next from 'i18next';
-import type { IVM } from '../types/vm';
+import type { IVM } from '../types/vm/vm';
 import WorkSpace from './workspace';
 // import { useState, useCallback } from 'react';
 // import { localStorageIDs } from '../../utils/localstorage';

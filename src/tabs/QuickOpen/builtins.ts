@@ -10,7 +10,7 @@
 // 标题使用 i18n key；插件的动态命令经 useQuickOpenCommandsStore 合并展示。
 
 import type { IQuickOpenCommand } from '../../types/gui';
-import { allBuiltInTabs } from '../../types/vm';
+import { allBuiltInTabs } from '../../types/vm/vm';
 import { guiInterface } from '../../types/gui';
 import { useGUIStore } from '../../stores/useGUIStore';
 import { useSidebarStore } from '../../stores/useSidebarStore';

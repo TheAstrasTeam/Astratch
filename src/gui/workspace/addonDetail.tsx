@@ -17,7 +17,7 @@ import rehypeHighlight from 'rehype-highlight';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
 
-import { events, type IUpdateThemeEvent, type IVM } from '../../types/vm';
+import { events, type IUpdateThemeEvent, type IVM } from '../../types/vm/vm';
 import { useSettings } from '../../settings/SettingsRegistry';
 import type { TGuiTheme } from '../../types/gui';
 

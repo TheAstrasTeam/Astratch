@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { events, type IFolder, type TEmit, type TFolderInfo } from '../../types/vm';
+import { events, type IFolder, type TEmit, type TFolderInfo } from '../../types/vm/vm';
 
 export const DEFAULT_FOLDERINFO: TFolderInfo = {
     name: '',

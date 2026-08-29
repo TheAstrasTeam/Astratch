@@ -10,9 +10,9 @@
 import * as Blockly from 'blockly/core';
 import type { AshConnection } from '../connectionRules';
 import { t } from 'i18next';
-import { AllCheckers, BlocksColor, OPCODES } from '../../../types/blocks';
-import type { ICustomFunction, IFunctionReference } from '../../../types/blocks';
-import type { IVM } from '../../../types/vm';
+import { AllCheckers, BlocksColor, OPCODES } from '../../../types/vm/blocks';
+import type { ICustomFunction, IFunctionReference } from '../../../types/vm/blocks';
+import type { IVM } from '../../../types/vm/vm';
 import type {
     IFunctionDropdownField,
     IFunctionValueBlock,

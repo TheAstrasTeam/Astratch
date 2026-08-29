@@ -5,7 +5,7 @@
  */
 
 import classNames from 'classnames';
-import { events, type ITarget, type IVM, type TTargetMode } from '../../types/vm';
+import { events, type ITarget, type IVM, type TTargetMode } from '../../types/vm/vm';
 import styles from './targets.module.scss';
 
 import { t } from 'i18next';

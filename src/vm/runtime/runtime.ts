@@ -21,7 +21,7 @@ import {
     type TFolderInfo,
     type TTargetInfo,
     type TViewportUpdateEvent,
-} from '../../types/vm';
+} from '../../types/vm/vm';
 import Settings from './settings/index';
 import Blocks from './blocks';
 import * as Blockly from 'blockly';

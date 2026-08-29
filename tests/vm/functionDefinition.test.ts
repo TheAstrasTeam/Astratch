@@ -8,8 +8,8 @@ import * as Blockly from 'blockly/core';
 import { initFunctionBlocks } from '../../src/lib/BlocklyAdapter/blocks/function';
 import { AshConnectionChecker } from '../../src/lib/BlocklyAdapter/connectionRules';
 import type { AshConnection } from '../../src/lib/BlocklyAdapter/connectionRules';
-import type { ICustomFunction } from '../../src/types/blocks';
-import { AllCheckers, OPCODES } from '../../src/types/blocks';
+import type { ICustomFunction } from '../../src/types/vm/blocks';
+import { AllCheckers, OPCODES } from '../../src/types/vm/blocks';
 import type {
     IFunctionDropdownField,
     TPreviewFunctionData,
@@ -236,7 +236,7 @@ describe('函数定义帽：下拉参数的枚举槽', () => {
     const setup = async () => {
         dropdownFunction.body = makeDropdownBody();
         const ws = new Blockly.Workspace();
-        const hat = ws.newBlock(OPCODES.FUNCTION_DEFINITION) as HatBlock;
+        const hat = ws.newBlock(OPCODES.FUNCTION_DEFINITION) as unknown as HatBlock;
         hat.setFunctionRef({ targetId: 't1', functionId: 'fn-drop' });
         await flush();
         const value = slotOf(hat).targetBlock() as IDropdownValueBlock;
@@ -333,7 +333,7 @@ describe('函数定义帽：下拉参数的枚举槽', () => {
             floating.getField('VALUE') as unknown as {
                 getOptions(): Blockly.MenuOption[];
             }
-        ).getOptions(false);
+        ).getOptions();
         expect(options.map(([, optionValue]) => optionValue)).toEqual(['normal', 'hard']);
     });
 

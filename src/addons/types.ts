@@ -6,7 +6,7 @@
 
 // 此文件由AI生成
 
-import type { IVM } from '../types/vm';
+import type { IVM } from '../types/vm/vm';
 import type * as Blockly from 'blockly';
 import type { TFunction } from 'i18next';
 import type { IToastManger } from '../types/lib';

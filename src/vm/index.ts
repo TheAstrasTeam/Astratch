@@ -22,7 +22,7 @@ import {
     type ITargetBlocks,
     TargetModes,
     type TTargetInfo,
-} from '../types/vm';
+} from '../types/vm/vm.ts';
 import { ProjectManager } from './project/projectManager';
 import { addonManager } from '../addons/manager';
 import { t } from 'i18next';

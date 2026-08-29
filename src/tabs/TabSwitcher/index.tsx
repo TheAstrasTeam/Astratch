@@ -15,7 +15,7 @@ import classNames from 'classnames';
 import styles from './index.module.scss';
 import { useTabSwitcherStore } from '../../stores/useTabSwitcherStore';
 import { useTabsStore } from '../../stores/useTabsStore';
-import { TargetModes } from '../../types/vm';
+import { TargetModes } from '../../types/vm/vm';
 import SpriteIcon from '../../assets/sprite.svg?react';
 import ModuleIcon from '../../assets/module.svg?react';
 

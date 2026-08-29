@@ -8,7 +8,7 @@ import { t } from 'i18next';
 import classNames from 'classnames';
 import styles from './index.module.scss';
 import { useTabsStore } from '../../stores/useTabsStore';
-import { TargetModes } from '../../types/vm';
+import { TargetModes } from '../../types/vm/vm';
 import CloseIcon from '../../assets/close.svg?react';
 import SpriteIcon from '../../assets/sprite.svg?react';
 import ModuleIcon from '../../assets/module.svg?react';

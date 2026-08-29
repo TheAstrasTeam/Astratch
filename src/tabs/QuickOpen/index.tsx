@@ -21,7 +21,7 @@ import { useQuickOpenStore } from '../../stores/useQuickOpenStore';
 import { useTabSwitcherStore } from '../../stores/useTabSwitcherStore';
 import { useTabSwitcher } from '../TabSwitcher/useTabSwitcher';
 import { TabSwitcherList } from '../TabSwitcher';
-import type { IVM } from '../../types/vm';
+import type { IVM } from '../../types/vm/vm';
 
 interface IAnchorRect {
     left: number;

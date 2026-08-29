@@ -5,8 +5,8 @@
  */
 
 import { useState, type ComponentType, type SVGProps } from 'react';
-import type { IVM, ITarget } from '../../types/vm';
-import { events } from '../../types/vm';
+import type { IVM, ITarget } from '../../types/vm/vm';
+import { events } from '../../types/vm/vm';
 import { t } from 'i18next';
 import classNames from 'classnames';
 import styles from './index.module.scss';

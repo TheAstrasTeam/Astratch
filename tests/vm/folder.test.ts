@@ -7,7 +7,7 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import Folder from '../../src/vm/runtime/folder';
-import { events } from '../../src/types/vm';
+import { events } from '../../src/types/vm/vm';
 
 describe('Folder.fromJSON', () => {
     it('应该从纯对象还原文件夹并带方法', () => {

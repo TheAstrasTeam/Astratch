@@ -26,7 +26,7 @@ import {
     type TFunctionFieldType,
     type TFunctionInputField,
 } from './functionPreview';
-import { AllCheckers } from '../../types/blocks';
+import { AllCheckers } from '../../types/vm/blocks';
 import type { JSX } from 'react/jsx-dev-runtime';
 
 export const FieldTypeModal = ({

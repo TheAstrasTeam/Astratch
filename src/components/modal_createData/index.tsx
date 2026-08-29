@@ -9,7 +9,7 @@ import { Modal } from '../Modal/modalWindow';
 import { t } from 'i18next';
 import styles from './index.module.scss';
 import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react';
-import { DATA_VISIBILITY, type IVM, type TDATA_VISIBILITY } from '../../types/vm';
+import { DATA_VISIBILITY, type IVM, type TDATA_VISIBILITY } from '../../types/vm/vm';
 
 export const CreateDataModal = ({ vm, addID }: { vm: IVM; addID?: string }) => {
     const [nowValue, setValue] = useState<string>('');

@@ -14,7 +14,7 @@ import styles from './addons.module.scss';
 import { addonManager, useAddonStore } from '../../addons';
 import { openSettingsModal } from '../../utils/ash-gui';
 import AddonDetail from './addonDetail';
-import type { IVM } from '../../types/vm';
+import type { IVM } from '../../types/vm/vm';
 
 const AddonCard = ({
     name,

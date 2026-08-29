@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { type IVM } from '../../../types/vm';
+import { type IVM } from '../../../types/vm/vm';
 import styles from './index.module.scss';
 import { useEffect, useRef } from 'react';
 import { MenuItem, MenuDivider } from '@szhsin/react-menu';

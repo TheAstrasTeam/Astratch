@@ -7,7 +7,7 @@
 
 import { beforeEach, describe, expect, it } from 'vitest';
 import { useTabsStore } from '../../src/stores/useTabsStore';
-import { TargetModes } from '../../src/types/vm';
+import { TargetModes } from '../../src/types/vm/vm';
 
 const open = (id: string, title: string) => {
     useTabsStore.getState().openTab(id, title, TargetModes.ENTITY);

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import type * as Blockly from 'blockly/core';
-import type { IVM } from '../../types/vm';
+import type { IVM } from '../../types/vm/vm';
 import { OPCODES, getEditingDataList } from './blocks/helpers';
 import { menu, num, txt } from './toolbox';
 import { t } from 'i18next';

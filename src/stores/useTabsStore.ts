@@ -5,7 +5,7 @@
  */
 
 import { create, type UseBoundStore, type StoreApi } from 'zustand';
-import type { TTargetMode } from '../types/vm';
+import type { TTargetMode } from '../types/vm/vm';
 
 export interface Tab {
     id: string;

@@ -7,9 +7,9 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import Target from '../../src/vm/runtime/target';
-import { events, type IEntityInfo, type TEmit, type TTargetInfo } from '../../src/types/vm';
+import { events, type IEntityInfo, type TEmit, type TTargetInfo } from '../../src/types/vm/vm';
 import { sendError } from '../../src/utils/debug';
-import type { ICustomFunction, IWorkspaceState } from '../../src/types/blocks';
+import type { ICustomFunction, IWorkspaceState } from '../../src/types/vm/blocks';
 
 vi.mock('../../src/utils/debug', () => ({
     sendError: vi.fn((error: unknown, type: 'error' | 'warn' = 'error') => {
@@ -293,12 +293,12 @@ describe('Target 数据序列化', () => {
         const body: ICustomFunction = {
             body: [
                 { type: 'text', text: '计算' },
-                { type: ['number', 'string'], text: 'value' },
+                { type: ['Number', 'String'] , text: 'value' },
             ],
             color: { primary: '#123456' },
             id: 'a',
             isValue: true,
-            returnType: ['number', 'string'],
+            returnType: ['Number', 'String'],
         };
         target.addCustomFunction('a', body);
         const json = target.toJSON();

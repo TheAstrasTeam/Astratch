@@ -9,7 +9,7 @@
 import * as Blockly from 'blockly';
 import { t } from 'i18next';
 import { Toast } from '../lib/ToastManager';
-import type { IVM } from '../types/vm';
+import type { IVM } from '../types/vm/vm';
 import type { IAddonContext } from './types';
 
 /**

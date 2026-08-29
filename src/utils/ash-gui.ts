@@ -7,7 +7,7 @@
 // 关于部分常用 GUI 互动的实用工具
 
 import { guiInterface, type IGuiInterface } from '../types/gui';
-import type { IVM } from '../types/vm';
+import type { IVM } from '../types/vm/vm';
 import { Toast } from '../lib/ToastManager';
 import { spawnRandomString } from './ash-data';
 import { t } from 'i18next';

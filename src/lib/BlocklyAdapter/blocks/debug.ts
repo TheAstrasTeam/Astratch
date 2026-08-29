@@ -6,7 +6,7 @@
 
 import * as Blockly from 'blockly/core';
 import { t } from 'i18next';
-import { BlocksColor, OPCODES } from '../../../types/blocks';
+import { BlocksColor, OPCODES } from '../../../types/vm/blocks';
 import { connections } from './helpers';
 
 /**

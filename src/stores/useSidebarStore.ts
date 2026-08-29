@@ -11,7 +11,7 @@
 // 让快捷键、QuickOpen 命令等外部调用方也能切换面板。
 
 import { create, type UseBoundStore, type StoreApi } from 'zustand';
-import { allBuiltInTabs, type TallBuiltInTabs } from '../types/vm';
+import { allBuiltInTabs, type TallBuiltInTabs } from '../types/vm/vm';
 
 interface ISidebarStore {
     /** 当前选中的侧边栏面板（targets / addons / debug） */

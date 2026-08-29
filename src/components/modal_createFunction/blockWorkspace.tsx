@@ -7,7 +7,7 @@
 // 此文件由 AI 生成
 import { useEffect, useRef } from 'react';
 import * as Blockly from 'blockly';
-import { type IVM } from '../../types/vm';
+import { type IVM } from '../../types/vm/vm';
 import { setupBlockly } from '../../lib/BlocklyAdapter';
 import styles from './index.module.scss';
 import {

@@ -32,7 +32,7 @@
 import * as Blockly from 'blockly/core';
 import type { AshConnection } from '../connectionRules';
 import { isInFlyoutInsteadOfTrashCan, OPCODES } from './helpers';
-import type { TAllCheckers } from '../../../types/blocks';
+import type { TAllCheckers } from '../../../types/vm/blocks';
 import type {
     IFunctionValueBlock,
     TFunctionInputField,

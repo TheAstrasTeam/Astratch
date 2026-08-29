@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { BlocksColor, type IBlockColor } from '../../types/blocks';
+import { BlocksColor, type IBlockColor } from '../../types/vm/blocks';
 
 import EnableIcon from '../../assets/blocks/enable.svg?react';
 import UnableIcon from '../../assets/blocks/unable.svg?react';
