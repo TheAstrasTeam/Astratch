@@ -74,3 +74,73 @@ describe('useTabsStore 的 MRU 维护', () => {
         expect(useTabsStore.getState().tabs).toHaveLength(0);
     });
 });
+
+describe('useTabsStore 的内置页面标签（openSpecialTab）', () => {
+    beforeEach(() => {
+        useTabsStore.getState().closeAllTabs();
+    });
+
+    it('打开欢迎标签：创建单例并激活', () => {
+        useTabsStore.getState().openSpecialTab('welcome');
+        const { tabs, activeTabId } = useTabsStore.getState();
+        expect(tabs).toHaveLength(1);
+        expect(tabs[0].type).toBe('welcome');
+        expect(tabs[0].id).toBe('welcome');
+        expect(activeTabId).toBe('welcome');
+    });
+
+    it('重复打开同一内置标签不会重复创建，仅激活', () => {
+        useTabsStore.getState().openSpecialTab('welcome');
+        useTabsStore.getState().openSpecialTab('create_project');
+        useTabsStore.getState().openSpecialTab('welcome');
+        const { tabs, activeTabId } = useTabsStore.getState();
+        expect(tabs).toHaveLength(2);
+        expect(activeTabId).toBe('welcome');
+        expect(useTabsStore.getState().mruTabIds[0]).toBe('welcome');
+    });
+
+    it('内置标签与 blockly 标签可共存', () => {
+        useTabsStore.getState().openSpecialTab('welcome');
+        open('a', 'A');
+        expect(useTabsStore.getState().tabs.map(t => t.type)).toEqual(['welcome', 'blockly']);
+    });
+
+    it('返回流程：关闭 create_project 后重新打开 welcome', () => {
+        useTabsStore.getState().openSpecialTab('welcome');
+        useTabsStore.getState().openSpecialTab('create_project');
+        // 模拟创建项目页“返回”：关闭 create_project 并重新打开 welcome
+        useTabsStore.getState().closeTab('create_project');
+        useTabsStore.getState().openSpecialTab('welcome');
+        const { tabs, activeTabId } = useTabsStore.getState();
+        expect(tabs.map(t => t.id)).toEqual(['welcome']);
+        expect(activeTabId).toBe('welcome');
+    });
+
+    it('关闭内置标签后 MRU 同步清理', () => {
+        useTabsStore.getState().openSpecialTab('welcome');
+        useTabsStore.getState().openSpecialTab('create_project');
+        useTabsStore.getState().closeTab('welcome');
+        const { tabs, mruTabIds } = useTabsStore.getState();
+        expect(tabs.map(t => t.id)).toEqual(['create_project']);
+        expect(mruTabIds).toEqual(['create_project']);
+    });
+
+    it('closeSpecialTabs 关闭全部内置页面标签，保留 blockly 标签', () => {
+        useTabsStore.getState().openSpecialTab('welcome');
+        useTabsStore.getState().openSpecialTab('create_project');
+        open('a', 'A');
+        useTabsStore.getState().closeSpecialTabs();
+        const { tabs, activeTabId } = useTabsStore.getState();
+        expect(tabs.map(t => t.type)).toEqual(['blockly']);
+        expect(tabs.map(t => t.id)).toEqual(['a']);
+        expect(activeTabId).toBe('a');
+    });
+
+    it('closeSpecialTabs 在无内置标签时不做任何事', () => {
+        open('a', 'A');
+        useTabsStore.getState().closeSpecialTabs();
+        const { tabs, activeTabId } = useTabsStore.getState();
+        expect(tabs.map(t => t.id)).toEqual(['a']);
+        expect(activeTabId).toBe('a');
+    });
+});

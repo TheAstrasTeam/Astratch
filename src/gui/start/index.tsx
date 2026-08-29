@@ -7,7 +7,7 @@
 import { useState } from 'react';
 import styles from './index.module.scss';
 import { useSettings } from '../../settings/SettingsRegistry';
-import { guiInterface, guiThemes } from '../../types/gui';
+import { guiThemes } from '../../types/gui';
 import { t } from 'i18next';
 
 import lightLogo from '../../assets/lightLogo.svg';
@@ -17,10 +17,11 @@ import LoadIcon from '../../assets/load.svg?react';
 
 import DebugIcon from '../../assets/bug.svg?react';
 
-import { useGUIStore } from '../../stores/useGUIStore';
 import { debug } from '../../utils/debug';
 import { type IVM } from '../../types/vm/vm';
 import { selectProjectThenJump } from '../../utils/ash-gui';
+import { useTabsStore } from '../../stores/useTabsStore';
+import { WELCOME_TAB_ID } from '../../tabs/tabTypes';
 
 // 通过此处获取一个句子😋
 import { getWelcomeText } from './welcome_text';
@@ -28,11 +29,11 @@ import { getWelcomeText } from './welcome_text';
 const Start = ({ vm }: { vm: IVM }): React.ReactNode => {
     const themeMode = useSettings(state => state.guiThemeMode);
     const userName = useSettings(state => state.userName);
-    const setInterface = useGUIStore(state => state.setInterface);
     const [welcome] = useState(() => getWelcomeText(String(userName)));
     const handleCreateProject = () => {
-        // 开始创建项目
-        setInterface(guiInterface.CREATE_PROJECT);
+        // 从欢迎页发起创建：关闭欢迎标签，再打开「创建项目」标签
+        useTabsStore.getState().closeTab(WELCOME_TAB_ID);
+        useTabsStore.getState().openSpecialTab('create_project');
     };
     const gotoEditor = () => {
         vm.runtime.createTarget({
@@ -41,7 +42,6 @@ const Start = ({ vm }: { vm: IVM }): React.ReactNode => {
         });
         // eslint-disable-next-line react-hooks/immutability
         vm.isEditingProject = true;
-        setInterface(guiInterface.EDITOR);
     };
     return (
         <div className={styles.start}>
@@ -55,10 +55,7 @@ const Start = ({ vm }: { vm: IVM }): React.ReactNode => {
                 <AddIcon />
                 {t('gui:start.createProject')}
             </button>
-            <button
-                className={styles.button}
-                onClick={() => void selectProjectThenJump(vm, setInterface)}
-            >
+            <button className={styles.button} onClick={() => void selectProjectThenJump(vm)}>
                 <LoadIcon />
                 {t('gui:start.loadProject')}
             </button>

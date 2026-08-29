@@ -22,8 +22,8 @@ import Title from '../../components/title';
 import SubTitle from '../../components/subTitle';
 import { toID } from '../../utils/ash-data';
 import { useSettings } from '../../settings/SettingsRegistry';
-import { useGUIStore } from '../../stores/useGUIStore';
-import { guiInterface } from '../../types/gui';
+import { useTabsStore } from '../../stores/useTabsStore';
+import { CREATE_PROJECT_TAB_ID } from '../../tabs/tabTypes';
 
 const tabs = {
     SCHEME: 'scheme',
@@ -104,7 +104,6 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
     const [projectFolderName, setProjectFolderName] = useState<string>('');
 
     const settingsStore = useSettings(state => state.userName) as string;
-    const setGuiStore = useGUIStore(state => state.setInterface);
 
     const nameInput = useRef<HTMLSpanElement>(null);
     const idInput = useRef<HTMLSpanElement>(null);
@@ -163,18 +162,14 @@ const CreateProject = ({ vm }: { vm: IVM }): React.ReactNode => {
                 author: [settingsStore],
             });
             await vm.initProject();
-            setGuiStore(guiInterface.EDITOR);
+            // 项目创建后 CREATE_PROJECT 事件会自动打开 blockly 标签，无需再切换界面
         }
     };
     const handleBackClick = () => {
-        if (nowTab === tabs.CONFIG) {
-            // TODO: 制作兼容后再使用scheme这个tab
-            setGuiStore(guiInterface.START);
-            // setTab(tabs.SCHEME);
-        } else {
-            // 回到主页
-            setGuiStore(guiInterface.START);
-        }
+        // 关闭「创建项目」标签，并重新打开「欢迎」标签
+        // 需要联动，不然看起来怪怪的
+        useTabsStore.getState().closeTab(CREATE_PROJECT_TAB_ID);
+        useTabsStore.getState().openSpecialTab('welcome');
     };
     return (
         <div className={styles.main}>

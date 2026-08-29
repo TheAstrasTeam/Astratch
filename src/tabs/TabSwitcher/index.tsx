@@ -15,9 +15,8 @@ import classNames from 'classnames';
 import styles from './index.module.scss';
 import { useTabSwitcherStore } from '../../stores/useTabSwitcherStore';
 import { useTabsStore } from '../../stores/useTabsStore';
-import { TargetModes } from '../../types/vm/vm';
-import SpriteIcon from '../../assets/sprite.svg?react';
-import ModuleIcon from '../../assets/module.svg?react';
+import { getTabTitle } from '../tabUtils';
+import { TabIcon } from '../TabIcon';
 
 const Entry = ({ tabID, selected }: { tabID: string; selected: boolean }): React.ReactNode => {
     const tab = useTabsStore(state => state.tabs.find(t => t.id === tabID));
@@ -40,12 +39,8 @@ const Entry = ({ tabID, selected }: { tabID: string; selected: boolean }): React
                 useTabSwitcherStore.getState().reset();
             }}
         >
-            {tab.mode === TargetModes.ENTITY ? (
-                <SpriteIcon className={styles.entryIcon} />
-            ) : (
-                <ModuleIcon className={styles.entryIcon} />
-            )}
-            <span className={styles.entryTitle}>{tab.title}</span>
+            <TabIcon tab={tab} className={styles.entryIcon} />
+            <span className={styles.entryTitle}>{getTabTitle(tab)}</span>
         </div>
     );
 };

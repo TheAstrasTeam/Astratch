@@ -8,10 +8,9 @@ import { t } from 'i18next';
 import classNames from 'classnames';
 import styles from './index.module.scss';
 import { useTabsStore } from '../../stores/useTabsStore';
-import { TargetModes } from '../../types/vm/vm';
 import CloseIcon from '../../assets/close.svg?react';
-import SpriteIcon from '../../assets/sprite.svg?react';
-import ModuleIcon from '../../assets/module.svg?react';
+import { getTabTitle } from '../tabUtils';
+import { TabIcon } from '../TabIcon';
 import { useState, useCallback, type MouseEvent as ReactMouseEvent } from 'react';
 import { useContextMenu } from '../../gui/contextMenu';
 import { AllContextMenu } from '../../types/gui';
@@ -136,13 +135,9 @@ const TabBar = (): React.ReactNode => {
                         onTouchMove={menuTrigger.onTouchMove}
                         onTouchEnd={menuTrigger.onTouchEnd}
                     >
-                        {tab.mode === TargetModes.ENTITY ? (
-                            <SpriteIcon className={styles.tabIcon} />
-                        ) : (
-                            <ModuleIcon className={styles.tabIcon} />
-                        )}
-                        <span className={styles.tabTitle} title={tab.title}>
-                            {tab.title}
+                        <TabIcon tab={tab} className={styles.tabIcon} />
+                        <span className={styles.tabTitle} title={getTabTitle(tab)}>
+                            {getTabTitle(tab)}
                         </span>
                         <button
                             className={styles.closeButton}

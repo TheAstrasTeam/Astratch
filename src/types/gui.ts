@@ -29,6 +29,9 @@ export interface IGuiSettings {
     guiTheme: TGuiThemeMap;
 }
 
+// [已停用] 界面切换已由 Tabs（useTabsStore）接管，开始/创建项目/编辑器均作为标签页存在。
+// guiInterface 及其状态保留仅作兼容与参考，不再被渲染逻辑使用。
+// 还是一句话，扣式咯牛逼！
 export const guiInterface = {
     /**
      * 程序一开始的 “开始” 页面

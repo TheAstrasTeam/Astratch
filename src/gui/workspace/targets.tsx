@@ -9,8 +9,7 @@ import { events, type ITarget, type IVM, type TTargetMode } from '../../types/vm
 import styles from './targets.module.scss';
 
 import { t } from 'i18next';
-import { guiInterface } from '../../types/gui';
-import { useGUIStore } from '../../stores/useGUIStore';
+import { useTabsStore } from '../../stores/useTabsStore';
 import { modal } from '../../components/Modal/modal';
 import { PromptModal } from '../../components/modal_prompt';
 import { useEffect, useState } from 'react';
@@ -30,8 +29,6 @@ import BackIcon from '../../assets/back.svg?react';
 import Hr from '../../components/hr';
 
 const TargetsPanel = ({ vm }: { vm: IVM }) => {
-    const setInterface = useGUIStore(state => state.setInterface);
-
     const [currentTargetTab, setCurrentTargetTab] = useState<TTargetMode>('entity');
 
     const handleSwitchTargetTab = (tab: TTargetMode) => {
@@ -70,7 +67,7 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
     };
 
     const handleCreateProject = () => {
-        setInterface(guiInterface.CREATE_PROJECT);
+        useTabsStore.getState().openSpecialTab('create_project');
     };
 
     const [selectedTargetID, setSelectedTargetID] = useState(vm.runtime.editingTargetID);

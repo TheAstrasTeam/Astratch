@@ -13,7 +13,7 @@ import WorkSpace from './workspace';
 
 import styles from './index.module.scss';
 import './public.scss';
-import { useGUIStore, useLoadingStore } from '../stores/useGUIStore';
+import { useLoadingStore } from '../stores/useGUIStore';
 import Loading from './loading';
 import MenuBar from './menubar';
 import { ContextMenuLayer } from './contextMenu';
@@ -21,20 +21,19 @@ import { shortcutManager } from '../lib/ShortcutManager';
 import { SHORTCUTS } from '../types/lib';
 import QuickOpen from '../tabs/QuickOpen';
 import { useEffect, useState } from 'react';
-import { guiInterface } from '../types/gui';
 import {
     openSettingsModal,
     saveCurrentProject,
     saveCurrentProjectAs,
     selectProjectThenJump,
 } from '../utils/ash-gui';
+import { useTabsStore } from '../stores/useTabsStore';
 import { addonManager, buildAddonContext } from '../addons';
 
 const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
     // 多数 GUI 组件直接调用 i18next.t；以 language 作为 key 可让整棵界面重新计算文本。
     const [language, setLanguage] = useState(i18next.language);
     const isLoading: boolean = useLoadingStore(state => state.loading);
-    const setInterface = useGUIStore(state => state.setInterface);
 
     useEffect(() => {
         const handleLanguageChanged = (nextLanguage: string) => {
@@ -56,9 +55,9 @@ const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
             [SHORTCUTS.SAVE_PROJECT.id]: () => saveCurrentProject(vm),
             [SHORTCUTS.SAVE_PROJECT_AS.id]: () => saveCurrentProjectAs(vm),
             [SHORTCUTS.NEW_PROJECT.id]: () => {
-                setInterface(guiInterface.CREATE_PROJECT);
+                useTabsStore.getState().openSpecialTab('create_project');
             },
-            [SHORTCUTS.OPEN_PROJECT.id]: () => selectProjectThenJump(vm, setInterface),
+            [SHORTCUTS.OPEN_PROJECT.id]: () => selectProjectThenJump(vm),
             [SHORTCUTS.OPEN_SETTINGS.id]: () => {
                 openSettingsModal();
             },
@@ -67,7 +66,7 @@ const GUI = ({ vm }: { vm: IVM }): React.ReactNode => {
         return () => {
             unbindShortcutCommands();
         };
-    }, [vm, setInterface]);
+    }, [vm]);
 
     return (
         <div key={language} className={styles.app}>

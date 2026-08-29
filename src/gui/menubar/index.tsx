@@ -10,8 +10,8 @@ import Logo from '../../assets/ashIconTransparent.svg?react';
 import { t } from 'i18next';
 import { MenuItem, MenuDivider } from '@szhsin/react-menu';
 import { useContextMenu } from '../contextMenu';
-import { AllContextMenu, guiInterface } from '../../types/gui';
-import { useGUIStore } from '../../stores/useGUIStore';
+import { AllContextMenu } from '../../types/gui';
+import { useTabsStore } from '../../stores/useTabsStore';
 import {
     openMenuByMouseDown,
     openSettingsModal,
@@ -31,12 +31,11 @@ export const MenuTextWithShortCut = ({ text, shortcut }: { text: string; shortcu
 );
 
 const MenuBar = ({ vm }: { vm: IVM }): React.ReactNode => {
-    const setInterface = useGUIStore(state => state.setInterface);
     const { openMenu: openFileMenu } = useContextMenu(AllContextMenu.MENUBAR_FILE, close => (
         <>
             <MenuItem
                 onClick={() => {
-                    setInterface(guiInterface.CREATE_PROJECT);
+                    useTabsStore.getState().openSpecialTab('create_project');
                 }}
             >
                 <MenuTextWithShortCut
@@ -46,7 +45,7 @@ const MenuBar = ({ vm }: { vm: IVM }): React.ReactNode => {
                     )}
                 />
             </MenuItem>
-            <MenuItem onClick={() => void selectProjectThenJump(vm, setInterface)}>
+            <MenuItem onClick={() => void selectProjectThenJump(vm)}>
                 <MenuTextWithShortCut
                     text={t('gui:menu.open')}
                     shortcut={shortcutManager.formatHotKey(
@@ -139,6 +138,25 @@ const MenuBar = ({ vm }: { vm: IVM }): React.ReactNode => {
         </>
     ));
 
+    const { openMenu: openHelpMenu } = useContextMenu(AllContextMenu.MENUBAR_HELP, close => (
+        <>
+        {/* 帮助列表需要一个 欢迎 按钮，AEN欢迎你 */}
+            <MenuItem
+                onClick={() => {
+                    useTabsStore.getState().openSpecialTab('welcome');
+                    close();
+                }}
+            >
+                <MenuTextWithShortCut text={t('gui:menu.welcome')} shortcut='' />
+            </MenuItem>
+            <MenuDivider />
+            {/* 先放个关于按钮在这占位 */}
+            <MenuItem onClick={close}>
+                <MenuTextWithShortCut text={t('gui:menu.about')} shortcut='' />
+            </MenuItem>
+        </>
+    ));
+
     return (
         <div className={styles.menubarContents}>
             <div className={styles.menubarContentsLeft}>
@@ -151,7 +169,9 @@ const MenuBar = ({ vm }: { vm: IVM }): React.ReactNode => {
                         {t('gui:menu.edit')}
                     </button>
                     <button>{t('gui:menu.run')}</button>
-                    <button>{t('gui:menu.help')}</button>
+                    <button onMouseDown={openMenuByMouseDown(openHelpMenu)}>
+                        {t('gui:menu.help')}
+                    </button>
                 </div>
             </div>
             <div className={styles.menubarContentsCenter}>

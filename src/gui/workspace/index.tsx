@@ -19,10 +19,7 @@ import EmptyTip2 from '../../assets/empty2.svg?react';
 
 import { t } from 'i18next';
 import SelectBar from '../../components/workspace/selectBar';
-import { useGUIStore } from '../../stores/useGUIStore';
-import { guiInterface } from '../../types/gui';
-import Start from '../start';
-import CreateProject from '../createProjet';
+import { getSpecialTabDefinition } from '../../tabs/specialTabs';
 import TargetsPanel from './targets';
 import AddonsPanel from './addons';
 import SplitPane from '../../components/splitPane';
@@ -32,6 +29,10 @@ import { shortcutManager } from '../../lib/ShortcutManager';
 import { SHORTCUTS } from '../../types/lib';
 import TabBar from '../../tabs/TabBar';
 import { useTabsStore } from '../../stores/useTabsStore';
+
+// 应用生命周期内是否已执行过「首挂载自动打开欢迎标签」。
+// 模块级：语言切换等重挂组件也不会重复触发。
+let welcomeTabAutoOpened = false;
 
 const TabButton = ({
     id,
@@ -57,13 +58,23 @@ const TabButton = ({
 };
 
 const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
-    const nowGuiInterface = useGUIStore(state => state.guiInterface);
     const [, setTargetsRevision] = useState(0);
     const tabSelected = useSidebarStore(state => state.selectedTab);
     const tabs = useTabsStore(state => state.tabs);
     const activeTabId = useTabsStore(state => state.activeTabId);
 
     const activeTab = activeTabId ? tabs.find(tab => tab.id === activeTabId) : null;
+
+    // 应用启动后首次挂载且没有任何标签时，自动打开「欢迎」标签页。
+    // 用模块级标记保证整个应用生命周期只执行一次（语言切换等会重挂组件）。
+    useEffect(() => {
+        if (welcomeTabAutoOpened) return;
+        welcomeTabAutoOpened = true;
+        const { tabs: currentTabs, activeTabId: currentActive } = useTabsStore.getState();
+        if (currentTabs.length === 0 && currentActive === null) {
+            useTabsStore.getState().openSpecialTab('welcome');
+        }
+    }, []);
 
     useEffect(() => {
         const handleTargetsUpdate = () => {
@@ -80,6 +91,9 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
             }
             const latest = vm.runtime.getEditingTarget();
             if (latest) useTabsStore.getState().openTab(latest.id, latest.name, latest.mode);
+            // 创建/打开项目成功后进入编辑器，关闭欢迎、创建项目等内置页面标签
+            // 这样会显示第一个角色
+            useTabsStore.getState().closeSpecialTabs();
         };
         // 任何位置触发目标切换时，同步打开/激活对应标签。
         // 保证左侧列表、创建目标、以及其它调用 switchTarget 的路径行为一致。
@@ -127,21 +141,21 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
 
     const renderEditorContent = () => {
         const showEmptyTip = () => Math.random() < 0.5;
-        if (nowGuiInterface === guiInterface.START) {
-            return <Start vm={vm} />;
-        }
-        if (nowGuiInterface === guiInterface.CREATE_PROJECT) {
-            return <CreateProject vm={vm} />;
-        }
-        // 编辑器
-        if (activeTab) return <BlocklyWorkspace vm={vm} targetId={activeTab.targetId} />;
-        else
+        // 无标签时保持显示 empty 图片
+        if (!activeTab) {
             return (
                 <div className={styles.empty}>
                     {showEmptyTip() ? <EmptyTip /> : <EmptyTip2 />}
                     <h1>{t('gui:selectNothing')}</h1>
                 </div>
             );
+        }
+        // 内置页面标签（欢迎/创建项目等）由注册表渲染
+        if (activeTab.type !== 'blockly') {
+            return getSpecialTabDefinition(activeTab.type).render(vm);
+        }
+        // 编辑器（blockly 工作区）
+        return <BlocklyWorkspace vm={vm} targetId={activeTab.targetId} />;
     };
     const renderToolBar = () => {
         if (tabSelected === allBuiltInTabs.TARGETS)

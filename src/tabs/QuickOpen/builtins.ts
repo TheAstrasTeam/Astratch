@@ -11,9 +11,8 @@
 
 import type { IQuickOpenCommand } from '../../types/gui';
 import { allBuiltInTabs } from '../../types/vm/vm';
-import { guiInterface } from '../../types/gui';
-import { useGUIStore } from '../../stores/useGUIStore';
 import { useSidebarStore } from '../../stores/useSidebarStore';
+import { useTabsStore } from '../../stores/useTabsStore';
 import {
     openSettingsModal,
     saveCurrentProject,
@@ -27,14 +26,14 @@ export const builtinCommands: readonly IQuickOpenCommand[] = [
         title: 'gui:menu.new',
         keywords: 'new create',
         run: () => {
-            useGUIStore.getState().setInterface(guiInterface.CREATE_PROJECT);
+            useTabsStore.getState().openSpecialTab('create_project');
         },
     },
     {
         id: 'builtin.openProject',
         title: 'gui:menu.open',
         keywords: 'open load',
-        run: vm => void selectProjectThenJump(vm, useGUIStore.getState().setInterface),
+        run: vm => void selectProjectThenJump(vm),
     },
     {
         id: 'builtin.saveProject',
@@ -47,6 +46,14 @@ export const builtinCommands: readonly IQuickOpenCommand[] = [
         title: 'gui:menu.saveAs',
         keywords: 'save as export',
         run: vm => void saveCurrentProjectAs(vm),
+    },
+    {
+        id: 'builtin.welcome',
+        title: 'gui:menu.welcome',
+        keywords: 'home welcome start',
+        run: () => {
+            useTabsStore.getState().openSpecialTab('welcome');
+        },
     },
     {
         id: 'builtin.settings',

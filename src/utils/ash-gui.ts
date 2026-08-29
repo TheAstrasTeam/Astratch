@@ -6,7 +6,6 @@
 
 // 关于部分常用 GUI 互动的实用工具
 
-import { guiInterface, type IGuiInterface } from '../types/gui';
 import type { IVM } from '../types/vm/vm';
 import { Toast } from '../lib/ToastManager';
 import { spawnRandomString } from './ash-data';
@@ -15,13 +14,13 @@ import { modal } from '../components/Modal/modal';
 import { SettingsModal } from '../components/modal_settings';
 
 /**
- * 选择项目并跳转到编辑器
+ * 选择项目并加载。
+ * 加载成功后 vm 会触发 CREATE_PROJECT 事件，界面由 Tabs 驱动自动打开 blockly 标签，
+ * 因此这里不再负责界面跳转。
  * @param vm VM 实例
- * @param setInterface Zustand 跳转函数
  */
-const selectProjectThenJump = async (vm: IVM, setInterface: (state: IGuiInterface) => void) => {
-    const loadedProject = await vm.loadProject();
-    if (loadedProject) setInterface(guiInterface.EDITOR);
+const selectProjectThenJump = async (vm: IVM) => {
+    await vm.loadProject();
 };
 
 /**
