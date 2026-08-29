@@ -77,7 +77,7 @@ export class ProjectManager implements IProjectManager {
         return await path.getDirectoryHandle(name, { create: true });
     }
 
-    async createFile(path: DirectoryHandle, name: string, content: string) {
+    async createFile(path: DirectoryHandle, name: string, content: string | BlobPart | ArrayBuffer) {
         if (!path) return false;
         const fileHandle = await path.getFileHandle(name, { create: true });
         const fileWrite = await fileHandle.createWritable();

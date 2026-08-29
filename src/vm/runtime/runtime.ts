@@ -29,6 +29,8 @@ import { sendError } from '../../utils/debug';
 import { t } from 'i18next';
 import Target from './target';
 import Folder from './folder';
+import { AssetManager } from './data/assets';
+import type { IAssetManager } from '../../types/vm/assets';
 
 /**
  * 运行时，管理关于项目的东西
@@ -45,6 +47,7 @@ class Runtime implements IRuntime {
     editingTargetID: string;
     DEFAULT_ENTITYINFO: IEntityInfo;
     folders: Map<TTargetMode, IFolder[]>;
+    assets: IAssetManager;
 
     private emit: TEmit = (id: TEvents, data?: object) => {
         this.vm.emit(id, data);
@@ -75,6 +78,11 @@ class Runtime implements IRuntime {
          * 文件夹系统
          */
         this.folders = new Map();
+
+        /**
+         * 资源池
+         */
+        this.assets = new AssetManager(vm);
         // 初始化
         this.folders.set('entity', []);
         this.folders.set('module', []);

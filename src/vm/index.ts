@@ -29,6 +29,7 @@ import { t } from 'i18next';
 import { modal } from '../components/Modal/modal';
 import { ConfirmModal } from '../components/modal_confirm';
 import { sendError } from '../utils/debug';
+import type { IAsset } from '../types/vm/assets.ts';
 
 /**
  * 虚拟机，管理整个ASH
@@ -99,6 +100,9 @@ export class VM implements IVM {
     }
 
     async saveProject() {
+        const checkResult = await this.projectManager.checkProjectCanSave();
+        if (!checkResult.pass) sendError(checkResult.result, 'error');
+
         const saveTargets = async (mode: TTargetMode, folder: DirectoryHandle) => {
             // 存储所有文件名，这用来判断是否是已存在target名称
             const allTargetNames: string[] = [];
@@ -138,26 +142,57 @@ export class VM implements IVM {
                     if (!allTargetNames.includes(targetName))
                         await this.projectManager.removeFile(folder, targetName);
         };
-
-        const checkResult = await this.projectManager.checkProjectCanSave();
-        if (!checkResult.pass) sendError(checkResult.result, 'error');
-
-        // TODO: 资源
-        await this.projectManager.createFolder(this.projectManager.folderHandle, 'assets');
-
-        const entityHandle = await this.projectManager.createFolder(
-            this.projectManager.folderHandle,
-            'entitys',
-        );
-        if (!entityHandle) sendError(t('err.fs.entityHandleLost'));
-        else await saveTargets('entity', entityHandle);
+        const saveAssets = async (folder: DirectoryHandle) => {
+            const assets = this.runtime.assets.listAssets();
+            const metaJSON: Record<string, Omit<IAsset, 'blob'>> = {};
+            for(const asset of assets){
+                // 去除blob
+                const { blob, ...assetResult } = asset;
+                metaJSON[asset.id] = {
+                    ...assetResult,
+                };
+                // 生成blob
+                await this.projectManager.createFile(
+                    folder,
+                    `${asset.id}${asset.extension}`,
+                    blob
+                )
+            }
+            await this.projectManager.createFile(
+                folder,
+                projectFileNames.assetsMeta,
+                JSON.stringify(metaJSON),
+            );
+        };
 
         const moduleHandle = await this.projectManager.createFolder(
             this.projectManager.folderHandle,
             'modules',
         );
-        if (!moduleHandle) sendError(t('err.fs.moduleHandleLost'));
-        else await saveTargets('module', moduleHandle);
+        if (!moduleHandle) {
+            sendError(t('err.fs.moduleHandleLost'));
+            return;
+        }
+        const entityHandle = await this.projectManager.createFolder(
+            this.projectManager.folderHandle,
+            'entitys',
+        );
+        if (!entityHandle) {
+            sendError(t('err.fs.entityHandleLost'));
+            return;
+        }
+        const assetHandle = await this.projectManager.createFolder(
+            this.projectManager.folderHandle,
+            'assets',
+        );
+        if (!assetHandle) {
+            sendError(t('err.fs.assetHandleLost'));
+            return;
+        }
+        await saveAssets(assetHandle);
+
+        await saveTargets('entity', entityHandle);
+        await saveTargets('module', moduleHandle);
 
         const entitysFolder = this.runtime.folders.get('entity') ?? [];
         const modulesFolder = this.runtime.folders.get('module') ?? [];

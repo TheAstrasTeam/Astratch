@@ -7,6 +7,7 @@
 import type { IBlocks, ICustomFunction, IWorkspaceState } from './blocks';
 import * as Blockly from 'blockly/core';
 import type { TGuiAccent, TGuiTheme } from '../gui';
+import type { IAssetManager } from './assets';
 
 export const DATA_VISIBILITY = {
     PUBLIC: 'public',
@@ -309,6 +310,10 @@ export interface IRuntime {
      */
     folders: Map<TTargetMode, IFolder[]>;
     /**
+     * 资源池
+     */
+    assets: IAssetManager;
+    /**
      * 对于实体额外的info
      */
     DEFAULT_ENTITYINFO: IEntityInfo;
@@ -455,7 +460,7 @@ export interface IProjectManager {
     createFile(
         path: DirectoryHandle,
         name: string,
-        content: string,
+        content: string | BlobPart | ArrayBuffer,
     ): Promise<FileSystemFileHandle | false>;
     /**
      * 返回这个文件夹内是不是空的
@@ -511,6 +516,7 @@ export const projectFileNames = {
     meta: 'projectMeta.json',
     targetMeta: 'targetMeta.json',
     targetBlocks: 'targetBlocks.json',
+    assetsMeta: 'assetsMeta.json',
 } as const;
 
 export interface IVM {
