@@ -40,11 +40,8 @@ impl CanvasWebGPU {
             position: fixed; \
             top: 0; \
             left: 0; \
-            width: 100vw; \
-            height: 100vh; \
             margin: 0; \
-            padding: 0; \
-            background: #66ccff;",
+            padding: 0;",
         )?;
         Ok(Self { canvas })
     }
@@ -53,5 +50,11 @@ impl CanvasWebGPU {
         let width = self.canvas.width();
         let height = self.canvas.height();
         (width, height)
+    }
+
+    pub fn resize(&self, width: u32, height: u32) -> Result<(), JsValue> {
+        self.canvas.set_width(width);
+        self.canvas.set_height(height);
+        Ok(())
     }
 }

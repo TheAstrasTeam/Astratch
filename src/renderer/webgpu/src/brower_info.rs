@@ -1,6 +1,7 @@
 use wasm_bindgen::JsValue;
 use web_sys::window;
 
+// 获取web窗口尺寸
 pub fn get_screen_size() -> Result<(u32, u32), JsValue> {
     let _window = window().ok_or_else(|| JsValue::from_str("No window"))?;
 

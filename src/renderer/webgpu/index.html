@@ -1,13 +1,60 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8" />
-        <title>test</title>
-    </head>
-    <body>
-        <script type="module">
-            import init from './pkg/renderer.js';
+
+<head>
+    <meta charset="UTF-8" />
+    <title>test</title>
+</head>
+
+<body>
+    <script type="module">
+        import init, { app_render, init_app, submit_triangles, clear_triangles } from './pkg/renderer.js';
+
+        async function main() {
+            console.log("正在加载Wasm模块");
             await init();
-        </script>
-    </body>
+
+            await init_app();
+            function drawTriangles(triList) {
+                clear_triangles()
+                const buf = [];
+                const s = 1 / 255;
+                for (const t of triList) {
+                    //顶点0
+                    buf.push(t.x0, t.y0, t.r0 * s, t.g0 * s, t.b0 * s, t.a0);
+                    //顶点1
+                    buf.push(t.x1, t.y1, t.r1 * s, t.g1 * s, t.b1 * s, t.a1);
+                    //顶点2
+                    buf.push(t.x2, t.y2, t.r2 * s, t.g2 * s, t.b2 * s, t.a2);
+                }
+                submit_triangles(buf);
+            }
+
+            drawTriangles([
+                {
+                    x0: -0.5, y0: 0.5, r0: 255, g0: 0, b0: 0, a0: 1.0,
+                    x1: 0.5, y1: 0.5, r1: 0, g1: 255, b1: 0, a1: 1.0,
+                    x2: 0.0, y2: -0.5, r2: 0, g2: 0, b2: 255, a2: 1.0,
+                },
+                {
+                    x0: 0.1, y0: 0.1, r0: 102, g0: 204, b0: 255, a0: 0.6,
+                    x1: 0.7, y1: 0.1, r1: 102, g1: 204, b1: 255, a1: 0.6,
+                    x2: 0.4, y2: 0.6, r2: 102, g2: 204, b2: 255, a2: 0.6,
+                }
+            ]);
+
+            // 渲染循环
+            function loop() {
+                app_render();
+                requestAnimationFrame(loop);
+            }
+            loop();
+
+
+        }
+
+        main().catch(e => console.error("程序启动失败", e));
+    </script>
+</body>
+
 </html>
