@@ -290,8 +290,70 @@ export class VM implements IVM {
                 }
             }
         };
+        const loadAssets = async (folder: DirectoryHandle) => {
+            const assetsMetaOrigin = await this.projectManager.getFile(
+                folder,
+                projectFileNames.assetsMeta,
+            );
+            if (!assetsMetaOrigin) {
+                sendError({ text: 'vm:err.assets.metaLost' });
+                return;
+            }
+            const assetMetaText = await (await assetsMetaOrigin.getFile()).text();
+            const assetsMeta = JSON.parse(assetMetaText) as Record<string, Omit<IAsset, 'blob'>>;
+
+            const assetsToLoad = Object.values(assetsMeta);
+
+            await Promise.allSettled(
+                assetsToLoad.map(async asset => {
+                    try {
+                        const blobHandle = await this.projectManager.getFile(
+                            folder,
+                            `${asset.id}${asset.extension}`,
+                        );
+                        if (!blobHandle) {
+                            sendError(
+                                {
+                                    text: 'vm:err.assets.assetLost',
+                                    params: { name: asset.name },
+                                },
+                                'warn',
+                            );
+                            return;
+                        }
+                        const blob = await (await blobHandle.getFile()).arrayBuffer();
+
+                        // 校验哈希
+                        if ((await this.runtime.assets.spawnHash(blob)) !== asset.hash) {
+                            sendError(
+                                {
+                                    text: 'vm:err.assets.hashCompareFailed',
+                                },
+                                'warn',
+                            );
+                            return;
+                        }
+
+                        await this.runtime.assets.loadAsset({
+                            ...asset,
+                            blob,
+                        });
+                    } catch {
+                        sendError(
+                            { text: 'vm:err.assets.loadFailed', params: { name: asset.name } },
+                            'warn',
+                        );
+                    }
+                }),
+            );
+        };
 
         await this.selectProject();
+        const assetsFolderHandle = await this.projectManager.getFolder(
+            this.projectManager.folderHandle,
+            'assets',
+        );
+        if (assetsFolderHandle) await loadAssets(assetsFolderHandle);
         // 获取元文件句柄
         const metaFileHandle = await this.projectManager.getFile(
             this.projectManager.folderHandle,
