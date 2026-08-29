@@ -6,7 +6,7 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ProjectManager } from '../../src/vm/project';
+import { ProjectManager } from '../../src/vm/project/projectManager';
 import { allProjectCheckError, projectFileNames, type IVM } from '../../src/types/vm';
 
 // ---- 模拟 FileSystemDirectoryHandle ----

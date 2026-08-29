@@ -23,7 +23,7 @@ import {
     TargetModes,
     type TTargetInfo,
 } from '../types/vm';
-import { ProjectManager } from './project';
+import { ProjectManager } from './project/projectManager';
 import { addonManager } from '../addons/manager';
 import { t } from 'i18next';
 import { modal } from '../components/Modal/modal';
