@@ -140,7 +140,7 @@ const MenuBar = ({ vm }: { vm: IVM }): React.ReactNode => {
 
     const { openMenu: openHelpMenu } = useContextMenu(AllContextMenu.MENUBAR_HELP, close => (
         <>
-        {/* 帮助列表需要一个 欢迎 按钮，AEN欢迎你 */}
+            {/* 帮助列表需要一个 欢迎 按钮，AEN欢迎你 */}
             <MenuItem
                 onClick={() => {
                     useTabsStore.getState().openSpecialTab('welcome');

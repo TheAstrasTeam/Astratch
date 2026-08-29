@@ -79,6 +79,15 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
     useEffect(() => {
         const handleTargetsUpdate = () => {
             setTargetsRevision(revision => revision + 1);
+            // 目标被删除/移动时，同步关闭目标已不存在的 blockly 标签，
+            // 避免留下无法加载的幽灵标签。
+            const { tabs } = useTabsStore.getState();
+            const removedTabIDs = tabs
+                .filter(tab => tab.type === 'blockly' && !vm.runtime.targets.has(tab.targetId))
+                .map(tab => tab.id);
+            removedTabIDs.forEach(id => {
+                useTabsStore.getState().closeTab(id);
+            });
         };
         const handleProjectCreated = () => {
             const editingTargetID = vm.runtime.getEditingTarget()?.id ?? '';
