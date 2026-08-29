@@ -532,40 +532,40 @@ export interface IBlocks {
      * 设置一个语言
      * @param lang ASH 兼容的 i18n
      */
-    setLanguage: (lang: 'en' | 'zh-Hans') => void;
+    setLanguage(lang: 'en' | 'zh-Hans'): void;
     /**
      * 销毁工作区
      *
      * @returns 是否销毁成功
      */
-    dispose: () => boolean;
+    dispose(): boolean;
     /**
      * 创建一个工作区
      *
      * @param restore 是否重置，若为 `false` 则若已初始化则不重置
      * @returns 是否创建成功
      */
-    createWorkspace: (DOM: HTMLDivElement, restart?: boolean) => Promise<boolean>;
+    createWorkspace(DOM: HTMLDivElement, restart?: boolean): Promise<boolean>;
     /**
      * 重启工作区
      */
-    restartWorkspace: () => Promise<void>;
+    restartWorkspace(): Promise<void>;
     /**
      * 延迟释放工作区（供 React 组件 cleanup 调用）
      */
-    scheduleDispose: () => void;
+    scheduleDispose(): void;
     /**
      * 取消 scheduleDispose 调度的释放
      */
-    cancelScheduledDispose: () => void;
+    cancelScheduledDispose(): void;
     /**
      * 初始化 Blockly，载入插件什么的
      */
-    init: () => Promise<void>;
+    init(): Promise<void>;
     /**
      * 刷新工作区的大小
      */
-    refreshBlocklySize: () => void;
+    refreshBlocklySize(): void;
 }
 
 // 设置吸附半径，48来自源码

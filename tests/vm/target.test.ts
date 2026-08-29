@@ -227,7 +227,7 @@ describe('Target.cloneAsNode', () => {
         expect(node).toBeInstanceOf(Target);
         expect(node.type).toBe('target');
         expect(node.id).toBe(target.id);
-        expect(node.rename).toBeTypeOf('function');
+        expect(node.rename.bind(this)).toBeTypeOf('function');
         // 浅拷贝：基本类型互不影响，但节点自身可用方法
         node.rename('改名');
         expect(node.name).toBe('改名');
@@ -293,7 +293,7 @@ describe('Target 数据序列化', () => {
         const body: ICustomFunction = {
             body: [
                 { type: 'text', text: '计算' },
-                { type: ['Number', 'String'] , text: 'value' },
+                { type: ['Number', 'String'], text: 'value' },
             ],
             color: { primary: '#123456' },
             id: 'a',

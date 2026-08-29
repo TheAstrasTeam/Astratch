@@ -100,5 +100,5 @@ export interface IQuickOpenCommand {
     /**
      * 执行命令；vm 由调用方（QuickOpen 组件）在执行时传入
      */
-    run: (vm: import('./vm/vm').IVM) => void | Promise<void>;
+    run(vm: import('./vm/vm').IVM): void | Promise<void>;
 }

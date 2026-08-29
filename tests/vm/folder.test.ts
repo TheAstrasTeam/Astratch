@@ -105,7 +105,7 @@ describe('Folder.cloneAsNode', () => {
         expect(node).toBeInstanceOf(Folder);
         expect(node.type).toBe('folder');
         expect(node.id).toBe('f1');
-        expect(node.rename).toBeTypeOf('function');
+        expect(node.rename.bind(this)).toBeTypeOf('function');
         // 浅拷贝：基本类型互不影响，但节点自身可用方法
         node.rename('改名');
         expect(node.name).toBe('改名');

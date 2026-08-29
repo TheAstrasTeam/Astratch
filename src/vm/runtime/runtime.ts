@@ -22,7 +22,7 @@ import {
     type TTargetInfo,
     type TViewportUpdateEvent,
 } from '../../types/vm/vm';
-import Settings from './settings/index';
+import Settings from './data/settings';
 import Blocks from './blocks';
 import * as Blockly from 'blockly';
 import { sendError } from '../../utils/debug';

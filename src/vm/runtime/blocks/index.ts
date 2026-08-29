@@ -4,7 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { OPCODES, type IBlocks, type IWorkspaceState, type Language } from '../../../types/vm/blocks';
+import {
+    OPCODES,
+    type IBlocks,
+    type IWorkspaceState,
+    type Language,
+} from '../../../types/vm/blocks';
 import * as Blockly from 'blockly';
 // 导入两个插件试试
 import * as AstratchToolbox from '../../../../plugins/astratch-toolbox/src';
