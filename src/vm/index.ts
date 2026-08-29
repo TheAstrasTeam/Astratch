@@ -101,7 +101,7 @@ export class VM implements IVM {
 
     async saveProject() {
         const checkResult = await this.projectManager.checkProjectCanSave();
-        if (!checkResult.pass) sendError(checkResult.result, 'error');
+        if (!checkResult.pass) sendError({ text: checkResult.result ?? '' }, 'error');
 
         const saveTargets = async (mode: TTargetMode, folder: DirectoryHandle) => {
             // 存储所有文件名，这用来判断是否是已存在target名称
@@ -135,7 +135,7 @@ export class VM implements IVM {
                 }
             }
             const targetNames = await this.projectManager.listAllFileName(folder);
-            if (!targetNames) sendError(t('err.fs.cannotFoundTargets'));
+            if (!targetNames) sendError({ text: 'vm:err.fs.cannotFoundTargets' });
             else
                 // 删除不应有的target
                 for (const targetName of targetNames)
@@ -145,18 +145,14 @@ export class VM implements IVM {
         const saveAssets = async (folder: DirectoryHandle) => {
             const assets = this.runtime.assets.listAssets();
             const metaJSON: Record<string, Omit<IAsset, 'blob'>> = {};
-            for(const asset of assets){
+            for (const asset of assets) {
                 // 去除blob
                 const { blob, ...assetResult } = asset;
                 metaJSON[asset.id] = {
                     ...assetResult,
                 };
                 // 生成blob
-                await this.projectManager.createFile(
-                    folder,
-                    `${asset.id}${asset.extension}`,
-                    blob
-                )
+                await this.projectManager.createFile(folder, `${asset.id}${asset.extension}`, blob);
             }
             await this.projectManager.createFile(
                 folder,
@@ -170,7 +166,7 @@ export class VM implements IVM {
             'modules',
         );
         if (!moduleHandle) {
-            sendError(t('err.fs.moduleHandleLost'));
+            sendError({ text: 'vm:err.fs.moduleHandleLost' });
             return;
         }
         const entityHandle = await this.projectManager.createFolder(
@@ -178,7 +174,7 @@ export class VM implements IVM {
             'entitys',
         );
         if (!entityHandle) {
-            sendError(t('err.fs.entityHandleLost'));
+            sendError({ text: 'vm:err.fs.entityHandleLost' });
             return;
         }
         const assetHandle = await this.projectManager.createFolder(
@@ -186,7 +182,7 @@ export class VM implements IVM {
             'assets',
         );
         if (!assetHandle) {
-            sendError(t('err.fs.assetHandleLost'));
+            sendError({ text: 'vm:err.fs.assetHandleLost' });
             return;
         }
         await saveAssets(assetHandle);

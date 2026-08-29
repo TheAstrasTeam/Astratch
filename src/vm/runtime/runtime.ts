@@ -26,7 +26,6 @@ import Settings from './data/settings';
 import Blocks from './blocks';
 import * as Blockly from 'blockly';
 import { sendError } from '../../utils/debug';
-import { t } from 'i18next';
 import Target from './target';
 import Folder from './folder';
 import { AssetManager } from './data/assets';
@@ -181,7 +180,7 @@ class Runtime implements IRuntime {
 
     addFolder(mode: TTargetMode, meta: TFolderInfo) {
         if (this.folders.get(mode)?.find(folder => folder.id === meta.id))
-            sendError(t('err.fs.alreadyExist'));
+            sendError({ text: 'vm:err.fs.alreadyExist' });
         this.folders.get(mode)?.push(Folder.fromJSON(meta, this.emit));
         this.vm.emit(events.UPDATE_TARGET_STRUCTURE);
     }
@@ -268,7 +267,10 @@ class Runtime implements IRuntime {
         const target = this.getTargetByID(targetID);
         if (!target) return false;
         if (newParentID && !this.getFolderByID(mode, newParentID)) {
-            sendError(t('vm:err.moveTarget.folderNotFound', { id: newParentID }), 'warn');
+            sendError(
+                { text: 'vm:err.moveTarget.folderNotFound', params: { id: newParentID } },
+                'warn',
+            );
             return false;
         }
         target.setParent(newParentID);
@@ -280,16 +282,14 @@ class Runtime implements IRuntime {
         if (newParentID)
             if (!this.getFolderByID(mode, newParentID)) {
                 sendError(
-                    t('vm:err.moveTarget.parentUndefined', {
-                        id: newParentID,
-                    }),
+                    { text: 'vm:err.moveTarget.parentUndefined', params: { id: newParentID } },
                     'warn',
                 );
                 return false;
             }
         if (folder) {
             if (folder.id === newParentID) {
-                sendError(t('vm:err.moveFolder.inSelf'), 'warn');
+                sendError({ text: 'vm:err.moveFolder.inSelf' }, 'warn');
                 return false;
             }
             if (
@@ -298,7 +298,7 @@ class Runtime implements IRuntime {
                 ) !== -1 &&
                 newParentID !== null
             ) {
-                sendError(t('vm:err.moveFolder.inSelf'), 'warn');
+                sendError({ text: 'vm:err.moveFolder.inSelf' }, 'warn');
                 return false;
             }
             folder.setParent(newParentID);
@@ -308,17 +308,17 @@ class Runtime implements IRuntime {
 
     linkTarget(targetID: string, linkTargetID: string) {
         if (targetID === linkTargetID) {
-            sendError(t('vm:err.link.linkSelf'), 'warn');
+            sendError({ text: 'vm:err.link.linkSelf' }, 'warn');
             return false;
         }
         const selectedTarget = this.getTargetByID(targetID);
         const linkTarget = this.getTargetByID(linkTargetID);
         if (!(selectedTarget && linkTarget)) {
-            sendError(t('vm:err.link.undefined'), 'warn');
+            sendError({ text: 'vm:err.link.undefined' }, 'warn');
             return false;
         }
         if (linkTarget.mode === 'entity') {
-            sendError(t('vm:err.link.tryToLinkEntity'), 'warn');
+            sendError({ text: 'vm:err.link.tryToLinkEntity' }, 'warn');
             return false;
         }
 

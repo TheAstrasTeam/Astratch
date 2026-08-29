@@ -483,6 +483,7 @@ export interface IProjectManager {
     getFolder(path: DirectoryHandle, name: string): Promise<FileSystemDirectoryHandle | false>;
     /**
      * 检查项目是否是可以保存的
+     * @param result 失败时的错误信息 i18n key（由调用方翻译）
      */
     checkProjectCanSave(): Promise<{
         pass: boolean;

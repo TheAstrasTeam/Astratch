@@ -24,12 +24,12 @@ export class AssetManager implements IAssetManager {
     ): Promise<string | undefined> {
         const joinID = id ?? asset.id ?? spawnRandomString();
         if (this.assets.has(joinID)) {
-            sendError('vm:asset.existing');
+            sendError({ text: 'vm:asset.existing' });
             return undefined;
         }
         const hash = await this.spawnHash(asset.blob);
         if (!hash) {
-            sendError('vm:asset.spawnHashFailed');
+            sendError({ text: 'vm:asset.spawnHashFailed' });
             return undefined;
         }
         const joinAsset: IAsset = {
@@ -43,7 +43,7 @@ export class AssetManager implements IAssetManager {
 
     removeAsset(id: string): boolean | undefined {
         if (!this.assets.has(id)) {
-            sendError('vm:asset.noExisting');
+            sendError({ text: 'vm:asset.noExisting' });
             return undefined;
         }
         this.assets.delete(id);
@@ -52,7 +52,7 @@ export class AssetManager implements IAssetManager {
 
     getAsset(id: string): IAsset | undefined {
         if (!this.assets.has(id)) {
-            sendError('vm:asset.noExisting', 'warn');
+            sendError({ text: 'vm:asset.noExisting' }, 'warn');
             return undefined;
         }
         return this.assets.get(id);

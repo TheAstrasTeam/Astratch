@@ -24,7 +24,6 @@ import {
 } from '../../types/vm/blocks';
 import { spawnRandomString } from '../../utils/ash-data';
 import { sendError } from '../../utils/debug';
-import { t } from 'i18next';
 import type * as Blockly from 'blockly/core';
 
 /**
@@ -106,7 +105,7 @@ class Target implements ITarget {
 
     addLink(linkTargetID: string): boolean {
         if (linkTargetID === this.id) {
-            sendError(t('vm:err.link.linkSelf'), 'warn');
+            sendError({ text: 'vm:err.link.linkSelf' }, 'warn');
             return false;
         }
         this.links.push(linkTargetID);
@@ -135,7 +134,7 @@ class Target implements ITarget {
 
     createData(name: string, data: unknown, isPrivate = false, isConst = false): string {
         this.data.forEach(targetData => {
-            if (targetData.name === name) sendError(t('vm:err.variable.nameExisting'));
+            if (targetData.name === name) sendError({ text: 'vm:err.variable.nameExisting' });
         });
         const id = spawnRandomString();
         this.data.set(id, {
@@ -173,7 +172,7 @@ class Target implements ITarget {
 
     addCustomFunction(id: string, meta: ICustomFunction) {
         if (this.function.has(id)) {
-            sendError(t('vm:err.customFunction.existing'));
+            sendError({ text: 'vm:err.customFunction.existing' });
             return false;
         }
         this.function.set(id, meta);
@@ -187,7 +186,7 @@ class Target implements ITarget {
 
     replaceCustomFunction(id: string, meta: ICustomFunction) {
         if (!this.function.has(id)) {
-            sendError(t('vm:err.customFunction.inexistent'));
+            sendError({ text: 'vm:err.customFunction.inexistent' });
             return false;
         }
         this.function.set(id, meta);
@@ -201,11 +200,11 @@ class Target implements ITarget {
 
     removeCustomFunction(id: string) {
         if (!this.function.has(id)) {
-            sendError(t('vm:err.customFunction.inexistent'));
+            sendError({ text: 'vm:err.customFunction.inexistent' });
             return false;
         }
         if (this.isUsingCustomFunction(id)) {
-            sendError(t('vm:err.customFunction.using'), 'warn');
+            sendError({ text: 'vm:err.customFunction.using' }, 'warn');
             return false;
         }
         this.function.delete(id);

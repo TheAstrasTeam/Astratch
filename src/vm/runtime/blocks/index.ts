@@ -30,7 +30,7 @@ import {
     type TViewportUpdateEvent,
 } from '../../../types/vm/vm';
 import { getBlocklyI18nByI18next } from '../../../utils/ash-i18n';
-import i18next, { t } from 'i18next';
+import i18next from 'i18next';
 import { replaceChineseI18n } from '../../../lib/BlocklyAdapter/i18n';
 import { Toast } from '../../../lib/ToastManager';
 import { spawnRandomString } from '../../../utils/ash-data';
@@ -170,7 +170,7 @@ class Blocks implements IBlocks {
         } else {
             const target = this.vm.runtime.getTargetByID(data.targetID);
             if (!target) {
-                sendError(t('vm:err.target.undefined'));
+                sendError({ text: 'vm:err.target.undefined' });
                 return;
             }
             // 新建一个临时工作区并创建头积木

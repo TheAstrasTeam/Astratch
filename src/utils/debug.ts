@@ -12,13 +12,17 @@ import { spawnRandomString } from './ash-data';
 
 // 是否正在开发服务器
 export const debug = import.meta.env.DEV;
+export interface TErrorMessage {
+    text: string;
+    params?: Record<string, string>;
+}
 
 export const sendError = (error: unknown, type: 'error' | 'warn' = 'error') => {
     Toast.create({
         type,
         id: `Error_${spawnRandomString()}`,
         // 为什么要在这里加translate？好问题！因为VM要解耦的！
-        text: t(error as string),
+        text: t((error as TErrorMessage).text, (error as TErrorMessage).params),
     });
     if (type === 'warn') {
         console.warn(error);
