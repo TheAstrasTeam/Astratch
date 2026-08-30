@@ -14,6 +14,8 @@ import { TabIcon } from '../TabIcon';
 import {
     useState,
     useCallback,
+    useEffect,
+    useRef,
     type MouseEvent as ReactMouseEvent,
     type DragEvent as ReactDragEvent,
 } from 'react';
@@ -33,6 +35,7 @@ const TabBar = (): React.ReactNode => {
     const orderedTabs = tabOrder
         .map(id => tabs.find(tab => tab.id === id))
         .filter((tab): tab is NonNullable<typeof tab> => tab !== undefined);
+    const tabBarRef = useRef<HTMLDivElement>(null);
     const [whereIsInContextMenuID, setWhereIsInContextMenuID] = useState('');
     // 拖拽排序状态：当前拖拽的标签 id，以及悬停目标（在哪个标签的左侧/右侧）
     const [dragState, setDragState] = useState<{
@@ -40,6 +43,22 @@ const TabBar = (): React.ReactNode => {
         targetId: string | null;
         position: 'before' | 'after' | null;
     }>({ dragId: '', targetId: null, position: null });
+
+    // 活动标签变化时横向滚动标签栏，保证其滚入可见区域
+    useEffect(() => {
+        if (!activeTabId || !tabBarRef.current) return;
+        const el = tabBarRef.current.querySelector<HTMLElement>(
+            `[data-tab-id="${CSS.escape(activeTabId)}"]`,
+        );
+        if (!el) return;
+        const containerRect = tabBarRef.current.getBoundingClientRect();
+        const elRect = el.getBoundingClientRect();
+        if (elRect.left < containerRect.left) {
+            tabBarRef.current.scrollLeft -= containerRect.left - elRect.left;
+        } else if (elRect.right > containerRect.right) {
+            tabBarRef.current.scrollLeft += elRect.right - containerRect.right;
+        }
+    }, [activeTabId, orderedTabs.length]);
 
     const handleDragStart = useCallback((e: ReactDragEvent<HTMLDivElement>, tabID: string) => {
         // 从关闭按钮上发起拖拽会被忽略（避免误触发）
@@ -176,6 +195,7 @@ const TabBar = (): React.ReactNode => {
 
     return (
         <div
+            ref={tabBarRef}
             className={styles.tabBar}
             onDragOver={e => {
                 // 条目级已 stopPropagation，这里只处理悬停在末尾空白区的情况。
@@ -203,6 +223,7 @@ const TabBar = (): React.ReactNode => {
                 return (
                     <div
                         key={tab.id}
+                        data-tab-id={tab.id}
                         className={classNames(styles.tabItem, {
                             [styles.isActive]: tab.id === activeTabId,
                             [styles.isDragging]: dragState.dragId === tab.id,

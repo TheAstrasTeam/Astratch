@@ -16,7 +16,6 @@ export interface Tab {
     /** 目标模式，仅 type === 'blockly' 时有效；内置页面标签为占位值 */
     mode: TTargetMode;
     type: TTabType;
-    modified: boolean;
 }
 
 // 将 id 移动到 MRU 数组队首（不存在则插入，已存在则去重后前置）
@@ -41,7 +40,6 @@ interface ITabsStore {
     closeSpecialTabs: () => void;
     setActiveTab: (id: string) => void;
     reorderTabs: (fromIndex: number, toIndex: number) => void;
-    markModified: (id: string, modified: boolean) => void;
 }
 
 const useTabsStore: UseBoundStore<StoreApi<ITabsStore>> = create<ITabsStore>((set, get) => ({
@@ -57,7 +55,7 @@ const useTabsStore: UseBoundStore<StoreApi<ITabsStore>> = create<ITabsStore>((se
             return;
         }
         const id = targetId;
-        const newTab: Tab = { id, targetId, title, mode, type: 'blockly', modified: false };
+        const newTab: Tab = { id, targetId, title, mode, type: 'blockly' };
         set({
             tabs: [...tabs, newTab],
             tabOrder: [...tabOrder, id],
@@ -80,7 +78,6 @@ const useTabsStore: UseBoundStore<StoreApi<ITabsStore>> = create<ITabsStore>((se
             title: meta.titleKey,
             mode: TargetModes.ENTITY,
             type,
-            modified: false,
         };
         set({
             tabs: [...tabs, newTab],
@@ -160,12 +157,6 @@ const useTabsStore: UseBoundStore<StoreApi<ITabsStore>> = create<ITabsStore>((se
         const [moved] = next.splice(fromIndex, 1);
         next.splice(toIndex, 0, moved);
         set({ tabOrder: next });
-    },
-    markModified: (id, modified) => {
-        const { tabs } = get();
-        set({
-            tabs: tabs.map(t => (t.id === id ? { ...t, modified } : t)),
-        });
     },
 }));
 
