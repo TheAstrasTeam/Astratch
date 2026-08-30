@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { MIME_TYPES, TYPES_ENUM, type TMIME_TYPES, type TTYPES_ENUM } from '../types/vm/assets';
 import type { IVM } from '../types/vm/vm';
 import { getFileExtension, getFileNameWithoutExt } from '../utils/ash-data';
