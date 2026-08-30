@@ -175,6 +175,8 @@
     "modal.ask.module": "创建一个模块，命名为：",
     "rename.tip": "重命名「{{name}}」目标为：",
     "selectNothing": "怎么什么都没有呢...",
+    "empty.shortcutHints.commands": "显示所有指令",
+    "empty.shortcutHints.settings": "打开 首选项",
     "attribute": "属性",
     "link": "链接",
     "data.forPublic": "整个目标",

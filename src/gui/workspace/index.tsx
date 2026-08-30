@@ -8,7 +8,7 @@ import { allBuiltInTabs, events, type IVM, type TallBuiltInTabs } from '../../ty
 import { useSidebarStore } from '../../stores/useSidebarStore';
 import styles from './index.module.scss';
 import BlocklyWorkspace from './Blockly/index';
-import { useEffect, useMemo, useState, type FunctionComponent, type SVGProps } from 'react';
+import { Fragment, useEffect, useMemo, useState, type FunctionComponent, type SVGProps } from 'react';
 import classNames from 'classnames';
 
 import SpriteIcon from '../../assets/sprite.svg?react';
@@ -57,13 +57,33 @@ const TabButton = ({
     );
 };
 
+// 渲染快捷键：组合键拆分为独立按键（有底板），加号作为无底板的分隔符
+const renderHotKey = (hotKey: string): React.ReactNode => (
+    <span className={styles.hotKeyGroup}>
+        {hotKey.split('+').map((part, index) => (
+            <Fragment key={index}>
+                {index > 0 && <span className={styles.hotKeySeparator}>+</span>}
+                <kbd>{part}</kbd>
+            </Fragment>
+        ))}
+    </span>
+);
+
 const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
     const [, setTargetsRevision] = useState(0);
     const tabSelected = useSidebarStore(state => state.selectedTab);
     const tabs = useTabsStore(state => state.tabs);
     const activeTabId = useTabsStore(state => state.activeTabId);
+    // 快捷键变化时触发重渲染，保证空界面提示随设置更新
+    const [, setShortcutRevision] = useState(0);
 
     const activeTab = activeTabId ? tabs.find(tab => tab.id === activeTabId) : null;
+
+    useEffect(() => {
+        return shortcutManager.onChange(() => {
+            setShortcutRevision(revision => revision + 1);
+        });
+    }, []);
 
     // 应用启动后首次挂载且没有任何标签时，自动打开「欢迎」标签页。
     // 用模块级标记保证整个应用生命周期只执行一次（语言切换等会重挂组件）。
@@ -156,6 +176,24 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
                 <div className={styles.empty}>
                     {showEmptyTip() ? <EmptyTip /> : <EmptyTip2 />}
                     <h1>{t('gui:selectNothing')}</h1>
+                    <ul className={styles.shortcutHints}>
+                        <li>
+                            <span>{t('gui:empty.shortcutHints.commands')}</span>
+                            {renderHotKey(
+                                shortcutManager.formatHotKey(
+                                    shortcutManager.getHotKey(SHORTCUTS.QUICK_OPEN_COMMAND.id),
+                                ),
+                            )}
+                        </li>
+                        <li>
+                            <span>{t('gui:empty.shortcutHints.settings')}</span>
+                            {renderHotKey(
+                                shortcutManager.formatHotKey(
+                                    shortcutManager.getHotKey(SHORTCUTS.OPEN_SETTINGS.id),
+                                ),
+                            )}
+                        </li>
+                    </ul>
                 </div>
             );
         }

@@ -176,6 +176,8 @@
     "modal.ask.module": "Create a module named:",
     "rename.tip": "Rename target \"{{name}}\" to:",
     "selectNothing": "But nothing here...",
+    "empty.shortcutHints.commands": "Show all commands",
+    "empty.shortcutHints.settings": "Open Preferences",
     "attribute": "Attribute",
     "link": "Link",
     "data.forPublic": "Entire target",
