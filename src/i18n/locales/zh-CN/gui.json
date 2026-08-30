@@ -224,6 +224,11 @@
     "workspaceSearch.findPrevious": "查找上一个",
     "workspaceSearch.close": "关闭搜索栏",
     "assets.uploadingProgress": "正在上传资源 ({{now}}/{{total}})",
+    "assets.title": "资源",
+    "assets.nothing": "这里空空如也...",
+    "assets.uploadFile": "上传文件",
+    "assets.addText": "新建文本文件",
+    "assets.addImage": "新建图片",
     "err.workspace.failed": "工作区创建失败。\n{{err}}",
     "err.save.failed": "目标数据保存失败。\n{{err}}"
 }
