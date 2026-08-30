@@ -104,6 +104,14 @@ class toastManager implements IToastManger {
         return true;
     }
 
+    setText(id: string, text: string) {
+        const toast = this.history.get(id);
+        if (!toast) return false;
+        toast.text = text;
+        this.emit({ type: 'refresh' });
+        return true;
+    }
+
     on(id: string, callback: (data: TToastEvent) => void, opts?: { once?: boolean }) {
         this.events.set(id, {
             id,

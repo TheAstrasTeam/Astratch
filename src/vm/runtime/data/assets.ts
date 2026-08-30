@@ -6,7 +6,7 @@
 
 import type { PartialByKeys } from '../../../types/utils';
 import type { IAsset, IAssetManager } from '../../../types/vm/assets';
-import type { IVM } from '../../../types/vm/vm';
+import { events, type IVM } from '../../../types/vm/vm';
 import { spawnRandomString } from '../../../utils/ash-data';
 import { sendError } from '../../../utils/debug';
 
@@ -38,6 +38,9 @@ export class AssetManager implements IAssetManager {
             hash,
         };
         this.assets.set(joinID, joinAsset);
+        this.vm.emit(events.LOAD_ASSET, {
+            id: joinID,
+        });
         return joinID;
     }
 
@@ -47,6 +50,9 @@ export class AssetManager implements IAssetManager {
             return undefined;
         }
         this.assets.delete(id);
+        this.vm.emit(events.REMOVE_ASSET, {
+            id,
+        });
         return true;
     }
 

@@ -76,6 +76,7 @@ export const AllContextMenu = {
     MENUBAR_HELP_DOCS: 'menubar_help_docs',
     BLOCKLY: 'blockly',
     ADD_TARGET: 'add_target',
+    ADD_ASSET: 'add_asset',
     TABS_EDIT: 'tabs_edit',
 };
 export type TAllContextMenu = (typeof AllContextMenu)[keyof typeof AllContextMenu];

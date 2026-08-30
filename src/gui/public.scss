@@ -103,6 +103,11 @@ select {
     padding: var(--select-padding);
 }
 
+hr {
+    width: 90%;
+    border: 1px solid $ui-tertiary;
+}
+
 code {
     font-family:
         ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',

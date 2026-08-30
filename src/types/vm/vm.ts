@@ -27,6 +27,7 @@ export type TallTarget = (typeof targets)[keyof typeof targets];
  */
 export const allBuiltInTabs = {
     TARGETS: 'targets',
+    ASSETS: 'assets',
     ADDONS: 'addons',
     DEBUG: 'debug',
 } as const;
@@ -588,6 +589,8 @@ export const events = {
     CREATE_CUSTOM_FUNCTION: 'create_custom_function',
     EDIT_CUSTOM_FUNCTION: 'edit_custom_function',
     REMOVE_CUSTOM_FUNCTION: 'remove_custom_function',
+    LOAD_ASSET: 'load_asset',
+    REMOVE_ASSET: 'remove_asset',
 } as const;
 
 export type TEvents = (typeof events)[keyof typeof events];
@@ -615,6 +618,9 @@ export interface IFunctionCreatedEvent {
 export interface IUpdateThemeEvent {
     guiThemeMode: TGuiTheme;
     guiThemeAccent: TGuiAccent;
+}
+export interface IAssetEvent {
+    id: string;
 }
 
 export interface IProjectMetaJSON {

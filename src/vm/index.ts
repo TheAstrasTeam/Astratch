@@ -152,7 +152,7 @@ export class VM implements IVM {
                     ...assetResult,
                 };
                 // 生成blob
-                await this.projectManager.createFile(folder, `${asset.id}${asset.extension}`, blob);
+                await this.projectManager.createFile(folder, `${asset.id}.${asset.extension}`, blob);
             }
             await this.projectManager.createFile(
                 folder,
@@ -309,7 +309,7 @@ export class VM implements IVM {
                     try {
                         const blobHandle = await this.projectManager.getFile(
                             folder,
-                            `${asset.id}${asset.extension}`,
+                            `${asset.id}.${asset.extension}`,
                         );
                         if (!blobHandle) {
                             sendError(

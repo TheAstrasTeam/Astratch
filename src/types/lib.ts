@@ -209,6 +209,11 @@ export interface IToastManger {
      * @returns 是否成功
      */
     setProgress(id: string, progress: number): boolean;
+    /**
+     * 设置通知的文字
+     * @returns 是否成功
+     */
+    setText(id: string, text: string): boolean;
 }
 
 export type TToastMode = 'info' | 'error' | 'warn' | 'spinner' | 'progress';

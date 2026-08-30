@@ -12,7 +12,7 @@ export interface IAsset {
     name: string;
     /** 扩展名 */
     extension: string;
-    type: 'audio' | 'image' | 'text' | 'font' | 'binary';
+    type: TTYPES_ENUM;
     mimeType: TMIME_TYPES;
     blob: ArrayBuffer;
     hash: string;
@@ -23,6 +23,7 @@ export const MIME_TYPES = {
     JPG: 'image/jpeg',
     PNG: 'image/png',
     SVG: 'image/svg+xml',
+    WEBP: 'image/webp',
     MP3: 'audio/mpeg',
     WAV: 'audio/wav',
     TTF: 'font/ttf',
@@ -32,6 +33,15 @@ export const MIME_TYPES = {
 } as const;
 export type TMIME_TYPES = (typeof MIME_TYPES)[keyof typeof MIME_TYPES];
 
+export const TYPES_ENUM = {
+    text: [MIME_TYPES.TEXT],
+    image: [MIME_TYPES.JPG, MIME_TYPES.PNG, MIME_TYPES.SVG, MIME_TYPES.WEBP],
+    audio: [MIME_TYPES.MP3, MIME_TYPES.WAV],
+    font: [MIME_TYPES.TTF, MIME_TYPES.WOFF, MIME_TYPES.WOFF2],
+    binary: [MIME_TYPES.BINARY],
+} as const;
+export type TTYPES_ENUM = keyof typeof TYPES_ENUM;
+
 export interface IAssetManager {
     vm: IVM;
     assets: Map<string, IAsset>;
@@ -40,7 +50,10 @@ export interface IAssetManager {
      * @param asset 资源
      * @param id ID
      */
-    loadAsset(asset: PartialByKeys<IAsset, 'id'>, id?: string): Promise<string | undefined>;
+    loadAsset(
+        asset: PartialByKeys<PartialByKeys<IAsset, 'id'>, 'hash'>,
+        id?: string,
+    ): Promise<string | undefined>;
     /**
      * 删除一个资源
      * @param id ID

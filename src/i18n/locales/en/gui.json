@@ -86,6 +86,7 @@
     "search.tip": "Search",
     "search.entity.tip": "Search entitys...",
     "search.module.tip": "Search modules...",
+    "search.assets.tip": "Search assets...",
     "search.nothing": "No matching entitys found",
     "quickOpen.placeholder": "Search targets, type > for commands",
     "quickOpen.noResults": "No matching results",

@@ -54,6 +54,9 @@
             box-shadow: inset 0 -1px 0px $looks-secondary;
         }
     }
+    & hr {
+        border: 1px solid $ui-tertiary;
+    }
 }
 .switch-tab {
     width: 2rem;
