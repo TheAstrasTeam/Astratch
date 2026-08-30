@@ -52,6 +52,20 @@
         background-color: $ui-primary;
         box-shadow: inset 0 2px 0 $looks-secondary;
     }
+
+    // 拖拽中的标签：半透明提示来源
+    &.isDragging {
+        opacity: 0.4;
+    }
+
+    // 悬停目标：在左侧/右侧显示插入指示线
+    &.dropBefore {
+        box-shadow: inset 3px 0 0 $looks-secondary;
+    }
+
+    &.dropAfter {
+        box-shadow: inset -3px 0 0 $looks-secondary;
+    }
 }
 
 .tabIcon {
