@@ -12,6 +12,7 @@ import { spawnRandomString } from './ash-data';
 import { t } from 'i18next';
 import { modal } from '../components/Modal/modal';
 import { SettingsModal } from '../components/modal_settings';
+import { AboutModal } from '../components/modal_about';
 
 /**
  * 选择项目并加载。
@@ -114,6 +115,14 @@ const openSettingsModal = (target?: ISettingsFocusTarget) => {
 };
 
 /**
+ * 打开「关于 Astratch」窗口
+ */
+const openAboutModal = () => {
+    const alreadyOpen = modal.getSnapshot().some(state => state.Component === AboutModal);
+    if (alreadyOpen) return;
+    void modal.open(AboutModal);
+};
+/**
  * 创建同时支持鼠标右键和触摸长按的菜单触发处理器
  * @param openFn 菜单打开函数，接收锚点坐标 { x, y }
  * @param options 配置项
@@ -191,5 +200,6 @@ export {
     saveCurrentProject,
     saveCurrentProjectAs,
     openSettingsModal,
+    openAboutModal,
     createMenuTrigger,
 };

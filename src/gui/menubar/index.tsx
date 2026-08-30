@@ -15,6 +15,7 @@ import { useTabsStore } from '../../stores/useTabsStore';
 import {
     openMenuByMouseDown,
     openSettingsModal,
+    openAboutModal,
     saveCurrentProject,
     saveCurrentProjectAs,
     selectProjectThenJump,
@@ -150,8 +151,12 @@ const MenuBar = ({ vm }: { vm: IVM }): React.ReactNode => {
                 <MenuTextWithShortCut text={t('gui:menu.welcome')} shortcut='' />
             </MenuItem>
             <MenuDivider />
-            {/* 先放个关于按钮在这占位 */}
-            <MenuItem onClick={close}>
+            <MenuItem
+                onClick={() => {
+                    openAboutModal();
+                    close();
+                }}
+            >
                 <MenuTextWithShortCut text={t('gui:menu.about')} shortcut='' />
             </MenuItem>
         </>
