@@ -223,6 +223,7 @@
     "workspaceSearch.findNext": "查找下一个",
     "workspaceSearch.findPrevious": "查找上一个",
     "workspaceSearch.close": "关闭搜索栏",
-
-    "assets.uploadingProgress": "正在上传资源 ({{now}}/{{total}})"
+    "assets.uploadingProgress": "正在上传资源 ({{now}}/{{total}})",
+    "err.workspace.failed": "工作区创建失败。\n{{err}}",
+    "err.save.failed": "目标数据保存失败。\n{{err}}"
 }

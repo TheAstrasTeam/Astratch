@@ -2,7 +2,6 @@
     "utils.collapseOther": "收起其它分类",
     "utils.searchBlocks": "搜索积木",
     "utils.noSearchResults": "没有找到匹配的积木",
-
     "category.entity": "实体",
     "category.transform": "变换",
     "category.position": "位置",
@@ -40,7 +39,6 @@
     "category.canvas.pen": "基础画笔",
     "category.canvas.render": "高级渲染",
     "category.debug": "调试",
-
     "menu.set": "设为",
     "menu.add": "增加",
     "boolean.true": "真",
@@ -50,14 +48,11 @@
     "menu.mouse": "鼠标",
     "menu.mousePoint": "鼠标指针",
     "menu.stageCenter": "页面中心",
-
     "menu.addLayer": "上移",
     "menu.subLayer": "下移",
-
     "example.imageName": "猫咪",
     "menu.xPos": "横向",
     "menu.yPos": "纵向",
-
     "menu.leftMouseButton": "左键",
     "menu.centerMouseButton": "中键",
     "menu.rightMouseButton": "右键",
@@ -65,14 +60,12 @@
     "menu.pressDown": "按下",
     "menu.pressIn": "按住",
     "menu.pressUp": "松开",
-
     "menu.transparent": "透明度",
     "menu.light": "亮度",
     "menu.saturation": "饱和度",
     "menu.contrast": "对比度",
     "menu.fisheye": "鱼眼",
     "menu.whirl": "漩涡",
-
     "menu.blockThread": "等待结束",
     "menu.continue": "继续",
     "menu.pause": "暂停",
@@ -81,23 +74,18 @@
     "menu.nowDuration": "当前时长",
     "menu.isPause": "是否暂停",
     "menu.isExist": "是否存在",
-
     "menu.unit": "单位",
     "menu.pers": "百分比",
-
     "menu.rightAngel": "直角",
     "menu.roundedAngle": "圆角",
     "menu.left": "靠左",
     "menu.center": "居中",
     "menu.right": "靠右",
-
     "menu.log": "日志",
     "menu.warn": "警告",
     "menu.err": "错误",
-
     "menu.key": "键",
     "menu.value": "值",
-
     "example.audioEffect": "速度",
     "audioEffect.pitch": "音调",
     "audioEffect.speed": "速度",
@@ -131,27 +119,21 @@
     "example.log": "日志",
     "example.message": "消息",
     "example.error": "错误",
-
     "example.textfont": "MiSans",
-
     "entity.transform.position.moveStep": "移动 %1 单位",
     "entity.transform.position.setPosition": "将 %1 坐标设为 %2 单位",
     "entity.transform.position.addPosition": "将 %1 坐标增加 %2 单位",
     "entity.transform.position.getPosition": "当前 %1 坐标",
-
     "entity.transform.scale.setScale": "将大小设为 %1 %%",
     "entity.transform.scale.addScale": "将大小增加 %1 %%",
     "entity.transform.scale.getScale": "当前大小",
-
     "entity.transform.direction.setDirection": "将方向设为 %1 度",
     "entity.transform.direction.addDirection": "将方向增加 %1 度",
     "entity.transform.direction.faceDirection": "朝向 %1",
     "entity.transform.direction.getDirection": "当前方向",
-
     "entity.transform.layer.setLayer": "将图层设为 %1 层",
     "entity.transform.layer.moveLayer": "将图层 %1 %2 层",
     "entity.transform.layer.getLayer": "当前图层",
-
     "entity.appearance.images.showImage": "切换造型为图像 %1",
     "entity.appearance.images.setStretch": "将 %1 拉伸设为 %2 %%",
     "entity.appearance.images.addStretch": "将 %1 拉伸增加 %2 %%",
@@ -164,7 +146,6 @@
     "entity.appearance.visibility.get": "是否显示？",
     "visibility.show": "显示",
     "visibility.hide": "隐藏",
-
     "entity.appearance.effects.setEffect": "将 %1 特效值设为 %2 %%",
     "entity.appearance.effects.addEffect": "将 %1 特效值增加 %2 %%",
     "entity.appearance.effects.getEffect": "当前 %1 特效值",
@@ -176,7 +157,6 @@
     "entity.lifecycle.clone.data": "    数据",
     "entity.lifecycle.clone.setTo": "为",
     "entity.lifecycle.deleteClone": "删除克隆体",
-
     "audio.play.play": "播放音频 %1 附带标签 %2 并 %3",
     "audio.play.exampleAudioName": "水声",
     "audio.play.exampleName": "背景声",
@@ -193,13 +173,11 @@
     "audio.effects.resetEffectAll": "重置所有音频的 %1 效果",
     "audio.effects.resetAllEffectsAll": "重置全部音频效果",
     "audio.effects.getEffect": "标签为 %1 的音频的 %2 特效百分比",
-
     "resources.addFromUrl": "从 URL %1 加载资源，并命名为 %2",
     "resources.get": "获取资源 %1",
     "resources.exists": "资源 %1 存在？",
     "resources.rename": "将资源 %1 重命名为 %2",
     "resources.delete": "删除资源 %1",
-
     "event.broadcast.send": "广播 %1 并附带数据 %2",
     "event.broadcast.listen": "当接收到 %1 并附带数据 %2",
     "event.broadcast.data": "广播数据",
@@ -223,11 +201,9 @@
     "event.input.whenMouseMoved": "移动鼠标时",
     "event.input.whenMouseButton": "当 %1 鼠标 %2",
     "event.input.whenKeyPressed": "当 %1 %2",
-
     "key.any": "任意键",
     "key.space": "空格",
     "key.backspace": "退格",
-
     "control.flow.wait": "等待 %1 秒",
     "control.flow.waitUntil": "等待 %1",
     "control.flow.break": "跳出当前嵌套",
@@ -249,13 +225,11 @@
     "control.match.match": "匹配 %1",
     "control.match.case": "若是 %1",
     "control.match.default": "若无匹配，则",
-
     "operator.math.op": "%1 %2 %3",
     "operator.math.random": "从 %1 到 %2 中取随机数",
     "operator.math.min": "%1 和 %2 中的较小值",
     "operator.math.max": "%1 和 %2 中的较大值",
     "operator.math.clamp": "限制 %1 在 %2 到 %3 之间",
-
     "operator.logic.compare": "%1 %2 %3",
     "operator.logic.operation": "%1 %2 %3",
     "logicOperation.and": "且",
@@ -264,7 +238,6 @@
     "operator.logic.boolean": "布尔值 %1",
     "operator.logic.ternary": "如果 %1 返回 %2，否则返回 %3",
     "operator.scientific.func": "%1 %2",
-
     "data.createTip": "创建一个数据",
     "data.createTip2": "它在此处共享：",
     "data.empty": "还没有数据",
@@ -272,7 +245,6 @@
     "data.variable.set": "将数据 %1 设为 %2",
     "data.variable.add": "将数据 %1 增加 %2",
     "data.variable.compute": "将数据 %1 %2 %3",
-
     "data.string.join": "合并",
     "data.string.joinText": "合并文本",
     "data.string.split": "以 %2 分割 %1 为数组",
@@ -281,7 +253,6 @@
     "data.string.contains": "%1 包含 %2 ？",
     "data.string.indexOf": "%1 中第一个 %2 的位置",
     "data.string.replace": "将 %1 中的所有 %2 替换为 %3",
-
     "data.array.empty": "空数组",
     "data.array.push": "向数组 %1 添加 %2 项",
     "data.array.removeAt": "删除数组 %1 第 %2 项",
@@ -301,11 +272,9 @@
     "data.object.get": "对象 %1 中键 %2 的值",
     "data.object.length": "对象 %1 的成员数",
     "data.object.has": "对象 %1 包含键 %2 ？",
-
     "data.type.typeof": "%1 的类型",
     "data.type.cast": "将 %1 强制转换为 %2",
     "data.type.null": "空值",
-
     "function.createTip": "创建自定义函数",
     "function.definition": "定义函数 %1",
     "function.call": "执行并返回",
@@ -324,7 +293,6 @@
     "function.edit": "编辑函数",
     "function.remove": "删除函数",
     "function.remove.tip": "确定要删除这个函数吗？",
-
     "canvas.cleanAll": "擦除全部",
     "canvas.color": "设置绘制颜色为 %1",
     "canvas.point": "在 %1 %2 处画点",
@@ -340,16 +308,14 @@
     "canvas.stampPlus": "将图像 %1 拓印到 %2 %3 大小 %4 角度 %5",
     "canvas.text": "绘制文本 %1 于坐标 %2 %3 对齐模式 %4",
     "canvas.textFont": "设置文本字体为 %1",
-
     "canvas.importData": "将 %1 作为 %2 加入渲染队列",
     "canvas.dataExist": "存在名为 %1 的数据？",
     "canvas.dataList": "渲染数据队列",
     "canvas.renderAll": "绘制队列数据",
     "canvas.delList": "清空渲染队列",
-
     "example.canvasData": "物体",
-
     "debug.log": "以 %1 输出 %2",
     "debug.crash": "停止全部并报错 %1",
-    "debug.breakpoint": "断点"
+    "debug.breakpoint": "断点",
+    "canvas.triangle": "以顶点 %1 %2、%3 %4、%5 %6 绘制三角形"
 }

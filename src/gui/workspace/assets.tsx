@@ -13,9 +13,9 @@ import { openMenuByMouseDown } from '../../utils/ash-gui';
 import { uploadAssets } from '../../lib/upload';
 import { Toast } from '../../lib/ToastManager';
 import { spawnRandomString } from '../../utils/ash-data';
-
-/** 缓存 */
-const objectURLCache = new WeakMap<ArrayBuffer, string>();
+import { getAssetObjectURL } from '../../utils/asset-url';
+import { modal } from '../../components/Modal/modal';
+import { AssetPreviewModal } from '../../components/modal_assetPreview';
 
 const ArrayBufferToImage = ({
     arrayBuffer,
@@ -24,12 +24,7 @@ const ArrayBufferToImage = ({
     arrayBuffer: ArrayBuffer;
     mimeType: TMIME_TYPES;
 }) => {
-    let url = objectURLCache.get(arrayBuffer);
-    if (!url) {
-        url = URL.createObjectURL(new Blob([arrayBuffer], { type: mimeType }));
-        objectURLCache.set(arrayBuffer, url);
-    }
-    return <img src={url}></img>;
+    return <img src={getAssetObjectURL(arrayBuffer, mimeType)}></img>;
 };
 
 const AssetPreview = ({ asset }: { asset: IAsset }) => {
@@ -84,8 +79,19 @@ const AssetsPanel = ({ vm }: { vm: IVM }) => {
             >
                 {t('gui:assets.uploadFile')}
             </MenuItem>
-            <MenuItem onClick={() => {}}>{t('gui:assets.addText')}</MenuItem>
-            <MenuItem onClick={() => {}}>{t('gui:assets.addImage')}</MenuItem>
+            {/* TODO: 添加文本/添加图片素材尚未实现 */}
+            <MenuItem
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                onClick={() => {}}
+            >
+                {t('gui:assets.addText')}
+            </MenuItem>
+            <MenuItem
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                onClick={() => {}}
+            >
+                {t('gui:assets.addImage')}
+            </MenuItem>
         </>
     ));
 
@@ -133,7 +139,14 @@ const AssetsPanel = ({ vm }: { vm: IVM }) => {
                     <div className={styles.empty}>{t('gui:assets.nothing')}</div>
                 ) : (
                     filteredAssets.map(asset => (
-                        <div key={asset.id} className={styles.asset} title={asset.name}>
+                        <div
+                            key={asset.id}
+                            className={styles.asset}
+                            title={asset.name}
+                            onClick={() => {
+                                void modal.open(AssetPreviewModal, { asset });
+                            }}
+                        >
                             <div className={styles.image}>
                                 <AssetPreview asset={asset} />
                             </div>

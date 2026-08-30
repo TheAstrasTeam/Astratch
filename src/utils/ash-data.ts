@@ -65,7 +65,7 @@ export const flattenObject = (
 export const getFileExtension = (filename: string) => {
     if (!filename.includes('.')) return '';
     return filename.split('.').pop();
-}
+};
 
 /** 获取去除扩展名的文件名 */
 
@@ -74,4 +74,4 @@ export const getFileNameWithoutExt = (filename: string) => {
     const lastDotIndex = filename.lastIndexOf('.');
     if (lastDotIndex === -1) return filename;
     return filename.substring(0, lastDotIndex);
-}
+};

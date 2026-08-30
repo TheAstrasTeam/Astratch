@@ -152,7 +152,11 @@ export class VM implements IVM {
                     ...assetResult,
                 };
                 // 生成blob
-                await this.projectManager.createFile(folder, `${asset.id}.${asset.extension}`, blob);
+                await this.projectManager.createFile(
+                    folder,
+                    `${asset.id}.${asset.extension}`,
+                    blob,
+                );
             }
             await this.projectManager.createFile(
                 folder,
