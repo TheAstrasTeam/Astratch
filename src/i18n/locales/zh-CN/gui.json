@@ -86,6 +86,7 @@
     "search.tip": "搜索",
     "search.entity.tip": "搜索实体...",
     "search.module.tip": "搜索模块...",
+    "search.assets.tip": "搜索素材...",
     "search.nothing": "没有找到匹配的实体",
     "quickOpen.placeholder": "搜索 Target，输入 > 执行命令",
     "quickOpen.noResults": "没有匹配的结果",
@@ -231,5 +232,13 @@
     "workspaceSearch.placeholder": "搜索",
     "workspaceSearch.findNext": "查找下一个",
     "workspaceSearch.findPrevious": "查找上一个",
-    "workspaceSearch.close": "关闭搜索栏"
+    "workspaceSearch.close": "关闭搜索栏",
+    "assets.uploadingProgress": "正在上传资源 ({{now}}/{{total}})",
+    "assets.title": "资源",
+    "assets.nothing": "这里空空如也...",
+    "assets.uploadFile": "上传文件",
+    "assets.addText": "新建文本文件",
+    "assets.addImage": "新建图片",
+    "err.workspace.failed": "工作区创建失败。\n{{err}}",
+    "err.save.failed": "目标数据保存失败。\n{{err}}"
 }

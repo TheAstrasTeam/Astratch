@@ -11,7 +11,6 @@ import {
     allProjectCheckError,
     projectFileNames,
 } from '../../types/vm/vm';
-import { t } from 'i18next';
 
 /**
  * 与文件系统互动
@@ -32,13 +31,13 @@ export class ProjectManager implements IProjectManager {
         if (!this.isAPIAvailable)
             return {
                 pass: false,
-                result: t('err.project.apiUnavailable'),
+                result: 'vm:err.project.apiUnavailable',
                 error: allProjectCheckError.API_UNDEFINED,
             };
         if (!this.folderHandle)
             return {
                 pass: false,
-                result: t('err.project.nothingSelected'),
+                result: 'vm:err.project.nothingSelected',
                 error: allProjectCheckError.NOTHING_SELECTED,
             };
         // 如果projectFileNames.meta存在则代表这是一个项目，因此不必要求为空
@@ -48,7 +47,7 @@ export class ProjectManager implements IProjectManager {
         )
             return {
                 pass: false,
-                result: t('err.project.folderNotEmpty'),
+                result: 'vm:err.project.folderNotEmpty',
                 error: allProjectCheckError.FOLDER_NOT_EMPTY,
             };
         return { pass: true };
@@ -77,7 +76,11 @@ export class ProjectManager implements IProjectManager {
         return await path.getDirectoryHandle(name, { create: true });
     }
 
-    async createFile(path: DirectoryHandle, name: string, content: string) {
+    async createFile(
+        path: DirectoryHandle,
+        name: string,
+        content: string | BlobPart | ArrayBuffer,
+    ) {
         if (!path) return false;
         const fileHandle = await path.getFileHandle(name, { create: true });
         const fileWrite = await fileHandle.createWritable();

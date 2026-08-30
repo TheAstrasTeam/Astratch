@@ -1,0 +1,52 @@
+/**
+ * @license
+ * Copyright 2026 AstrasTeam
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/** @author AI */
+
+.content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+
+    &.dark {
+        background-color: #1e1e1e;
+    }
+
+    &.light {
+        background-color: #ffffff;
+    }
+
+    &.checkerboard {
+        background-image: conic-gradient(
+            #cccccc 90deg,
+            #ffffff 90deg 180deg,
+            #cccccc 180deg 270deg,
+            #ffffff 270deg
+        );
+        background-size: 16px 16px;
+    }
+
+    .switch-background {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+    }
+
+    .image {
+        height: 100%;
+        width: 100%;
+        object-fit: contain;
+    }
+
+    .file-tip {
+        font-size: xx-large;
+        opacity: 0.5;
+        user-select: none;
+    }
+}

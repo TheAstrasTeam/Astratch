@@ -29,6 +29,7 @@ import { t } from 'i18next';
 import { modal } from '../components/Modal/modal';
 import { ConfirmModal } from '../components/modal_confirm';
 import { sendError } from '../utils/debug';
+import type { IAsset } from '../types/vm/assets.ts';
 
 /**
  * 虚拟机，管理整个ASH
@@ -99,6 +100,9 @@ export class VM implements IVM {
     }
 
     async saveProject() {
+        const checkResult = await this.projectManager.checkProjectCanSave();
+        if (!checkResult.pass) sendError({ text: checkResult.result ?? '' }, 'error');
+
         const saveTargets = async (mode: TTargetMode, folder: DirectoryHandle) => {
             // 存储所有文件名，这用来判断是否是已存在target名称
             const allTargetNames: string[] = [];
@@ -131,33 +135,64 @@ export class VM implements IVM {
                 }
             }
             const targetNames = await this.projectManager.listAllFileName(folder);
-            if (!targetNames) sendError(t('err.fs.cannotFoundTargets'));
+            if (!targetNames) sendError({ text: 'vm:err.fs.cannotFoundTargets' });
             else
                 // 删除不应有的target
                 for (const targetName of targetNames)
                     if (!allTargetNames.includes(targetName))
                         await this.projectManager.removeFile(folder, targetName);
         };
-
-        const checkResult = await this.projectManager.checkProjectCanSave();
-        if (!checkResult.pass) sendError(checkResult.result, 'error');
-
-        // TODO: 资源
-        await this.projectManager.createFolder(this.projectManager.folderHandle, 'assets');
-
-        const entityHandle = await this.projectManager.createFolder(
-            this.projectManager.folderHandle,
-            'entitys',
-        );
-        if (!entityHandle) sendError(t('err.fs.entityHandleLost'));
-        else await saveTargets('entity', entityHandle);
+        const saveAssets = async (folder: DirectoryHandle) => {
+            const assets = this.runtime.assets.listAssets();
+            const metaJSON: Record<string, Omit<IAsset, 'blob'>> = {};
+            for (const asset of assets) {
+                // 去除blob
+                const { blob, ...assetResult } = asset;
+                metaJSON[asset.id] = {
+                    ...assetResult,
+                };
+                // 生成blob
+                await this.projectManager.createFile(
+                    folder,
+                    `${asset.id}.${asset.extension}`,
+                    blob,
+                );
+            }
+            await this.projectManager.createFile(
+                folder,
+                projectFileNames.assetsMeta,
+                JSON.stringify(metaJSON),
+            );
+        };
 
         const moduleHandle = await this.projectManager.createFolder(
             this.projectManager.folderHandle,
             'modules',
         );
-        if (!moduleHandle) sendError(t('err.fs.moduleHandleLost'));
-        else await saveTargets('module', moduleHandle);
+        if (!moduleHandle) {
+            sendError({ text: 'vm:err.fs.moduleHandleLost' });
+            return;
+        }
+        const entityHandle = await this.projectManager.createFolder(
+            this.projectManager.folderHandle,
+            'entitys',
+        );
+        if (!entityHandle) {
+            sendError({ text: 'vm:err.fs.entityHandleLost' });
+            return;
+        }
+        const assetHandle = await this.projectManager.createFolder(
+            this.projectManager.folderHandle,
+            'assets',
+        );
+        if (!assetHandle) {
+            sendError({ text: 'vm:err.fs.assetHandleLost' });
+            return;
+        }
+        await saveAssets(assetHandle);
+
+        await saveTargets('entity', entityHandle);
+        await saveTargets('module', moduleHandle);
 
         const entitysFolder = this.runtime.folders.get('entity') ?? [];
         const modulesFolder = this.runtime.folders.get('module') ?? [];
@@ -259,8 +294,70 @@ export class VM implements IVM {
                 }
             }
         };
+        const loadAssets = async (folder: DirectoryHandle) => {
+            const assetsMetaOrigin = await this.projectManager.getFile(
+                folder,
+                projectFileNames.assetsMeta,
+            );
+            if (!assetsMetaOrigin) {
+                sendError({ text: 'vm:err.assets.metaLost' });
+                return;
+            }
+            const assetMetaText = await (await assetsMetaOrigin.getFile()).text();
+            const assetsMeta = JSON.parse(assetMetaText) as Record<string, Omit<IAsset, 'blob'>>;
+
+            const assetsToLoad = Object.values(assetsMeta);
+
+            await Promise.allSettled(
+                assetsToLoad.map(async asset => {
+                    try {
+                        const blobHandle = await this.projectManager.getFile(
+                            folder,
+                            `${asset.id}.${asset.extension}`,
+                        );
+                        if (!blobHandle) {
+                            sendError(
+                                {
+                                    text: 'vm:err.assets.assetLost',
+                                    params: { name: asset.name },
+                                },
+                                'warn',
+                            );
+                            return;
+                        }
+                        const blob = await (await blobHandle.getFile()).arrayBuffer();
+
+                        // 校验哈希
+                        if ((await this.runtime.assets.spawnHash(blob)) !== asset.hash) {
+                            sendError(
+                                {
+                                    text: 'vm:err.assets.hashCompareFailed',
+                                },
+                                'warn',
+                            );
+                            return;
+                        }
+
+                        await this.runtime.assets.loadAsset({
+                            ...asset,
+                            blob,
+                        });
+                    } catch {
+                        sendError(
+                            { text: 'vm:err.assets.loadFailed', params: { name: asset.name } },
+                            'warn',
+                        );
+                    }
+                }),
+            );
+        };
 
         await this.selectProject();
+        const assetsFolderHandle = await this.projectManager.getFolder(
+            this.projectManager.folderHandle,
+            'assets',
+        );
+        if (assetsFolderHandle) await loadAssets(assetsFolderHandle);
         // 获取元文件句柄
         const metaFileHandle = await this.projectManager.getFile(
             this.projectManager.folderHandle,

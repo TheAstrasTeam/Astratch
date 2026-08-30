@@ -60,3 +60,18 @@ export const flattenObject = (
     }
     return result;
 };
+
+/** 获取文件扩展名 */
+export const getFileExtension = (filename: string) => {
+    if (!filename.includes('.')) return '';
+    return filename.split('.').pop();
+};
+
+/** 获取去除扩展名的文件名 */
+
+export const getFileNameWithoutExt = (filename: string) => {
+    if (!filename) return '';
+    const lastDotIndex = filename.lastIndexOf('.');
+    if (lastDotIndex === -1) return filename;
+    return filename.substring(0, lastDotIndex);
+};

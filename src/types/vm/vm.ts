@@ -7,6 +7,7 @@
 import type { IBlocks, ICustomFunction, IWorkspaceState } from './blocks';
 import * as Blockly from 'blockly/core';
 import type { TGuiAccent, TGuiTheme } from '../gui';
+import type { IAssetManager } from './assets';
 
 export const DATA_VISIBILITY = {
     PUBLIC: 'public',
@@ -26,6 +27,7 @@ export type TallTarget = (typeof targets)[keyof typeof targets];
  */
 export const allBuiltInTabs = {
     TARGETS: 'targets',
+    ASSETS: 'assets',
     ADDONS: 'addons',
     DEBUG: 'debug',
 } as const;
@@ -309,6 +311,10 @@ export interface IRuntime {
      */
     folders: Map<TTargetMode, IFolder[]>;
     /**
+     * 资源池
+     */
+    assets: IAssetManager;
+    /**
      * 对于实体额外的info
      */
     DEFAULT_ENTITYINFO: IEntityInfo;
@@ -455,7 +461,7 @@ export interface IProjectManager {
     createFile(
         path: DirectoryHandle,
         name: string,
-        content: string,
+        content: string | BlobPart | ArrayBuffer,
     ): Promise<FileSystemFileHandle | false>;
     /**
      * 返回这个文件夹内是不是空的
@@ -478,6 +484,7 @@ export interface IProjectManager {
     getFolder(path: DirectoryHandle, name: string): Promise<FileSystemDirectoryHandle | false>;
     /**
      * 检查项目是否是可以保存的
+     * @param result 失败时的错误信息 i18n key（由调用方翻译）
      */
     checkProjectCanSave(): Promise<{
         pass: boolean;
@@ -511,6 +518,7 @@ export const projectFileNames = {
     meta: 'projectMeta.json',
     targetMeta: 'targetMeta.json',
     targetBlocks: 'targetBlocks.json',
+    assetsMeta: 'assetsMeta.json',
 } as const;
 
 export interface IVM {
@@ -581,6 +589,8 @@ export const events = {
     CREATE_CUSTOM_FUNCTION: 'create_custom_function',
     EDIT_CUSTOM_FUNCTION: 'edit_custom_function',
     REMOVE_CUSTOM_FUNCTION: 'remove_custom_function',
+    LOAD_ASSET: 'load_asset',
+    REMOVE_ASSET: 'remove_asset',
 } as const;
 
 export type TEvents = (typeof events)[keyof typeof events];
@@ -608,6 +618,9 @@ export interface IFunctionCreatedEvent {
 export interface IUpdateThemeEvent {
     guiThemeMode: TGuiTheme;
     guiThemeAccent: TGuiAccent;
+}
+export interface IAssetEvent {
+    id: string;
 }
 
 export interface IProjectMetaJSON {

@@ -14,6 +14,7 @@ import classNames from 'classnames';
 import SpriteIcon from '../../assets/sprite.svg?react';
 import AddonsIcon from '../../assets/addons.svg?react';
 import DebuggerIcon from '../../assets/debugger.svg?react';
+import AssetsIcon from '../../assets/assets.svg?react';
 import EmptyTip from '../../assets/empty.svg?react';
 import EmptyTip2 from '../../assets/empty2.svg?react';
 
@@ -29,6 +30,7 @@ import { shortcutManager } from '../../lib/ShortcutManager';
 import { SHORTCUTS } from '../../types/lib';
 import TabBar from '../../tabs/TabBar';
 import { useTabsStore } from '../../stores/useTabsStore';
+import { AssetsPanel } from './assets';
 
 // 应用生命周期内是否已执行过「首挂载自动打开欢迎标签」。
 // 模块级：语言切换等重挂组件也不会重复触发。
@@ -205,18 +207,26 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
         return <BlocklyWorkspace vm={vm} targetId={activeTab.targetId} />;
     };
     const renderToolBar = () => {
-        if (tabSelected === allBuiltInTabs.TARGETS)
-            return (
-                <SelectBar title={t('gui:target.title')}>
-                    <TargetsPanel vm={vm} />
-                </SelectBar>
-            );
-        if (tabSelected === allBuiltInTabs.ADDONS)
-            return (
-                <SelectBar title={t('gui:addon.title')}>
-                    <AddonsPanel vm={vm} />
-                </SelectBar>
-            );
+        switch (tabSelected) {
+            case allBuiltInTabs.TARGETS:
+                return (
+                    <SelectBar title={t('gui:target.title')}>
+                        <TargetsPanel vm={vm} />
+                    </SelectBar>
+                );
+            case allBuiltInTabs.ADDONS:
+                return (
+                    <SelectBar title={t('gui:addon.title')}>
+                        <AddonsPanel vm={vm} />
+                    </SelectBar>
+                );
+            case allBuiltInTabs.ASSETS:
+                return (
+                    <SelectBar title={t('gui:assets.title')}>
+                        <AssetsPanel vm={vm} />
+                    </SelectBar>
+                );
+        }
     };
 
     return (
@@ -236,6 +246,12 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
                                         id={allBuiltInTabs.TARGETS}
                                         ICON={SpriteIcon}
                                     />
+                                    <TabButton
+                                        selected={tabSelected}
+                                        id={allBuiltInTabs.ASSETS}
+                                        ICON={AssetsIcon}
+                                    />
+                                    <hr />
                                     <TabButton
                                         selected={tabSelected}
                                         id={allBuiltInTabs.ADDONS}

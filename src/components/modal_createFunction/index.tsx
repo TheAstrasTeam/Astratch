@@ -157,7 +157,7 @@ export const CreateFunctionModal = ({ vm, addID, editFunctionId }: ICreateFuncti
                 ? target.replaceCustomFunction(id, functionData)
                 : target.addCustomFunction(id, functionData);
             if (saved) void closeSelf();
-        } else sendError(t('vm:err.target.undefined'), 'warn');
+        } else sendError({ text: 'vm:err.target.undefined' }, 'warn');
     };
 
     // 此函数由AI生成
