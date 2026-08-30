@@ -85,16 +85,18 @@ const AssetsPanel = ({ vm }: { vm: IVM }) => {
             >
                 {t('gui:assets.uploadFile')}
             </MenuItem>
-            {/* TODO: 添加文本/添加图片素材尚未实现 */}
+            {/* TODO: 添加文本/添加图片素材 */}
             <MenuItem
-                // eslint-disable-next-line @typescript-eslint/no-empty-function
-                onClick={() => {}}
+                onClick={() => {
+                    alert('coming soon...');
+                }}
             >
                 {t('gui:assets.addText')}
             </MenuItem>
             <MenuItem
-                // eslint-disable-next-line @typescript-eslint/no-empty-function
-                onClick={() => {}}
+                onClick={() => {
+                    alert('coming soon...');
+                }}
             >
                 {t('gui:assets.addImage')}
             </MenuItem>
