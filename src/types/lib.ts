@@ -120,6 +120,11 @@ export const SHORTCUTS = {
         defaultKey: 'mod+p',
         scope: 'global',
     },
+    QUICK_OPEN_COMMAND: {
+        id: 'quickOpen.openCommand',
+        defaultKey: 'mod+shift+p',
+        scope: 'global',
+    },
     QUICK_OPEN_NEXT_TAB: {
         id: 'tabs.quickOpenNext',
         defaultKey: 'mod+tab',

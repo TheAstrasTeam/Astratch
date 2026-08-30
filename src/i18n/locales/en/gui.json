@@ -160,6 +160,7 @@
     "shortcut.tabs.quickOpenNext": "Cycle Between Open Tabs (Next)",
     "shortcut.tabs.quickOpenPrev": "Cycle Between Open Tabs (Previous)",
     "shortcut.quickOpen.open": "Quick Open (Search Targets and Commands)",
+    "shortcut.quickOpen.openCommand": "Open Command Palette",
     "shortcut.blockly.copy": "Copy",
     "shortcut.blockly.cut": "Cut",
     "shortcut.blockly.paste": "Paste",

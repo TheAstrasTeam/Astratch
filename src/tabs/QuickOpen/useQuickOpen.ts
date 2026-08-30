@@ -97,6 +97,19 @@ export function useQuickOpen(): void {
                 event.preventDefault();
                 event.stopPropagation();
                 store.open();
+                return;
+            }
+
+            // mod+shift+p：打开命令面板（自动输入 `>` 前缀）
+            const commandCombo = parseCombo(
+                shortcutManager.getHotKey(SHORTCUTS.QUICK_OPEN_COMMAND.id),
+            );
+            if (commandCombo && matchesCombo(event, commandCombo)) {
+                event.preventDefault();
+                event.stopPropagation();
+                store.open();
+                store.setQuery('>');
+                return;
             }
         };
 

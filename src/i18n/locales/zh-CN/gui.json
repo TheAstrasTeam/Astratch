@@ -159,6 +159,7 @@
     "shortcut.tabs.quickOpenNext": "在打开的标签页间切换（下一个）",
     "shortcut.tabs.quickOpenPrev": "在打开的标签页间切换（上一个）",
     "shortcut.quickOpen.open": "快速打开（搜索 Target 与命令）",
+    "shortcut.quickOpen.openCommand": "打开命令面板",
     "shortcut.blockly.copy": "复制",
     "shortcut.blockly.cut": "剪切",
     "shortcut.blockly.paste": "粘贴",
