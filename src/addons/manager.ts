@@ -573,7 +573,7 @@ class AddonManager {
         const sidebar = {
             registerTab: (tab: {
                 id: string;
-                title: string | (() => string);
+                title: string;
                 icon: string;
                 content: () => HTMLElement;
             }) =>

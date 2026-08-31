@@ -86,8 +86,7 @@ export interface IAddonSidebarApi {
      */
     registerTab: (tab: {
         id: string;
-        /** 标签页标题：字符串或返回字符串的函数（延迟求值，i18n 加载完成后可正确翻译） */
-        title: string | (() => string);
+        title: string;
         /** 图标：SVG 字符串，会作为 <img> 的 src（data URI） */
         icon: string;
         /** 内容：返回 DOM 元素的函数，每次选中标签页时调用 */
