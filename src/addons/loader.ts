@@ -10,9 +10,7 @@ import type { IAddon, IAddonRegistry, IRegistryAddon, IRegistryVersion } from '.
 import {
     cacheGet,
     cacheSet,
-    cacheDelete,
     setRegistryHash,
-    getFileHash,
     setFileHash,
 } from './cache';
 import { registerAddonI18n } from './i18n';
@@ -61,6 +59,9 @@ const getFile = async (cacheKey: string, url: string): Promise<string> => {
     if (cached !== null) return cached;
     const text = await fetchText(url);
     await cacheSet(cacheKey, text);
+    // 首次下载后记录哈希，防止 refreshRegistry 误判为变更并删除缓存
+    const hash = await computeHash(text);
+    await setFileHash(cacheKey, hash);
     return text;
 };
 
@@ -202,7 +203,7 @@ export async function refreshRegistry(): Promise<IAddonRegistry> {
     await cacheSet(REGISTRY_CACHE_KEY, text);
     await setRegistryHash(newHash);
 
-    // 逐插件拉取 hashes.json，比对并仅重下载变更文件
+    // 逐插件拉取 hashes.json，更新本地哈希记录（不删除缓存，避免与本地哈希算法不一致导致误删）
     await Promise.all(
         registry.addons.map(async addon => {
             try {
@@ -218,17 +219,9 @@ export async function refreshRegistry(): Promise<IAddonRegistry> {
                         const locale = relPath.replace(/^i18n\//, '').replace(/\.json$/, '');
                         cacheKey = addonI18nCacheKey(addon.id, addon.version, locale);
                     } else {
-                        // 其他文件（README、info.json 等）暂不追踪哈希
                         continue;
                     }
 
-                    const localHash = await getFileHash(cacheKey);
-                    if (localHash !== remoteHash) {
-                        // 哈希变更：删除旧缓存，下次读取时会重新下载
-                        await cacheDelete(cacheKey);
-                    }
-
-                    // 更新本地哈希记录
                     await setFileHash(cacheKey, remoteHash);
                 }
             } catch {
