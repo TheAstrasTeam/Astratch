@@ -30,6 +30,7 @@ export const allBuiltInTabs = {
     ASSETS: 'assets',
     ADDONS: 'addons',
     DEBUG: 'debug',
+    STAGE: 'stage',
 } as const;
 export type TallBuiltInTabs = (typeof allBuiltInTabs)[keyof typeof allBuiltInTabs];
 

@@ -8,13 +8,21 @@ import { allBuiltInTabs, events, type IVM, type TallBuiltInTabs } from '../../ty
 import { useSidebarStore } from '../../stores/useSidebarStore';
 import styles from './index.module.scss';
 import BlocklyWorkspace from './Blockly/index';
-import { Fragment, useEffect, useMemo, useState, type FunctionComponent, type SVGProps } from 'react';
+import {
+    Fragment,
+    useEffect,
+    useMemo,
+    useState,
+    type FunctionComponent,
+    type SVGProps,
+} from 'react';
 import classNames from 'classnames';
 
 import SpriteIcon from '../../assets/sprite.svg?react';
 import AddonsIcon from '../../assets/addons.svg?react';
 import DebuggerIcon from '../../assets/debugger.svg?react';
 import AssetsIcon from '../../assets/assets.svg?react';
+import StageIcon from '../../assets/stage.svg?react';
 import EmptyTip from '../../assets/empty.svg?react';
 import EmptyTip2 from '../../assets/empty2.svg?react';
 
@@ -31,6 +39,7 @@ import { SHORTCUTS } from '../../types/lib';
 import TabBar from '../../tabs/TabBar';
 import { useTabsStore } from '../../stores/useTabsStore';
 import { AssetsPanel } from './assets';
+import StageView from '../../components/stage';
 
 // 应用生命周期内是否已执行过「首挂载自动打开欢迎标签」。
 // 模块级：语言切换等重挂组件也不会重复触发。
@@ -226,6 +235,8 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
                         <AssetsPanel vm={vm} />
                     </SelectBar>
                 );
+            case allBuiltInTabs.STAGE:
+                return <StageView vm={vm} />;
         }
     };
 
@@ -250,6 +261,11 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
                                         selected={tabSelected}
                                         id={allBuiltInTabs.ASSETS}
                                         ICON={AssetsIcon}
+                                    />
+                                    <TabButton
+                                        selected={tabSelected}
+                                        id={allBuiltInTabs.STAGE}
+                                        ICON={StageIcon}
                                     />
                                     <hr />
                                     <TabButton

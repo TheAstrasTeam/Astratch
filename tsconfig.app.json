@@ -4,7 +4,12 @@
         "target": "es2023",
         "lib": ["ES2023", "DOM"],
         "module": "esnext",
-        "types": ["vite/client", "wicg-file-system-access", "vite-plugin-svgr/client"],
+        "types": [
+            "vite/client",
+            "wicg-file-system-access",
+            "vite-plugin-svgr/client",
+            "@webgpu/types"
+        ],
         "skipLibCheck": true,
 
         /* Bundler mode */
