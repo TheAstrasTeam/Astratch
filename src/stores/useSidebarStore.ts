@@ -11,12 +11,12 @@
 // 让快捷键、QuickOpen 命令等外部调用方也能切换面板。
 
 import { create, type UseBoundStore, type StoreApi } from 'zustand';
-import { allBuiltInTabs, type TallBuiltInTabs } from '../types/vm/vm';
+import { allBuiltInTabs } from '../types/vm/vm';
 
 interface ISidebarStore {
-    /** 当前选中的侧边栏面板（targets / addons / debug） */
-    selectedTab: TallBuiltInTabs;
-    select: (id: TallBuiltInTabs) => void;
+    /** 当前选中的侧边栏面板（内置标签页 ID 或插件标签页 ID） */
+    selectedTab: string;
+    select: (id: string) => void;
 }
 
 const useSidebarStore: UseBoundStore<StoreApi<ISidebarStore>> = create<ISidebarStore>(set => ({
