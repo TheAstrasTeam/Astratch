@@ -76,7 +76,7 @@ const AddonDetail = ({ addon, onBack, vm }: { addon: IAddon; onBack: () => void;
                 </button>
                 <div className={styles.detailInfo}>
                     {addon.icon && <img className={styles.detailIcon} src={addon.icon} alt='' />}
-                    <div className={styles.detailMeta}>
+                    <div className={styles.detailNameAuthor}>
                         <span className={styles.detailName}>
                             {t(`${addon.i18nNamespace}:@name`, {
                                 defaultValue: addon.name,
@@ -86,24 +86,26 @@ const AddonDetail = ({ addon, onBack, vm }: { addon: IAddon; onBack: () => void;
                         {addon.author && (
                             <span className={styles.detailAuthor}>{addon.author}</span>
                         )}
-                        {addon.description && (
-                            <span className={styles.detailDesc}>
-                                {t(`${addon.i18nNamespace}:@description`, {
-                                    defaultValue: addon.description,
-                                })}
-                            </span>
-                        )}
-                        {addon.readme && addon.readme.length > 0 && (
-                            <span className={styles.detailMetaItem}>
-                                {t('gui:addon.languages')}: {addon.readme.join(', ')}
-                            </span>
-                        )}
-                        {addon.astratchVersion && (
-                            <span className={styles.detailMetaItem}>
-                                {t('gui:addon.compatibility')}: {addon.astratchVersion}
-                            </span>
-                        )}
                     </div>
+                </div>
+                {addon.description && (
+                    <span className={styles.detailDesc}>
+                        {t(`${addon.i18nNamespace}:@description`, {
+                            defaultValue: addon.description,
+                        })}
+                    </span>
+                )}
+                <div className={styles.detailMetaTags}>
+                    {addon.readme && addon.readme.length > 0 && (
+                        <span className={styles.detailMetaItem}>
+                            {t('gui:addon.languages')}: {addon.readme.join(', ')}
+                        </span>
+                    )}
+                    {addon.astratchVersion && (
+                        <span className={styles.detailMetaItem}>
+                            {t('gui:addon.compatibility')}: {addon.astratchVersion}
+                        </span>
+                    )}
                 </div>
             </div>
             <div className={styles.detailReadme}>

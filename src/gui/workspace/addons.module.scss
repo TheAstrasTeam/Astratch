@@ -116,7 +116,7 @@
         color: $text-primary;
         font-size: small;
         font-weight: 600;
-        word-break: break-all;
+        overflow-wrap: anywhere;
         display: flex;
         align-items: center;
         gap: 6px;
@@ -156,7 +156,7 @@
         color: $text-primary;
         opacity: 0.6;
         font-size: x-small;
-        word-break: break-all;
+        overflow-wrap: anywhere;
     }
 
     .card-author {
@@ -237,10 +237,13 @@
     flex: 0 0 auto;
     padding: 10px;
     border-bottom: 1px solid $ui-tertiary;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
 .back-button {
-    margin: 0 0 8px;
+    margin: 0;
     padding: 4px 8px;
     font-size: x-small;
     background: none;
@@ -264,12 +267,10 @@
     flex-shrink: 0;
 }
 
-.detail-meta {
+.detail-name-author {
     display: flex;
     flex-direction: column;
-    flex-wrap: wrap;
-    gap: 4px;
-    min-width: 0;
+    gap: 2px;
 }
 
 .detail-name {
@@ -291,7 +292,7 @@
     color: $text-primary;
     opacity: 0.6;
     font-size: x-small;
-    word-break: break-all;
+    overflow-wrap: anywhere;
 }
 
 .detail-readme {
@@ -300,6 +301,12 @@
     min-height: 0;
     overflow-y: auto;
     padding: 10px;
+}
+
+.detail-meta-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
 }
 
 .detail-meta-item {
