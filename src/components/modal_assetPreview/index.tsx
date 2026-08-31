@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/** @author AI */
+/** @author AI, KOSHINO */
 
 import { useModalInstance } from '@reactleaf/modal';
 import { Modal } from '../Modal/modalWindow';
@@ -14,6 +14,8 @@ import { getAssetObjectURL } from '../../utils/asset-url';
 import { t } from 'i18next';
 import { useState } from 'react';
 import classNames from 'classnames';
+
+import BackgroundSwitcher from '../../assets/backgroundSwitcher.svg?react'
 
 /** 预览衬底背景，循环切换的顺序 */
 const BACKGROUND_MODES = ['dark', 'light', 'checkerboard'] as const;
@@ -47,7 +49,7 @@ export const AssetPreviewModal = ({ asset }: { asset: IAsset }) => {
                             title={t('gui:assetPreview.switchBackground')}
                             onClick={switchBackground}
                         >
-                            {t('gui:assetPreview.switchBackground')}
+                            <BackgroundSwitcher />
                         </button>
                         <img
                             className={styles.image}
