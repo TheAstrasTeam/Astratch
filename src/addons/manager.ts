@@ -153,9 +153,18 @@ class AddonManager {
                 if (userDisabled ? false : userEnabled || addon.defaultEnabled)
                     enabled.add(addon.id);
             }
-            useAddonStore.setState({ addons, enabled, status: 'ready' });
+            // 根据缓存状态重建 downloaded 标记（downloaded 未持久化到 localStorage）
+            const addonsWithCache = await Promise.all(
+                addons.map(async addon => {
+                    const cached = await cacheGet(addonContentCacheKey(addon.id, addon.version));
+                    return cached ? { ...addon, downloaded: true } : addon;
+                }),
+            );
+            useAddonStore.setState({ addons: addonsWithCache, enabled, status: 'ready' });
             this.syncAddonSettings();
-            const pending = addons.filter(addon => enabled.has(addon.id) && !addon.downloaded);
+            const pending = addonsWithCache.filter(
+                addon => enabled.has(addon.id) && !addon.downloaded,
+            );
             await Promise.all(pending.map(addon => this.downloadAddon(addon.id, addon.version)));
             for (const addon of addons) {
                 if (!enabled.has(addon.id)) continue;
@@ -181,25 +190,28 @@ class AddonManager {
             const freshRemote = registry.addons.map(entry => registryAddonToIAddon(entry));
             const current = useAddonStore.getState();
             const custom = current.addons.filter(addon => addon.isCustom);
-            const merged = freshRemote.map(fresh => {
+            const merged = freshRemote.map(async fresh => {
                 const existing = current.addons.find(item => item.id === fresh.id);
                 if (!existing) return fresh;
-                // 保留用户已选择的版本、下载状态与已编译内容
+                // 保留用户已选择的版本
                 const version =
                     existing.version && fresh.versions.includes(existing.version)
                         ? existing.version
                         : fresh.version;
-                return {
-                    ...fresh,
-                    version,
-                    downloaded: existing.downloaded && version === existing.version,
-                    run:
-                        existing.downloaded && version === existing.version
-                            ? existing.run
-                            : undefined,
-                };
+                // 验证缓存是否仍存在，避免 downloaded 标记与缓存不一致
+                let downloaded = existing.downloaded && version === existing.version;
+                let run = existing.run;
+                if (downloaded) {
+                    const cached = await cacheGet(addonContentCacheKey(fresh.id, version));
+                    if (!cached) {
+                        downloaded = false;
+                        run = undefined;
+                    }
+                }
+                return { ...fresh, version, downloaded, run };
             });
-            useAddonStore.setState({ addons: [...merged, ...custom] });
+            const resolvedMerged = await Promise.all(merged);
+            useAddonStore.setState({ addons: [...resolvedMerged, ...custom] });
             this.syncAddonSettings();
         } catch {
             // 后台刷新失败不影响已展示的列表
@@ -255,24 +267,26 @@ class AddonManager {
         try {
             const registry = await refreshRegistry();
             const freshRemote = registry.addons.map(entry => registryAddonToIAddon(entry));
-            const merged = freshRemote.map(fresh => {
+            const merged = freshRemote.map(async fresh => {
                 const existing = current.addons.find(item => item.id === fresh.id);
                 if (!existing) return fresh;
                 const version =
                     existing.version && fresh.versions.includes(existing.version)
                         ? existing.version
                         : fresh.version;
-                return {
-                    ...fresh,
-                    version,
-                    downloaded: existing.downloaded && version === existing.version,
-                    run:
-                        existing.downloaded && version === existing.version
-                            ? existing.run
-                            : undefined,
-                };
+                let downloaded = existing.downloaded && version === existing.version;
+                let run = existing.run;
+                if (downloaded) {
+                    const cached = await cacheGet(addonContentCacheKey(fresh.id, version));
+                    if (!cached) {
+                        downloaded = false;
+                        run = undefined;
+                    }
+                }
+                return { ...fresh, version, downloaded, run };
             });
-            useAddonStore.setState({ addons: [...merged, ...custom] });
+            const resolvedMerged = await Promise.all(merged);
+            useAddonStore.setState({ addons: [...resolvedMerged, ...custom] });
             this.syncAddonSettings();
             Toast.create({
                 type: 'info',
