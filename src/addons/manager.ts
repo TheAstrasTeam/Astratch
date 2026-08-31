@@ -33,7 +33,6 @@ import type {
 } from './types';
 import type { IQuickOpenCommand } from '../types/gui';
 import { useQuickOpenCommandsStore } from '../stores/useQuickOpenCommandsStore';
-import { useSidebarTabsStore } from './sidebar';
 
 /** 插件设置项在 Settings 里的 key 前缀（`addon.<addonId>.<settingId>`） */
 const ADDON_SETTINGS_CATEGORY = 'addons';
@@ -569,20 +568,7 @@ class AddonManager {
                     id: `${addonID}.${command.id}`,
                 }),
         };
-        // 侧边栏标签页 ID 自动加插件前缀
-        const sidebar = {
-            registerTab: (tab: {
-                id: string;
-                title: string;
-                icon: string;
-                content: () => HTMLElement;
-            }) =>
-                useSidebarTabsStore.getState().registerTab(addonID, {
-                    ...tab,
-                    id: `${addonID}.${tab.id}`,
-                }),
-        };
-        return { ...base, storage, settings, quickOpen, sidebar };
+        return { ...base, storage, settings, quickOpen };
     }
 
     /**
@@ -614,9 +600,8 @@ class AddonManager {
     }
 
     private cleanup(id: string) {
-        // 先注销插件注册的 QuickOpen 命令和侧边栏标签页：即使插件清理函数遗漏也不会泄漏
+        // 先注销插件注册的 QuickOpen 命令：即使插件清理函数遗漏也不会泄漏
         useQuickOpenCommandsStore.getState().unregisterByOwner(id);
-        useSidebarTabsStore.getState().unregisterByOwner(id);
         const cleanup = this.cleanups.get(id);
         this.cleanups.delete(id);
         try {

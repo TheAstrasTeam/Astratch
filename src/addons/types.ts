@@ -74,27 +74,6 @@ export interface IAddonQuickOpenApi {
 }
 
 /**
- * 提供给插件的侧边栏标签页注册 API。
- * 注册的标签页出现在编辑器左侧边栏，
- * ID 自动加上 `<插件ID>.` 前缀；插件禁用/卸载时自动注销全部标签页。
- */
-export interface IAddonSidebarApi {
-    /**
-     * 注册一个侧边栏标签页
-     * @param tab 标签页定义，id 只需在插件内唯一（无需带插件前缀）
-     * @returns 注销函数
-     */
-    registerTab: (tab: {
-        id: string;
-        title: string;
-        /** 图标：SVG 字符串，会作为 <img> 的 src（data URI） */
-        icon: string;
-        /** 内容：返回 DOM 元素的函数，每次选中标签页时调用 */
-        content: () => HTMLElement;
-    }) => () => void;
-}
-
-/**
  * 插件运行时可用的上下文（userscript 风格 API）
  */
 export interface IAddonContext {
@@ -112,8 +91,6 @@ export interface IAddonContext {
     settings: IAddonSettingsApi;
     /** QuickOpen 命令面板的命令注册 */
     quickOpen: IAddonQuickOpenApi;
-    /** 侧边栏标签页注册 */
-    sidebar: IAddonSidebarApi;
 }
 
 /**
