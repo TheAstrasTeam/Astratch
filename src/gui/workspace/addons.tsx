@@ -69,7 +69,7 @@ const AddonCard = ({
     return (
         <div
             className={classNames(styles.card, {
-                [styles.disabled]: !enabled && downloaded,
+                [styles.disabled]: !enabled,
             })}
             onClick={onSelectAddon}
             role='button'
