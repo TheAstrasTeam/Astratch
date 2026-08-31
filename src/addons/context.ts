@@ -37,5 +37,9 @@ export function buildAddonContext(vm: IVM): IAddonContext {
         quickOpen: {
             registerCommand: () => () => undefined,
         },
+        // 占位实现，真正的侧边栏 API 由 AddonManager.makeContext 按插件注入
+        sidebar: {
+            registerTab: () => () => undefined,
+        },
     };
 }
