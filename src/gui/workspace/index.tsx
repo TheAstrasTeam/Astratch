@@ -4,12 +4,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { allBuiltInTabs, events, type IVM } from '../../types/vm/vm';
+import { allBuiltInTabs, events, type IVM, type TallBuiltInTabs } from '../../types/vm/vm';
 import { useSidebarStore } from '../../stores/useSidebarStore';
-import { useSidebarTabsStore } from '../../addons/sidebar';
 import styles from './index.module.scss';
 import BlocklyWorkspace from './Blockly/index';
-import { Fragment, useEffect, useMemo, useRef, useState, type ComponentType, type SVGProps } from 'react';
+import { Fragment, useEffect, useMemo, useState, type FunctionComponent, type SVGProps } from 'react';
 import classNames from 'classnames';
 
 import SpriteIcon from '../../assets/sprite.svg?react';
@@ -41,12 +40,10 @@ const TabButton = ({
     id,
     selected,
     ICON,
-    iconSrc,
 }: {
-    id: string;
+    id: TallBuiltInTabs;
     selected: string;
-    ICON?: ComponentType<SVGProps<SVGSVGElement>>;
-    iconSrc?: string;
+    ICON: FunctionComponent<SVGProps<SVGSVGElement>>;
 }) => {
     return (
         <button
@@ -57,23 +54,9 @@ const TabButton = ({
                 useSidebarStore.getState().select(id);
             }}
         >
-            {ICON ? <ICON /> : iconSrc ? <img src={iconSrc} alt='' style={{ width: 20, height: 20 }} /> : null}
+            <ICON />
         </button>
     );
-};
-
-/** 渲染插件侧边栏标签页的内容（将 DOM 元素挂载到 React ref） */
-const AddonTabContent = ({ content }: { content: () => HTMLElement }) => {
-    const ref = useRef<HTMLDivElement>(null);
-    useEffect(() => {
-        if (!ref.current) return;
-        const el = content();
-        ref.current.appendChild(el);
-        return () => {
-            el.remove();
-        };
-    }, [content]);
-    return <div ref={ref} style={{ flex: 1, minHeight: 0, overflow: 'auto' }} />;
 };
 
 // 渲染快捷键：组合键拆分为独立按键（有底板），加号作为无底板的分隔符
@@ -93,7 +76,6 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
     const tabSelected = useSidebarStore(state => state.selectedTab);
     const tabs = useTabsStore(state => state.tabs);
     const activeTabId = useTabsStore(state => state.activeTabId);
-    const addonTabs = useSidebarTabsStore(state => state.tabs);
     // 快捷键变化时触发重渲染，保证空界面提示随设置更新
     const [, setShortcutRevision] = useState(0);
 
@@ -244,18 +226,6 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
                         <AssetsPanel vm={vm} />
                     </SelectBar>
                 );
-            default: {
-                // 插件注册的侧边栏标签页
-                const addonTab = addonTabs.get(tabSelected);
-                if (addonTab) {
-                    return (
-                        <SelectBar title={addonTab.title}>
-                            <AddonTabContent content={addonTab.content} />
-                        </SelectBar>
-                    );
-                }
-                return null;
-            }
         }
     };
 
@@ -292,15 +262,6 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
                                         id={allBuiltInTabs.DEBUG}
                                         ICON={DebuggerIcon}
                                     />
-                                    {addonTabs.size > 0 && <hr />}
-                                    {Array.from(addonTabs.values()).map(tab => (
-                                        <TabButton
-                                            key={tab.id}
-                                            selected={tabSelected}
-                                            id={tab.id}
-                                            iconSrc={tab.icon}
-                                        />
-                                    ))}
                                 </div>
                             </div>
                             <div className={styles.sidebarBody}>{renderToolBar()}</div>
