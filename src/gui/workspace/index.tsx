@@ -248,8 +248,10 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
                 // 插件注册的侧边栏标签页
                 const addonTab = addonTabs.get(tabSelected);
                 if (addonTab) {
+                    const resolvedTitle =
+                        typeof addonTab.title === 'function' ? addonTab.title() : addonTab.title;
                     return (
-                        <SelectBar title={addonTab.title}>
+                        <SelectBar title={resolvedTitle}>
                             <AddonTabContent content={addonTab.content} />
                         </SelectBar>
                     );

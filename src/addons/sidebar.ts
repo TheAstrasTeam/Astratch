@@ -17,8 +17,8 @@ export interface IAddonSidebarTabDefinition {
     id: string;
     /** 归属插件 ID */
     owner: string;
-    /** 标签页标题 */
-    title: string;
+    /** 标签页标题：字符串或返回字符串的函数 */
+    title: string | (() => string);
     /** 标签页图标：SVG 字符串 */
     icon: string;
     /** 标签页内容：返回 DOM 元素的函数 */
