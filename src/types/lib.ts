@@ -127,12 +127,12 @@ export const SHORTCUTS = {
     },
     QUICK_OPEN_NEXT_TAB: {
         id: 'tabs.quickOpenNext',
-        defaultKey: 'mod+tab',
+        defaultKey: 'mod+`',
         scope: 'global',
     },
     QUICK_OPEN_PREV_TAB: {
         id: 'tabs.quickOpenPrev',
-        defaultKey: 'mod+shift+tab',
+        defaultKey: 'mod+shift+`',
         scope: 'global',
     },
 } as const satisfies Record<string, ShortcutDefinition>;
