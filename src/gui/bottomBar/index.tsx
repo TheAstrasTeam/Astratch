@@ -21,7 +21,6 @@ export const BottomBar = ({ vm }: { vm: IVM }): React.ReactNode => {
 
     const noticeButtonRef = useRef<HTMLButtonElement>(null);
 
-    const [isCreatedProject, setIsCreatedProject] = useState(false);
     const [overlayText, setOverlayText] = useState({
         x: '0',
         y: '0',
@@ -35,9 +34,6 @@ export const BottomBar = ({ vm }: { vm: IVM }): React.ReactNode => {
                 setOverlayText(prev => ({ ...prev, x: data.x.toFixed(2), y: data.y.toFixed(2) }));
             }
         };
-        const handleCreateProject = () => {
-            setIsCreatedProject(true);
-        };
         const handleResize = () => {
             if (!noticeButtonRef.current) return;
             const rect = noticeButtonRef.current.getBoundingClientRect();
@@ -45,23 +41,20 @@ export const BottomBar = ({ vm }: { vm: IVM }): React.ReactNode => {
         };
 
         vm.off(events.VIEWPORT_VIEW, handleViewportUpdate as (data: object) => void);
-        vm.off(events.CREATE_PROJECT, handleCreateProject);
         window.removeEventListener('resize', handleResize);
         window.addEventListener('resize', handleResize);
         handleResize();
         vm.on(events.VIEWPORT_VIEW, handleViewportUpdate as (data: object) => void);
-        vm.on(events.CREATE_PROJECT, handleCreateProject, true);
         return () => {
             window.removeEventListener('resize', handleResize);
             vm.off(events.VIEWPORT_VIEW, handleViewportUpdate as (data: object) => void);
-            vm.off(events.CREATE_PROJECT, handleCreateProject);
         };
     }, [vm, noticeButtonRef]);
     return (
         <div className={styles.main}>
             <div className={styles.left}>
                 <button className={styles.positionText}>
-                    {isCreatedProject &&
+                    {vm.isEditingProject &&
                         t(`gui:bottomBar.positionText`, {
                             x: overlayText.x,
                             y: overlayText.y,

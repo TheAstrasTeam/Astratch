@@ -9,7 +9,7 @@
     margin: 0;
     padding: 0 5px;
     background-color: $ui-secondary;
-    height: 20px;
+    height: 30px;
     border-top: $ui-black-transparent $border-width solid;
     & button {
         margin: 0 !important;
@@ -27,8 +27,8 @@
             filter: brightness(1.5);
         }
         & svg {
-            width: 12px;
-            height: 12px;
+            width: 20px;
+            height: auto;
         }
     }
 }
