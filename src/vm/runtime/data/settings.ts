@@ -28,7 +28,7 @@ class Settings implements IVMSettings {
                 width: 480,
                 height: 320,
             },
-            customStorage: {}
+            customStorage: {},
         };
     }
 
@@ -41,7 +41,7 @@ class Settings implements IVMSettings {
     }
 
     getCustomStorage(): Record<string, unknown> {
-        return structuredClone(this.projectMeta.customStorage)
+        return structuredClone(this.projectMeta.customStorage);
     }
 }
 
