@@ -24,11 +24,24 @@ class Settings implements IVMSettings {
             projectName: '',
             projectID: '',
             projectMode: targets.ASH,
+            projectScreenSize: {
+                width: 480,
+                height: 320,
+            },
+            customStorage: {}
         };
     }
 
     setProjectMeta(meta: Partial<IProjectMeta>) {
         this.projectMeta = { ...this.projectMeta, ...meta };
+    }
+
+    setCustomStorage(meta: Record<string, unknown>): void {
+        this.projectMeta.customStorage = structuredClone(meta);
+    }
+
+    getCustomStorage(): Record<string, unknown> {
+        return structuredClone(this.projectMeta.customStorage)
     }
 }
 

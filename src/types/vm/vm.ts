@@ -33,7 +33,7 @@ export const allBuiltInTabs = {
 } as const;
 export type TallBuiltInTabs = (typeof allBuiltInTabs)[keyof typeof allBuiltInTabs];
 
-export interface IStageSize {
+export interface IScreenSize {
     width: number;
     height: number;
 }
@@ -48,13 +48,17 @@ export interface IProjectMeta {
      */
     projectID: string;
     projectMode: TallTarget;
-    projectStageSize: IStageSize;
+    projectScreenSize: IScreenSize;
+    /** 自定义设置，它不影响项目运行 */
+    customStorage: Record<string, unknown>;
 }
 
 export interface IVMSettings {
     enableTurboMode: boolean;
     projectMeta: IProjectMeta;
     setProjectMeta(meta: Partial<IProjectMeta>): void;
+    setCustomStorage(meta: Record<string, unknown>): void;
+    getCustomStorage(): Record<string, unknown>;
 }
 
 export interface ITargetBlocks {
@@ -651,7 +655,7 @@ export interface IUpdateThemeEvent {
 export interface IAssetEvent {
     id: string;
 }
-export type TProjectMetaEvent = IStageSize;
+export type TProjectMetaEvent = IScreenSize;
 
 export interface IProjectMetaJSON {
     // 截至目前，1 为最新
