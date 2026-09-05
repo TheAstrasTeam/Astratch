@@ -57,6 +57,7 @@
         height: 100%;
         display: flex;
         align-items: center;
+        min-width: fit-content;
         &:hover {
             border: none;
             background-color: $ui-tertiary;
