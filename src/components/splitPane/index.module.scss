@@ -19,6 +19,13 @@
     &.dragging {
         user-select: none;
     }
+
+    // 程序化调整尺寸时的过渡动画，时长与 index.tsx 中 ANIMATION_DURATION_MS 保持一致
+    &.animating .pane {
+        transition:
+            width 0.3s ease,
+            height 0.3s ease;
+    }
 }
 
 .pane {
