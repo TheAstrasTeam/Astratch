@@ -75,3 +75,14 @@ export const getFileNameWithoutExt = (filename: string) => {
     if (lastDotIndex === -1) return filename;
     return filename.substring(0, lastDotIndex);
 };
+
+export const mapFindIndex = (map: Map<unknown, unknown>, id: string) => {
+    let index = 0;
+    for (const key of map.keys()) {
+        if (id === key) {
+            return index;
+        }
+        index++;
+    }
+    return -1;
+};

@@ -4,25 +4,18 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { allBuiltInTabs, events, type IVM, type TallBuiltInTabs } from '../../types/vm/vm';
+import { allBuiltInTabs, events, type IVM } from '../../types/vm/vm';
 import { useSidebarStore } from '../../stores/useSidebarStore';
 import styles from './index.module.scss';
 import BlocklyWorkspace from './Blockly/index';
-import { Fragment, useEffect, useMemo, useState, type FunctionComponent, type SVGProps } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 
-import SpriteIcon from '../../assets/sprite.svg?react';
-import AddonsIcon from '../../assets/addons.svg?react';
-import DebuggerIcon from '../../assets/debugger.svg?react';
-import AssetsIcon from '../../assets/assets.svg?react';
 import EmptyTip from '../../assets/empty.svg?react';
 import EmptyTip2 from '../../assets/empty2.svg?react';
 
 import { t } from 'i18next';
-import SelectBar from '../../components/workspace/selectBar';
 import { getSpecialTabDefinition } from '../../tabs/specialTabs';
-import TargetsPanel from './targets';
-import AddonsPanel from './addons';
 import SplitPane from '../../components/splitPane';
 import { debounce } from '../../utils/ash-debounce';
 import { BottomBar } from '../bottomBar';
@@ -30,31 +23,34 @@ import { shortcutManager } from '../../lib/ShortcutManager';
 import { SHORTCUTS } from '../../types/lib';
 import TabBar from '../../tabs/TabBar';
 import { useTabsStore } from '../../stores/useTabsStore';
-import { AssetsPanel } from './assets';
+import { useSideTabsStore, type ISideTab } from '../../stores/useSidetabsStore';
+import { registerBuiltInSideTabs } from './sidebarReg';
 
 // 应用生命周期内是否已执行过「首挂载自动打开欢迎标签」。
 // 模块级：语言切换等重挂组件也不会重复触发。
 let welcomeTabAutoOpened = false;
 
 const TabButton = ({
-    id,
+    tab,
     selected,
-    ICON,
+    onSelect,
 }: {
-    id: TallBuiltInTabs;
+    tab: ISideTab;
     selected: string;
-    ICON: FunctionComponent<SVGProps<SVGSVGElement>>;
+    onSelect: (id: string) => void;
 }) => {
+    const handleClick = () => {
+        onSelect(tab.id);
+    };
+    if (tab.mode === 'split') return <hr />;
     return (
         <button
             className={classNames(styles.switchTab, {
-                [styles.enabled]: id === selected,
+                [styles.enabled]: tab.id === selected,
             })}
-            onClick={() => {
-                useSidebarStore.getState().select(id);
-            }}
+            onClick={handleClick}
         >
-            <ICON />
+            <img src={tab.icon} />
         </button>
     );
 };
@@ -73,13 +69,18 @@ const renderHotKey = (hotKey: string): React.ReactNode => (
 
 const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
     const [, setTargetsRevision] = useState(0);
-    const tabSelected = useSidebarStore(state => state.selectedTab);
-    const tabs = useTabsStore(state => state.tabs);
+
+    const sideTabSelectedId = useSideTabsStore(state => state.activeTabId);
+    const sideTabs = useSideTabsStore(state => state.tabs);
+    const selectSideTab = useSideTabsStore(state => state.openTab);
+    const sideTabState = useSideTabsStore(state => state);
+
+    const projectTabs = useTabsStore(state => state.tabs);
     const activeTabId = useTabsStore(state => state.activeTabId);
     // 快捷键变化时触发重渲染，保证空界面提示随设置更新
     const [, setShortcutRevision] = useState(0);
 
-    const activeTab = activeTabId ? tabs.find(tab => tab.id === activeTabId) : null;
+    const activeTab = activeTabId ? projectTabs.find(tab => tab.id === activeTabId) : null;
 
     useEffect(() => {
         return shortcutManager.onChange(() => {
@@ -96,6 +97,17 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
         if (currentTabs.length === 0 && currentActive === null) {
             useTabsStore.getState().openSpecialTab('welcome');
         }
+    }, []);
+
+    // 默认Tabs加载
+    useEffect(() => {
+        const regIds = registerBuiltInSideTabs(sideTabState, vm);
+        return () => {
+            regIds.forEach(regId => {
+                sideTabState.removeTab(regId);
+            });
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
@@ -206,27 +218,14 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
         // 编辑器（blockly 工作区）
         return <BlocklyWorkspace vm={vm} targetId={activeTab.targetId} />;
     };
-    const renderToolBar = () => {
-        switch (tabSelected) {
-            case allBuiltInTabs.TARGETS:
-                return (
-                    <SelectBar title={t('gui:target.title')}>
-                        <TargetsPanel vm={vm} />
-                    </SelectBar>
-                );
-            case allBuiltInTabs.ADDONS:
-                return (
-                    <SelectBar title={t('gui:addon.title')}>
-                        <AddonsPanel vm={vm} />
-                    </SelectBar>
-                );
-            case allBuiltInTabs.ASSETS:
-                return (
-                    <SelectBar title={t('gui:assets.title')}>
-                        <AssetsPanel vm={vm} />
-                    </SelectBar>
-                );
-        }
+    const renderSideTabContent = () => {
+        const tab = sideTabs.get(sideTabSelectedId);
+        if (!tab) return;
+        return tab.mode === 'split' ? <hr /> : tab.dom;
+    };
+
+    const handleSideTabSelected = (id: string) => {
+        selectSideTab(id);
     };
 
     return (
@@ -241,30 +240,19 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
                         <div className={styles.sidebarCol}>
                             <div className={styles.sidebarHeader}>
                                 <div className={styles.switchTabs}>
-                                    <TabButton
-                                        selected={tabSelected}
-                                        id={allBuiltInTabs.TARGETS}
-                                        ICON={SpriteIcon}
-                                    />
-                                    <TabButton
-                                        selected={tabSelected}
-                                        id={allBuiltInTabs.ASSETS}
-                                        ICON={AssetsIcon}
-                                    />
-                                    <hr />
-                                    <TabButton
-                                        selected={tabSelected}
-                                        id={allBuiltInTabs.ADDONS}
-                                        ICON={AddonsIcon}
-                                    />
-                                    <TabButton
-                                        selected={tabSelected}
-                                        id={allBuiltInTabs.DEBUG}
-                                        ICON={DebuggerIcon}
-                                    />
+                                    {Array.from(sideTabs.values()).map(tab => {
+                                        return (
+                                            <TabButton
+                                                key={tab.id}
+                                                selected={sideTabSelectedId}
+                                                tab={tab}
+                                                onSelect={handleSideTabSelected}
+                                            />
+                                        );
+                                    })}
                                 </div>
                             </div>
-                            <div className={styles.sidebarBody}>{renderToolBar()}</div>
+                            <div className={styles.sidebarBody}>{renderSideTabContent()}</div>
                         </div>
                     }
                     second={
