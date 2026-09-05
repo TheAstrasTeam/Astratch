@@ -20,6 +20,10 @@
  * 由 AstrasTeam 修改于 2026/8/14:
  * - 增加 .astratchContinuousFlyout 的 hover overflow 规则，悬停时显示完整积木
  * - 设置滚动条粗细为 8px，改为浅灰色、背景透明
+ *
+ * 由 AstrasTeam 修改于 2026/9/5:
+ * - 将分类列表的滚动容器从 .blocklyToolbox 移到根 .blocklyToolboxCategoryGroup，
+ *   滚动条归属分类列表本身，顶部操作按钮不再随之滚走
  */
 
 /**
@@ -144,6 +148,17 @@ export function registerAstratchToolbox(options: i18n['t']) {
     );
 
     Blockly.Css.register(`
+    .blocklyToolbox {
+        display: flex !important;
+        flex-direction: column;
+        overflow-y: visible;
+    }
+    .blocklyToolbox > .blocklyToolboxCategoryGroup {
+        flex: 1;
+        flex-wrap: nowrap;
+        min-height: 0;
+        overflow-y: auto;
+    }
     .blocklyToolboxCategory {
         height: initial;
         padding: 3px 0;

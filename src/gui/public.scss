@@ -295,7 +295,7 @@ span {
     }
 }
 
-.blocklyToolbox {
+.blocklyToolbox > .blocklyToolboxCategoryGroup {
     scrollbar-color: $ui-black-transparent transparent;
     scrollbar-width: thin;
 }

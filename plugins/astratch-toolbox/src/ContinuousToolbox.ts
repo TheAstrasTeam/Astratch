@@ -19,6 +19,10 @@
  * - 将工具箱操作按钮拆分到 ContinuousToolboxControls
  * - 增加收起选中路径以外分类的操作
  * - 支持由宿主注入按钮的国际化文本
+ *
+ * 由 AstrasTeam 修改于 2026/9/5:
+ * - selectCategoryById 改为滚动分类列表容器（contentsDiv_）而非整个工具箱，
+ *   与滚动条归属 .blocklyToolboxCategoryGroup 的 CSS 调整配套
  */
 
 /**
@@ -283,15 +287,16 @@ export class ContinuousToolbox extends Blockly.Toolbox {
         if (this.shouldSelectItem_(oldItem, newItem)) {
             this.selectItem_(oldItem, newItem);
             const categoryDiv = newItem.getDiv();
+            const contentsDiv = this.contentsDiv_;
 
-            if (categoryDiv && this.HtmlDiv) {
+            if (categoryDiv && contentsDiv) {
                 const target = Blockly.utils.style.getContainerOffsetToScrollInto(
                     categoryDiv,
-                    this.HtmlDiv,
+                    contentsDiv,
                     false,
                 );
 
-                this.HtmlDiv.scrollTo({
+                contentsDiv.scrollTo({
                     top: target.y,
                     left: target.x,
                     behavior: 'smooth',
