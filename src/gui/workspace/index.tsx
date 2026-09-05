@@ -16,7 +16,7 @@ import EmptyTip2 from '../../assets/empty2.svg?react';
 
 import { t } from 'i18next';
 import { getSpecialTabDefinition } from '../../tabs/specialTabs';
-import SplitPane from '../../components/splitPane';
+import SplitPane, { DIVIDER_WIDTH } from '../../components/splitPane';
 import { debounce } from '../../utils/ash-debounce';
 import { BottomBar } from '../bottomBar';
 import { shortcutManager } from '../../lib/ShortcutManager';
@@ -25,6 +25,7 @@ import TabBar from '../../tabs/TabBar';
 import { useTabsStore } from '../../stores/useTabsStore';
 import { useSideTabsStore, type ISideTab } from '../../stores/useSidetabsStore';
 import { registerBuiltInSideTabs } from './sidebarReg';
+import { Screen, SCREEN_TITLE_HEIGHT } from '../../components/screen';
 
 // 应用生命周期内是否已执行过「首挂载自动打开欢迎标签」。
 // 模块级：语言切换等重挂组件也不会重复触发。
@@ -221,7 +222,18 @@ const WorkSpace = ({ vm }: { vm: IVM }): React.ReactNode => {
     const renderSideTabContent = () => {
         const tab = sideTabs.get(sideTabSelectedId);
         if (!tab) return;
-        return tab.mode === 'split' ? <hr /> : tab.dom;
+        return tab.mode === 'split' ? (
+            <div />
+        ) : (
+            <SplitPane
+                direction='vertical'
+                defaultRatio={1}
+                minFirst={300}
+                minSecond={SCREEN_TITLE_HEIGHT + DIVIDER_WIDTH}
+                first={tab.dom}
+                second={<Screen vm={vm} />}
+            />
+        );
     };
 
     const handleSideTabSelected = (id: string) => {
