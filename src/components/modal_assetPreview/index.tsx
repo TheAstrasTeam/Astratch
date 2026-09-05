@@ -15,7 +15,7 @@ import { t } from 'i18next';
 import { useState } from 'react';
 import classNames from 'classnames';
 
-import BackgroundSwitcher from '../../assets/backgroundSwitcher.svg?react'
+import BackgroundSwitcher from '../../assets/backgroundSwitcher.svg?react';
 
 /** 预览衬底背景，循环切换的顺序 */
 const BACKGROUND_MODES = ['dark', 'light', 'checkerboard'] as const;

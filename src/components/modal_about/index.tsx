@@ -41,9 +41,7 @@ export const AboutModal = () => {
                 </div>
                 <div className={styles.slogan}>{t('gui:about.slogan')}</div>
                 <div className={styles.divider} />
-                <div className={styles.copyright}>
-                    {t('gui:about.copyright')}
-                </div>
+                <div className={styles.copyright}>{t('gui:about.copyright')}</div>
             </div>
         </Modal>
     );

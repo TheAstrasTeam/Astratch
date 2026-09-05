@@ -7,12 +7,7 @@
 // 此文件由AI生成
 
 import type { IAddon, IAddonRegistry, IRegistryAddon, IRegistryVersion } from './types';
-import {
-    cacheGet,
-    cacheSet,
-    setRegistryHash,
-    setFileHash,
-} from './cache';
+import { cacheGet, cacheSet, setRegistryHash, setFileHash } from './cache';
 import { registerAddonI18n } from './i18n';
 
 /**
