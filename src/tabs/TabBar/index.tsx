@@ -24,6 +24,9 @@ import { AllContextMenu } from '../../types/gui';
 import { MenuItem } from '@szhsin/react-menu';
 import { createMenuTrigger } from '../../utils/ash-gui';
 
+// 拖拽幽灵标签，和VSCode类似
+const DRAG_IMAGE_X_OFFSET = 8;
+
 const TabBar = (): React.ReactNode => {
     const tabs = useTabsStore(state => state.tabs);
     const tabOrder = useTabsStore(state => state.tabOrder);
@@ -37,12 +40,30 @@ const TabBar = (): React.ReactNode => {
         .filter((tab): tab is NonNullable<typeof tab> => tab !== undefined);
     const tabBarRef = useRef<HTMLDivElement>(null);
     const [whereIsInContextMenuID, setWhereIsInContextMenuID] = useState('');
-    // 拖拽排序状态：当前拖拽的标签 id，以及悬停目标（在哪个标签的左侧/右侧）
+    // 拖拽排序状态：当前拖拽的标签 id、悬停目标（在哪个标签的左侧/右侧）
     const [dragState, setDragState] = useState<{
         dragId: string;
         targetId: string | null;
         position: 'before' | 'after' | null;
     }>({ dragId: '', targetId: null, position: null });
+
+    // 拖动期间阻止浏览器的猎奇行为，为什么你要一直显示禁止图标
+    useEffect(() => {
+        if (!dragState.dragId) return;
+        const onWindowDragOver = (e: DragEvent) => {
+            e.preventDefault();
+            if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+        };
+        const onWindowDrop = (e: DragEvent) => {
+            e.preventDefault();
+        };
+        window.addEventListener('dragover', onWindowDragOver);
+        window.addEventListener('drop', onWindowDrop);
+        return () => {
+            window.removeEventListener('dragover', onWindowDragOver);
+            window.removeEventListener('drop', onWindowDrop);
+        };
+    }, [dragState.dragId]);
 
     // 活动标签变化时横向滚动标签栏，保证其滚入可见区域
     useEffect(() => {
@@ -60,44 +81,68 @@ const TabBar = (): React.ReactNode => {
         }
     }, [activeTabId, orderedTabs.length]);
 
-    const handleDragStart = useCallback((e: ReactDragEvent<HTMLDivElement>, tabID: string) => {
-        // 从关闭按钮上发起拖拽会被忽略（避免误触发）
-        if ((e.target as HTMLElement).closest('button')) {
-            e.preventDefault();
-            return;
-        }
-        // 拖拽来源需要能在浏览器中正常发起
-        e.dataTransfer.setData('text/plain', tabID);
-        e.dataTransfer.effectAllowed = 'move';
-        setDragState(prev => ({ ...prev, dragId: tabID, targetId: null, position: null }));
-    }, []);
-
-    const handleDragOver = useCallback(
+    const handleDragStart = useCallback(
         (e: ReactDragEvent<HTMLDivElement>, tabID: string) => {
-            if (!dragState.dragId || dragState.dragId === tabID) return;
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-            const rect = e.currentTarget.getBoundingClientRect();
-            // 以标签中线判断悬停在前半/后半 → 插入其左侧/右侧
-            const position = e.clientX < rect.left + rect.width / 2 ? 'before' : 'after';
-            setDragState(prev =>
-                prev.targetId === tabID && prev.position === position
-                    ? prev
-                    : { ...prev, targetId: tabID, position },
+            // 从关闭按钮上发起拖拽会被忽略
+            if ((e.target as HTMLElement).closest('button')) {
+                e.preventDefault();
+                return;
+            }
+            // 拖拽来源需要能在浏览器中正常发起
+            e.dataTransfer.setData('text/plain', tabID);
+            e.dataTransfer.effectAllowed = 'move';
+            // 拖拽幽灵吸附鼠标
+            e.dataTransfer.setDragImage(
+                e.currentTarget,
+                DRAG_IMAGE_X_OFFSET,
+                e.currentTarget.getBoundingClientRect().height / 2,
             );
+            setDragState(() => ({ dragId: tabID, targetId: null, position: null }));
         },
-        [dragState.dragId],
+        [setDragState],
+    );
+
+    // 计算鼠标位置最近的插入间隙：遍历所有标签边界
+    const computeDropPosition = useCallback(
+        (clientX: number): { targetId: string; position: 'before' | 'after' } | null => {
+            const bar = tabBarRef.current;
+            if (!bar || orderedTabs.length === 0) return null;
+            let best: { targetId: string; position: 'before' | 'after' } | null = null;
+            let bestDist = Number.POSITIVE_INFINITY;
+            for (let i = 0; i < orderedTabs.length; i++) {
+                const el = bar.querySelector<HTMLElement>(
+                    `[data-tab-id="${CSS.escape(orderedTabs[i].id)}"]`,
+                );
+                if (!el) continue;
+                const rect = el.getBoundingClientRect();
+                const distLeft = Math.abs(clientX - rect.left);
+                if (distLeft < bestDist) {
+                    bestDist = distLeft;
+                    best = { targetId: orderedTabs[i].id, position: 'before' };
+                }
+                if (i === orderedTabs.length - 1) {
+                    const distRight = Math.abs(clientX - rect.right);
+                    if (distRight < bestDist) {
+                        bestDist = distRight;
+                        best = { targetId: orderedTabs[i].id, position: 'after' };
+                    }
+                }
+            }
+            return best;
+        },
+        [orderedTabs],
     );
 
     const handleDrop = useCallback(
-        (e: ReactDragEvent<HTMLDivElement>, tabID: string) => {
+        (e: ReactDragEvent<HTMLDivElement>) => {
             e.preventDefault();
-            const { dragId, position } = dragState;
-            if (!dragId || dragId === tabID) return;
+            const { dragId, targetId, position } = dragState;
+            if (!dragId || !targetId) return;
             const fromIndex = tabOrder.indexOf(dragId);
-            const targetIndex = tabOrder.indexOf(tabID);
+            const targetIndex = tabOrder.indexOf(targetId);
             if (fromIndex === -1 || targetIndex === -1) return;
-            // 计算拖拽标签应放置的最终下标（移除自身后插入的位置）
+            // 计算拖拽标签应放置的最终下标（移除自身后插入的位置）。
+            // 目标即自身时（吸附到自身相邻间隙）补偿后为 no-op。
             let toIndex = targetIndex;
             if (position === 'after') toIndex += 1;
             if (fromIndex < toIndex) toIndex -= 1;
@@ -108,7 +153,7 @@ const TabBar = (): React.ReactNode => {
 
     const handleDragEnd = useCallback(() => {
         setDragState({ dragId: '', targetId: null, position: null });
-    }, []);
+    }, [setDragState]);
 
     const { openMenu: openTabsMenu } = useContextMenu(AllContextMenu.TABS_EDIT, () => {
         return (
@@ -161,7 +206,7 @@ const TabBar = (): React.ReactNode => {
             setWhereIsInContextMenuID(tabID);
             openTabsMenu(point);
         },
-        [openTabsMenu],
+        [openTabsMenu, setWhereIsInContextMenuID],
     );
 
     const getMenuTrigger = useCallback(
@@ -198,23 +243,23 @@ const TabBar = (): React.ReactNode => {
             ref={tabBarRef}
             className={styles.tabBar}
             onDragOver={e => {
-                // 条目级已 stopPropagation，这里只处理悬停在末尾空白区的情况。
-                // 委托给最后一个标签（等效"追加到末尾"），让它显示右侧插入指示线。
+                // 全局按鼠标位置计算最近的插入间隙（见 computeDropPosition）
                 if (!dragState.dragId) return;
-                const lastTab = orderedTabs[orderedTabs.length - 1];
-                if (lastTab.id === dragState.dragId) return;
                 e.preventDefault();
                 e.dataTransfer.dropEffect = 'move';
-                setDragState(prev =>
-                    prev.targetId === lastTab.id && prev.position === 'after'
-                        ? prev
-                        : { ...prev, targetId: lastTab.id, position: 'after' },
-                );
+                const target = computeDropPosition(e.clientX);
+                setDragState(prev => {
+                    const nextTargetId = target !== null ? target.targetId : prev.targetId;
+                    const nextPosition = target !== null ? target.position : prev.position;
+                    if (prev.targetId === nextTargetId && prev.position === nextPosition) {
+                        return prev;
+                    }
+                    return { ...prev, targetId: nextTargetId, position: nextPosition };
+                });
             }}
             onDrop={e => {
                 if (!dragState.dragId) return;
-                e.preventDefault();
-                handleDrop(e, orderedTabs[orderedTabs.length - 1].id);
+                handleDrop(e);
                 setDragState({ dragId: '', targetId: null, position: null });
             }}
         >
@@ -246,14 +291,6 @@ const TabBar = (): React.ReactNode => {
                         onTouchEnd={menuTrigger.onTouchEnd}
                         onDragStart={e => {
                             handleDragStart(e, tab.id);
-                        }}
-                        onDragOver={e => {
-                            e.stopPropagation();
-                            handleDragOver(e, tab.id);
-                        }}
-                        onDrop={e => {
-                            e.stopPropagation();
-                            handleDrop(e, tab.id);
                         }}
                         onDragEnd={handleDragEnd}
                     >
