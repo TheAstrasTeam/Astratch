@@ -1,8 +1,5 @@
 /* eslint-disable @typescript-eslint/non-nullable-type-assertion-style */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 /**
  * 检查所有源码内的 i18n key 使用情况：
  * - 从 t() 调用中提取 key（基于 TypeScript AST，准确处理模板字符串、注释、嵌套括号）
@@ -293,8 +290,8 @@ async function main() {
             fill: { type: 'string', default: 'fallback' },
         },
     });
-    const insertMissing = values['insert-missing'] === true;
-    const pruneUnused = values['prune-unused'] === true;
+    const insertMissing = values['insert-missing'];
+    const pruneUnused = values['prune-unused'];
     const fill = values.fill as TFillMode;
     if (!['fallback', 'empty', 'key'].includes(fill)) {
         console.error(`无效的 --fill 值: ${fill}（可选 fallback | empty | key）`);
