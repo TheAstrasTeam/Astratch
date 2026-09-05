@@ -240,5 +240,9 @@
     "assets.addText": "新建文本文件",
     "assets.addImage": "新建图片",
     "err.workspace.failed": "工作区创建失败。\n{{err}}",
-    "err.save.failed": "目标数据保存失败。\n{{err}}"
+    "err.save.failed": "目标数据保存失败。\n{{err}}",
+    "assetPreview.switchBackground": "切换预览背景",
+    "stage.title": "舞台",
+    "stage.collapse.title": "折叠舞台",
+    "debug.title": "调试"
 }

@@ -235,5 +235,14 @@
     "workspaceSearch.findNext": "Find next",
     "workspaceSearch.findPrevious": "Find previous",
     "workspaceSearch.close": "Close search bar",
-    "assets.uploadingProgress": "Uploading assets ({{now}}/{{total}})"
+    "assets.uploadingProgress": "Uploading assets ({{now}}/{{total}})",
+    "assetPreview.switchBackground": "Switch Preview Background",
+    "stage.title": "Stage",
+    "stage.collapse.title": "Collapse Stage",
+    "assets.uploadFile": "Upload File",
+    "assets.addText": "New Text",
+    "assets.addImage": "New Image",
+    "assets.nothing": "Nothing here...",
+    "assets.title": "Assets",
+    "debug.title": "Debug"
 }

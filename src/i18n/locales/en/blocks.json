@@ -352,5 +352,6 @@
 
     "debug.log": "log %2 as %1",
     "debug.crash": "stop all and crash with %1",
-    "debug.breakpoint": "breakpoint"
+    "debug.breakpoint": "breakpoint",
+    "event.input.isMouseTouching": "is Mouse Touching?"
 }

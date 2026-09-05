@@ -317,5 +317,6 @@
     "debug.log": "以 %1 输出 %2",
     "debug.crash": "停止全部并报错 %1",
     "debug.breakpoint": "断点",
-    "canvas.triangle": "以顶点 %1 %2、%3 %4、%5 %6 绘制三角形"
+    "canvas.triangle": "以顶点 %1 %2、%3 %4、%5 %6 绘制三角形",
+    "event.input.isMouseTouching": "鼠标正在碰到？"
 }
