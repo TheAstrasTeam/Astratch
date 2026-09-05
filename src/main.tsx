@@ -18,7 +18,7 @@ import { ModalProvider } from '@reactleaf/modal';
 import { initBuiltInSettings } from './settings/index.ts';
 import { Settings } from './settings/SettingsRegistry.ts';
 import { events } from './types/vm/vm.ts';
-import type { TGuiAccent, TGuiTheme } from './types/gui/index.ts';
+import type { TGuiAccent, TGuiTheme } from './types/gui.ts';
 import { Toast } from './lib/ToastManager/index.ts';
 import i18next from 'i18next';
 import { isSupportedLanguage } from './i18n/index.ts';
