@@ -258,8 +258,6 @@ class Target implements ITarget {
         const target = new Target(emit);
         // 默认模板的 data / function 是序列化数组形式，排除掉，保留构造器初始化的空 Map
         const { data: _data, function: _function, ...defaultsRest } = structuredClone(defaults);
-        void _data;
-        void _function;
         Object.assign(target, defaultsRest, {
             id,
             name: meta.name ?? defaults.name,

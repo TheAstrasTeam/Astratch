@@ -154,6 +154,7 @@ const SearchPanel = ({
     }, [isOpen]);
 
     const entries = useMemo<TListEntry[]>(() => {
+        // eslint-disable-next-line @typescript-eslint/no-meaningless-void-operator
         void targetsRevision; // 仅作为重算依赖
 
         // 命令模式：`>` 前缀，标题 + 关键词联合过滤，按匹配质量排序
