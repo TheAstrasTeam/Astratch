@@ -51,42 +51,46 @@ export const BottomBar = ({ vm }: { vm: IVM }): React.ReactNode => {
         };
     }, [vm, noticeButtonRef]);
     return (
-        <div className={styles.main}>
-            <div className={styles.left}>
-                <button className={styles.positionText}>
-                    {vm.isEditingProject &&
-                        t(`gui:bottomBar.positionText`, {
-                            x: overlayText.x,
-                            y: overlayText.y,
-                            scale: overlayText.scale,
-                        })}
-                </button>
+        <>
+            <div className={styles.main}>
+                <div className={styles.left}>
+                    <button className={styles.positionText}>
+                        {vm.isEditingProject &&
+                            t(`gui:bottomBar.positionText`, {
+                                x: overlayText.x,
+                                y: overlayText.y,
+                                scale: overlayText.scale,
+                            })}
+                    </button>
+                </div>
+                <div className={styles.right}>
+                    <button
+                        ref={noticeButtonRef}
+                        onClick={() => {
+                            setHistoryOpen(v => !v);
+                        }}
+                        aria-expanded={historyOpen}
+                    >
+                        {Toast.getFullHistory().length > 0 ? (
+                            <NotificationUnreadIcon />
+                        ) : (
+                            <NotificationIcon />
+                        )}
+                    </button>
+                </div>
             </div>
-            <ToastLayer y={noticeY} />
-            {historyOpen && (
-                <ToastHistoryPanel
-                    anchorY={noticeY}
-                    anchorRef={noticeButtonRef}
-                    onClose={() => {
-                        setHistoryOpen(false);
-                    }}
-                />
-            )}
-            <div className={styles.right}>
-                <button
-                    ref={noticeButtonRef}
-                    onClick={() => {
-                        setHistoryOpen(v => !v);
-                    }}
-                    aria-expanded={historyOpen}
-                >
-                    {Toast.getFullHistory().length > 0 ? (
-                        <NotificationUnreadIcon />
-                    ) : (
-                        <NotificationIcon />
-                    )}
-                </button>
+            <div className={styles.layer}>
+                <ToastLayer y={noticeY} />
+                {historyOpen && (
+                    <ToastHistoryPanel
+                        anchorY={noticeY}
+                        anchorRef={noticeButtonRef}
+                        onClose={() => {
+                            setHistoryOpen(false);
+                        }}
+                    />
+                )}
             </div>
-        </div>
+        </>
     );
 };
