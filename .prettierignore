@@ -3,4 +3,3 @@ dist
 dist-ssr
 pnpm-lock.yaml
 *.local
-*.svg
