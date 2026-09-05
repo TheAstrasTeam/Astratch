@@ -18,6 +18,7 @@ import { ModalProvider } from '@reactleaf/modal';
 import { initBuiltInSettings } from './settings/index.ts';
 import { Settings } from './settings/SettingsRegistry.ts';
 import { events } from './types/vm/vm.ts';
+import type { TGuiAccent, TGuiTheme } from './types/gui/index.ts';
 import { Toast } from './lib/ToastManager/index.ts';
 import i18next from 'i18next';
 import { isSupportedLanguage } from './i18n/index.ts';
@@ -57,7 +58,10 @@ await i18nReady.then(async () => {
             state.guiThemeAccent !== prevState.guiThemeAccent
         ) {
             applyGuiTheme();
-            vm.emit(events.UPDATE_THEME, state);
+            vm.emit(events.UPDATE_THEME, {
+                guiThemeMode: state.guiThemeMode as TGuiTheme,
+                guiThemeAccent: state.guiThemeAccent as TGuiAccent,
+            });
         }
 
         if (state.language !== prevState.language && isSupportedLanguage(state.language)) {

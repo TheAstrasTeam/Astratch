@@ -50,7 +50,6 @@ const AddonDetail = ({ addon, onBack, vm }: { addon: IAddon; onBack: () => void;
             })();
         };
         handleThemeChanged();
-        // @ts-expect-error 它会传递正确的数据
         vm.on(events.UPDATE_THEME, handleThemeChanged);
 
         let cancelled = false;
@@ -63,7 +62,6 @@ const AddonDetail = ({ addon, onBack, vm }: { addon: IAddon; onBack: () => void;
         });
         return () => {
             cancelled = true;
-            // @ts-expect-error 这里不会运行所以不需要
             vm.off(events.UPDATE_THEME, handleThemeChanged);
         };
     }, [addon.id, addon.version, themeMode, vm]);

@@ -40,14 +40,14 @@ export const BottomBar = ({ vm }: { vm: IVM }): React.ReactNode => {
             setNoticeY(rect.top);
         };
 
-        vm.off(events.VIEWPORT_VIEW, handleViewportUpdate as (data: object) => void);
+        vm.off(events.VIEWPORT_VIEW, handleViewportUpdate);
         window.removeEventListener('resize', handleResize);
         window.addEventListener('resize', handleResize);
         handleResize();
-        vm.on(events.VIEWPORT_VIEW, handleViewportUpdate as (data: object) => void);
+        vm.on(events.VIEWPORT_VIEW, handleViewportUpdate);
         return () => {
             window.removeEventListener('resize', handleResize);
-            vm.off(events.VIEWPORT_VIEW, handleViewportUpdate as (data: object) => void);
+            vm.off(events.VIEWPORT_VIEW, handleViewportUpdate);
         };
     }, [vm, noticeButtonRef]);
     return (

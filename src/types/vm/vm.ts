@@ -33,6 +33,10 @@ export const allBuiltInTabs = {
 } as const;
 export type TallBuiltInTabs = (typeof allBuiltInTabs)[keyof typeof allBuiltInTabs];
 
+export interface IStageSize {
+    width: number;
+    height: number;
+}
 export interface IProjectMeta {
     /**
      * 项目作者（们）
@@ -44,6 +48,7 @@ export interface IProjectMeta {
      */
     projectID: string;
     projectMode: TallTarget;
+    projectStageSize: IStageSize;
 }
 
 export interface IVMSettings {
@@ -429,8 +434,9 @@ export interface IRuntime {
 
 /**
  * 事件发送函数（结构体方法用它发事件，绑定 VM 的 emit）
+ * 载荷类型由 IEventMap 按事件名约束
  */
-export type TEmit = (id: TEvents, data?: object) => void;
+export type TEmit = <T extends keyof IEventMap>(id: T, data?: TEventData<T>) => void;
 
 export type DirectoryHandle = FileSystemDirectoryHandle | undefined;
 
@@ -546,20 +552,24 @@ export interface IVM {
      * @param callback 回调
      * @param once 是否只探测一次
      */
-    on(id: TEvents, callback: (data: object) => void, once?: boolean): void;
+    on<T extends keyof IEventMap>(
+        id: T,
+        callback: (data: TEventData<T>) => void,
+        once?: boolean,
+    ): void;
     /**
      * 取消订阅事件
      * @param id 取消订阅的事件
      * @param callback 回调
      */
-    off(id: TEvents, callback: (data: object) => void): void;
+    off<T extends keyof IEventMap>(id: T, callback: (data: TEventData<T>) => void): void;
     /**
      * 发送事件
      * @param id 发送的事件
      * @param data 数据
      * @returns
      */
-    emit(id: TEvents, data?: object): void;
+    emit<T extends keyof IEventMap>(id: T, data?: TEventData<T>): void;
     /**
      * 加载项目
      * @returns 是否加载成功
@@ -574,7 +584,7 @@ export interface IVM {
 }
 
 export interface IEvent {
-    callback?(data: object): void;
+    callback?(data: unknown): void;
     once?: boolean;
 }
 
@@ -591,9 +601,28 @@ export const events = {
     REMOVE_CUSTOM_FUNCTION: 'remove_custom_function',
     LOAD_ASSET: 'load_asset',
     REMOVE_ASSET: 'remove_asset',
+    UPDATE_PROJECT_META: 'update_project_meta',
 } as const;
 
 export type TEvents = (typeof events)[keyof typeof events];
+
+export interface IEventMap {
+    [events.VIEWPORT_VIEW]: TViewportUpdateEvent;
+    [events.CREATE_DATA]: IDataCreatedEvent;
+    [events.CREATE_CUSTOM_FUNCTION]: IFunctionCreatedEvent;
+    [events.EDIT_CUSTOM_FUNCTION]: IFunctionCreatedEvent;
+    [events.REMOVE_CUSTOM_FUNCTION]: IFunctionCreatedEvent;
+    [events.UPDATE_THEME]: IUpdateThemeEvent;
+    [events.LOAD_ASSET]: IAssetEvent;
+    [events.REMOVE_ASSET]: IAssetEvent;
+    [events.UPDATE_PROJECT_META]: TProjectMetaEvent;
+    [events.UPDATE_TARGET_STRUCTURE]: undefined;
+    [events.SWITCH_TARGET]: undefined;
+    [events.UPDATE_PROJECT]: undefined;
+    [events.CREATE_PROJECT]: undefined;
+}
+
+export type TEventData<T extends TEvents> = T extends keyof IEventMap ? IEventMap[T] : undefined;
 
 export type TViewportUpdateEvent =
     | {
@@ -622,6 +651,7 @@ export interface IUpdateThemeEvent {
 export interface IAssetEvent {
     id: string;
 }
+export type TProjectMetaEvent = IStageSize;
 
 export interface IProjectMetaJSON {
     // 截至目前，1 为最新

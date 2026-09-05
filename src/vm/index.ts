@@ -12,7 +12,8 @@ import {
     type IRuntime,
     type IProjectManager,
     type IEvent,
-    type TEvents,
+    type IEventMap,
+    type TEventData,
     projectFileNames,
     events,
     allProjectCheckError,
@@ -64,7 +65,7 @@ export class VM implements IVM {
         this.isEditingProject = false;
     }
 
-    on(id: TEvents, callback: (data: object) => void, once = false) {
+    on<T extends keyof IEventMap>(id: T, callback: (data: TEventData<T>) => void, once = false) {
         if (!this.events.has(id)) this.events.set(id, []);
         const listeners = this.events.get(id);
         if (!listeners) return;
@@ -75,14 +76,14 @@ export class VM implements IVM {
         });
     }
 
-    off(id: TEvents, callback: (data: object) => void) {
+    off<T extends keyof IEventMap>(id: T, callback: (data: TEventData<T>) => void) {
         const listeners = this.events.get(id);
         if (!listeners) return;
         const index = listeners.findIndex(e => e.callback === callback);
         if (index !== -1) listeners.splice(index, 1);
     }
 
-    emit(id: TEvents, data: object = {}) {
+    emit<T extends keyof IEventMap>(id: T, data?: TEventData<T>) {
         const callbacks = this.events.get(id);
         if (!callbacks) return;
 

@@ -17,7 +17,6 @@ import {
     type TTargetTreeNode,
     type IVMSettings,
     type TEmit,
-    type TEvents,
     type TFolderInfo,
     type TTargetInfo,
     type TViewportUpdateEvent,
@@ -48,7 +47,7 @@ class Runtime implements IRuntime {
     folders: Map<TTargetMode, IFolder[]>;
     assets: IAssetManager;
 
-    private emit: TEmit = (id: TEvents, data?: object) => {
+    private emit: TEmit = (id, data) => {
         this.vm.emit(id, data);
     };
 
@@ -140,9 +139,7 @@ class Runtime implements IRuntime {
         this.editingTargetID = '';
 
         // 监听视口更改并将其更新到target meta
-        // VIEWPORT_VIEW 发来的数据总会为 TViewportUpdateEvent
-        // 但是我太懒了所以类型总是object，所以直接as了
-        this.vm.on(events.VIEWPORT_VIEW, this.updateView.bind(this) as (data: object) => void);
+        this.vm.on(events.VIEWPORT_VIEW, this.updateView.bind(this));
     }
 
     createTarget(meta: ITargetMeta, switchTo = true) {

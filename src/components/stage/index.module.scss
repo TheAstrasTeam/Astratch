@@ -1,0 +1,26 @@
+@use '../../gui/styles/color.scss' as *;
+
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid $ui-black-transparent;
+    & .title {
+        background-color: $ui-secondary;
+        width: 100%;
+        padding: 0 3px;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        & .right {
+            & button {
+                padding: 2px;
+                svg {
+                    width: 15px;
+                    height: auto;
+                }
+            }
+        }
+    }
+}
