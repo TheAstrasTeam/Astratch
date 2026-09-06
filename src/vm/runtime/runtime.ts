@@ -30,6 +30,7 @@ import Target from './target';
 import Folder from './folder';
 import { AssetManager } from './data/assets';
 import type { IAssetManager } from '../../types/vm/assets';
+import { ProjectExecutor } from './execution';
 
 /**
  * 运行时，管理关于项目的东西
@@ -47,6 +48,9 @@ class Runtime implements IRuntime {
     DEFAULT_ENTITYINFO: IEntityInfo;
     folders: Map<TTargetMode, IFolder[]>;
     assets: IAssetManager;
+
+    /** 项目执行器：跑目标脚本（JIT + 解释器） */
+    runner: ProjectExecutor;
 
     private emit: TEmit = (id: TEvents, data?: object) => {
         this.vm.emit(id, data);
@@ -85,6 +89,11 @@ class Runtime implements IRuntime {
         // 初始化
         this.folders.set('entity', []);
         this.folders.set('module', []);
+
+        /**
+         * 项目执行器
+         */
+        this.runner = new ProjectExecutor(this.vm);
 
         /**
          * 对于实体额外的info
