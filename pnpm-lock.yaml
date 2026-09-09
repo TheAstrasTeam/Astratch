@@ -78,6 +78,9 @@ importers:
       '@reactleaf/modal':
         specifier: ^2.0.0
         version: 2.0.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@rolldown/binding-linux-x64-gnu':
+        specifier: ^1.2.7
+        version: 1.2.7
       '@rolldown/plugin-babel':
         specifier: ^0.2.3
         version: 0.2.3(@babel/core@8.0.1)(@babel/runtime@7.29.7)(rolldown@1.2.5)(vite@8.2.2(@types/node@26.4.0)(sass@1.103.1))
@@ -578,6 +581,12 @@ packages:
     cpu: [x64]
     os: [linux]
     libc: [glibc]
+
+  '@rolldown/binding-linux-x64-gnu@1.2.7':
+    resolution: {integrity: sha512-r8/z8n7GFaYRln3xmP1Cxy0HH/HLM0uBUPkEuSVEfKGDA89M0FsZRZJRSwe/tJjRx+fpH/gjorfhB8tmEbSFLA==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [linux]
 
   '@rolldown/binding-linux-x64-musl@1.2.5':
     resolution: {integrity: sha512-mY8AP0/ichsbhAxGnLa3d3+MwV0EfgrPND2bplI3Ym8T6R2pJ0N87bvrKVwNXmdy3jnr6eQBecdqx/HMknBmpA==}
@@ -2591,6 +2600,8 @@ snapshots:
 
   '@rolldown/binding-linux-x64-gnu@1.2.5':
     optional: true
+
+  '@rolldown/binding-linux-x64-gnu@1.2.7': {}
 
   '@rolldown/binding-linux-x64-musl@1.2.5':
     optional: true
