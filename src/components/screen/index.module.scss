@@ -1,4 +1,25 @@
 @use '../../gui/styles/color.scss' as *;
+@use '../../gui/styles/constants.scss' as *;
+
+@keyframes controller-collapse-show {
+    from {
+        transform: translateX(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes controller-show {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+    }
+}
 
 .main {
     flex: 1;
@@ -22,5 +43,31 @@
                 }
             }
         }
+    }
+    & .controller {
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
+        padding-left: 5px;
+        &.collapse {
+            animation: controller-collapse-show $time-animation ease forwards;
+        }
+        &:not(.collapse) {
+            animation: controller-show $time-animation ease forwards;
+        }
+    }
+    & .controller-button {
+        background-color: transparent;
+        padding: 5px;
+        margin: 0;
+
+        svg {
+            width: 15px;
+            height: auto;
+        }
+    }
+    & .screen-controller {
+        display: flex;
+        justify-content: space-between;
     }
 }
