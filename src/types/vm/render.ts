@@ -11,6 +11,4 @@ export interface IRender {
 
     /** 初始化渲染器 */
     initRenderer(): void;
-    initWebGPURenderer(): void;
-    initWebGLRenderer(): void;
 }

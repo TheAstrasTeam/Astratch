@@ -32,11 +32,11 @@ export class Render implements IRender {
         }
         this.initWebGLRenderer();
     }
-    initWebGPURenderer(): void {
+    private initWebGPURenderer(): void {
         // TODO: webGPU
         return;
     }
-    initWebGLRenderer(): void {
+    private initWebGLRenderer(): void {
         log(this.getCanvas());
         this.gl =
             this.getCanvas()?.getContext('webgl2') ?? this.getCanvas()?.getContext('webgl') ?? null;

@@ -244,5 +244,6 @@
     "assetPreview.switchBackground": "切换预览背景",
     "screen.title": "屏幕",
     "screen.collapse.title": "折叠屏幕",
+    "screen.expand.title": "展开屏幕",
     "debug.title": "调试"
 }

@@ -239,6 +239,7 @@
     "assetPreview.switchBackground": "Switch Preview Background",
     "screen.title": "Screen",
     "screen.collapse.title": "Collapse Screen",
+    "screen.expand.title": "Expand Screen",
     "assets.uploadFile": "Upload File",
     "assets.addText": "New Text",
     "assets.addImage": "New Image",

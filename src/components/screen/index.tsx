@@ -6,6 +6,7 @@ import { events, type IScreenSize, type IVM, type TProjectMetaEvent } from '../.
 import classNames from 'classnames';
 
 import CollapseIcon from '../../assets/collapse.svg?react';
+import ExpandIcon from '../../assets/expand.svg?react';
 import StartIcon from '../../assets/controls/start.svg?react';
 import StopIcon from '../../assets/controls/stop.svg?react';
 import PauseIcon from '../../assets/controls/pause.svg?react';
@@ -18,6 +19,8 @@ import UnFullModeIcon from '../../assets/unFullScreen.svg?react';
 
 /** 屏幕标题栏的高度 */
 const SCREEN_TITLE_HEIGHT = 30;
+/** 展开后标题栏下方控制器的大致高度 */
+const SCREEN_CONTROLLER_HEIGHT = 27;
 
 const ControllerButtons = ({ collapse = false }: { collapse?: boolean }) => {
     return (
@@ -55,9 +58,19 @@ const Screen = ({ vm }: { vm: IVM }) => {
     );
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const mainRef = useRef<HTMLDivElement>(null);
 
     const handleCollapseScreen = () => {
         setSecondSize(SCREEN_TITLE_HEIGHT);
+        setCollapsing(true);
+    };
+    const handleExpandScreen = () => {
+        const main = mainRef.current;
+        if (!main || !screenSize.width || !screenSize.height) return;
+        // 展开所需高度 = 可用宽度 / (舞台宽 / 舞台高)
+        const canvasHeight = Math.ceil((main.clientWidth * screenSize.height) / screenSize.width);
+        setSecondSize(SCREEN_TITLE_HEIGHT + SCREEN_CONTROLLER_HEIGHT + canvasHeight);
+        setCollapsing(false);
     };
 
     useEffect(() => {
@@ -91,7 +104,7 @@ const Screen = ({ vm }: { vm: IVM }) => {
     );
 
     return (
-        <div className={styles.main}>
+        <div ref={mainRef} className={styles.main}>
             <div className={styles.title} style={{ height: `${String(SCREEN_TITLE_HEIGHT)}px` }}>
                 <div className={styles.left}>
                     <span>{t('gui:screen.title')}</span>
@@ -100,6 +113,17 @@ const Screen = ({ vm }: { vm: IVM }) => {
                     {isCollapsing && (
                         <div className={styles.screenController}>
                             <ControllerButtons collapse={true} />
+                            <button
+                                title={t('gui:screen.expand.title')}
+                                // 焦点切换会让浏览器跳过同帧的 CSS 过渡，导致折叠动画失效
+                                // 太几把奇怪了，铸币浏览器
+                                onMouseDown={e => {
+                                    e.preventDefault();
+                                }}
+                                onClick={handleExpandScreen}
+                            >
+                                <ExpandIcon />
+                            </button>
                         </div>
                     )}
 
