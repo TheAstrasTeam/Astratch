@@ -36,7 +36,7 @@ class Target implements ITarget {
     comments: ITarget['comments'];
     size?: number;
     direction?: number;
-    currentCostume?: number;
+    currentCostumeID?: string | null;
     effects?: ITarget['effects'];
     volume?: number;
     x?: number;
@@ -89,6 +89,7 @@ class Target implements ITarget {
         this.viewY = 0;
         this.viewScale = 1;
         this.links = [];
+        this.currentCostumeID = null;
         this.data = new Map();
         this.function = new Map();
     }
@@ -245,6 +246,22 @@ class Target implements ITarget {
             flatBlock(blockGroup);
         });
         return result;
+    }
+
+    setPosition(x: number, y: number) {
+        this.x = x;
+        this.y = y;
+        this.emit(events.UPDATE_PROJECT);
+    }
+
+    setSize(size: number) {
+        this.size = size;
+        this.emit(events.UPDATE_PROJECT);
+    }
+
+    setDirection(dire: number): void {
+        this.direction = dire;
+        this.emit(events.UPDATE_PROJECT);
     }
 
     static fromMeta(

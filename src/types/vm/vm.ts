@@ -87,7 +87,7 @@ export interface ITarget {
     comments: Record<string, Blockly.serialization.workspaceComments.State>;
     size?: number;
     direction?: number;
-    currentCostume?: number;
+    currentCostumeID?: string | null;
     effects?: ITargetEffects;
     volume?: number;
     x?: number;
@@ -181,6 +181,9 @@ export interface ITarget {
     getFunction(id: string): ICustomFunction | null;
     /** 获取自定义函数的只读快照，供动态工具箱生成内容。 */
     listFunctions(): readonly ICustomFunction[];
+    setPosition(x: number, y: number): void;
+    setSize(size: number): void;
+    setDirection(dire: number): void;
 }
 
 export type TFlatBlocks = Blockly.serialization.blocks.State & { parentID?: string };
@@ -211,6 +214,9 @@ export type TTargetInfo = Omit<
     | 'function'
     | 'getFunction'
     | 'listFunctions'
+    | 'setPosition'
+    | 'setSize'
+    | 'setDirection'
 > & {
     data: IVariable[];
     function: ICustomFunction[];

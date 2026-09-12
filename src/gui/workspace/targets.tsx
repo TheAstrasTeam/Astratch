@@ -19,15 +19,6 @@ import { TargetsList } from '../../components/targets';
 import { TargetAttributes } from '../../components/targetAttributes';
 import { useTargetsStore } from '../../stores/useTargetsStore';
 
-import SpriteIcon from '../../assets/sprite.svg?react';
-import SizeIcon from '../../assets/magnifyingGlass.svg?react';
-import DirectionIcon from '../../assets/direction.svg?react';
-import ArrowIcon from '../../assets/arrow.svg?react';
-import ModuleIcon from '../../assets/module.svg?react';
-import BackIcon from '../../assets/back.svg?react';
-
-import Hr from '../../components/hr';
-
 const TargetsPanel = ({ vm }: { vm: IVM }) => {
     const [currentTargetTab, setCurrentTargetTab] = useState<TTargetMode>('entity');
 
@@ -83,9 +74,6 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
     const expandedFolders = useTargetsStore(state => state.expandedFolders);
     const toggleFolder = useTargetsStore(state => state.toggleFolder);
 
-    const [isOpenTargetPanel, setOpenTargetPanel] = useState<boolean>(false);
-    const [hasToggledTargetPanel, setHasToggledTargetPanel] = useState<boolean>(false);
-
     useEffect(() => {
         const handleTargetSwitch = () => {
             const target = vm.runtime.targets.get(vm.runtime.editingTargetID) ?? null;
@@ -107,48 +95,33 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
         };
     }, [vm]);
 
-    const handleTargetPanelClick = () => {
-        setHasToggledTargetPanel(true);
-        setOpenTargetPanel(true);
-    };
-    const handleTargetPanelBackClick = (e: { stopPropagation: () => void }) => {
-        e.stopPropagation();
-        setOpenTargetPanel(false);
-    };
-
     if (vm.isEditingProject)
         return (
             <>
-                {!isOpenTargetPanel && (
-                    <div className={styles.targetsTab}>
-                        <button
-                            className={classNames(styles.targetTab, {
-                                [styles.isEnable]: currentTargetTab === 'entity',
-                            })}
-                            onClick={() => {
-                                handleSwitchTargetTab('entity');
-                            }}
-                        >
-                            {t('gui:target.entity')}
-                        </button>
-                        <button
-                            className={classNames(styles.targetTab, {
-                                [styles.isEnable]: currentTargetTab === 'module',
-                            })}
-                            onClick={() => {
-                                handleSwitchTargetTab('module');
-                            }}
-                        >
-                            {t('gui:target.module')}
-                        </button>
-                    </div>
-                )}
-                <div
-                    className={classNames(styles.targetsList, {
-                        [styles.closeList]: isOpenTargetPanel,
-                        [styles.openList]: hasToggledTargetPanel && !isOpenTargetPanel,
-                    })}
-                >
+                <div className={styles.targetsTab}>
+                    <button
+                        className={classNames(styles.targetTab, {
+                            [styles.isEnable]: currentTargetTab === 'entity',
+                        })}
+                        onClick={() => {
+                            handleSwitchTargetTab('entity');
+                        }}
+                    >
+                        {t('gui:target.entity')}
+                    </button>
+                    <button
+                        className={classNames(styles.targetTab, {
+                            [styles.isEnable]: currentTargetTab === 'module',
+                        })}
+                        onClick={() => {
+                            handleSwitchTargetTab('module');
+                        }}
+                    >
+                        {t('gui:target.module')}
+                    </button>
+                </div>
+
+                <div className={styles.targetsList}>
                     {currentTargetTab === 'entity' ? (
                         <TargetsList
                             key={targetsVersion}
@@ -176,86 +149,7 @@ const TargetsPanel = ({ vm }: { vm: IVM }) => {
                     )}
                 </div>
                 {selectedTargetID && selectedTarget && (
-                    <div
-                        className={classNames(styles.targetPanel, {
-                            [styles.isExpand]: isOpenTargetPanel,
-                        })}
-                        onClick={handleTargetPanelClick}
-                    >
-                        {!isOpenTargetPanel ? (
-                            <>
-                                {selectedTarget.mode === 'entity' && (
-                                    <div className={styles.targetPanelTop}>
-                                        <div className={styles.targetPanelInfo}>
-                                            <SizeIcon />
-                                            <span>{selectedTarget.size}</span>
-                                        </div>
-                                        <div className={styles.targetPanelInfo}>
-                                            <DirectionIcon
-                                                style={{
-                                                    transform: `rotate(${String(selectedTarget.direction ?? 90)}deg)`,
-                                                }}
-                                            />
-                                            <span>{selectedTarget.direction}</span>
-                                        </div>
-                                        <div className={styles.targetPanelInfo}>
-                                            <ArrowIcon />
-                                            <span>{selectedTarget.x}</span>
-                                        </div>
-                                        <div className={styles.targetPanelInfo}>
-                                            <ArrowIcon className={styles.targetPanelInfoY} />
-                                            <span>{selectedTarget.y}</span>
-                                        </div>
-                                    </div>
-                                )}
-                                <div className={styles.targetPanelBottom}>
-                                    <div className={styles.targetPanelLeft}>
-                                        <SpriteIcon className={styles.targetPanelIcon} />
-                                    </div>
-                                    <div className={styles.targetPanelRight}>
-                                        <span className={styles.targetPanelTitle}>
-                                            {selectedTarget.mode === 'module'
-                                                ? t('gui:target.module')
-                                                : t('gui:target.entity')}
-                                        </span>
-                                        <span className={styles.targetPanelContent}>
-                                            {selectedTarget.name}
-                                        </span>
-                                    </div>
-                                </div>
-                            </>
-                        ) : (
-                            <div className={styles.targetInfoPanel}>
-                                <button
-                                    onClick={handleTargetPanelBackClick}
-                                    className={styles.back}
-                                >
-                                    <BackIcon />
-                                </button>
-                                <SpriteIcon className={styles.targetPanelIcon} />
-                                <span className={styles.title}>{selectedTarget.name}</span>
-                                {selectedTarget.mode === 'module' ? (
-                                    <div className={styles.mode}>
-                                        <ModuleIcon />
-                                        <span>{t('gui:target.module')}</span>
-                                    </div>
-                                ) : (
-                                    <div className={styles.mode}>
-                                        <SpriteIcon />
-                                        <span>{t('gui:target.entity')}</span>
-                                    </div>
-                                )}
-                                <Hr label={t('gui:attribute')} />
-                                {selectedTarget.mode === 'entity' && (
-                                    <TargetAttributes vm={vm} target={selectedTarget} />
-                                )}
-                                <Hr label={t('gui:link')} />
-                                {selectedTarget.links.map(moduleID => (
-                                    <div>{moduleID}</div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
+                    <TargetAttributes vm={vm} targetID={selectedTargetID} />
                 )}
             </>
         );

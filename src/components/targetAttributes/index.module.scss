@@ -1,47 +1,65 @@
-.attributes {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    width: 100%;
-    padding: 0 15px;
-}
+@use '../../gui/styles/constants.scss' as *;
+@use '../../gui/styles/color.scss' as *;
 
-.attribute-row {
+.target-attributes {
+    padding: 5px;
     display: flex;
-    align-items: center;
-    justify-content: space-around;
-    gap: 6px;
-    width: 100%;
-
-    .icons {
+    flex: 0 1;
+    border: $border-width solid $ui-black-transparent;
+    .right,
+    .left {
         display: flex;
-        align-items: center;
-        gap: 10px;
+        flex: 1;
     }
-    .attribute-icon {
-        width: 15px;
-        height: 15px;
-        flex: 0 0 15px;
-        opacity: 0.5;
-
-        &.rotated {
-            transform: rotate(90deg);
+    .left {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        .target-icon {
+            width: 50px;
+            height: auto;
+            flex: 1;
+        }
+        .bottom {
+            display: flex;
+            flex-direction: row;
+            gap: 5px;
+            svg {
+                width: 15px;
+                height: auto;
+            }
+            .icon {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+            input {
+                width: 100%;
+            }
         }
     }
-
-    .attribute-input {
-        min-width: 0;
-        margin: 0;
-        padding: 3px 5px;
-        text-align: left;
-    }
-
-    .attribute-button {
-        width: 24px;
-        height: 24px;
-        margin: 0;
-        padding: 0;
-        flex: 0 0 24px;
-        font-size: small;
+    .right {
+        flex-direction: column;
+        .attr-box {
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+            .icon {
+                display: flex;
+                gap: 5px;
+                align-items: center;
+                svg {
+                    width: 15px;
+                    height: auto;
+                }
+            }
+            span {
+                width: max-content;
+            }
+            input {
+                width: 50%;
+            }
+        }
     }
 }

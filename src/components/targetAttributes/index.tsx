@@ -4,116 +4,162 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, type ComponentType, type SVGProps } from 'react';
+import { useEffect, useState } from 'react';
 import type { IVM, ITarget } from '../../types/vm/vm';
 import { events } from '../../types/vm/vm';
 import { t } from 'i18next';
-import classNames from 'classnames';
+// import classNames from 'classnames';
 import styles from './index.module.scss';
 
 import ArrowIcon from '../../assets/arrow.svg?react';
 import DirectionIcon from '../../assets/direction.svg?react';
 import SizeIcon from '../../assets/magnifyingGlass.svg?react';
+import SpriteIcon from '../../assets/sprite.svg?react';
+import ModuleIcon from '../../assets/module.svg?react';
+// import BackIcon from '../../assets/back.svg?react';
+import { getAssetObjectURL } from '../../utils/asset-url';
 
-type TAttributeKey = 'x' | 'y' | 'direction' | 'size';
-
-interface IAttributeConfig {
-    key: TAttributeKey;
-    label: string;
-    step: number;
-    min?: number;
-    /** Y 轴箭头需要旋转 90° */
-    rotatedIcon?: boolean;
-    Icon: ComponentType<SVGProps<SVGSVGElement>>;
-}
-
-const ATTRIBUTES: IAttributeConfig[] = [
-    { key: 'x', label: 'gui:target.attr.x', step: 10, Icon: ArrowIcon },
-    { key: 'y', label: 'gui:target.attr.y', step: 10, rotatedIcon: true, Icon: ArrowIcon },
-    { key: 'direction', label: 'gui:target.attr.direction', step: 15, Icon: DirectionIcon },
-    { key: 'size', label: 'gui:target.attr.size', step: 10, min: 0, Icon: SizeIcon },
-];
-
-const AttributeRow = ({
+const SpawnTargetIcon = ({
     vm,
-    targetID,
-    config,
+    targetInfo,
+    className,
 }: {
     vm: IVM;
-    targetID: string;
-    config: IAttributeConfig;
+    targetInfo: ITarget | undefined;
+    className: string;
 }) => {
-    const readValue = () => vm.runtime.getTargetByID(targetID)?.[config.key] ?? 0;
+    if (!targetInfo) return;
+    const target = vm.runtime.assets.getAsset(targetInfo.currentCostumeID ?? '');
+    if (!target)
+        return targetInfo.mode === 'entity' ? (
+            <SpriteIcon className={className} />
+        ) : (
+            <ModuleIcon className={className} />
+        );
+    return <img className={className} src={getAssetObjectURL(target.blob, target.mimeType)} />;
+};
 
-    const [draft, setDraft] = useState(() => String(readValue()));
+const TargetAttributes = ({ vm, targetID }: { vm: IVM; targetID: string }) => {
+    const [targetInfo, setTargetInfo] = useState(vm.runtime.getTargetByID(targetID));
+    const [, forceUpdate] = useState(0);
 
-    const commit = (raw: string) => {
+    const updateMeta = (callback: (target: ITarget) => void) => {
         const target = vm.runtime.getTargetByID(targetID);
         if (!target) return;
-        const value = Number(raw);
-        if (Number.isNaN(value)) {
-            setDraft(String(readValue()));
-            return;
-        }
-        const clamped = config.min !== undefined ? Math.max(config.min, value) : value;
-        target[config.key] = clamped;
-        setDraft(String(clamped));
-        vm.emit(events.UPDATE_PROJECT);
+        callback(target);
+        setTargetInfo(() => target);
+        forceUpdate(v => v + 1);
     };
 
-    const Icon = config.Icon;
+    const handleXChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
+        updateMeta(target => {
+            target.setPosition(Number(e.target.value), target.y ?? 0);
+        });
+    };
 
+    const handleYChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
+        updateMeta(target => {
+            target.setPosition(target.x ?? 0, Number(e.target.value));
+        });
+    };
+
+    const handleSizeChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
+        updateMeta(target => {
+            target.setSize(Number(e.target.value));
+        });
+    };
+
+    const handleDirectionChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
+        updateMeta(target => {
+            target.setDirection(Number(e.target.value));
+        });
+    };
+
+    useEffect(() => {
+        const handleUpdate = () => {
+            setTargetInfo(() => vm.runtime.getTargetByID(targetID));
+            forceUpdate(v => v + 1);
+        };
+        vm.off(events.UPDATE_PROJECT, handleUpdate);
+        vm.off(events.SWITCH_TARGET, handleUpdate);
+        vm.off(events.UPDATE_TARGET_STRUCTURE, handleUpdate);
+        vm.on(events.UPDATE_PROJECT, handleUpdate);
+        vm.on(events.SWITCH_TARGET, handleUpdate);
+        vm.on(events.UPDATE_TARGET_STRUCTURE, handleUpdate);
+        return () => {
+            vm.off(events.UPDATE_PROJECT, handleUpdate);
+            vm.off(events.SWITCH_TARGET, handleUpdate);
+            vm.off(events.UPDATE_TARGET_STRUCTURE, handleUpdate);
+        };
+    });
     return (
-        <div className={styles.attributeRow}>
-            <div className={styles.icons}>
-                <Icon
-                    className={classNames(styles.attributeIcon, {
-                        [styles.rotated]: config.rotatedIcon,
-                    })}
-                    style={
-                        config.key === 'direction'
-                            ? {
-                                  transform: `rotate(${draft}deg)`,
-                              }
-                            : {}
-                    }
-                />
-                <span>{t(config.label)}</span>
+        <div className={styles.targetAttributes}>
+            <div className={styles.left}>
+                <SpawnTargetIcon vm={vm} targetInfo={targetInfo} className={styles.targetIcon} />
+                <div
+                    className={styles.bottom}
+                    title={t(
+                        targetInfo?.mode === 'entity' ? 'gui:target.entity' : 'gui:target.module',
+                    )}
+                >
+                    {targetInfo?.mode === 'entity' ? (
+                        <SpriteIcon className={styles.targetIcon} />
+                    ) : (
+                        <ModuleIcon className={styles.targetIcon} />
+                    )}
+                    <span>{targetInfo?.name}</span>
+                </div>
             </div>
-            <input
-                className={styles.attributeInput}
-                type='number'
-                title={config.label}
-                aria-label={config.label}
-                value={draft}
-                onChange={e => {
-                    setDraft(e.target.value);
-                }}
-                onBlur={e => {
-                    commit(e.target.value);
-                }}
-                onKeyDown={e => {
-                    if (e.key === 'Enter') commit((e.target as HTMLInputElement).value);
-                }}
-            />
+            {targetInfo?.mode === 'entity' && (
+                <div className={styles.right}>
+                    <div className={styles.attrBox}>
+                        <div className={styles.icon}>
+                            <ArrowIcon />
+                            <span>{t('gui:target.attr.x')}</span>
+                        </div>
+                        <input type='number' value={targetInfo.x} onChange={handleXChanged} />
+                    </div>
+                    <div className={styles.attrBox}>
+                        <div className={styles.icon}>
+                            <ArrowIcon
+                                style={{
+                                    transform: 'rotate(90deg)',
+                                }}
+                            />
+                            <span>{t('gui:target.attr.y')}</span>
+                        </div>
+                        <input type='number' value={targetInfo.y} onChange={handleYChanged} />
+                    </div>
+                    <div className={styles.attrBox}>
+                        <div className={styles.icon}>
+                            <SizeIcon />
+                            <span>{t('gui:target.attr.size')}</span>
+                        </div>
+                        <input
+                            type='number'
+                            value={targetInfo.size}
+                            onChange={handleSizeChanged}
+                        />
+                    </div>
+                    <div className={styles.attrBox}>
+                        <div className={styles.icon}>
+                            <DirectionIcon
+                                style={{
+                                    transform: `rotate(${String(targetInfo.direction ?? 0)}deg)`,
+                                }}
+                            />
+                            <span>{t('gui:target.attr.direction')}</span>
+                        </div>
+                        <input
+                            type='number'
+                            value={targetInfo.direction}
+                            onChange={handleDirectionChanged}
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
 
-export const TargetAttributes = ({ vm, target }: { vm: IVM; target: ITarget }) => {
-    if (target.mode !== 'entity') return null;
-    return (
-        <div className={styles.attributes}>
-            {ATTRIBUTES.map(attr => (
-                <AttributeRow
-                    key={`${target.id}-${attr.key}`}
-                    vm={vm}
-                    targetID={target.id}
-                    config={attr}
-                />
-            ))}
-        </div>
-    );
-};
-
-export default TargetAttributes;
+export { TargetAttributes };
