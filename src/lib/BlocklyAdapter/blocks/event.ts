@@ -6,8 +6,8 @@
 
 import * as Blockly from 'blockly/core';
 import { t } from 'i18next';
-import startIcon from '../../../assets/start.svg';
-import stopIcon from '../../../assets/stop.svg';
+import startIcon from '../../../assets/controls/start.svg';
+import stopIcon from '../../../assets/controls/stop.svg';
 import { BlocksColor, OPCODES } from '../../../types/vm/blocks';
 import { connections, hatConnections, returnConnections } from './helpers';
 import {

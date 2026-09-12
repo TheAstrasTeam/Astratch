@@ -29,6 +29,8 @@ import Target from './target';
 import Folder from './folder';
 import { AssetManager } from './data/assets';
 import type { IAssetManager } from '../../types/vm/assets';
+import { Render } from './render';
+import type { IRender } from '../../types/vm/render';
 
 /**
  * 运行时，管理关于项目的东西
@@ -46,6 +48,7 @@ class Runtime implements IRuntime {
     DEFAULT_ENTITYINFO: IEntityInfo;
     folders: Map<TTargetMode, IFolder[]>;
     assets: IAssetManager;
+    render: IRender;
 
     private emit: TEmit = (id, data) => {
         this.vm.emit(id, data);
@@ -66,6 +69,11 @@ class Runtime implements IRuntime {
          * 存储项目设置
          */
         this.settings = new Settings(this.vm);
+
+        /**
+         * 画布渲染
+         */
+        this.render = new Render(this.vm);
 
         /**
          * Targets
