@@ -10,7 +10,7 @@
     "err.fs.cannotFoundTargets": "找不到目标文件夹",
     "err.fs.entityHandleLost": "实体文件夹句柄丢失",
     "err.fs.moduleHandleLost": "模块文件夹句柄丢失",
-    "err.fs.assetHandleLost": "资产文件夹句柄丢失",
+    "err.fs.assetHandleLost": "资源文件夹句柄丢失",
     "err.project.apiUnavailable": "文件系统API不可用",
     "err.project.nothingSelected": "请先加载或创建一个项目！",
     "err.project.folderNotEmpty": "请选择一个空文件夹！",
@@ -22,8 +22,8 @@
     "err.customFunction.existing": "自定义函数已存在",
     "err.customFunction.inexistent": "自定义函数不存在",
     "err.customFunction.using": "自定义函数正在被使用",
-    "asset.existing": "资产已存在",
-    "asset.noExisting": "资产不存在",
-    "asset.spawnHashFailed": "资产生成哈希失败",
+    "asset.existing": "资源已存在",
+    "asset.noExisting": "资源不存在",
+    "asset.spawnHashFailed": "资源生成哈希失败",
     "render.getWebGLFailed": "WebGL 加载失败"
 }
