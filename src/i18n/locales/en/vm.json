@@ -24,5 +24,6 @@
     "err.customFunction.using": "The custom function is in use",
     "asset.existing": "Asset already exists",
     "asset.noExisting": "Asset does not exist",
-    "asset.spawnHashFailed": "Failed to generate asset hash"
+    "asset.spawnHashFailed": "Failed to generate asset hash",
+    "render.getWebGLFailed": "Failed to load WebGL"
 }

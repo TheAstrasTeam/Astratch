@@ -70,4 +70,18 @@
         display: flex;
         justify-content: space-between;
     }
+    & .screen-div {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex: 1;
+        overflow: hidden;
+        & .screen {
+            min-width: 0;
+            min-height: 0;
+            object-fit: contain;
+            max-width: 100%;
+            max-height: 100%;
+        }
+    }
 }

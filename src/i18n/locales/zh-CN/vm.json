@@ -24,5 +24,6 @@
     "err.customFunction.using": "自定义函数正在被使用",
     "asset.existing": "资产已存在",
     "asset.noExisting": "资产不存在",
-    "asset.spawnHashFailed": "资产生成哈希失败"
+    "asset.spawnHashFailed": "资产生成哈希失败",
+    "render.getWebGLFailed": "WebGL 加载失败"
 }

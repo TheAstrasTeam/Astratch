@@ -1,4 +1,4 @@
-﻿// 此文件由AI生成
+// 此文件由AI生成
 /**
  * @license
  * Copyright 2026 AstrasTeam

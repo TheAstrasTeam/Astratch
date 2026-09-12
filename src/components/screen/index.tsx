@@ -1,7 +1,7 @@
 import { t } from 'i18next';
 import styles from './index.module.scss';
 import { useSplitPane } from '../splitPane/context';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { events, type IScreenSize, type IVM, type TProjectMetaEvent } from '../../types/vm/vm';
 import classNames from 'classnames';
 
@@ -54,17 +54,26 @@ const Screen = ({ vm }: { vm: IVM }) => {
         vm.runtime.settings.projectMeta.projectScreenSize,
     );
 
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+
     const handleCollapseScreen = () => {
         setSecondSize(SCREEN_TITLE_HEIGHT);
     };
 
     useEffect(() => {
+        const selectCanvas = (needInit = false) => {
+            if (!canvasRef.current) return;
+            vm.runtime.render.setCanvas(canvasRef.current);
+            if (needInit) vm.runtime.render.initRenderer();
+        };
         const handleUpdateScreenSize = (size: TProjectMetaEvent) => {
             setScreenSize({
                 width: size.width,
                 height: size.height,
             });
+            selectCanvas();
         };
+        selectCanvas(true);
         vm.off(events.UPDATE_PROJECT_META, handleUpdateScreenSize);
         vm.on(events.UPDATE_PROJECT_META, handleUpdateScreenSize);
         return () => {
@@ -123,8 +132,14 @@ const Screen = ({ vm }: { vm: IVM }) => {
                             </button>
                         </div>
                     </div>
-
-                    <canvas width={screenSize.width} height={screenSize.height} />
+                    <div className={styles.screenDiv}>
+                        <canvas
+                            className={styles.screen}
+                            ref={canvasRef}
+                            width={screenSize.width}
+                            height={screenSize.height}
+                        />
+                    </div>
                 </>
             )}
         </div>

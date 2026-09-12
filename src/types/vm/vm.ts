@@ -8,6 +8,7 @@ import type { IBlocks, ICustomFunction, IWorkspaceState } from './blocks';
 import * as Blockly from 'blockly/core';
 import type { TGuiAccent, TGuiTheme } from '../gui';
 import type { IAssetManager } from './assets';
+import type { IRender } from './render';
 
 export const DATA_VISIBILITY = {
     PUBLIC: 'public',
@@ -323,6 +324,10 @@ export interface IRuntime {
      * 资源池
      */
     assets: IAssetManager;
+    /**
+     * 画布渲染
+     */
+    render: IRender;
     /**
      * 对于实体额外的info
      */
