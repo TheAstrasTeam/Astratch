@@ -1,0 +1,55 @@
+@use '../../gui/styles/color.scss' as *;
+@use '../../gui/styles/constants.scss' as *;
+@use '../../gui/styles/zIndex.scss' as *;
+
+@keyframes tip-in {
+    from {
+        opacity: 0;
+        transform: translateY(4px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes tip-out {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(4px) scale(0.98);
+    }
+}
+
+.tipBox {
+    position: fixed;
+    overflow: visible;
+    z-index: $tooltip;
+    max-width: 320px;
+    padding: 6px 8px;
+    border: $ui-black-transparent $border-width solid;
+    border-radius: 4px;
+    background-color: $ui-secondary;
+    color: $text-primary;
+    font-size: 12px;
+    line-height: 1.4;
+    word-break: break-word;
+    pointer-events: auto;
+    user-select: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transform-origin: top left;
+    animation: tip-in $time-hover ease both;
+}
+
+.tipBox.leaving {
+    animation: tip-out $time-hover ease both;
+}
+
+.markdown {
+    p {
+        margin: 0;
+    }
+}

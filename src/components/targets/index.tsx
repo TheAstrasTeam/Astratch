@@ -23,6 +23,7 @@ import { AllContextMenu } from '../../types/gui';
 import { MenuItem } from '@szhsin/react-menu';
 import { openMenuByMouseDown } from '../../utils/ash-gui';
 import { PromptModal } from '../modal_prompt';
+import { Box } from '../Box';
 
 // 部分拖动代码由AI生成
 
@@ -178,20 +179,22 @@ const GenerateFoldersAndTargets = ({
             >
                 <span>{target.name}</span>
                 <div className={styles.folderLeft}>
-                    <button
-                        className={classNames(styles.button, styles.remove)}
-                        onClick={handleRenameTarget}
-                        title={t('gui:target.rename')}
-                    >
-                        <RenameIcon className={classNames(styles.removeIcon)} />
-                    </button>
-                    <button
-                        className={classNames(styles.button, styles.remove)}
-                        onClick={handleRemoveClicked}
-                        title={t('gui:target.remove')}
-                    >
-                        <RemoveIcon className={classNames(styles.removeIcon)} />
-                    </button>
+                    <Box title={t('gui:target.rename')}>
+                        <button
+                            className={classNames(styles.button, styles.remove)}
+                            onClick={handleRenameTarget}
+                        >
+                            <RenameIcon className={classNames(styles.removeIcon)} />
+                        </button>
+                    </Box>
+                    <Box title={t('gui:target.remove')}>
+                        <button
+                            className={classNames(styles.button, styles.remove)}
+                            onClick={handleRemoveClicked}
+                        >
+                            <RemoveIcon className={classNames(styles.removeIcon)} />
+                        </button>
+                    </Box>
                 </div>
             </li>
         );
@@ -230,34 +233,38 @@ const GenerateFoldersAndTargets = ({
                     <span>{target.name}</span>
                 </div>
                 <div className={styles.folderLeft}>
-                    <button
-                        className={classNames(styles.button, styles.remove)}
-                        onClick={handleCreateTarget}
-                        title={t('gui:target.add')}
-                    >
-                        <AddIcon className={classNames(styles.removeIcon)} />
-                    </button>
-                    <button
-                        className={classNames(styles.button, styles.remove)}
-                        onClick={handleCreateFolder}
-                        title={t('gui:target.createFolder')}
-                    >
-                        <FolderIcon className={classNames(styles.removeIcon)} />
-                    </button>
-                    <button
-                        className={classNames(styles.button, styles.remove)}
-                        onClick={handleRenameTarget}
-                        title={t('gui:target.rename')}
-                    >
-                        <RenameIcon className={classNames(styles.removeIcon)} />
-                    </button>
-                    <button
-                        className={classNames(styles.button, styles.remove)}
-                        onClick={handleRemoveClicked}
-                        title={t('gui:target.remove')}
-                    >
-                        <RemoveIcon className={classNames(styles.removeIcon)} />
-                    </button>
+                    <Box title={t('gui:target.add')}>
+                        <button
+                            className={classNames(styles.button, styles.remove)}
+                            onClick={handleCreateTarget}
+                        >
+                            <AddIcon className={classNames(styles.removeIcon)} />
+                        </button>
+                    </Box>
+                    <Box title={t('gui:target.createFolder')}>
+                        <button
+                            className={classNames(styles.button, styles.remove)}
+                            onClick={handleCreateFolder}
+                        >
+                            <FolderIcon className={classNames(styles.removeIcon)} />
+                        </button>
+                    </Box>
+                    <Box title={t('gui:target.rename')}>
+                        <button
+                            className={classNames(styles.button, styles.remove)}
+                            onClick={handleRenameTarget}
+                        >
+                            <RenameIcon className={classNames(styles.removeIcon)} />
+                        </button>
+                    </Box>
+                    <Box title={t('gui:target.remove')}>
+                        <button
+                            className={classNames(styles.button, styles.remove)}
+                            onClick={handleRemoveClicked}
+                        >
+                            <RemoveIcon className={classNames(styles.removeIcon)} />
+                        </button>
+                    </Box>
                 </div>
             </div>
 
@@ -469,13 +476,14 @@ export const TargetsList = ({
                     }}
                 />
                 {onAdd && (
-                    <button
-                        className={styles.entityAdd}
-                        onMouseDown={openMenuByMouseDown(openAddMenu)}
-                        title={t('gui:target.create')}
-                    >
-                        <AddIcon />
-                    </button>
+                    <Box title={t('gui:target.create')}>
+                        <button
+                            className={styles.entityAdd}
+                            onMouseDown={openMenuByMouseDown(openAddMenu)}
+                        >
+                            <AddIcon />
+                        </button>
+                    </Box>
                 )}
             </div>
             <div

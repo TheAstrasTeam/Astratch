@@ -14,6 +14,7 @@ import { getAssetObjectURL } from '../../utils/asset-url';
 import { t } from 'i18next';
 import { useState } from 'react';
 import classNames from 'classnames';
+import { Box } from '../Box';
 
 import BackgroundSwitcher from '../../assets/backgroundSwitcher.svg?react';
 
@@ -44,13 +45,11 @@ export const AssetPreviewModal = ({ asset }: { asset: IAsset }) => {
             <div className={classNames(styles.content, styles[backgroundMode])}>
                 {asset.type === 'image' ? (
                     <>
-                        <button
-                            className={styles.switchBackground}
-                            title={t('gui:assetPreview.switchBackground')}
-                            onClick={switchBackground}
-                        >
-                            <BackgroundSwitcher />
-                        </button>
+                        <Box title={t('gui:assetPreview.switchBackground')}>
+                            <button className={styles.switchBackground} onClick={switchBackground}>
+                                <BackgroundSwitcher />
+                            </button>
+                        </Box>
                         <img
                             className={styles.image}
                             src={getAssetObjectURL(asset.blob, asset.mimeType)}

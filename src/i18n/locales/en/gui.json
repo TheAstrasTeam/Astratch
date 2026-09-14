@@ -247,6 +247,6 @@
     "assets.title": "Assets",
     "debug.title": "Debug",
     "render.getWebGLFailed": "Get WebGL Failed",
-    "target.attr.asset": "Manage Assets",
+    "target.attr.assets": "Manage Assets",
     "target.attr.link": "Link"
 }

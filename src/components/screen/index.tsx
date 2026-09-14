@@ -1,6 +1,7 @@
 import { t } from 'i18next';
 import styles from './index.module.scss';
 import { useSplitPane } from '../splitPane/context';
+import { Box } from '../Box';
 import { useEffect, useRef, useState } from 'react';
 import { events, type IScreenSize, type IVM, type TProjectMetaEvent } from '../../types/vm/vm';
 import classNames from 'classnames';
@@ -115,32 +116,34 @@ const Screen = ({ vm }: { vm: IVM }) => {
                     {isCollapsing && (
                         <div className={styles.screenController}>
                             <ControllerButtons collapse={true} />
+                            <Box title={t('gui:screen.expand.title')}>
+                                <button
+                                    // 焦点切换会让浏览器跳过同帧的 CSS 过渡，导致折叠动画失效
+                                    // 太几把奇怪了，铸币浏览器
+                                    onMouseDown={e => {
+                                        e.preventDefault();
+                                    }}
+                                    onClick={handleExpandScreen}
+                                >
+                                    <ExpandIcon />
+                                </button>
+                            </Box>
+                        </div>
+                    )}
+
+                    {!isCollapsing && (
+                        <Box title={t('gui:screen.collapse.title')}>
                             <button
-                                title={t('gui:screen.expand.title')}
                                 // 焦点切换会让浏览器跳过同帧的 CSS 过渡，导致折叠动画失效
                                 // 太几把奇怪了，铸币浏览器
                                 onMouseDown={e => {
                                     e.preventDefault();
                                 }}
-                                onClick={handleExpandScreen}
+                                onClick={handleCollapseScreen}
                             >
-                                <ExpandIcon />
+                                <CollapseIcon />
                             </button>
-                        </div>
-                    )}
-
-                    {!isCollapsing && (
-                        <button
-                            title={t('gui:screen.collapse.title')}
-                            // 焦点切换会让浏览器跳过同帧的 CSS 过渡，导致折叠动画失效
-                            // 太几把奇怪了，铸币浏览器
-                            onMouseDown={e => {
-                                e.preventDefault();
-                            }}
-                            onClick={handleCollapseScreen}
-                        >
-                            <CollapseIcon />
-                        </button>
+                        </Box>
                     )}
                 </div>
             </div>

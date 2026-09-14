@@ -24,6 +24,7 @@ import {
 } from '../../stores/useModalWindowStore';
 import { useModalRelationshipStore } from '../../stores/useModalRelationshipStore';
 import { spawnRandomString } from '../../utils/ash-data';
+import { Box } from '../Box';
 
 export const Modal = ({
     fullScreen,
@@ -239,7 +240,9 @@ export const Modal = ({
         >
             <div className={styles.bar}>
                 <div className={styles.barLeft}>
-                    <span title={description}>{title}</span>
+                    <Box title={description}>
+                        <span>{title}</span>
+                    </Box>
                 </div>
                 <div className={styles.barRight}>
                     <button onClick={handleClose} className={styles.controlButton}>

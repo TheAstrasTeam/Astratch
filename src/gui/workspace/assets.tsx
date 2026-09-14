@@ -22,6 +22,7 @@ import { spawnRandomString } from '../../utils/ash-data';
 import { getAssetObjectURL } from '../../utils/asset-url';
 import { modal } from '../../components/Modal/modal';
 import { AssetPreviewModal } from '../../components/modal_assetPreview';
+import { Box } from '../../components/Box';
 
 const ArrayBufferToImage = ({
     arrayBuffer,
@@ -130,13 +131,14 @@ const AssetsPanel = ({ vm }: { vm: IVM }) => {
                     }}
                 />
 
-                <button
-                    className={styles.assetsAdd}
-                    onMouseDown={openMenuByMouseDown(openAddMenu)}
-                    title={t('gui:target.create')}
-                >
-                    <AddIcon />
-                </button>
+                <Box title={t('gui:target.create')}>
+                    <button
+                        className={styles.assetsAdd}
+                        onMouseDown={openMenuByMouseDown(openAddMenu)}
+                    >
+                        <AddIcon />
+                    </button>
+                </Box>
             </div>
             <hr />
             <div className={styles.assets}>
@@ -147,29 +149,29 @@ const AssetsPanel = ({ vm }: { vm: IVM }) => {
                     <div className={styles.empty}>{t('gui:assets.nothing')}</div>
                 ) : (
                     filteredAssets.map(asset => (
-                        <div
-                            key={asset.id}
-                            className={styles.asset}
-                            title={asset.name}
-                            onClick={() => {
-                                void modal.open(AssetPreviewModal, { asset });
-                            }}
-                        >
-                            <div className={styles.image}>
-                                <AssetPreview asset={asset} />
+                        <Box key={asset.id} title={asset.name}>
+                            <div
+                                className={styles.asset}
+                                onClick={() => {
+                                    void modal.open(AssetPreviewModal, { asset });
+                                }}
+                            >
+                                <div className={styles.image}>
+                                    <AssetPreview asset={asset} />
+                                </div>
+                                <div className={styles.bar}>
+                                    <span className={styles.name}>{asset.name}</span>
+                                    <button
+                                        className={styles.remove}
+                                        onClick={() => {
+                                            handleRemoveAsset(asset.id);
+                                        }}
+                                    >
+                                        <RemoveIcon />
+                                    </button>
+                                </div>
                             </div>
-                            <div className={styles.bar}>
-                                <span className={styles.name}>{asset.name}</span>
-                                <button
-                                    className={styles.remove}
-                                    onClick={() => {
-                                        handleRemoveAsset(asset.id);
-                                    }}
-                                >
-                                    <RemoveIcon />
-                                </button>
-                            </div>
-                        </div>
+                        </Box>
                     ))
                 )}
             </div>

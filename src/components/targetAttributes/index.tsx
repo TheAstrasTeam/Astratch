@@ -20,6 +20,7 @@ import ModuleIcon from '../../assets/module.svg?react';
 import LinkIcon from '../../assets/link.svg?react';
 import AssetsIcon from '../../assets/assets.svg?react';
 import { getAssetObjectURL } from '../../utils/asset-url';
+import { Box } from '../Box';
 
 const SpawnTargetIcon = ({
     vm,
@@ -103,21 +104,22 @@ const TargetAttributes = ({ vm, targetID }: { vm: IVM; targetID: string }) => {
                         targetInfo={targetInfo}
                         className={styles.targetIcon}
                     />
-                    <div
-                        className={styles.bottom}
+                    <Box
                         title={t(
                             targetInfo?.mode === 'entity'
                                 ? 'gui:target.entity'
                                 : 'gui:target.module',
                         )}
                     >
-                        {targetInfo?.mode === 'entity' ? (
-                            <SpriteIcon className={styles.targetIcon} />
-                        ) : (
-                            <ModuleIcon className={styles.targetIcon} />
-                        )}
-                        <span>{targetInfo?.name}</span>
-                    </div>
+                        <div className={styles.bottom}>
+                            {targetInfo?.mode === 'entity' ? (
+                                <SpriteIcon className={styles.targetIcon} />
+                            ) : (
+                                <ModuleIcon className={styles.targetIcon} />
+                            )}
+                            <span>{targetInfo?.name}</span>
+                        </div>
+                    </Box>
                 </div>
                 {targetInfo?.mode === 'entity' && (
                     <div className={styles.right}>
@@ -170,12 +172,16 @@ const TargetAttributes = ({ vm, targetID }: { vm: IVM; targetID: string }) => {
             </div>
             <div className={styles.bottom}>
                 <div className={styles.bottom}>
-                    <button title={t('gui:target.attr.link')}>
-                        <LinkIcon />
-                    </button>
-                    <button title={t('gui:target.attr.assets')}>
-                        <AssetsIcon />
-                    </button>
+                    <Box title={t('gui:target.attr.link')}>
+                        <button>
+                            <LinkIcon />
+                        </button>
+                    </Box>
+                    <Box title={t('gui:target.attr.assets')}>
+                        <button>
+                            <AssetsIcon />
+                        </button>
+                    </Box>
                 </div>
             </div>
         </div>

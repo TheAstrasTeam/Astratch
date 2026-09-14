@@ -10,6 +10,7 @@
 
 import { useRef } from 'react';
 import styles from './index.module.scss';
+import { Box } from '../Box';
 
 interface IColorPickerButtonProps {
     /** 当前颜色值（#RRGGBB）。 */
@@ -37,24 +38,25 @@ export const ColorPickerButton = ({
     };
 
     return (
-        <button
-            type='button'
-            className={className}
-            style={{ backgroundColor: value }}
-            title={title}
-            aria-label={title}
-            onClick={openPicker}
-        >
-            <input
-                ref={inputRef}
-                type='color'
-                value={value}
-                onChange={event => {
-                    onChange(event.target.value);
-                }}
-                className={styles.hiddenInput}
-                tabIndex={-1}
-            />
-        </button>
+        <Box title={title}>
+            <button
+                type='button'
+                className={className}
+                style={{ backgroundColor: value }}
+                aria-label={title}
+                onClick={openPicker}
+            >
+                <input
+                    ref={inputRef}
+                    type='color'
+                    value={value}
+                    onChange={event => {
+                        onChange(event.target.value);
+                    }}
+                    className={styles.hiddenInput}
+                    tabIndex={-1}
+                />
+            </button>
+        </Box>
     );
 };

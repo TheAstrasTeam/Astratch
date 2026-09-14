@@ -23,6 +23,7 @@ import { useContextMenu } from '../../gui/contextMenu';
 import { AllContextMenu } from '../../types/gui';
 import { MenuItem } from '@szhsin/react-menu';
 import { createMenuTrigger } from '../../utils/ash-gui';
+import { Box } from '../../components/Box';
 
 // 拖拽幽灵标签，和VSCode类似
 const DRAG_IMAGE_X_OFFSET = 8;
@@ -295,22 +296,23 @@ const TabBar = (): React.ReactNode => {
                         onDragEnd={handleDragEnd}
                     >
                         <TabIcon tab={tab} className={styles.tabIcon} />
-                        <span className={styles.tabTitle} title={getTabTitle(tab)}>
-                            {getTabTitle(tab)}
-                        </span>
-                        <button
-                            className={styles.closeButton}
-                            title={t('gui:tab.close')}
-                            onClick={e => {
-                                e.stopPropagation();
-                                closeTab(tab.id);
-                            }}
-                            onMouseDown={e => {
-                                e.stopPropagation();
-                            }}
-                        >
-                            <CloseIcon />
-                        </button>
+                        <Box title={getTabTitle(tab)}>
+                            <span className={styles.tabTitle}>{getTabTitle(tab)}</span>
+                        </Box>
+                        <Box title={t('gui:tab.close')}>
+                            <button
+                                className={styles.closeButton}
+                                onClick={e => {
+                                    e.stopPropagation();
+                                    closeTab(tab.id);
+                                }}
+                                onMouseDown={e => {
+                                    e.stopPropagation();
+                                }}
+                            >
+                                <CloseIcon />
+                            </button>
+                        </Box>
                     </div>
                 );
             })}

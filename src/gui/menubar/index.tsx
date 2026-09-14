@@ -23,6 +23,9 @@ import {
 import { shortcutManager } from '../../lib/ShortcutManager';
 import { SHORTCUTS } from '../../types/lib';
 import { useQuickOpenStore } from '../../stores/useQuickOpenStore';
+import { debug } from '../../utils/debug';
+import { modal } from '../../components/Modal/modal';
+import { CreateToolTipModal } from '../../components/tests/modal_toolTip';
 
 export const MenuTextWithShortCut = ({ text, shortcut }: { text: string; shortcut: string }) => (
     <span style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
@@ -151,6 +154,18 @@ const MenuBar = ({ vm }: { vm: IVM }): React.ReactNode => {
                 <MenuTextWithShortCut text={t('gui:menu.welcome')} shortcut='' />
             </MenuItem>
             <MenuDivider />
+            {debug && (
+                <>
+                    <MenuItem
+                        onClick={() => {
+                            void modal.open(CreateToolTipModal);
+                        }}
+                    >
+                        ToolTip Test
+                    </MenuItem>
+                    <MenuDivider />
+                </>
+            )}
             <MenuItem
                 onClick={() => {
                     openAboutModal();
