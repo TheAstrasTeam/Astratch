@@ -17,6 +17,8 @@ import SizeIcon from '../../assets/magnifyingGlass.svg?react';
 import SpriteIcon from '../../assets/sprite.svg?react';
 import ModuleIcon from '../../assets/module.svg?react';
 // import BackIcon from '../../assets/back.svg?react';
+import LinkIcon from '../../assets/link.svg?react';
+import AssetsIcon from '../../assets/assets.svg?react';
 import { getAssetObjectURL } from '../../utils/asset-url';
 
 const SpawnTargetIcon = ({
@@ -94,70 +96,88 @@ const TargetAttributes = ({ vm, targetID }: { vm: IVM; targetID: string }) => {
     });
     return (
         <div className={styles.targetAttributes}>
-            <div className={styles.left}>
-                <SpawnTargetIcon vm={vm} targetInfo={targetInfo} className={styles.targetIcon} />
-                <div
-                    className={styles.bottom}
-                    title={t(
-                        targetInfo?.mode === 'entity' ? 'gui:target.entity' : 'gui:target.module',
-                    )}
-                >
-                    {targetInfo?.mode === 'entity' ? (
-                        <SpriteIcon className={styles.targetIcon} />
-                    ) : (
-                        <ModuleIcon className={styles.targetIcon} />
-                    )}
-                    <span>{targetInfo?.name}</span>
+            <div className={styles.top}>
+                <div className={styles.left}>
+                    <SpawnTargetIcon
+                        vm={vm}
+                        targetInfo={targetInfo}
+                        className={styles.targetIcon}
+                    />
+                    <div
+                        className={styles.bottom}
+                        title={t(
+                            targetInfo?.mode === 'entity'
+                                ? 'gui:target.entity'
+                                : 'gui:target.module',
+                        )}
+                    >
+                        {targetInfo?.mode === 'entity' ? (
+                            <SpriteIcon className={styles.targetIcon} />
+                        ) : (
+                            <ModuleIcon className={styles.targetIcon} />
+                        )}
+                        <span>{targetInfo?.name}</span>
+                    </div>
+                </div>
+                {targetInfo?.mode === 'entity' && (
+                    <div className={styles.right}>
+                        <div className={styles.attrBox}>
+                            <div className={styles.icon}>
+                                <ArrowIcon />
+                                <span>{t('gui:target.attr.x')}</span>
+                            </div>
+                            <input type='number' value={targetInfo.x} onChange={handleXChanged} />
+                        </div>
+                        <div className={styles.attrBox}>
+                            <div className={styles.icon}>
+                                <ArrowIcon
+                                    style={{
+                                        transform: 'rotate(90deg)',
+                                    }}
+                                />
+                                <span>{t('gui:target.attr.y')}</span>
+                            </div>
+                            <input type='number' value={targetInfo.y} onChange={handleYChanged} />
+                        </div>
+                        <div className={styles.attrBox}>
+                            <div className={styles.icon}>
+                                <SizeIcon />
+                                <span>{t('gui:target.attr.size')}</span>
+                            </div>
+                            <input
+                                type='number'
+                                value={targetInfo.size}
+                                onChange={handleSizeChanged}
+                            />
+                        </div>
+                        <div className={styles.attrBox}>
+                            <div className={styles.icon}>
+                                <DirectionIcon
+                                    style={{
+                                        transform: `rotate(${String(targetInfo.direction ?? 0)}deg)`,
+                                    }}
+                                />
+                                <span>{t('gui:target.attr.direction')}</span>
+                            </div>
+                            <input
+                                type='number'
+                                value={targetInfo.direction}
+                                onChange={handleDirectionChanged}
+                            />
+                        </div>
+                    </div>
+                )}
+            </div>
+            <div className={styles.bottom}>
+                <div className={styles.bottom}>
+                    <button title={t('gui:target.attr.link')}>
+                        <LinkIcon />
+                    </button>
+                    <button title={t('gui:target.attr.assets')}>
+                        <AssetsIcon />
+                    </button>
                 </div>
             </div>
-            {targetInfo?.mode === 'entity' && (
-                <div className={styles.right}>
-                    <div className={styles.attrBox}>
-                        <div className={styles.icon}>
-                            <ArrowIcon />
-                            <span>{t('gui:target.attr.x')}</span>
-                        </div>
-                        <input type='number' value={targetInfo.x} onChange={handleXChanged} />
-                    </div>
-                    <div className={styles.attrBox}>
-                        <div className={styles.icon}>
-                            <ArrowIcon
-                                style={{
-                                    transform: 'rotate(90deg)',
-                                }}
-                            />
-                            <span>{t('gui:target.attr.y')}</span>
-                        </div>
-                        <input type='number' value={targetInfo.y} onChange={handleYChanged} />
-                    </div>
-                    <div className={styles.attrBox}>
-                        <div className={styles.icon}>
-                            <SizeIcon />
-                            <span>{t('gui:target.attr.size')}</span>
-                        </div>
-                        <input
-                            type='number'
-                            value={targetInfo.size}
-                            onChange={handleSizeChanged}
-                        />
-                    </div>
-                    <div className={styles.attrBox}>
-                        <div className={styles.icon}>
-                            <DirectionIcon
-                                style={{
-                                    transform: `rotate(${String(targetInfo.direction ?? 0)}deg)`,
-                                }}
-                            />
-                            <span>{t('gui:target.attr.direction')}</span>
-                        </div>
-                        <input
-                            type='number'
-                            value={targetInfo.direction}
-                            onChange={handleDirectionChanged}
-                        />
-                    </div>
-                </div>
-            )}
         </div>
     );
 };
