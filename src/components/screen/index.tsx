@@ -56,6 +56,7 @@ const Screen = ({ vm }: { vm: IVM }) => {
     const [screenSize, setScreenSize] = useState<IScreenSize>(
         vm.runtime.settings.projectMeta.projectScreenSize,
     );
+    const isFinishLoad = useRef<boolean>(false);
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const mainRef = useRef<HTMLDivElement>(null);
@@ -86,7 +87,8 @@ const Screen = ({ vm }: { vm: IVM }) => {
             });
             selectCanvas();
         };
-        selectCanvas(true);
+        selectCanvas(isFinishLoad.current);
+        isFinishLoad.current = true;
         vm.off(events.UPDATE_PROJECT_META, handleUpdateScreenSize);
         vm.on(events.UPDATE_PROJECT_META, handleUpdateScreenSize);
         return () => {
