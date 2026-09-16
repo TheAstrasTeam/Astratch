@@ -30,8 +30,8 @@ importers:
         specifier: ^4.0.2
         version: 4.0.2
       js-yaml:
-        specifier: '>=5.4.1'
-        version: 5.4.1
+        specifier: '>=5.4.2'
+        version: 5.4.2
       react:
         specifier: ^19.3.0
         version: 19.3.0
@@ -39,8 +39,8 @@ importers:
         specifier: ^19.3.0
         version: 19.3.0(react@19.3.0)
       react-i18next:
-        specifier: ^17.0.13
-        version: 17.0.13(i18next@26.4.2(typescript@6.0.3))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@6.0.3)
+        specifier: ^17.0.14
+        version: 17.0.14(i18next@26.4.2(typescript@6.0.3))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@6.0.3)
       react-markdown:
         specifier: ^10.1.0
         version: 10.1.0(@types/react@19.3.0)(react@19.3.0)
@@ -64,7 +64,7 @@ importers:
         version: 7.8.5
       vite-plugin-svgr:
         specifier: ^5.2.0
-        version: 5.2.0(typescript@6.0.3)(vite@8.3.0(@types/node@26.5.1)(sass@1.104.0))
+        version: 5.2.0(typescript@6.0.3)(vite@8.3.0(@types/node@26.5.1)(sass@1.104.1))
       zustand:
         specifier: ^5.0.15
         version: 5.0.15(@types/react@19.3.0)(react@19.3.0)(use-sync-external-store@1.6.0(react@19.3.0))
@@ -83,7 +83,7 @@ importers:
         version: 1.2.8
       '@rolldown/plugin-babel':
         specifier: ^0.2.4
-        version: 0.2.4(@babel/core@8.0.5)(@babel/runtime@7.29.7)(rolldown@1.2.8)(vite@8.3.0(@types/node@26.5.1)(sass@1.104.0))
+        version: 0.2.4(@babel/core@8.0.5)(@babel/runtime@7.29.7)(rolldown@1.2.8)(vite@8.3.0(@types/node@26.5.1)(sass@1.104.1))
       '@types/babel__core':
         specifier: ^7.20.5
         version: 7.20.5
@@ -107,7 +107,7 @@ importers:
         version: 2023.10.7
       '@vitejs/plugin-react':
         specifier: ^6.1.1
-        version: 6.1.1(@rolldown/plugin-babel@0.2.4(@babel/core@8.0.5)(@babel/runtime@7.29.7)(rolldown@1.2.8)(vite@8.3.0(@types/node@26.5.1)(sass@1.104.0)))(babel-plugin-react-compiler@1.0.0)(vite@8.3.0(@types/node@26.5.1)(sass@1.104.0))
+        version: 6.1.1(@rolldown/plugin-babel@0.2.4(@babel/core@8.0.5)(@babel/runtime@7.29.7)(rolldown@1.2.8)(vite@8.3.0(@types/node@26.5.1)(sass@1.104.1)))(babel-plugin-react-compiler@1.0.0)(vite@8.3.0(@types/node@26.5.1)(sass@1.104.1))
       babel-plugin-react-compiler:
         specifier: ^1.0.0
         version: 1.0.0
@@ -133,8 +133,8 @@ importers:
         specifier: ^3.9.6
         version: 3.9.6
       sass:
-        specifier: ^1.104.0
-        version: 1.104.0
+        specifier: ^1.104.1
+        version: 1.104.1
       typescript:
         specifier: ~6.0.2
         version: 6.0.3
@@ -143,13 +143,13 @@ importers:
         version: 8.70.0(eslint@10.10.0)(typescript@6.0.3)
       vite:
         specifier: ^8.3.0
-        version: 8.3.0(@types/node@26.5.1)(sass@1.104.0)
+        version: 8.3.0(@types/node@26.5.1)(sass@1.104.1)
       vite-plugin-page-reload:
         specifier: ^0.2.3
-        version: 0.2.3(vite@8.3.0(@types/node@26.5.1)(sass@1.104.0))
+        version: 0.2.3(vite@8.3.0(@types/node@26.5.1)(sass@1.104.1))
       vitest:
         specifier: ^5.0.0
-        version: 5.0.0(@types/node@26.5.1)(jsdom@29.1.1)(vite@8.3.0(@types/node@26.5.1)(sass@1.104.0))
+        version: 5.0.0(@types/node@26.5.1)(jsdom@29.1.1)(vite@8.3.0(@types/node@26.5.1)(sass@1.104.1))
 
 packages:
 
@@ -598,6 +598,7 @@ packages:
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
 
   '@rolldown/binding-linux-x64-musl@1.2.8':
     resolution: {integrity: sha512-UefiqfM3D6IVNlZ8tSGs9+Ejjud2T+oxO0IHADU45Y+lyEjD2dVFyZHbkfX0LUb5Zugo/oIv1eCO/KVYhgYJYA==}
@@ -1378,8 +1379,8 @@ packages:
     resolution: {integrity: sha512-CY6crGq313MX8GkwvB7tzgp99vjQxY1++5y10/BKN/GUfHqWaOGQMNZkBvqSzsZKWk/ijwHlWzzkLulsGHhjWQ==}
     hasBin: true
 
-  js-yaml@5.4.1:
-    resolution: {integrity: sha512-28R/k+NAjeuf7+CKlTxWZVExJGwVVLwY06DgEnOMz2gEpfNkDcD7QvyiVPT0xy0XXhU8vHsd4Ot42OOPdJG7dQ==}
+  js-yaml@5.4.2:
+    resolution: {integrity: sha512-m+aqu+LwO1O6sIopafj8HUVl5aawITwZQe/yHpMCKjaWBaA/d07B/QdMb3529REftiU+RMMHL3Vlsw3hON7vWg==}
     hasBin: true
 
   jsdom@29.1.1:
@@ -1796,8 +1797,8 @@ packages:
       react: '>= 16.3.0'
       react-dom: '>= 16.3.0'
 
-  react-i18next@17.0.13:
-    resolution: {integrity: sha512-Cc1PscmblIHA1kljTqDwrcVMI21ydgmUzw0UAeQBe7pAOgfuRLfzXze4EUBQoeDiICzFIXXhHFoZxuetNg5D0Q==}
+  react-i18next@17.0.14:
+    resolution: {integrity: sha512-ZpMBfJL3BiXPuYHj5QMY1GwvKJNhE1vCxOJQ8BoMBdHP5XONTfi/Qss1nuRlnFdIl72PKo2jPmw+fxuLjRFgaQ==}
     peerDependencies:
       i18next: '>= 26.2.0'
       react: '>= 16.8.0'
@@ -1875,8 +1876,8 @@ packages:
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
 
-  sass@1.104.0:
-    resolution: {integrity: sha512-btHMApW2bgolvClhRW8AlQJzgI9lUB3pPSofBQQT+E46GWvf9o0TVQ13SYv5riWZVFyPN+JNz3TKW9XhBlc10w==}
+  sass@1.104.1:
+    resolution: {integrity: sha512-yDA+1aIG3EHgN4V/BvuhCvu61FF6hEd4e+9DxikUm9U0CAGuvdIZ/UYy7qbOxjhbbWQraoyLlMuzdRGOSV5Bmw==}
     engines: {node: '>=20.19.0'}
     hasBin: true
 
@@ -2670,14 +2671,14 @@ snapshots:
   '@rolldown/binding-win32-x64-msvc@1.2.8':
     optional: true
 
-  '@rolldown/plugin-babel@0.2.4(@babel/core@8.0.5)(@babel/runtime@7.29.7)(rolldown@1.2.8)(vite@8.3.0(@types/node@26.5.1)(sass@1.104.0))':
+  '@rolldown/plugin-babel@0.2.4(@babel/core@8.0.5)(@babel/runtime@7.29.7)(rolldown@1.2.8)(vite@8.3.0(@types/node@26.5.1)(sass@1.104.1))':
     dependencies:
       '@babel/core': 8.0.5
       picomatch: 4.0.7
       rolldown: 1.2.8
     optionalDependencies:
       '@babel/runtime': 7.29.7
-      vite: 8.3.0(@types/node@26.5.1)(sass@1.104.0)
+      vite: 8.3.0(@types/node@26.5.1)(sass@1.104.1)
 
   '@rolldown/pluginutils@1.0.1': {}
 
@@ -2934,22 +2935,22 @@ snapshots:
 
   '@ungap/structured-clone@1.3.3': {}
 
-  '@vitejs/plugin-react@6.1.1(@rolldown/plugin-babel@0.2.4(@babel/core@8.0.5)(@babel/runtime@7.29.7)(rolldown@1.2.8)(vite@8.3.0(@types/node@26.5.1)(sass@1.104.0)))(babel-plugin-react-compiler@1.0.0)(vite@8.3.0(@types/node@26.5.1)(sass@1.104.0))':
+  '@vitejs/plugin-react@6.1.1(@rolldown/plugin-babel@0.2.4(@babel/core@8.0.5)(@babel/runtime@7.29.7)(rolldown@1.2.8)(vite@8.3.0(@types/node@26.5.1)(sass@1.104.1)))(babel-plugin-react-compiler@1.0.0)(vite@8.3.0(@types/node@26.5.1)(sass@1.104.1))':
     dependencies:
       '@rolldown/pluginutils': 1.0.1
-      vite: 8.3.0(@types/node@26.5.1)(sass@1.104.0)
+      vite: 8.3.0(@types/node@26.5.1)(sass@1.104.1)
     optionalDependencies:
-      '@rolldown/plugin-babel': 0.2.4(@babel/core@8.0.5)(@babel/runtime@7.29.7)(rolldown@1.2.8)(vite@8.3.0(@types/node@26.5.1)(sass@1.104.0))
+      '@rolldown/plugin-babel': 0.2.4(@babel/core@8.0.5)(@babel/runtime@7.29.7)(rolldown@1.2.8)(vite@8.3.0(@types/node@26.5.1)(sass@1.104.1))
       babel-plugin-react-compiler: 1.0.0
 
-  '@vitest/mocker@5.0.0(vite@8.3.0(@types/node@26.5.1)(sass@1.104.0))':
+  '@vitest/mocker@5.0.0(vite@8.3.0(@types/node@26.5.1)(sass@1.104.1))':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       '@vitest/spy': 5.0.0
       estree-walker: 3.0.3
       magic-string: 1.2.3
     optionalDependencies:
-      vite: 8.3.0(@types/node@26.5.1)(sass@1.104.0)
+      vite: 8.3.0(@types/node@26.5.1)(sass@1.104.1)
 
   '@vitest/spy@5.0.0': {}
 
@@ -3441,7 +3442,7 @@ snapshots:
     dependencies:
       argparse: 2.0.1
 
-  js-yaml@5.4.1:
+  js-yaml@5.4.2:
     dependencies:
       argparse: 2.0.1
 
@@ -4048,7 +4049,7 @@ snapshots:
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
 
-  react-i18next@17.0.13(i18next@26.4.2(typescript@6.0.3))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@6.0.3):
+  react-i18next@17.0.14(i18next@26.4.2(typescript@6.0.3))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@6.0.3):
     dependencies:
       '@babel/runtime': 7.29.7
       html-parse-stringify: 4.0.1
@@ -4174,7 +4175,7 @@ snapshots:
       '@rolldown/binding-win32-arm64-msvc': 1.2.8
       '@rolldown/binding-win32-x64-msvc': 1.2.8
 
-  sass@1.104.0:
+  sass@1.104.1:
     dependencies:
       chokidar: 5.0.0
       immutable: 5.1.9
@@ -4361,24 +4362,24 @@ snapshots:
       '@types/unist': 3.0.3
       vfile-message: 4.0.3
 
-  vite-plugin-page-reload@0.2.3(vite@8.3.0(@types/node@26.5.1)(sass@1.104.0)):
+  vite-plugin-page-reload@0.2.3(vite@8.3.0(@types/node@26.5.1)(sass@1.104.1)):
     dependencies:
       picocolors: 1.1.1
       picomatch: 2.3.2
-      vite: 8.3.0(@types/node@26.5.1)(sass@1.104.0)
+      vite: 8.3.0(@types/node@26.5.1)(sass@1.104.1)
 
-  vite-plugin-svgr@5.2.0(typescript@6.0.3)(vite@8.3.0(@types/node@26.5.1)(sass@1.104.0)):
+  vite-plugin-svgr@5.2.0(typescript@6.0.3)(vite@8.3.0(@types/node@26.5.1)(sass@1.104.1)):
     dependencies:
       '@rollup/pluginutils': 5.4.0
       '@svgr/core': 8.1.0(typescript@6.0.3)
       '@svgr/plugin-jsx': 8.1.0(@svgr/core@8.1.0(typescript@6.0.3))
-      vite: 8.3.0(@types/node@26.5.1)(sass@1.104.0)
+      vite: 8.3.0(@types/node@26.5.1)(sass@1.104.1)
     transitivePeerDependencies:
       - rollup
       - supports-color
       - typescript
 
-  vite@8.3.0(@types/node@26.5.1)(sass@1.104.0):
+  vite@8.3.0(@types/node@26.5.1)(sass@1.104.1):
     dependencies:
       lightningcss: 1.33.0
       picomatch: 4.0.7
@@ -4388,12 +4389,12 @@ snapshots:
     optionalDependencies:
       '@types/node': 26.5.1
       fsevents: 2.3.3
-      sass: 1.104.0
+      sass: 1.104.1
 
-  vitest@5.0.0(@types/node@26.5.1)(jsdom@29.1.1)(vite@8.3.0(@types/node@26.5.1)(sass@1.104.0)):
+  vitest@5.0.0(@types/node@26.5.1)(jsdom@29.1.1)(vite@8.3.0(@types/node@26.5.1)(sass@1.104.1)):
     dependencies:
       '@types/chai': 5.2.3
-      '@vitest/mocker': 5.0.0(vite@8.3.0(@types/node@26.5.1)(sass@1.104.0))
+      '@vitest/mocker': 5.0.0(vite@8.3.0(@types/node@26.5.1)(sass@1.104.1))
       chai: 6.2.2
       es-module-lexer: 2.3.2
       expect-type: 1.4.0
@@ -4404,7 +4405,7 @@ snapshots:
       tinybench: 6.1.4
       tinyexec: 1.3.0
       tinyglobby: 0.2.17
-      vite: 8.3.0(@types/node@26.5.1)(sass@1.104.0)
+      vite: 8.3.0(@types/node@26.5.1)(sass@1.104.1)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 26.5.1
