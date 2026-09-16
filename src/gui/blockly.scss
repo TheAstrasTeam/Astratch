@@ -1,0 +1,209 @@
+@use './styles/color' as *;
+@use './styles/mixin' as *;
+
+// blocklyHtmlInput 是 blockly 输入框选中时的类名
+// 在暗色模式下积木输入框会变黑
+input[class*='blocklyHtmlInput'] {
+    color-scheme: light;
+}
+
+/*  Flyout 按钮  */
+.blocklyFlyoutButton {
+    display: flex;
+    stroke: transparent;
+    align-items: center;
+    justify-content: center;
+
+    & .blocklyText {
+        font:
+            normal 13pt 'Segoe UI',
+            Tahoma,
+            Geneva,
+            Verdana,
+            sans-serif !important;
+    }
+    & .blocklyFlyoutButtonBackground {
+        display: none;
+    }
+    & .blocklyFlyoutButtonShadow {
+        @include control-base();
+    }
+    &:hover {
+        border: $ui-black-transparent 1px solid;
+
+        & .blocklyFlyoutButtonShadow {
+            stroke: $ui-black-transparent;
+            stroke-width: 1px;
+        }
+    }
+    &:active {
+        filter: $active-button;
+    }
+}
+
+/*  Toolbox 工具箱  */
+.blocklyToolboxCategory {
+    display: flex;
+    align-items: center;
+}
+.blocklyToolboxCategory.entity::before {
+    background-image: url('../assets/sprite.svg');
+}
+.blocklyToolboxCategory.audio::before {
+    background-image: url('../assets/sound.svg');
+}
+.blocklyToolboxCategory.resources::before {
+    background-image: url('../assets/files.svg');
+}
+.blocklyToolboxCategory.events::before {
+    background-image: url('../assets/events.svg');
+}
+.blocklyToolboxCategory.control::before {
+    background-image: url('../assets/control.svg');
+}
+.blocklyToolboxCategory.operator::before {
+    background-image: url('../assets/operator.svg');
+}
+.blocklyToolboxCategory.data::before {
+    background-image: url('../assets/data.svg');
+}
+.blocklyToolboxCategory.function::before {
+    background-image: url('../assets/function.svg');
+}
+.blocklyToolboxCategory.canvas::before {
+    background-image: url('../assets/canvas.svg');
+}
+.blocklyToolboxCategory.debug::before {
+    background-image: url('../assets/debug.svg');
+}
+
+.blocklyToolboxCategory:is(
+        .entity,
+        .audio,
+        .resources,
+        .events,
+        .control,
+        .operator,
+        .data,
+        .function,
+        .canvas,
+        .debug
+    )::before {
+    content: '';
+    width: 14px;
+    height: 14px;
+    background-repeat: round;
+    margin-left: 5px;
+    margin-right: 3px;
+    filter: var(--svg-filter);
+    flex: 0 0 14px;
+}
+
+.blocklyToolboxCategory .blocklyTreeRowContentContainer {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+}
+
+.blocklyToolbox > .blocklyToolboxCategoryGroup {
+    scrollbar-color: var(--ui-black-transparent) transparent;
+    scrollbar-width: thin;
+}
+
+.blocklyToolboxCategoryLabel {
+    color: var(--text-primary) !important;
+}
+
+.blocklyToolboxCategoryIcon {
+    filter: var(--svg-filter);
+}
+
+/*  自定义工具箱工具  */
+.ash-toolbox-tools {
+    display: flex;
+}
+.ash-toolbox-tools button {
+    padding: 0;
+    width: 16px;
+    height: 16px;
+}
+.ash-toolbox-tools .ash-toolbox-tools-collapseAll {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.ash-toolbox-tools .ash-toolbox-tools-collapseAll::before {
+    content: '';
+    background-image: url('../assets/collapse.svg');
+    background-repeat: round;
+    width: 12px;
+    height: 12px;
+    filter: var(--svg-filter);
+}
+
+/*  搜索框  */
+.continuousFlyoutSearchInput::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 16px;
+    width: 16px;
+    background-image: url('../assets/close.svg');
+    filter: var(--svg-filter);
+    background-repeat: round;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+}
+.continuousFlyoutSearchInput::-webkit-search-cancel-button:hover {
+    background-color: var(--ui-secondary);
+}
+
+/*  Flyout 文字  */
+g.astratchFlyoutGroupLevel0 text {
+    font-size: x-large !important;
+    font-weight: bold !important;
+}
+g.astratchFlyoutGroupLevel1 text {
+    font-size: larger !important;
+}
+
+/*  Blockly 下拉框、提示框、注释框、取色与缩放（HTML 浮层，不属于积木 SVG）  */
+.blocklyDropDownDiv {
+    background-color: var(--ui-secondary);
+    border-color: var(--ui-tertiary);
+}
+.blocklyDropDownDiv span {
+    color: var(--text-primary);
+}
+.blocklyDropDownDiv hr {
+    border-top: 1px solid var(--ui-tertiary);
+}
+
+.fieldColourEyedropper {
+    color: var(--text-primary);
+}
+
+/* Blockly 注释框内的文字颜色（不随主题变化） */
+.blocklyComment .blocklyTextarea {
+    color: #000 !important;
+}
+
+.fieldColourSlider {
+    background-color: var(--ui-secondary);
+}
+
+.blocklyToast {
+    background-color: var(--ui-secondary);
+    border-color: var(--ui-tertiary);
+}
+.blocklyToast .blocklyToastMessage {
+    color: var(--text-primary);
+}
+.blocklyToast .blocklyToastCloseButton svg rect {
+    /* X 的图标 */
+    fill: var(--text-primary) !important;
+}
+
+.blocklyZoom.blocklyZoomReset {
+    transform: translateY(10px);
+}

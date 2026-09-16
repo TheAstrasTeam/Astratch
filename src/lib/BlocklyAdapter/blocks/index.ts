@@ -23,14 +23,22 @@ import { registerBlocksCSS } from './css';
 
 export { connections, hatConnections, endConnections, returnConnections } from './helpers';
 
+import { dropdownWithInput } from '../../../../plugins/fieldDropdown';
+import { FieldAngle } from '../../../../plugins/field-angle/src';
+import { FieldColourHsvSliders } from '../../../../plugins/field-colour-hsv-sliders/src';
+
 /**
  * 初始化所有 ASH 自定义积木
- *
- * 先清空 Blockly 已注册的积木，再按类别依次注册。
- * 注册顺序通常无关紧要，但 primitives（数字/文本/颜色）应先于其他积木，
- * 因为它们的字段类型会被其他积木的输入连接引用。
  */
 export const initBlocks = (blockly: typeof Blockly, vm: IVM) => {
+    blockly.fieldRegistry.unregister('field_dropdown_with_block');
+    blockly.fieldRegistry.unregister('field_angle');
+    blockly.fieldRegistry.unregister('field_colour');
+
+    blockly.fieldRegistry.register('field_dropdown_with_block', dropdownWithInput);
+    blockly.fieldRegistry.register('field_angle', FieldAngle);
+    blockly.fieldRegistry.register('field_colour', FieldColourHsvSliders);
+
     clearRegisteredBlocks(blockly);
     registerBlocksCSS();
 

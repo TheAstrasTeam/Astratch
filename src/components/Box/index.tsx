@@ -12,6 +12,13 @@ import { createPortal } from 'react-dom';
 import classNames from 'classnames';
 import Markdown from 'react-markdown';
 import styles from './index.module.scss';
+import { type ReactNode } from 'react';
+
+import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
+import rehypeRaw from 'rehype-raw';
+import rehypeSanitize from 'rehype-sanitize';
+import { spawnBlockAST, spawnBlocksSvg } from '../../utils/ash-DSLToBlocks';
 
 interface IBox extends Omit<React.HTMLAttributes<HTMLDivElement>, 'style'> {
     title?: string;
@@ -58,6 +65,28 @@ const computeTipPos = (anchor: IAnchor, tip: HTMLElement): { left: number; top: 
     top = Math.min(top, viewportHeight - offsetHeight);
 
     return { left, top };
+};
+
+interface AsyncAshBlockProps {
+    children?: ReactNode;
+    className?: string;
+}
+
+const AsyncAshBlock = ({ children }: AsyncAshBlockProps) => {
+    const [content, setContent] = useState<string | null>(null);
+
+    useEffect(() => {
+        void (async () => {
+            const ast = await spawnBlockAST(children as string);
+            if (!ast) return;
+            const svg = spawnBlocksSvg(ast);
+            setContent(svg);
+        })();
+    }, [children]);
+
+    if (content === null) return null;
+
+    return <div className={styles.ashBlock} dangerouslySetInnerHTML={{ __html: content }} />;
 };
 
 /* 承载容器 */
@@ -190,7 +219,32 @@ export const Box = ({
             case 'markdown':
                 return (
                     <div className={styles.markdown}>
-                        <Markdown>{title}</Markdown>
+                        <Markdown
+                            remarkPlugins={[remarkGfm]}
+                            rehypePlugins={[rehypeRaw, rehypeSanitize, rehypeHighlight]}
+                            components={{
+                                code: ({ className, children, ...props }) => {
+                                    const match = /language-(\w+)/.exec(className ?? '');
+                                    const language = match ? match[1] : '';
+
+                                    if (language === 'ash') {
+                                        return (
+                                            <AsyncAshBlock className={className} {...props}>
+                                                {children}
+                                            </AsyncAshBlock>
+                                        );
+                                    }
+
+                                    return (
+                                        <code className={className} {...props}>
+                                            {children}
+                                        </code>
+                                    );
+                                },
+                            }}
+                        >
+                            {title}
+                        </Markdown>
                     </div>
                 );
             default:

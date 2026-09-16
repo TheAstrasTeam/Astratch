@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 // 此文件由AI生成
 
 import { beforeAll, describe, expect, it } from 'vitest';

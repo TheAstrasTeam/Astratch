@@ -12,9 +12,6 @@ import { shortcutManager } from '../ShortcutManager';
 import type { ShortcutIds } from '../../types/lib';
 import { ALL_PLATFORMS, getPlatfrom } from '../../utils/ash-navigator';
 
-import { dropdownWithInput } from '../../../plugins/fieldDropdown';
-import { FieldAngle } from '../../../plugins/field-angle/src';
-import { FieldColourHsvSliders } from '../../../plugins/field-colour-hsv-sliders/src';
 import { registerScratchComment, ScratchCommentBubble } from '../../../plugins/scratch-comment';
 import { installCBlockWrap } from './cBlockWrap';
 import { modal } from '../../components/Modal/modal';
@@ -215,14 +212,7 @@ function installBlocklyPatches(blockly: typeof BlocklyType): () => void {
     } catch {
         // 不需要管
     }
-    blockly.fieldRegistry.unregister('field_dropdown_with_block');
-    blockly.fieldRegistry.unregister('field_angle');
-    blockly.fieldRegistry.unregister('field_colour');
-
     installCBlockWrap(blockly);
-    blockly.fieldRegistry.register('field_dropdown_with_block', dropdownWithInput);
-    blockly.fieldRegistry.register('field_angle', FieldAngle);
-    blockly.fieldRegistry.register('field_colour', FieldColourHsvSliders);
 
     // 替换 blockly 自己的modal
     blockly.dialog.setAlert((message, callback) => {
@@ -346,6 +336,7 @@ export function setupBlockly(blockly: typeof BlocklyType, vm: IVM): Promise<IBlo
 
         initBlocks(blockly, vm);
         registerAstratchToolbox(i18next.t);
+        blockly.Css.register((await import('./blockStyle.css?inline')).default);
 
         const toolbox = await getToolbox();
 

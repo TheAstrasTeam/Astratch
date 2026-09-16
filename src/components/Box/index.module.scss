@@ -53,3 +53,15 @@
         margin: 0;
     }
 }
+
+.ash-block {
+    padding: 5px;
+    background-color: $ui-tertiary;
+    svg {
+        width: 75%;
+        height: auto;
+        position: relative !important;
+        background-color: transparent !important;
+        overflow: visible !important;
+    }
+}
