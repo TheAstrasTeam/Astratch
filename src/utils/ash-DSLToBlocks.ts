@@ -241,7 +241,11 @@ const refreshBlocksDefinitions = async (): Promise<void> => {
 
 type TAtom = number | string | boolean;
 
-type TValueExpr = { kind: 'atom'; value: TAtom } | { kind: 'call'; node: TNode } | { kind: 'skip' };
+type TValueExpr =
+    | { kind: 'atom'; value: TAtom }
+    | { kind: 'call'; node: TNode }
+    | { kind: 'state'; state: Blockly.serialization.blocks.State; shadow: boolean }
+    | { kind: 'skip' };
 
 type TArg =
     | { kind: 'field'; value: TAtom }
@@ -251,9 +255,11 @@ type TArg =
 interface TNode {
     opcode: string;
     args: TArg[];
+    /** 来自 `[]` 逃逸舱的原始序列化状态，会合并进最终 state。 */
+    state?: Record<string, unknown>;
 }
 
-const _KEYWORDS = [';', '{', '}', '(', ')', ',', '<', '>'] as const;
+const _KEYWORDS = [';', '{', '}', '(', ')', ',', '<', '>', '[', ']', '@', '$'] as const;
 
 const isKeyword = (word: string | undefined): boolean =>
     word !== undefined && (_KEYWORDS as readonly string[]).includes(word);
@@ -322,18 +328,147 @@ const parseAtom = (word: string): TAtom => {
     return word;
 };
 
-/** 递归下降解析 DSL：script → statement*，statement → opcode ( args? )。 */
+/**
+ * 宽松对象字面量：键可不加引号，字符串可用单/双引号，允许尾逗号和注释。
+ * 用于 `[]` 逃逸舱里的状态描述。
+ */
+const parseObjectLiteral = (text: string): Record<string, unknown> => {
+    let index = 0;
+
+    const skip = (): void => {
+        for (;;) {
+            const char = text[index];
+            if (char === ' ' || char === '\n' || char === '\r' || char === '\t') {
+                index++;
+                continue;
+            }
+            if (char === '/' && text[index + 1] === '/') {
+                while (index < text.length && text[index] !== '\n') index++;
+                continue;
+            }
+            if (char === '/' && text[index + 1] === '*') {
+                const end = text.indexOf('*/', index + 2);
+                index = end === -1 ? text.length : end + 2;
+                continue;
+            }
+            return;
+        }
+    };
+
+    const parseString = (): string => {
+        const quote = text[index];
+        index++;
+        let raw = '';
+        while (index < text.length && text[index] !== quote) {
+            if (text[index] === '\\') {
+                raw += text[index] + (text[index + 1] ?? '');
+                index += 2;
+                continue;
+            }
+            raw += text[index];
+            index++;
+        }
+        index++;
+        if (quote === '"') {
+            try {
+                return JSON.parse(`"${raw}"`) as string;
+            } catch {
+                return raw;
+            }
+        }
+        return raw.replace(/\\'/g, "'").replace(/\\\\/g, '\\');
+    };
+
+    const parseValue = (): unknown => {
+        skip();
+        const char = text[index];
+        if (char === '{') return parseObject();
+        if (char === '[') {
+            index++;
+            const array: unknown[] = [];
+            skip();
+            while (index < text.length && text[index] !== ']') {
+                array.push(parseValue());
+                skip();
+                if (text[index] === ',') {
+                    index++;
+                    skip();
+                }
+            }
+            index++;
+            return array;
+        }
+        if (char === '"' || char === "'") return parseString();
+        const start = index;
+        while (index < text.length && !',}]'.includes(text[index])) index++;
+        const raw = text.slice(start, index).trim();
+        if (raw === 'true') return true;
+        if (raw === 'false') return false;
+        if (raw === 'null') return null;
+        const number = Number(raw);
+        if (raw !== '' && Number.isFinite(number)) return number;
+        return raw;
+    };
+
+    const parseObject = (): Record<string, unknown> => {
+        index++; // {
+        const object: Record<string, unknown> = {};
+        skip();
+        while (index < text.length && text[index] !== '}') {
+            let key: string;
+            if (text[index] === '"' || text[index] === "'") {
+                key = parseString();
+            } else {
+                const start = index;
+                while (index < text.length && !':,}'.includes(text[index])) index++;
+                key = text.slice(start, index).trim();
+            }
+            skip();
+            if (text[index] !== ':') {
+                throw new Error(`对象字面量错误：键 '${key}' 后缺少 ':'`);
+            }
+            index++;
+            object[key] = parseValue();
+            skip();
+            if (text[index] === ',') {
+                index++;
+                skip();
+            }
+        }
+        index++; // }
+        return object;
+    };
+
+    skip();
+    if (text[index] !== '{') throw new Error('对象字面量错误：需要以 { 开头');
+    return parseObject();
+};
+
+/**
+ * 解析 DSL：script → statement*。
+ * 积木以 `@OPCODE["..."] (args)` 为基本形式，另有 `$变量`、`!布尔` 等语法糖。
+ */
 const parseDSL = (content: string): TNode[] => {
     const tokens = tokenize(content);
     let pos = 0;
 
     const peek = (): string | undefined => tokens[pos];
+    const take = (): string | undefined => tokens[pos++];
 
     function expect(word: string): void {
         if (tokens[pos] !== word) {
             throw new Error(`DSL 语法错误：期望 '${word}'，实际 '${tokens[pos] ?? '<EOF>'}'`);
         }
         pos++;
+    }
+
+    /** 读一个名字：裸词或字符串。 */
+    function takeName(): string {
+        const word = take();
+        if (word === undefined || isKeyword(word)) {
+            throw new Error(`DSL 语法错误：期望名字，实际 '${word ?? '<EOF>'}'`);
+        }
+        return String(parseAtom(word));
     }
 
     function parseScript(untilBrace: boolean): TNode[] {
@@ -343,40 +478,65 @@ const parseDSL = (content: string): TNode[] => {
                 pos++;
                 continue;
             }
-            nodes.push(parseCall());
+            nodes.push(parseStatement());
         }
         if (untilBrace) expect('}');
         return nodes;
     }
 
-    function parseCall(): TNode {
-        const opcode = peek();
-        if (opcode === undefined || isKeyword(opcode)) {
-            throw new Error(`DSL 语法错误：期望积木名，实际 '${opcode ?? '<EOF>'}'`);
+    function parseStatement(): TNode {
+        const word = peek();
+        if (word === '@') return parseBlock();
+        if (word === '$') return parseVariable();
+        if (word?.startsWith('!')) return parseBuiltinBlock(word);
+        if (word?.startsWith('#')) {
+            throw new Error(`DSL 语法错误：宏 '${word}' 暂未实现`);
         }
-        pos++;
+        throw new Error(`DSL 语法错误：积木要以 '@' 开头，实际 '${word ?? '<EOF>'}'`);
+    }
+
+    /** @TYPE["{...}"] (args) —— [] 与 () 可任意顺序、可省略。 */
+    function parseBlock(): TNode {
+        expect('@');
+        const opcode = take();
+        if (opcode === undefined || isKeyword(opcode)) {
+            throw new Error(`DSL 语法错误：'@' 后需要积木名，实际 '${opcode ?? '<EOF>'}'`);
+        }
         const node: TNode = { opcode, args: [] };
-        if (peek() === '(') {
-            pos++;
-            while (pos < tokens.length && peek() !== ')') {
-                node.args.push(parseArg());
-                if (peek() === ',') pos++;
-                else break;
+        for (;;) {
+            if (peek() === '[') {
+                node.state = { ...node.state, ...parsePayload() };
+                continue;
             }
-            expect(')');
+            if (peek() === '(') {
+                node.args = parseArgs();
+                continue;
+            }
+            break;
         }
         return node;
+    }
+
+    function parseArgs(): TArg[] {
+        expect('(');
+        const args: TArg[] = [];
+        while (pos < tokens.length && peek() !== ')') {
+            args.push(parseArg());
+            if (peek() === ',') pos++;
+            else break;
+        }
+        expect(')');
+        return args;
     }
 
     function parseArg(): TArg {
         // 只有 <value> 才当 field，避免和比较运算符 '<' 冲突
         if (peek() === '<' && tokens[pos + 2] === '>') {
             pos++;
-            const word = peek();
+            const word = take();
             if (word === undefined || isKeyword(word)) {
                 throw new Error(`DSL 语法错误：< > 中缺少 field 值`);
             }
-            pos++;
             expect('>');
             return { kind: 'field', value: parseAtom(word) };
         }
@@ -384,32 +544,80 @@ const parseDSL = (content: string): TNode[] => {
             pos++;
             return { kind: 'statement', body: parseScript(true) };
         }
+        return { kind: 'value', expr: parseValue() };
+    }
+
+    function parseValue(): TValueExpr {
         const word = peek();
         if (word === undefined) {
             throw new Error(`DSL 语法错误：期望参数，实际 '<EOF>'`);
         }
-        // 比较运算符 < > 允许当原子（仅当不是 field 的 <value> 分隔符时）
+        if (word === '_') {
+            pos++;
+            return { kind: 'skip' };
+        }
+        if (word === '@') return { kind: 'call', node: parseBlock() };
+        if (word === '$') return { kind: 'call', node: parseVariable() };
+        if (word.startsWith('!')) {
+            pos++;
+            return parseBuiltinValue(word);
+        }
+        if (word.startsWith('#')) {
+            throw new Error(`DSL 语法错误：宏 '${word}' 暂未实现`);
+        }
+        // 比较运算符 < > 允许当原子
         if (word === '<' || word === '>') {
             pos++;
-            return { kind: 'value', expr: { kind: 'atom', value: word } };
+            return { kind: 'atom', value: word };
         }
         if (isKeyword(word)) {
             throw new Error(`DSL 语法错误：期望参数，实际 '${word}'`);
         }
-        if (word === '_') {
-            pos++;
-            return { kind: 'value', expr: { kind: 'skip' } };
-        }
-        if (tokens[pos + 1] === '(') {
-            return { kind: 'value', expr: { kind: 'call', node: parseCall() } };
-        }
         pos++;
-        const atom = parseAtom(word);
-        // 裸标识符若是已知积木（且非字符串字面量），当无参积木；否则当原子（菜单选项 / 文本）
-        if (typeof atom === 'string' && !word.startsWith('"') && _BlocksDefinitions[atom]) {
-            return { kind: 'value', expr: { kind: 'call', node: { opcode: atom, args: [] } } };
+        return { kind: 'atom', value: parseAtom(word) };
+    }
+
+    /** $名字 —— 变量取值积木（报告者）。名字是符号，不要求已在项目里存在。 */
+    function parseVariable(): TNode {
+        expect('$');
+        const name = takeName();
+        return {
+            opcode: OPCODES.DATA_VARIABLE_GET,
+            args: [],
+            state: { fields: { NAME: name }, extraState: { dataId: name } },
+        };
+    }
+
+    /** !true / !false / !s_true / !s_false —— 布尔积木；s_ 前缀表示 shadow。 */
+    function parseBuiltinValue(word: string): TValueExpr {
+        const match = /^!(s_)?(true|false)$/.exec(word);
+        if (match) {
+            return {
+                kind: 'state',
+                state: {
+                    type: OPCODES.OPERATOR_LOGIC_BOOLEAN,
+                    extraState: { value: match[2] === 'true' },
+                },
+                shadow: Boolean(match[1]),
+            };
         }
-        return { kind: 'value', expr: { kind: 'atom', value: atom } };
+        throw new Error(`DSL 语法错误：不认识的 '!' 构造 '${word}'`);
+    }
+
+    /** !f_* 等会生成积木的构造（语句位置）。 */
+    function parseBuiltinBlock(word: string): TNode {
+        throw new Error(`DSL 语法错误：'${word}' 暂未实现`);
+    }
+
+    /** [ "..."] —— 逃逸舱；字符串内容按宽松对象字面量解析成序列化状态。 */
+    function parsePayload(): Record<string, unknown> {
+        expect('[');
+        const word = take();
+        if (!word?.startsWith('"')) {
+            throw new Error(`DSL 语法错误：[] 中需要字符串`);
+        }
+        expect(']');
+        return parseObjectLiteral(parseAtom(word) as string);
     }
 
     return parseScript(false);
@@ -476,8 +684,9 @@ function buildScript(nodes: TNode[]): TState | undefined {
 
 /** 单个积木 → 序列化状态，参数按类别（field/value/statement）顺序填槽。 */
 function buildNode(node: TNode): TState {
+    const payload = node.state ?? {};
     const definition = _BlocksDefinitions[node.opcode];
-    const state: TState = { type: node.opcode };
+    const state = { ...payload, type: node.opcode } as TState;
     if (!definition) return state;
 
     let fieldIndex = 0;
@@ -495,6 +704,10 @@ function buildNode(node: TNode): TState {
         expr: TValueExpr,
     ): void => {
         if (expr.kind === 'skip') return;
+        if (expr.kind === 'state') {
+            inputs[name] = expr.shadow ? { shadow: expr.state } : { block: expr.state };
+            return;
+        }
         if (expr.kind === 'call') {
             const nested = _BlocksDefinitions[expr.node.opcode];
             if (!isCompatible(nested?.output ?? null, check)) {
@@ -546,8 +759,16 @@ function buildNode(node: TNode): TState {
         }
     }
 
-    if (Object.keys(fields).length > 0) state.fields = fields;
-    if (Object.keys(inputs).length > 0) state.inputs = inputs;
+    // [] 逃逸舱的状态作为底，() 派生的字段/输入覆盖其上
+    const baseFields = (payload.fields ?? {}) as Record<string, unknown>;
+    const baseInputs = (payload.inputs ?? {}) as Record<
+        string,
+        Blockly.serialization.blocks.ConnectionState
+    >;
+    const mergedFields = { ...baseFields, ...fields };
+    const mergedInputs = { ...baseInputs, ...inputs };
+    if (Object.keys(mergedFields).length > 0) state.fields = mergedFields;
+    if (Object.keys(mergedInputs).length > 0) state.inputs = mergedInputs;
     return state;
 }
 
@@ -581,7 +802,10 @@ const _getBlockStyle = () => {
  * @param needStyle 是否需要内联样式（用于导出）
  * @returns
  */
-const spawnBlocksSvg = (ast: Blockly.serialization.blocks.State, needStyle = false) => {
+const spawnBlocksSvg = async (
+    ast: Blockly.serialization.blocks.State,
+    needStyle = false,
+): Promise<string> => {
     const host = document.createElement('div');
     host.style.cssText = 'position:fixed;left:-99999px;top:0;';
     document.body.appendChild(host);
@@ -595,6 +819,9 @@ const spawnBlocksSvg = (ast: Blockly.serialization.blocks.State, needStyle = fal
     });
 
     const block = Blockly.serialization.blocks.append(ast, ws) as Blockly.BlockSvg;
+    // 部分积木在 loadExtraState 里排了延后更新（如布尔块连上父块后继承父色），
+    // 等一个微任务让它们跑完再渲染，否则导出会拿到错误的颜色。
+    await Promise.resolve();
     ws.getRenderer().render(block);
 
     const bBox = ws.getBlocksBoundingBox();

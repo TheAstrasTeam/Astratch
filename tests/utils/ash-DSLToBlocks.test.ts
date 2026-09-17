@@ -8,10 +8,15 @@ import type { IVM } from '../../src/types/vm/vm';
 
 // 变量菜单在 field 构造时就会读 vm.runtime，这里给一个最小可用替身
 const fakeVm = {
-    runtime: {
-        targets: new Map(),
-        editingTargetID: '',
-    },
+    runtime: new Proxy(
+        { targets: new Map(), editingTargetID: '' },
+        {
+            get: (target, prop) =>
+                Reflect.has(target, prop)
+                    ? (Reflect.get(target, prop) as unknown)
+                    : () => undefined,
+        },
+    ),
 } as unknown as IVM;
 
 type TDSL = typeof import('../../src/utils/ash-DSLToBlocks');
@@ -21,7 +26,6 @@ let definitions: Record<string, IBlockDefinition | undefined>;
 beforeAll(async () => {
     registerAstratchRenderer();
     initBlocks(Blockly, fakeVm);
-    // 动态导入：refreshBlocksDefinitions 在 spawnBlockAST 首次调用时才构建
     dsl = await import('../../src/utils/ash-DSLToBlocks');
     await dsl.refreshBlocksDefinitions();
     definitions = dsl.getBlocksDefinitions();
@@ -80,31 +84,63 @@ const buildDSL = (type: string, definition: IBlockDefinition): string => {
         ...definition.fields.map(field => `<${fieldArg(field)}>`),
         ...definition.values.map(valueArg),
         ...definition.statements.map(slot =>
-            slot.check === null || slot.check.includes('Action') ? '{ debug_breakpoint; }' : '{}',
+            slot.check === null || slot.check.includes('Action') ? '{ @debug_breakpoint; }' : '{}',
         ),
     ];
-    return args.length > 0 ? `${type}(${args.join(', ')});` : `${type};`;
+    return args.length > 0 ? `@${type}(${args.join(', ')});` : `@${type};`;
 };
 
-describe('spawnBlockAST', () => {
-    it('字面量落到 value 输入的默认 shadow', async () => {
-        const ast = await dsl.spawnBlockAST('entity_transform_position_moveStep(10);');
+/** 沿 next 链收集积木类型。 */
+const chainTypes = (state: Blockly.serialization.blocks.State | undefined): string[] => {
+    const types: string[] = [];
+    let current = state;
+    while (current) {
+        types.push(current.type);
+        current = current.next?.block;
+    }
+    return types;
+};
+
+/** 取 next 链上第 index 个积木（0 起）。 */
+const chainAt = (
+    state: Blockly.serialization.blocks.State | undefined,
+    index: number,
+): Blockly.serialization.blocks.State | undefined => {
+    let current = state;
+    for (let step = 0; step < index && current; step++) current = current.next?.block;
+    return current;
+};
+
+const inputOf = (
+    ast: Blockly.serialization.blocks.State | undefined,
+    name: string,
+): Blockly.serialization.blocks.ConnectionState | undefined => ast?.inputs?.[name];
+
+const renderOk = async (ast: Blockly.serialization.blocks.State | undefined): Promise<void> => {
+    if (!ast) throw new Error('未生成 AST');
+    const svg = await dsl.spawnBlocksSvg(ast);
+    expect(svg).toContain('<svg');
+};
+
+describe('base form：@ 与 []', () => {
+    it('@ 标记积木，字面量落到 value 输入的默认 shadow', async () => {
+        const ast = await dsl.spawnBlockAST('@entity_transform_position_moveStep(10);');
         expect(ast?.type).toBe('entity_transform_position_moveStep');
-        const steps = ast?.inputs?.STEPS;
-        expect(steps?.shadow).toMatchObject({ type: 'math_number', fields: { NUM: 10 } });
+        expect(inputOf(ast, 'STEPS')?.shadow).toMatchObject({
+            type: 'math_number',
+            fields: { NUM: 10 },
+        });
     });
 
     it('<> 落到 field，裸参数落到 value', async () => {
-        const ast = await dsl.spawnBlockAST('data_variable_set(<score>, 10);');
+        const ast = await dsl.spawnBlockAST('@data_variable_set(<score>, 10);');
         expect(ast?.fields?.NAME).toBe('score');
-        const value = ast?.inputs?.VALUE;
-        expect(value?.shadow).toBeDefined();
+        expect(inputOf(ast, 'VALUE')?.shadow).toBeDefined();
     });
 
     it('菜单原子按 options 转成对应值', async () => {
-        const ast = await dsl.spawnBlockAST('operator_math_op(1, +, 2);');
-        const operator = ast?.inputs?.OPERATOR;
-        expect(operator?.shadow).toMatchObject({
+        const ast = await dsl.spawnBlockAST('@operator_math_op(1, +, 2);');
+        expect(inputOf(ast, 'OPERATOR')?.shadow).toMatchObject({
             type: 'math_operator_menu',
             fields: { ASH_BLOCKMENU: '_ADD_' },
         });
@@ -112,72 +148,159 @@ describe('spawnBlockAST', () => {
 
     it('嵌套调用生成 block 而不是 shadow', async () => {
         const ast = await dsl.spawnBlockAST(
-            'control_flow_waitUntil(operator_logic_compare(1, <, 2));',
+            '@control_flow_waitUntil(@operator_logic_compare(1, <, 2));',
         );
-        const conditionInput = ast?.inputs?.CONDITION;
-        const condition = conditionInput?.block;
-        expect(condition?.type).toBe('operator_logic_compare');
+        expect(inputOf(ast, 'CONDITION')?.block?.type).toBe('operator_logic_compare');
     });
 
     it('嵌套积木类型不符时报清晰的 DSL 错误', async () => {
         await expect(
-            dsl.spawnBlockAST('control_flow_waitUntil(operator_math_op(1, 2));'),
+            dsl.spawnBlockAST('@control_flow_waitUntil(@operator_math_op(1, 2));'),
         ).rejects.toThrow(/DSL 类型错误/);
     });
 
-    it('{} 落到 statement，if 带 else 时写入 mutation 的 extraState', async () => {
+    it('[] 逃逸舱直接写入任意序列化状态', async () => {
         const ast = await dsl.spawnBlockAST(
-            'control_condition_if(true, { debug_breakpoint; }, { debug_breakpoint; });',
+            `@data_variable_set["{ fields: { NAME: 'score' }, extraState: { dataId: 'v1' } }"]();`,
         );
-        const doInput = ast?.inputs?.DO;
-        const elseInput = ast?.inputs?.ELSE_DO;
-        expect(doInput?.block?.type).toBe('debug_breakpoint');
-        expect(elseInput?.block?.type).toBe('debug_breakpoint');
-        expect(ast?.extraState).toMatchObject({ elseIfCount: 0, hasElse: true });
-        if (!ast) throw new Error('未生成 AST');
-        expect(() => dsl.spawnBlocksSvg(ast)).not.toThrow();
+        expect(ast).toMatchObject({
+            type: 'data_variable_set',
+            fields: { NAME: 'score' },
+            extraState: { dataId: 'v1' },
+        });
     });
 
-    it('if 带 else if 时展开 ELSE_IF_* 动态槽', async () => {
+    it('[] 与 () 合并时 () 优先', async () => {
         const ast = await dsl.spawnBlockAST(
-            'control_condition_if(true, { debug_breakpoint; }, false, { debug_breakpoint; }, { debug_breakpoint; });',
+            `@data_variable_set["{ fields: { NAME: 'fromPayload' } }"](<fromArgs>, 1);`,
         );
-        const conditionInput = ast?.inputs?.ELSE_IF_CONDITION_0;
-        expect(conditionInput?.shadow).toMatchObject({ type: 'operator_logic_boolean' });
-        const elseIfInput = ast?.inputs?.ELSE_IF_DO_0;
-        expect(elseIfInput?.block?.type).toBe('debug_breakpoint');
-        const elseInput = ast?.inputs?.ELSE_DO;
-        expect(elseInput?.block?.type).toBe('debug_breakpoint');
-        expect(ast?.extraState).toMatchObject({ elseIfCount: 1, hasElse: true });
-        if (!ast) throw new Error('未生成 AST');
-        expect(() => dsl.spawnBlocksSvg(ast)).not.toThrow();
+        expect(ast?.fields?.NAME).toBe('fromArgs');
     });
 
-    it('完整样例可端到端渲染', async () => {
-        const ast = await dsl.spawnBlockAST(`
-event_lifecycle_onStart;
-entity_transform_position_moveStep(10);
-entity_appearance_images_showImage("hello world");
-entity_transform_layer_setLayer(entity_transform_layer_getLayer);
-control_flow_waitUntil(operator_logic_compare(1, <, 2));
-control_condition_if(operator_logic_compare(1, <, 2), {
-    entity_transform_position_moveStep(1);
-    entity_appearance_images_showImage("hello world");
-}, {
-    entity_transform_position_moveStep(10);
+    it('[] 支持宽松对象语法（无引号键/单引号/尾逗号/注释/嵌套）', async () => {
+        const ast = await dsl.spawnBlockAST(
+            `@whatever["{ a: 1, b: 'two', c: [1, 2,], d: { e: true }, // 注释\n }"]();`,
+        );
+        expect(ast).toMatchObject({
+            type: 'whatever',
+            a: 1,
+            b: 'two',
+            c: [1, 2],
+            d: { e: true },
+        });
+    });
 });
-`);
-        if (!ast) throw new Error('未生成 AST');
-        expect(() => dsl.spawnBlocksSvg(ast)).not.toThrow();
+
+describe('语法糖：$ 与 !', () => {
+    it('$变量 生成变量取值积木（符号名，不要求已存在）', async () => {
+        const ast = await dsl.spawnBlockAST('$score;');
+        expect(ast).toMatchObject({
+            type: 'data_variable_get',
+            fields: { NAME: 'score' },
+            extraState: { dataId: 'score' },
+        });
     });
 
-    it('多条语句用 next 串成栈', async () => {
+    it('$变量 可作为 value 使用', async () => {
+        const ast = await dsl.spawnBlockAST('@entity_transform_position_moveStep($score);');
+        expect(inputOf(ast, 'STEPS')?.block).toMatchObject({
+            type: 'data_variable_get',
+            fields: { NAME: 'score' },
+        });
+    });
+
+    it('!true 走 block，!s_false 走 shadow', async () => {
+        const asBlock = await dsl.spawnBlockAST('@control_flow_waitUntil(!true);');
+        expect(inputOf(asBlock, 'CONDITION')?.block).toMatchObject({
+            type: 'operator_logic_boolean',
+            extraState: { value: true },
+        });
+        expect(inputOf(asBlock, 'CONDITION')?.shadow).toBeUndefined();
+
+        const asShadow = await dsl.spawnBlockAST('@control_flow_waitUntil(!s_false);');
+        expect(inputOf(asShadow, 'CONDITION')?.shadow).toMatchObject({
+            type: 'operator_logic_boolean',
+            extraState: { value: false },
+        });
+        expect(inputOf(asShadow, 'CONDITION')?.block).toBeUndefined();
+    });
+
+    it('!s_false 继承父块颜色，而不是 operator.tertiary', async () => {
+        const ast = await dsl.spawnBlockAST('@control_flow_waitUntil(!s_false);');
+        if (!ast) throw new Error('未生成 AST');
+        const svg = await dsl.spawnBlocksSvg(ast);
+        expect(svg).not.toContain('#3D963D'); // operator.tertiary：没继承父色
+        expect(svg).toContain('#ffab19'); // control.primary，父块颜色
+    });
+});
+
+describe('动态积木', () => {
+    it('if 带 else 写入 mutation 的 extraState', async () => {
         const ast = await dsl.spawnBlockAST(
-            'event_lifecycle_onStart; entity_transform_position_moveStep(10);',
+            '@control_condition_if(true, { @debug_breakpoint; }, { @debug_breakpoint; });',
         );
-        expect(ast?.type).toBe('event_lifecycle_onStart');
-        const next = ast?.next?.block;
-        expect(next?.type).toBe('entity_transform_position_moveStep');
+        expect(inputOf(ast, 'DO')?.block?.type).toBe('debug_breakpoint');
+        expect(inputOf(ast, 'ELSE_DO')?.block?.type).toBe('debug_breakpoint');
+        expect(ast?.extraState).toMatchObject({ elseIfCount: 0, hasElse: true });
+        await renderOk(ast);
+    });
+
+    it('if 带 else if 展开 ELSE_IF_* 动态槽', async () => {
+        const ast = await dsl.spawnBlockAST(
+            '@control_condition_if(true, { @debug_breakpoint; }, false, { @debug_breakpoint; }, { @debug_breakpoint; });',
+        );
+        expect(inputOf(ast, 'ELSE_IF_CONDITION_0')?.shadow).toMatchObject({
+            type: 'operator_logic_boolean',
+        });
+        expect(inputOf(ast, 'ELSE_IF_DO_0')?.block?.type).toBe('debug_breakpoint');
+        expect(inputOf(ast, 'ELSE_DO')?.block?.type).toBe('debug_breakpoint');
+        expect(ast?.extraState).toMatchObject({ elseIfCount: 1, hasElse: true });
+        await renderOk(ast);
+    });
+});
+
+describe('整簇 DSL', () => {
+    const cluster = `
+@event_lifecycle_onStart;
+@entity_transform_position_moveStep(10);
+@entity_appearance_images_showImage("hello world");
+@entity_transform_layer_setLayer(@entity_transform_layer_getLayer);
+@control_flow_waitUntil(@operator_logic_compare(1, <, 2));
+@entity_transform_position_moveStep($score);
+@control_condition_if(@operator_logic_compare(1, <, 2), {
+    @entity_transform_position_moveStep(1);
+    @entity_appearance_images_showImage("hello world");
+}, {
+    @control_flow_waitUntil(!s_false);
+});
+`;
+
+    it('整簇能生成正确的 next 栈', async () => {
+        const ast = await dsl.spawnBlockAST(cluster);
+        expect(chainTypes(ast)).toEqual([
+            'event_lifecycle_onStart',
+            'entity_transform_position_moveStep',
+            'entity_appearance_images_showImage',
+            'entity_transform_layer_setLayer',
+            'control_flow_waitUntil',
+            'entity_transform_position_moveStep',
+            'control_condition_if',
+        ]);
+    });
+
+    it('整簇内部结构正确', async () => {
+        const ast = await dsl.spawnBlockAST(cluster);
+        const ifBlock = chainAt(ast, 6);
+        expect(ifBlock?.type).toBe('control_condition_if');
+        expect(inputOf(ifBlock, 'DO')?.block?.type).toBe('entity_transform_position_moveStep');
+        expect(inputOf(ifBlock, 'ELSE_DO')?.block?.type).toBe('control_flow_waitUntil');
+        expect(ifBlock?.extraState).toMatchObject({ elseIfCount: 0, hasElse: true });
+        await renderOk(ast);
+    });
+
+    it('整簇能端到端渲染', async () => {
+        const ast = await dsl.spawnBlockAST(cluster);
+        await renderOk(ast);
     });
 });
 
@@ -204,7 +327,7 @@ describe('全部静态积木', () => {
                     failures.push(`${type}: 未生成 AST`);
                     continue;
                 }
-                const svg = dsl.spawnBlocksSvg(ast);
+                const svg = await dsl.spawnBlocksSvg(ast);
                 if (!svg.includes('<svg')) failures.push(`${type}: SVG 输出异常`);
             } catch (error) {
                 failures.push(`${type}: ${(error as Error).message}`);

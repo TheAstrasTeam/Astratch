@@ -15,16 +15,17 @@ export const CreateToolTipModal = () => {
 Astratch by **The Astras Team**
 
 \`\`\` ash
-event_lifecycle_onStart;
-entity_transform_position_moveStep(10);
-entity_appearance_images_showImage("hello world");
-entity_transform_layer_setLayer(entity_transform_layer_getLayer);
-control_flow_waitUntil(operator_logic_compare(1, >, 2));
-control_condition_if(operator_logic_compare(1, <, 2), {
-    entity_transform_position_moveStep(1);
-    entity_appearance_images_showImage("hello world");
+@event_lifecycle_onStart;
+@entity_transform_position_moveStep(10);
+@entity_appearance_images_showImage("hello world");
+@entity_transform_layer_setLayer(@entity_transform_layer_getLayer);
+@control_flow_waitUntil(@operator_logic_compare(1, <, 2));
+@entity_transform_position_moveStep($score);
+@control_condition_if( {
+    @entity_transform_position_moveStep(1);
+    @entity_appearance_images_showImage("hello world");
 }, {
-    entity_transform_position_moveStep(10);
+    @control_flow_waitUntil(!s_false);
 });
 \`\`\`
 

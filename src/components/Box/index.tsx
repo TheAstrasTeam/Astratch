@@ -79,7 +79,7 @@ const AsyncAshBlock = ({ children }: AsyncAshBlockProps) => {
         void (async () => {
             const ast = await spawnBlockAST(children as string);
             if (!ast) return;
-            const svg = spawnBlocksSvg(ast);
+            const svg = await spawnBlocksSvg(ast);
             setContent(svg);
         })();
     }, [children]);
