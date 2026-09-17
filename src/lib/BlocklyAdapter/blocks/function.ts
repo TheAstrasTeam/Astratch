@@ -1359,10 +1359,13 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
 
             this.functionRef = state.functionRef ?? null;
             this.previewData = structuredClone(functionData?.body ?? state.params ?? []);
-            this.colors = structuredClone(functionData?.color ?? BlocksColor.function);
+            // 允许外部直接传入 colors / returnType（生成器/导入场景没有函数数据时用）。
+            this.colors = structuredClone(
+                functionData?.color ?? state.colors ?? BlocksColor.function,
+            );
             // 引用积木自己的显示状态优先；函数定义中的 true 只是默认值。
             this.isValue = state.isValue ?? functionData?.isValue ?? true;
-            this.returnType = normalizeReturnType(functionData?.returnType);
+            this.returnType = normalizeReturnType(functionData?.returnType ?? state.returnType);
 
             // 引用目标可能已删除；此时仍应渲染一个空签名。
             configureFunctionValueConnections(this, this.isValue, this.returnType);
@@ -2305,6 +2308,8 @@ export function initFunctionBlocks(blockly: typeof Blockly, vm: IVM) {
             // 读档顺序是「建积木 → loadExtraState → 接子积木」，
             // 此刻还读不到行内函数，必须靠快照先把插槽建出来，
             // 否则用户填的实参会因为没有落脚点而丢失。
+            // 实参槽随快照一起恢复（生成器/导入会把 args 直接写进状态）；
+            // 交互时拖入函数仍由 onchange → syncArgs 自动同步。
             this.args = state.args ?? [];
             this.autoSync = state.autoSync ?? true;
             this.updateShape();

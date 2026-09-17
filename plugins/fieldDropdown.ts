@@ -460,23 +460,7 @@ export class dropdownWithInput extends Blockly.Field<string> {
     protected override doClassValidation_(newValue: string): string | null | undefined;
     protected override doClassValidation_(newValue?: string): string | null;
     protected override doClassValidation_(newValue?: string): string | null | undefined {
-        const options = this.getOptions(true);
-        const isValueValid = options.some(option => option[1] === newValue);
-
-        if (!isValueValid) {
-            if (this.sourceBlock_) {
-                console.warn(
-                    "Cannot set the dropdown's value to an unavailable option." +
-                        ' Block type: ' +
-                        this.sourceBlock_.type +
-                        ', Blockly.Field name: ' +
-                        this.name +
-                        ', Value: ' +
-                        newValue,
-                );
-            }
-            return null;
-        }
+        // 允许不在选项里的值：生成器 / 未解析的符号引用直接显示值本身。
         return newValue;
     }
 
@@ -489,11 +473,15 @@ export class dropdownWithInput extends Blockly.Field<string> {
     protected override doValueUpdate_(newValue: string) {
         super.doValueUpdate_(newValue);
         const options = this.getOptions(true);
+        let matched = false;
         for (let i = 0, option; (option = options[i]); i++) {
-            if (option[1] === this.value_) {
+            if (option !== 'separator' && option[1] === this.value_) {
                 this.selectedOption = option;
+                matched = true;
             }
         }
+        // 不在选项里的值合成一个选项，让它按原样渲染。
+        if (!matched) this.selectedOption = [newValue, newValue];
         if (this.isInitialized) {
             this.recomputeAriaContext();
         }

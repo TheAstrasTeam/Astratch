@@ -9,7 +9,7 @@ DSL 是一段文本，描述要生成的积木结构。这份文档只讲**怎�
 - 字符串用双引号，支持 `\"`、`\\`。
 - 数字：`10`、`-3.14`；布尔：`true`、`false`。
 - `!` 和 `#` 直接粘在后面的词上（`!true`、`!f_define`、`#define`）。
-- 没有注释语法。
+- 注释：`// ...` 到行尾，`/* ... */` 成块；字符串内不生效。
 
 ## 基本形式
 
@@ -71,13 +71,20 @@ DSL 是一段文本，描述要生成的积木结构。这份文档只讲**怎�
 
 嵌套积木会校验类型：子积木输出与父输入 check 必须有交集，否则报错。
 
-## `$`：变量取值
+## `$`：变量
 
-`$名字` 生成一个变量取值积木（`data_variable_get`）。名字是**符号**，不要求项目里已经存在；有同名变量时会显示该变量。
+`$名字` 生成一个变量取值积木（`data_variable_get`）。名字是**符号**，不要求项目里已经存在；有同名变量时显示该变量，没有就按名字原样显示。
 
 ```
 $score;
 @entity_transform_position_moveStep($score);
+```
+
+变量字段（`<...>`）同样支持符号名，`data_variable_set` / `add` / `compute` 都能写不存在的变量：
+
+```
+@data_variable_set(<score>, 10);
+@data_variable_add(<score>, 1);
 ```
 
 ## `!`：布尔与内置构造
@@ -125,20 +132,65 @@ $score;
 });
 ```
 
-## 计划中
+## 函数：`!f_*`
 
-以下语法尚未实现：
+函数是**声明式**的：签名直接写在 DSL 里，不要求项目里存在同名函数。
 
-- `!f_define` / `!f_use` / `!f_inline` / `!f_param` / `!f_execute` / `!f_rexecute`：函数族（定义签名、函数值、执行）。
-- `#define(x, y)` / `#(x)`：AST 级宏，全局作用域、先定义后使用。
-- `!p_dropdown(CAN_PUTIN_BLOCKS, "NAME")`：签名里的下拉参数。
+| 写法                                                   | 作用                             |
+| ------------------------------------------------------ | -------------------------------- |
+| `!f_use(COLOR, ...签名)`                               | 函数值（可被 `!f_execute` 接入） |
+| `!f_define(COLOR, ...签名)`                            | 函数定义帽 + 签名                |
+| `!f_inline(RETURN_TYPE, ...参数)`                      | 行内函数值                       |
+| `!f_param(MODE, "NAME")`                               | 一个参数                         |
+| `!p_dropdown(CAN_PUTIN_BLOCKS, "NAME")`                | 签名里的下拉参数                 |
+| `!f_execute(IS_AUTO, FUNCTION, ...参数)`               | 执行函数（语句）                 |
+| `!f_rexecute(IS_AUTO, RETURN_TYPE, FUNCTION, ...参数)` | 执行并返回                       |
+
+- `COLOR` 是十六进制色，如 `"#0099ff"`。
+- 签名里的裸字符串是文本标签，如 `"Let"`、`"To"`。
+- `MODE` ∈ `Unknown` `String` `Number` `Boolean` `Function` `Object` `Array`；`RETURN_TYPE` 再加 `None`。
+- `IS_AUTO` 为 `!true` 时参数由接入的函数自动同步；为 `!false` 时才读后面的 `...参数`。
+
+```
+!f_define("#0099ff", "Let", !f_param("String", "a"), "To", !p_dropdown(!false, "UPPER"));
+!f_execute(!true, !f_use("#ff6680", "do", !f_param("String", "a")));
+!f_rexecute(!true, "Number", !f_inline("Number", !f_param("Number", "x")));
+```
+
+`!f_inline` 的函数体写在调用后面的 `{}` 里：
+
+```
+!f_inline("None", !f_param("String", "x")) {
+    @debug_breakpoint;
+}
+```
+
+## 宏：`#define` / `#()`
+
+- `#define(x, y)`：把 `y` 的 **token 片段**存成全局宏 `x`，必须写在最前面。
+- `#(x)`：把 `x` 的 token 拼回当前位置，之后照常解析。
+
+```
+#define(ten, 10);
+@entity_transform_position_moveStep(#(ten));
+```
+
+因为是 token 级拼接，宏可以只写一半、后面再补参数：
+
+```
+#define(move, @entity_transform_position_moveStep);
+#(move)(10);
+```
+
+先定义后使用；字符串 token 是原子的，替换不会动到字符串内容；递归会报“展开层数过深”。
 
 ## 常见错误
 
-| 现象                          | 原因                                |
-| ----------------------------- | ----------------------------------- |
-| `积木要以 '@' 开头`           | 忘了 `@`                            |
-| `期望参数，实际 ...`          | 括号/逗号位置不对，或字符串没加引号 |
-| `< > 中缺少 field 值`         | 写了 `<` 却没有对应的 `>`           |
-| `DSL 类型错误：...`           | 嵌套积木输出与父输入 check 不兼容   |
-| `missing a(n) ... connection` | 动态槽的数量没按动态积木写法给出    |
+| 现象                             | 原因                                |
+| -------------------------------- | ----------------------------------- |
+| `a block must start with '@'`    | 忘了 `@`                            |
+| `macro '#(...)' is not defined`  | 忘了先 `#define`                    |
+| `expected an argument, got ...`  | 括号/逗号位置不对，或字符串没加引号 |
+| `missing field value inside < >` | 写了 `<` 却没有对应的 `>`           |
+| `DSL type error: ...`            | 嵌套积木输出与父输入 check 不兼容   |
+| `missing a(n) ... connection`    | 动态槽的数量没按动态积木写法给出    |

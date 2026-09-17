@@ -117,7 +117,7 @@ const inputOf = (
 ): Blockly.serialization.blocks.ConnectionState | undefined => ast?.inputs?.[name];
 
 const renderOk = async (ast: Blockly.serialization.blocks.State | undefined): Promise<void> => {
-    if (!ast) throw new Error('未生成 AST');
+    if (!ast) throw new Error('no AST');
     const svg = await dsl.spawnBlocksSvg(ast);
     expect(svg).toContain('<svg');
 };
@@ -156,7 +156,7 @@ describe('base form：@ 与 []', () => {
     it('嵌套积木类型不符时报清晰的 DSL 错误', async () => {
         await expect(
             dsl.spawnBlockAST('@control_flow_waitUntil(@operator_math_op(1, 2));'),
-        ).rejects.toThrow(/DSL 类型错误/);
+        ).rejects.toThrow(/DSL type error/);
     });
 
     it('[] 逃逸舱直接写入任意序列化状态', async () => {
@@ -227,10 +227,151 @@ describe('语法糖：$ 与 !', () => {
 
     it('!s_false 继承父块颜色，而不是 operator.tertiary', async () => {
         const ast = await dsl.spawnBlockAST('@control_flow_waitUntil(!s_false);');
-        if (!ast) throw new Error('未生成 AST');
+        if (!ast) throw new Error('no AST');
         const svg = await dsl.spawnBlocksSvg(ast);
         expect(svg).not.toContain('#3D963D'); // operator.tertiary：没继承父色
         expect(svg).toContain('#ffab19'); // control.primary，父块颜色
+    });
+});
+
+describe('符号变量与函数执行', () => {
+    it('变量 set/add 支持符号名', async () => {
+        const ast = await dsl.spawnBlockAST('@data_variable_set(<score>, 1);');
+        expect(ast?.fields?.NAME).toBe('score');
+        if (!ast) throw new Error('no AST');
+        const svg = await dsl.spawnBlocksSvg(ast);
+        expect(svg).toContain('score');
+    });
+
+    it('!f_execute 手动参数渲染出提示文字', async () => {
+        const ast = await dsl.spawnBlockAST(
+            '!f_execute(!false, !f_use("#6cf", "ABC"), !f_param("String", "Test"));',
+        );
+        if (!ast) throw new Error('no AST');
+        const svg = await dsl.spawnBlocksSvg(ast);
+        expect(svg).toContain('Test');
+    });
+});
+
+describe('注释', () => {
+    it('// 与 /* */ 注释被忽略', async () => {
+        const ast = await dsl.spawnBlockAST(`
+// 行注释
+@entity_transform_position_moveStep(/* 块注释 */ 10);
+`);
+        expect(ast?.type).toBe('entity_transform_position_moveStep');
+        expect(inputOf(ast, 'STEPS')?.shadow).toMatchObject({
+            type: 'math_number',
+            fields: { NUM: 10 },
+        });
+    });
+});
+
+describe('#define / #()', () => {
+    it('宏替换到值位置', async () => {
+        const ast = await dsl.spawnBlockAST(`
+#define(ten, 10);
+@entity_transform_position_moveStep(#(ten));
+`);
+        expect(ast?.type).toBe('entity_transform_position_moveStep');
+        expect(inputOf(ast, 'STEPS')?.shadow).toMatchObject({
+            type: 'math_number',
+            fields: { NUM: 10 },
+        });
+    });
+
+    it('宏替换到语句位置', async () => {
+        const ast = await dsl.spawnBlockAST(`
+#define(move, @entity_transform_position_moveStep(10));
+#(move);
+`);
+        expect(ast?.type).toBe('entity_transform_position_moveStep');
+    });
+
+    it('宏可拼接参数（token 替换）', async () => {
+        const ast = await dsl.spawnBlockAST(`
+#define(move, @entity_transform_position_moveStep);
+#(move)(10);
+`);
+        expect(ast?.type).toBe('entity_transform_position_moveStep');
+        expect(inputOf(ast, 'STEPS')?.shadow).toMatchObject({
+            type: 'math_number',
+            fields: { NUM: 10 },
+        });
+    });
+
+    it('undefined macro errors', async () => {
+        await expect(
+            dsl.spawnBlockAST('@entity_transform_position_moveStep(#(nope));'),
+        ).rejects.toThrow(/is not defined/);
+    });
+});
+
+describe('函数族 !f_*', () => {
+    it('!f_use 生成带签名的函数值', async () => {
+        const ast = await dsl.spawnBlockAST(
+            '!f_use("#0099ff", "Let", !f_param("String", "a"), "To", !p_dropdown(!false, "UPPER"));',
+        );
+        expect(ast?.type).toBe('function_value');
+        const extra = ast?.extraState as { params?: unknown[] };
+        expect(extra.params).toHaveLength(4);
+        if (!ast) throw new Error('no AST');
+        const svg = await dsl.spawnBlocksSvg(ast);
+        // 函数值模式的参数渲染成提示文字样式
+        expect(svg).toContain('blockly-function-value-shadow');
+    });
+
+    it('!f_define 生成定义帽 + 嵌套签名', async () => {
+        const ast = await dsl.spawnBlockAST('!f_define("#0099ff", "do", !f_param("String", "a"));');
+        expect(ast?.type).toBe('function_definition');
+        expect(inputOf(ast, 'NAME')?.block?.type).toBe('function_value');
+        await renderOk(ast);
+    });
+
+    it('!f_inline 生成行内函数', async () => {
+        const ast = await dsl.spawnBlockAST('!f_inline("None", !f_param("String", "content"));');
+        expect(ast?.type).toBe('function_inline');
+        await renderOk(ast);
+    });
+
+    it('!f_execute 接入函数值并自动同步参数', async () => {
+        const ast = await dsl.spawnBlockAST(
+            '!f_execute(!true, !f_use("#ff6680", "do", !f_param("String", "a")));',
+        );
+        expect(ast?.type).toBe('function_execute');
+        expect(inputOf(ast, 'FUNCTION')?.block?.type).toBe('function_value');
+        await renderOk(ast);
+    });
+
+    it('!f_inline 后面的 {} 是函数体', async () => {
+        const ast = await dsl.spawnBlockAST(
+            '!f_inline("None", !f_param("String", "x")) { @debug_breakpoint; }',
+        );
+        expect(ast?.type).toBe('function_inline');
+        expect(inputOf(ast, 'DO')?.block?.type).toBe('debug_breakpoint');
+        await renderOk(ast);
+    });
+
+    it('!f_execute 自动适配 !f_inline 的参数', async () => {
+        const ast = await dsl.spawnBlockAST(
+            '!f_execute(!true, !f_inline("None", !f_param("Object", "Hello")));',
+        );
+        expect(ast?.extraState).toMatchObject({
+            autoSync: true,
+            args: [{ id: 'dsl_p0', name: 'Hello', type: 'Object' }],
+        });
+        if (!ast) throw new Error('no AST');
+        const svg = await dsl.spawnBlocksSvg(ast);
+        // Hello 出现两次：inline 签名里的参数 + caller 实参槽的提示
+        expect((svg.match(/Hello/g) ?? []).length).toBeGreaterThanOrEqual(2);
+    });
+
+    it('!f_rexecute 生成 function_call', async () => {
+        const ast = await dsl.spawnBlockAST(
+            '!f_rexecute(!true, "Number", !f_use("#ff6680", "do", !f_param("Number", "a")));',
+        );
+        expect(ast?.type).toBe('function_call');
+        await renderOk(ast);
     });
 });
 
@@ -255,6 +396,33 @@ describe('动态积木', () => {
         expect(inputOf(ast, 'ELSE_IF_DO_0')?.block?.type).toBe('debug_breakpoint');
         expect(inputOf(ast, 'ELSE_DO')?.block?.type).toBe('debug_breakpoint');
         expect(ast?.extraState).toMatchObject({ elseIfCount: 1, hasElse: true });
+        await renderOk(ast);
+    });
+});
+
+describe('其它动态积木', () => {
+    it('字符串拼接按多余参数展开 DATAi', async () => {
+        const ast = await dsl.spawnBlockAST('@data_string_join("a", "b", "c");');
+        expect(ast?.extraState).toMatchObject({ itemCount: 3 });
+        expect(inputOf(ast, 'DATA0')).toBeDefined();
+        expect(inputOf(ast, 'DATA2')).toBeDefined();
+        await renderOk(ast);
+    });
+
+    it('克隆按值对展开行', async () => {
+        const ast = await dsl.spawnBlockAST('@entity_lifecycle_clone("hp", 10);');
+        expect(ast?.extraState).toMatchObject({ itemCount: 1 });
+        expect(inputOf(ast, 'DATA0')).toBeDefined();
+        expect(inputOf(ast, 'DATA0_CONTENT')).toBeDefined();
+        await renderOk(ast);
+    });
+
+    it('自动模式下实参值接进插槽', async () => {
+        const ast = await dsl.spawnBlockAST(
+            '!f_execute(!true, !f_inline("None", !f_param("String", "a")), $myVar);',
+        );
+        const argInput = inputOf(ast, 'ARG_dsl_p0');
+        expect(argInput?.block).toMatchObject({ type: 'data_variable_get' });
         await renderOk(ast);
     });
 });
@@ -324,7 +492,7 @@ describe('全部静态积木', () => {
             try {
                 const ast = await dsl.spawnBlockAST(buildDSL(type, definition));
                 if (!ast) {
-                    failures.push(`${type}: 未生成 AST`);
+                    failures.push(`${type}: no AST`);
                     continue;
                 }
                 const svg = await dsl.spawnBlocksSvg(ast);

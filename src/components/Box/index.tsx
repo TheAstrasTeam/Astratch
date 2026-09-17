@@ -77,7 +77,12 @@ const AsyncAshBlock = ({ children }: AsyncAshBlockProps) => {
 
     useEffect(() => {
         void (async () => {
-            const ast = await spawnBlockAST(children as string);
+            let ast;
+            try {
+                ast = await spawnBlockAST(children as string);
+            } catch (e) {
+                ast = await spawnBlockAST(`!f_use("#f00", "${String(e)}")`);
+            }
             if (!ast) return;
             const svg = await spawnBlocksSvg(ast);
             setContent(svg);
