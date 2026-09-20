@@ -1,0 +1,22 @@
+{
+    "name": "astratch-vm",
+    "version": "1.0.0",
+    "description": "The VM of astratch",
+    "exports": {
+        ".": {
+            "types": "./src/index.ts",
+            "default": "./src/index.ts"
+        }
+    },
+    "scripts": {
+        "check-types": "tsc --noEmit"
+    },
+    "keywords": [],
+    "author": "TheAstrasTeam",
+    "license": "Apache-2.0",
+    "type": "module",
+    "devDependencies": {
+        "astratch-blockly": "workspace:*",
+        "typescript": "^6.0.3"
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "name": "astratch-blockly",
+    "version": "1.0.0",
+    "description": "",
+    "exports": {
+        ".": {
+            "types": "./src/index.ts",
+            "default": "./src/index.ts"
+        }
+    },
+    "keywords": [],
+    "author": "",
+    "license": "Apache-2.0",
+    "type": "module",
+    "dependencies": {
+        "blockly": "^13.3.0",
+        "astratch-i18n": "workspace:*"
+    }
+}
