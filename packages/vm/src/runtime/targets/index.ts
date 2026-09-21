@@ -1,4 +1,16 @@
-interface ITarget {
+import type {  IWorkspaceState } from 'astratch-blockly';
+
+const DEFAULT_EFFECTS: ITargetInfo['effects'] = {
+    brightness: 100,
+    color: 0,
+    fisheye: 0,
+    ghost: 0,
+    mosaic: 0,
+    pixelate: 0,
+    whirl: 0,
+} as const;
+
+interface ITargetInfo {
     effects: {
         /** 亮度 */
         brightness: number;
@@ -19,13 +31,12 @@ interface ITarget {
     id: string;
     blocks: {
         script: Record<string, string>;
-        blocks: Blockly;
+        blocks: IWorkspaceState;
     };
-    serialize(): TJsonTarget;
 }
 
-interface TJsonTarget {
-    effect: ITarget['effects'];
+interface ITarget extends ITargetInfo {
+    serialize(): ITargetInfo;
 }
 
 class Target implements ITarget {
@@ -38,20 +49,35 @@ class Target implements ITarget {
         pixelate: number;
         whirl: number;
     };
-    constructor() {
-        this.effects = {
-            brightness: 100,
-            color: 0,
-            fisheye: 0,
-            ghost: 0,
-            mosaic: 0,
-            pixelate: 0,
-            whirl: 0,
+    name: string;
+    id: string;
+    blocks: {
+        script: Record<string, string>;
+        blocks: IWorkspaceState;
+    };
+
+    constructor(meta: Partial<ITargetInfo>) {
+        this.effects = { ...DEFAULT_EFFECTS };
+        this.name = meta.name ?? 'target';
+        this.id = meta.id ?? crypto.randomUUID();
+        this.effects = meta.effects ?? { ...DEFAULT_EFFECTS };
+        this.blocks = meta.blocks ?? {
+            script: {},
+            blocks: {
+                blocks: {
+                    languageVersion: 1,
+                    blocks: [],
+                },
+                workspaceComments: [],
+            },
         };
     }
-    serialize(): TJsonTarget {
+    serialize(): ITargetInfo {
         return {
-            effect: this.effects,
+            effects: this.effects,
+            name: this.name,
+            id: this.id,
+            blocks: this.blocks,
         };
     }
 }
