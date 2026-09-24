@@ -8,4 +8,11 @@ export default defineConfig({
     plugins: [react(), babel({ presets: [reactCompilerPreset()] })],
     root: 'src',
     publicDir: resolve(import.meta.dirname, 'public'),
+    css: {
+        modules: {
+            scopeBehaviour: 'local',
+            generateScopedName: '[folder]_[local]_[hash:base64:5]',
+            localsConvention: 'camelCaseOnly',
+        },
+    },
 });

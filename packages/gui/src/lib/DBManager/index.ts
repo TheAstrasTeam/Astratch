@@ -3,7 +3,7 @@ const STORE_ID = 'astratch' as const;
 
 interface IDBManager {
     DB: IDBDatabase;
-    getData(key: string): Promise<unknown | undefined>;
+    getData(key: string): Promise<unknown>;
     setData(key: string, data: unknown): Promise<void>;
     deleteData(key: string): Promise<void>;
 }
@@ -15,8 +15,12 @@ class DBManager implements IDBManager {
         this.DB = await new Promise<IDBDatabase>((resolve, reject) => {
             const request = indexedDB.open(DB_ID, 1);
 
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error);
+            request.onsuccess = () => {
+                resolve(request.result);
+            };
+            request.onerror = () => {
+                reject(request.error ?? new Error('DB Error'));
+            };
             request.onupgradeneeded = event => {
                 const db = (event.target as IDBOpenDBRequest).result;
                 if (!db.objectStoreNames.contains(STORE_ID)) {
@@ -26,12 +30,16 @@ class DBManager implements IDBManager {
         });
     }
 
-    async getData(key: string): Promise<unknown | undefined> {
+    async getData(key: string): Promise<unknown> {
         return new Promise((resolve, reject) => {
             const transaction = this.DB.transaction(STORE_ID, 'readonly');
             const request = transaction.objectStore(STORE_ID).get(key);
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error);
+            request.onsuccess = () => {
+                resolve(request.result);
+            };
+            request.onerror = () => {
+                reject(request.error ?? new Error('DB Error'));
+            };
         });
     }
 
@@ -39,8 +47,12 @@ class DBManager implements IDBManager {
         return new Promise((resolve, reject) => {
             const transaction = this.DB.transaction(STORE_ID, 'readwrite');
             const request = transaction.objectStore(STORE_ID).put(data, key);
-            request.onsuccess = () => resolve();
-            request.onerror = () => reject(request.error);
+            request.onsuccess = () => {
+                resolve();
+            };
+            request.onerror = () => {
+                reject(request.error ?? new Error('DB Error'));
+            };
         });
     }
 
@@ -48,8 +60,12 @@ class DBManager implements IDBManager {
         return new Promise((resolve, reject) => {
             const transaction = this.DB.transaction(STORE_ID, 'readwrite');
             const request = transaction.objectStore(STORE_ID).delete(key);
-            request.onsuccess = () => resolve();
-            request.onerror = () => reject(request.error);
+            request.onsuccess = () => {
+                resolve();
+            };
+            request.onerror = () => {
+                reject(request.error ?? new Error('DB Error'));
+            };
         });
     }
 }

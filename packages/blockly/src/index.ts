@@ -2,7 +2,7 @@ export { blocklyAdapter } from './blockly';
 
 import * as Blockly from 'blockly/core';
 import type * as IBlockly from 'blockly/core';
-export { type IBlockly , Blockly };
+export { type IBlockly, Blockly };
 
 export interface IBlocksState {
     languageVersion: number;

@@ -284,7 +284,4 @@ const OPCODES = {
 
 type TOPCODES_VALUE = (typeof OPCODES)[keyof typeof OPCODES];
 
-export {
-    OPCODES,
-    type TOPCODES_VALUE
-}
+export { OPCODES, type TOPCODES_VALUE };

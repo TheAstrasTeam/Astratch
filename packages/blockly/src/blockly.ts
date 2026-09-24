@@ -64,7 +64,10 @@ class BlocklyAdapter implements IBlocklyAdapter {
         Data?: Record<string, unknown>,
         Options?: Blockly.BlocklyOptions,
     ): string {
-        if(this._isCreating) throw new Error('[Add Workspace] There\'s already has a workspace is creating.\nPlease try later.')
+        if (this._isCreating)
+            throw new Error(
+                "[Add Workspace] There's already has a workspace is creating.\nPlease try later.",
+            );
         this._isCreating = true;
         Blockly.Events.disable();
         const id = crypto.randomUUID();

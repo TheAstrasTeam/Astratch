@@ -1,4 +1,4 @@
-import type {  IWorkspaceState } from 'astratch-blockly';
+import type { IWorkspaceState } from 'astratch-blockly';
 
 const DEFAULT_EFFECTS: ITargetInfo['effects'] = {
     brightness: 100,

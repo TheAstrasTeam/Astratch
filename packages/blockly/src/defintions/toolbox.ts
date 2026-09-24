@@ -243,7 +243,9 @@ const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                                         gap: 12,
                                         kind: 'block',
                                         type: OPCODES.ENTITY_APPEARANCE_IMAGES_SHOWIMAGE,
-                                        inputs: { IMAGE_NAME: txt(i18next.t('blocks:example.imageName')) },
+                                        inputs: {
+                                            IMAGE_NAME: txt(i18next.t('blocks:example.imageName')),
+                                        },
                                     },
                                     {
                                         gap: 12,
@@ -547,7 +549,10 @@ const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                         gap: 12,
                         kind: 'block',
                         type: OPCODES.RESOURCES_ADDFROMURL,
-                        inputs: { URL: txt('https://'), NAME: txt(i18next.t('blocks:example.resource')) },
+                        inputs: {
+                            URL: txt('https://'),
+                            NAME: txt(i18next.t('blocks:example.resource')),
+                        },
                     },
                     {
                         gap: 12,

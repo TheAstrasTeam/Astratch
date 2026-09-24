@@ -19,7 +19,7 @@ import * as Blockly from 'blockly/core';
 
 import { injectSearchCss } from './css';
 
-import {i18next} from 'astratch-i18n';
+import { i18next } from 'astratch-i18n';
 
 /** 翻译搜索栏文案使用的函数；默认直接回显 key。 */
 export type WorkspaceSearchTranslator = (key: string) => string;

@@ -161,8 +161,4 @@ interface IBlockColor {
 
 type IBlocksColor = typeof BlocksColor;
 
-export {
-    BlocksColor,
-    type IBlocksColor,
-    type IBlockColor
-}
+export { BlocksColor, type IBlocksColor, type IBlockColor };

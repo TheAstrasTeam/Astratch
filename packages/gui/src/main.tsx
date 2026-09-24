@@ -1,15 +1,18 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { Editor } from './components/editor';
 
-import { i18next } from 'astratch-i18n';
+import './lib/initAstratch';
 
 // 删除加载页面
-document.querySelectorAll('.loading').forEach(ele => ele.remove());
+document.querySelectorAll('.loading').forEach(ele => {
+    ele.remove();
+});
 
 const root = document.getElementById('root');
 if (root)
     createRoot(root).render(
         <StrictMode>
-            <span>{i18next.t('gui:button.ok')}</span>
+            <Editor />
         </StrictMode>,
     );
