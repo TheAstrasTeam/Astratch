@@ -16,7 +16,6 @@ export const Box = ({
     tipPosition = 'pointer',
     children,
     onMouseEnter,
-    onMouseMove,
     onMouseLeave,
     ...props
 }: IBox) => {
@@ -32,6 +31,16 @@ export const Box = ({
     const [tipAniMode, setTipAniMode] = useState<'hidden' | 'waiting' | 'show' | 'hiding'>(
         'hidden',
     );
+
+    useEffect(() => {
+        if (tipAniMode !== 'waiting') return;
+        const timer = setTimeout(() => {
+            setTipAniMode('show');
+        }, 500);
+        return () => {
+            clearTimeout(timer);
+        };
+    }, [tipAniMode]);
 
     const _updateTipPosition = () => {
         if (!tipRef.current) return;
@@ -49,13 +58,42 @@ export const Box = ({
         setTipAniMode(tipAniMode === 'show' ? 'hiding' : 'hidden');
     };
 
+    /** 下面的是 {@link tipPosition} 为 dom 才需要的喵 */
+
+    useLayoutEffect(() => {
+        if (tipPosition !== 'dom' || !divRef.current || !tipRef.current) return;
+        const divPos = divRef.current.getBoundingClientRect();
+        const screenSize = {
+            width: document.documentElement.clientWidth,
+            height: document.documentElement.clientHeight,
+        };
+        const posSize = { width: tipRef.current.offsetWidth, height: tipRef.current.offsetHeight };
+        posRef.current.x = Math.min(divPos.right, screenSize.width - posSize.width);
+        posRef.current.y = Math.min(divPos.bottom, screenSize.height - posSize.height);
+        _updateTipPosition();
+    }, [tipAniMode, tipPosition]);
+
+    /** 下面的是 {@link tipPosition} 为 pointer 才需要的喵 */
+
     // handleMouseMove
     // 这么做主要是让在移出元素也能动，我真聪明！
+    // DeepSeek是好女孩吗，一直给我出离奇方案
     useEffect(() => {
-        if (tipAniMode === 'hidden') return;
+        if (tipAniMode === 'hidden' || tipPosition !== 'pointer') return;
 
         const onMove = (e: MouseEvent) => {
-            posRef.current = { x: e.clientX + 5, y: e.clientY + 5 };
+            const screenSize = {
+                width: document.documentElement.clientWidth,
+                height: document.documentElement.clientHeight,
+            };
+            const posSize = {
+                width: tipRef.current?.offsetWidth ?? 0,
+                height: tipRef.current?.offsetHeight ?? 0,
+            };
+            posRef.current = {
+                x: Math.min(e.clientX + 5, screenSize.width - posSize.width),
+                y: Math.min(e.clientY + 5, screenSize.height - posSize.height),
+            };
             _updateTipPosition();
         };
 
@@ -63,25 +101,16 @@ export const Box = ({
         return () => {
             window.removeEventListener('mousemove', onMove);
         };
-    }, [tipAniMode]);
+    }, [tipAniMode, tipPosition]);
 
     const handleTipAnimationEnd = () => {
         if (tipAniMode === 'hiding') setTipAniMode('hidden');
     };
 
-    useEffect(() => {
-        if (tipAniMode !== 'waiting') return;
-        const timer = setTimeout(() => {
-            setTipAniMode('show');
-        }, 500);
-        return () => {
-            clearTimeout(timer);
-        };
-    }, [tipAniMode]);
-
     useLayoutEffect(() => {
+        if (tipPosition !== 'pointer') return;
         _updateTipPosition();
-    }, [tipAniMode]);
+    }, [tipAniMode, tipPosition]);
 
     return (
         <div
