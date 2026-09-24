@@ -1,5 +1,10 @@
 import { Box } from '../box';
 
 export const Editor = () => {
-    return <Box tip='hello'>Hello World</Box>;
+    return (
+        <div>
+            <Box tip='hello'>tip align is pointer!</Box>
+            <Box tip='hello123' tipPosition='dom'>tip align is dom!</Box>
+        </div>
+    );
 };

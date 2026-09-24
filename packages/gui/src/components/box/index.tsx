@@ -68,8 +68,14 @@ export const Box = ({
             height: document.documentElement.clientHeight,
         };
         const posSize = { width: tipRef.current.offsetWidth, height: tipRef.current.offsetHeight };
-        posRef.current.x = Math.min(divPos.right, screenSize.width - posSize.width);
-        posRef.current.y = Math.min(divPos.bottom, screenSize.height - posSize.height);
+        posRef.current.x =
+            screenSize.width - posSize.width < divPos.right
+                ? divPos.right - posSize.width
+                : divPos.right;
+        posRef.current.y =
+            screenSize.height - posSize.height < divPos.bottom
+                ? divPos.bottom - posSize.height
+                : divPos.bottom;
         _updateTipPosition();
     }, [tipAniMode, tipPosition]);
 
@@ -90,10 +96,14 @@ export const Box = ({
                 width: tipRef.current?.offsetWidth ?? 0,
                 height: tipRef.current?.offsetHeight ?? 0,
             };
-            posRef.current = {
-                x: Math.min(e.clientX + 5, screenSize.width - posSize.width),
-                y: Math.min(e.clientY + 5, screenSize.height - posSize.height),
-            };
+            posRef.current.x =
+                screenSize.width - posSize.width < e.clientX
+                    ? e.clientX - posSize.width - 5
+                    : e.clientX + 10;
+            posRef.current.y =
+                screenSize.height - posSize.height < e.clientY
+                    ? e.clientY - posSize.height - 5
+                    : e.clientY + 10;
             _updateTipPosition();
         };
 
