@@ -1,0 +1,15 @@
+{
+    "name": "astratch-core",
+    "version": "1.0.0",
+    "description": "",
+    "exports": {
+        ".": {
+            "types": "./src/index.ts",
+            "default": "./src/index.ts"
+        }
+    },
+    "keywords": [],
+    "author": "",
+    "license": "Apache-2.0",
+    "type": "module"
+}

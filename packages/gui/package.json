@@ -15,7 +15,8 @@
         "remark-gfm": "^4.0.1",
         "zustand": "^5.0.15",
         "astratch-vm": "workspace:*",
-        "astratch-i18n": "workspace:*"
+        "astratch-i18n": "workspace:*",
+        "astratch-core": "workspace:*"
     },
     "devDependencies": {
         "@babel/core": "^7.29.7",

@@ -20,6 +20,6 @@ const dark = {
         'transparent-light': '#eeeeee70',
         text: '#eeeeee',
     },
-} as TTheme;
+} satisfies TTheme;
 
 export default dark;

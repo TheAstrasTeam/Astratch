@@ -1,30 +1,23 @@
-interface IEventsType {
-    SWITCH_TARGET: {
-        targetID: string;
-    };
-    UPDATE_PROJECT: {
-        targetID: string;
-    };
-}
-
-interface IEvents {
-    emit<T extends keyof IEvents>(event: T, data: IEvents[T]): void;
-    on<T extends keyof IEvents>(
+interface IEvents<IEventsType extends IEventsTypeMap> {
+    emit<T extends keyof IEventsType>(event: T, data: IEventsType[T]): void;
+    on<T extends keyof IEventsType>(
         event: T,
-        callback: (data: IEvents[T]) => void,
+        callback: (data: IEventsType[T]) => void,
         once: boolean,
     ): void;
-    off<T extends keyof IEvents>(event: T, callback: (data: IEvents[T]) => void): void;
+    off<T extends keyof IEventsType>(event: T, callback: (data: IEventsType[T]) => void): void;
 }
 
-class Events implements IEvents {
+type IEventsTypeMap = object;
+
+class EventBus<EventsType extends IEventsTypeMap> implements IEvents<EventsType> {
     private eventsStorage: {
-        [T in keyof IEvents]?: { once: boolean; callback(data: unknown): void }[];
+        [T in keyof EventsType]?: { once: boolean; callback(data: unknown): void }[];
     } = {};
 
-    on<T extends keyof IEvents>(
+    on<T extends keyof EventsType>(
         event: T,
-        callback: (data: IEvents[T]) => void,
+        callback: (data: EventsType[T]) => void,
         once: boolean,
     ): void {
         if (!this.eventsStorage[event]) this.eventsStorage[event] = [];
@@ -32,7 +25,7 @@ class Events implements IEvents {
         callbacks.push({ callback, once });
     }
 
-    emit<T extends keyof IEvents>(event: T, data: IEvents[T]): void {
+    emit<T extends keyof EventsType>(event: T, data: EventsType[T]): void {
         const callbacks = this.eventsStorage[event];
         if (!callbacks) return;
 
@@ -45,7 +38,7 @@ class Events implements IEvents {
         }
     }
 
-    off<T extends keyof IEvents>(event: T, callback: (data: IEvents[T]) => void): void {
+    off<T extends keyof EventsType>(event: T, callback: (data: EventsType[T]) => void): void {
         const callbacks = this.eventsStorage[event];
         if (!callbacks) return;
 
@@ -54,5 +47,4 @@ class Events implements IEvents {
     }
 }
 
-export { type IEventsType };
-export const events = new Events();
+export { type IEventsTypeMap, type IEvents, EventBus };

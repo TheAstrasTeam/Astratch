@@ -1,3 +1,4 @@
+import { EventBus } from 'astratch-core';
 import type { PartialByKeys } from '../../utils/types';
 import { DB } from '../DBManager';
 import {
@@ -61,6 +62,7 @@ interface IThemeManager {
     deleteTheme(kind: 'accent' | 'ui', id: string): Promise<boolean>;
     /** 获取一个主题 */
     getTheme(kind: 'accent' | 'ui', id: string): Promise<TTheme | undefined>;
+    /** 应用一个主题 */
     applyTheme(kind: 'accent' | 'ui', id: string): Promise<void>;
 }
 
@@ -73,11 +75,26 @@ interface IThemeDBStorage {
     };
 }
 
+interface IThemeEventsType {
+    APPLIED_THEME: {
+        id: string;
+        kind: 'accent' | 'ui';
+    };
+    DELETED_THEME: {
+        id: string;
+        kind: 'accent' | 'ui';
+    };
+    ADDED_THEME: {
+        id: string;
+        kind: 'accent' | 'ui';
+    };
+}
+
 const THEME_MANAGER_ID = 'astratch-theme' as const;
 const THEME_DOM_ACCENT_ID = 'astratch-theme-accent' as const;
 const THEME_DOM_UI_ID = 'astratch-theme-ui' as const;
 
-class ThemeManager implements IThemeManager {
+class ThemeManager extends EventBus<IThemeEventsType> implements IThemeManager {
     private isWriting = false;
     protected async useDB<T>(callback: (storage: IThemeDBStorage) => Promise<T> | T): Promise<T> {
         if (this.isWriting) throw new Error('DB is using.');
@@ -125,6 +142,11 @@ class ThemeManager implements IThemeManager {
             id,
         };
         await this.addThemeToDB(themeConfig);
+        this.emit('ADDED_THEME', {
+            id,
+            kind: themeConfig.kind,
+        });
+
         if (autoApply) await this.applyTheme(themeConfig.kind, id);
         return id;
     }
@@ -200,6 +222,10 @@ class ThemeManager implements IThemeManager {
         }
         styleDOM.textContent = cssString;
         await this.setUsingThemeToDB(kind, id);
+        this.emit('APPLIED_THEME', {
+            id,
+            kind,
+        });
     }
     async getTheme(kind: 'accent' | 'ui', id: string): Promise<TTheme | undefined> {
         const themeConfig = await this.getThemeByDB(kind, id);
@@ -210,9 +236,22 @@ class ThemeManager implements IThemeManager {
             console.warn(`Can't delete the built-in theme.`);
             return false;
         }
-        const themeConfig = await this.getThemeByDB(kind, id);
+        const themeStorage = await this.getThemeStorage();
+        if (!themeStorage) return false;
+        if (
+            (kind === 'accent' && themeStorage.usingAccentTheme === id) ||
+            (kind === 'ui' && themeStorage.usingUITheme === id)
+        ) {
+            console.warn(`Can't delete theme of ${id}\nThis theme is using.`);
+            return false;
+        }
+        const themeConfig = themeStorage.themes[kind][id];
         if (!themeConfig) return false;
         await this.deleteThemeFromDB(kind, id);
+        this.emit('DELETED_THEME', {
+            id,
+            kind,
+        });
         return true;
     }
 }
