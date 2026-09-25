@@ -3,7 +3,7 @@ interface IEvents<IEventsType extends IEventsTypeMap> {
     on<T extends keyof IEventsType>(
         event: T,
         callback: (data: IEventsType[T]) => void,
-        once: boolean,
+        once?: boolean,
     ): void;
     off<T extends keyof IEventsType>(event: T, callback: (data: IEventsType[T]) => void): void;
 }
@@ -18,7 +18,7 @@ class EventBus<EventsType extends IEventsTypeMap> implements IEvents<EventsType>
     on<T extends keyof EventsType>(
         event: T,
         callback: (data: EventsType[T]) => void,
-        once: boolean,
+        once = false,
     ): void {
         if (!this.eventsStorage[event]) this.eventsStorage[event] = [];
         const callbacks = this.eventsStorage[event]!;
