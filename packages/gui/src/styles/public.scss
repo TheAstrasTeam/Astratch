@@ -1,0 +1,31 @@
+@use './styles.scss' as *;
+
+body {
+    margin: 0 !important;
+}
+
+* {
+    &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: $ui-tertiary;
+        border-radius: 0;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background-color: $ui-quaternary;
+    }
+
+    &::-webkit-scrollbar-button,
+    &::-webkit-scrollbar-corner {
+        display: none;
+        background: transparent;
+    }
+}
