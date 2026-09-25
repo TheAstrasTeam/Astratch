@@ -9,45 +9,42 @@ import {
     builtIn_UIThemes,
 } from './builtIn';
 
-type TTheme = {
+// 公共部分
+type TThemeMeta = { translate: false; name: string } | { translate: true; translateID: string };
+
+type TAccentTheme = {
     id: string;
-} & (
-    | {
-          translate: false;
-          name: string;
-      }
-    | { translate: true; translateID: string }
-) &
-    (
-        | {
-              kind: 'accent';
-              scheme: {
-                  primary: string;
-                  secondary: string;
-                  tertiary: string;
-                  transparent: string;
-                  highlight: string;
-              };
-          }
-        | {
-              kind: 'ui';
-              mixWithAccent: boolean;
-              isDarkTheme: boolean;
-              scheme: {
-                  primary: string;
-                  secondary: string;
-                  tertiary: string;
-                  quaternary: string;
-                  'primary-icon': string;
-                  'secondary-icon': string;
-                  'tertiary-icon': string;
-                  'quaternary-icon': string;
-                  'transparent-dark': string;
-                  'transparent-light': string;
-                  text: string;
-              };
-          }
-    );
+    kind: 'accent';
+    scheme: {
+        primary: string;
+        secondary: string;
+        tertiary: string;
+        transparent: string;
+        highlight: string;
+    };
+} & TThemeMeta;
+
+type TUITheme = {
+    id: string;
+    kind: 'ui';
+    mixWithAccent: boolean;
+    isDarkTheme: boolean;
+    scheme: {
+        primary: string;
+        secondary: string;
+        tertiary: string;
+        quaternary: string;
+        'primary-icon': string;
+        'secondary-icon': string;
+        'tertiary-icon': string;
+        'quaternary-icon': string;
+        'transparent-dark': string;
+        'transparent-light': string;
+        text: string;
+    };
+} & TThemeMeta;
+
+type TTheme = TAccentTheme | TUITheme;
 
 type TSubmitTheme = PartialByKeys<TTheme, 'id'>;
 
@@ -61,7 +58,25 @@ interface IThemeManager {
     /** 删除一个主题，并返回是否删除成功 */
     deleteTheme(kind: 'accent' | 'ui', id: string): Promise<boolean>;
     /** 获取一个主题 */
-    getTheme(kind: 'accent' | 'ui', id: string): Promise<TTheme | undefined>;
+    getTheme<K extends 'accent' | 'ui'>(
+        kind: K,
+        id: string,
+    ): Promise<
+        | {
+              accent: TAccentTheme;
+              ui: TUITheme;
+          }[K]
+        | undefined
+    >;
+    /** 获取正在使用的主题 */
+    getUsingTheme<K extends 'accent' | 'ui'>(
+        kind: K,
+    ): Promise<
+        {
+            accent: TAccentTheme;
+            ui: TUITheme;
+        }[K]
+    >;
     /** 应用一个主题 */
     applyTheme(kind: 'accent' | 'ui', id: string): Promise<void>;
 }
@@ -70,8 +85,8 @@ interface IThemeDBStorage {
     usingUITheme: string;
     usingAccentTheme: string;
     themes: {
-        ui: Record<string, TTheme>;
-        accent: Record<string, TTheme>;
+        ui: Record<string, TUITheme>;
+        accent: Record<string, TAccentTheme>;
     };
 }
 
@@ -115,7 +130,8 @@ class ThemeManager extends EventBus<IThemeEventsType> implements IThemeManager {
     private async deleteThemeFromDB(kind: 'accent' | 'ui', id: string): Promise<void> {
         await this.useDB(async DBThemeStorage => {
             const { [id]: _, ...themes } = DBThemeStorage.themes[kind];
-            DBThemeStorage.themes[kind] = themes;
+            DBThemeStorage.themes[kind] = themes as Record<string, TAccentTheme> &
+                Record<string, TUITheme>;
             await DB.setData(THEME_MANAGER_ID, DBThemeStorage);
         });
     }
@@ -126,12 +142,24 @@ class ThemeManager extends EventBus<IThemeEventsType> implements IThemeManager {
             await DB.setData(THEME_MANAGER_ID, DBThemeStorage);
         });
     }
-    private async getThemeByDB(kind: 'accent' | 'ui', id: string): Promise<TTheme | undefined> {
-        const storage = (await DB.getData(THEME_MANAGER_ID)) as IThemeDBStorage | undefined;
-        return storage?.themes[kind][id];
+    private async getThemeByDB<K extends 'accent' | 'ui'>(
+        kind: K,
+        id: string,
+    ): Promise<
+        | {
+              accent: TAccentTheme;
+              ui: TUITheme;
+          }[K]
+        | undefined
+    > {
+        const storage = await this.getThemeStorage();
+        // TypeScript, FUCK YOU!
+        // 等价报错类型不兼容的来
+        return storage.themes[kind][id] as { accent: TAccentTheme; ui: TUITheme }[K] | undefined;
     }
-    private async getThemeStorage(): Promise<IThemeDBStorage | undefined> {
+    private async getThemeStorage(): Promise<IThemeDBStorage> {
         const storage = (await DB.getData(THEME_MANAGER_ID)) as IThemeDBStorage | undefined;
+        if (!storage) throw new Error(`Can't get theme storage.`);
         return storage;
     }
 
@@ -166,7 +194,7 @@ class ThemeManager extends EventBus<IThemeEventsType> implements IThemeManager {
                 await this.applyTheme('accent', builtIn_defaultTheme_accent);
             }
         };
-        const themeStorage = await this.getThemeStorage();
+        const themeStorage = (await DB.getData(THEME_MANAGER_ID)) as IThemeDBStorage;
 
         if (themeStorage) {
             await addDefaultThemes(false);
@@ -227,9 +255,39 @@ class ThemeManager extends EventBus<IThemeEventsType> implements IThemeManager {
             kind,
         });
     }
-    async getTheme(kind: 'accent' | 'ui', id: string): Promise<TTheme | undefined> {
+    async getTheme<K extends 'accent' | 'ui'>(
+        kind: K,
+        id: string,
+    ): Promise<
+        | {
+              accent: TAccentTheme;
+              ui: TUITheme;
+          }[K]
+        | undefined
+    > {
         const themeConfig = await this.getThemeByDB(kind, id);
         return themeConfig;
+    }
+    async getUsingTheme<K extends 'accent' | 'ui'>(
+        kind: K,
+    ): Promise<
+        {
+            accent: TAccentTheme;
+            ui: TUITheme;
+        }[K]
+    > {
+        const themeStorage = await this.getThemeStorage();
+        // 等价报错类型不兼容的来
+        // 好熟悉的样子
+        if (kind === 'accent')
+            return themeStorage.themes.accent[themeStorage.usingAccentTheme] as {
+                accent: TAccentTheme;
+                ui: TUITheme;
+            }[K];
+        return themeStorage.themes.ui[themeStorage.usingUITheme] as {
+            accent: TAccentTheme;
+            ui: TUITheme;
+        }[K];
     }
     async deleteTheme(kind: 'accent' | 'ui', id: string): Promise<boolean> {
         if (builtIn_themeIDs.includes(id)) {
@@ -237,7 +295,6 @@ class ThemeManager extends EventBus<IThemeEventsType> implements IThemeManager {
             return false;
         }
         const themeStorage = await this.getThemeStorage();
-        if (!themeStorage) return false;
         if (
             (kind === 'accent' && themeStorage.usingAccentTheme === id) ||
             (kind === 'ui' && themeStorage.usingUITheme === id)
@@ -257,4 +314,4 @@ class ThemeManager extends EventBus<IThemeEventsType> implements IThemeManager {
 }
 const themeManager = new ThemeManager();
 await themeManager.init();
-export { themeManager, type TTheme };
+export { themeManager, type TTheme, type IThemeEventsType };
