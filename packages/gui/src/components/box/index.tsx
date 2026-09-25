@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import classNames from 'classnames';
 
 import styles from './index.module.scss';
+import { MarkdownArea } from '../markdown';
 
 interface IBox extends React.ComponentProps<'div'> {
     tip?: string;
@@ -12,7 +13,7 @@ interface IBox extends React.ComponentProps<'div'> {
 
 export const Box = ({
     tip,
-    tipMode,
+    tipMode = 'text',
     tipPosition = 'pointer',
     children,
     onMouseEnter,
@@ -22,6 +23,7 @@ export const Box = ({
     const divRef = useRef<HTMLDivElement>(null);
     const tipRef = useRef<HTMLDivElement>(null);
     const posRef = useRef({ x: 0, y: 0 });
+    const positionedRef = useRef(false);
     /**
      * - hidden: 隐藏
      * - waiting: 等待出现tip {@link timer}
@@ -50,7 +52,10 @@ export const Box = ({
 
     const handleMouseEnter = (event: React.MouseEvent<HTMLDivElement>) => {
         onMouseEnter?.(event);
-        setTipAniMode(tipAniMode === 'hiding' ? 'show' : 'waiting');
+        if (tipAniMode === 'hiding') return;
+        posRef.current = { x: event.clientX, y: event.clientY };
+        positionedRef.current = false;
+        setTipAniMode('waiting');
     };
 
     const handleMouseLeave = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -88,23 +93,8 @@ export const Box = ({
         if (tipAniMode === 'hidden' || tipPosition !== 'pointer') return;
 
         const onMove = (e: MouseEvent) => {
-            const screenSize = {
-                width: document.documentElement.clientWidth,
-                height: document.documentElement.clientHeight,
-            };
-            const posSize = {
-                width: tipRef.current?.offsetWidth ?? 0,
-                height: tipRef.current?.offsetHeight ?? 0,
-            };
-            posRef.current.x =
-                screenSize.width - posSize.width < e.clientX
-                    ? e.clientX - posSize.width - 5
-                    : e.clientX + 10;
-            posRef.current.y =
-                screenSize.height - posSize.height < e.clientY
-                    ? e.clientY - posSize.height - 5
-                    : e.clientY + 10;
-            _updateTipPosition();
+            if (positionedRef.current) return;
+            posRef.current = { x: e.clientX, y: e.clientY };
         };
 
         window.addEventListener('mousemove', onMove);
@@ -119,8 +109,42 @@ export const Box = ({
 
     useLayoutEffect(() => {
         if (tipPosition !== 'pointer') return;
+        if (tipAniMode !== 'show' || !tipRef.current || positionedRef.current) {
+            _updateTipPosition();
+            return;
+        }
+
+        const screenSize = {
+            width: document.documentElement.clientWidth,
+            height: document.documentElement.clientHeight,
+        };
+        const posSize = {
+            width: tipRef.current.offsetWidth,
+            height: tipRef.current.offsetHeight,
+        };
+        posRef.current.x =
+            screenSize.width - posSize.width < posRef.current.x
+                ? posRef.current.x - posSize.width
+                : posRef.current.x;
+        posRef.current.y =
+            screenSize.height - posSize.height < posRef.current.y
+                ? posRef.current.y - posSize.height
+                : posRef.current.y;
+
+        positionedRef.current = true;
         _updateTipPosition();
     }, [tipAniMode, tipPosition]);
+
+    const render = () => {
+        switch (tipMode) {
+            case 'html':
+                return <div dangerouslySetInnerHTML={{ __html: tip ?? '' }} />;
+            case 'markdown':
+                return <MarkdownArea>{tip ?? ''}</MarkdownArea>;
+            case 'text':
+                return <span>{tip ?? ''}</span>;
+        }
+    };
 
     return (
         <div
@@ -142,10 +166,9 @@ export const Box = ({
                         onAnimationEnd={handleTipAnimationEnd}
                         style={{
                             position: 'fixed',
-                            pointerEvents: 'none',
                         }}
                     >
-                        {tip}
+                        {render()}
                     </div>,
                     document.body,
                 )}
