@@ -15,9 +15,14 @@ input {
     }
 }
 
+span {
+    cursor: default;
+}
+
 * {
     box-sizing: border-box;
     color: $ui-text;
+    font-size: small;
     &::-webkit-scrollbar {
         width: 8px;
         height: 8px;

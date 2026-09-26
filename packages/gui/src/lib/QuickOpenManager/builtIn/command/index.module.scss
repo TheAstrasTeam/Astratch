@@ -1,0 +1,21 @@
+@use '../../../../styles/styles.scss' as *;
+
+.command {
+    display: flex;
+    padding: 5px;
+    border-radius: 5px;
+    gap: 10px;
+    &:hover {
+        background-color: $ui-quaternary;
+    }
+    .left {
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+        flex-direction: column;
+        .description {
+            opacity: 0.5;
+            font-size: x-small;
+        }
+    }
+}

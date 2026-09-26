@@ -11,7 +11,7 @@
         "lint": "eslint . && tsc -b",
         "check": "prettier --check .",
         "format": "prettier --write .",
-        "sync:i18n": "node scripts/sync-i18n.mjs"
+        "test": "cd ./packages/gui && vitest run && cd ../../"
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
