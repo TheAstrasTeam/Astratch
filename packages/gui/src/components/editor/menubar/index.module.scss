@@ -1,0 +1,28 @@
+@use '../../../styles/styles.scss' as *;
+
+.main {
+    background-color: $ui-secondary;
+    display: flex;
+    height: 35px;
+    flex: 1;
+    padding: 10px;
+    gap: 10px;
+    align-items: center;
+    .left,
+    .center,
+    .right {
+        align-items: center;
+        display: flex;
+        flex: 1;
+        &.center {
+            justify-content: center;
+        }
+        &.right {
+            justify-content: right;
+        }
+    }
+    .logo-icon {
+        width: 15px;
+        height: 15px;
+    }
+}

@@ -11,7 +11,10 @@
         "allowImportingTsExtensions": true,
         "moduleDetection": "force",
         "jsx": "react-jsx",
-        "noEmit": true
+        "noEmit": true,
+        "paths": {
+            "@as/*": ["./src/assets/*"]
+        }
     },
     "include": ["src", "vite.config.ts", "../i18next/src/i18next"]
 }

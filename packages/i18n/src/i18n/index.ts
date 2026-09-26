@@ -9,16 +9,10 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
 import zhGui from './locales/zh-CN/gui';
-import zhVm from './locales/zh-CN/vm';
 import zhBlocks from './locales/zh-CN/blocks';
-import zhPaint from './locales/zh-CN/paint';
-import zhAudio from './locales/zh-CN/audio';
 
 import enGui from './locales/en/gui';
-import enVm from './locales/en/vm';
 import enBlocks from './locales/en/blocks';
-import enPaint from './locales/en/paint';
-import enAudio from './locales/en/audio';
 
 /** Astratch 当前内置并允许用户选择的界面语言。 */
 const supportedLanguages = ['zh-CN', 'en'] as const;
@@ -31,17 +25,11 @@ const isSupportedLanguage = (value: unknown): value is TSupportedLanguage =>
 const languageResources = {
     'zh-CN': {
         gui: zhGui,
-        vm: zhVm,
         blocks: zhBlocks,
-        paint: zhPaint,
-        audio: zhAudio,
     },
     en: {
         gui: enGui,
-        vm: enVm,
         blocks: enBlocks,
-        paint: enPaint,
-        audio: enAudio,
     },
 };
 
@@ -60,9 +48,11 @@ await i18next
             escapeValue: false,
         },
     });
+const t = i18next.t;
 
 export {
     i18next,
+    t,
     supportedLanguages,
     type TSupportedLanguage,
     isSupportedLanguage,

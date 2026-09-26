@@ -4,7 +4,20 @@ body {
     margin: 0 !important;
 }
 
+input {
+    border: transparent 1px solid;
+    border-radius: 2px;
+    background-color: $ui-quaternary;
+    transition: border 0.1s ease;
+    outline: none;
+    &:focus {
+        border: $accent-primary 1px solid;
+    }
+}
+
 * {
+    box-sizing: border-box;
+    color: $ui-text;
     &::-webkit-scrollbar {
         width: 8px;
         height: 8px;

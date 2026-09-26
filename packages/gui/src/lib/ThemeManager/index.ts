@@ -194,7 +194,7 @@ class ThemeManager extends EventBus<IThemeEventsType> implements IThemeManager {
                 await this.applyTheme('accent', builtIn_defaultTheme_accent);
             }
         };
-        const themeStorage = (await DB.getData(THEME_MANAGER_ID)) as IThemeDBStorage;
+        const themeStorage = (await DB.getData(THEME_MANAGER_ID)) as IThemeDBStorage | undefined;
 
         if (themeStorage) {
             await addDefaultThemes(false);
@@ -302,7 +302,7 @@ class ThemeManager extends EventBus<IThemeEventsType> implements IThemeManager {
             console.warn(`Can't delete theme of ${id}\nThis theme is using.`);
             return false;
         }
-        const themeConfig = themeStorage.themes[kind][id];
+        const themeConfig = themeStorage.themes[kind][id] as TAccentTheme | TUITheme | undefined;
         if (!themeConfig) return false;
         await this.deleteThemeFromDB(kind, id);
         this.emit('DELETED_THEME', {

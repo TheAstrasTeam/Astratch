@@ -1,0 +1,6 @@
+@use '../../styles/styles.scss' as *;
+
+.main {
+    width: 100%;
+    border: $ui-quaternary 1px solid;
+}
