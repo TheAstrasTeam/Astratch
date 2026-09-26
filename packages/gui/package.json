@@ -1,6 +1,5 @@
 {
     "name": "astratch-gui",
-    "private": true,
     "version": "0.0.0",
     "type": "module",
     "dependencies": {
@@ -28,9 +27,11 @@
         "@types/react-dom": "^19.2.7",
         "@vitejs/plugin-react": "^6.1.1",
         "babel-plugin-react-compiler": "^1.0.0",
+        "fake-indexeddb": "^6.2.5",
         "sass": "^1.104.1",
         "typescript": "^6.0.3",
         "vite": "^8.3.0",
-        "vite-plugin-svgr": "^5.2.0"
+        "vite-plugin-svgr": "^5.2.0",
+        "vitest": "^5.0.1"
     }
 }
