@@ -3,7 +3,7 @@
 .main {
     background-color: $ui-secondary;
     display: flex;
-    height: 35px;
+    height: 40px;
     flex: 1;
     padding: 10px;
     gap: 10px;
@@ -16,6 +16,18 @@
         flex: 1;
         &.center {
             justify-content: center;
+            .quick-open-input {
+                width: 50vw;
+                max-width: 600px;
+                border: $ui-quaternary 1px solid;
+                background-color: $ui-quaternary;
+                padding: 2px;
+                border-radius: 4px;
+                span {
+                    font-size: x-small;
+                    opacity: 0.5;
+                }
+            }
         }
         &.right {
             justify-content: right;

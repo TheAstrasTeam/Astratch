@@ -14,7 +14,7 @@ export const Menubar = () => {
             </div>
             <div className={styles.center}>
                 <div className={styles.quickOpenInput} onClick={openQuickOpen}>
-                    {t('gui:quickOpen_tip')}
+                    <span>{t('gui:quickOpen_tip')}</span>
                 </div>
             </div>
             <div className={styles.right}></div>
