@@ -1,5 +1,3 @@
 export const QuickOpen_BuiltIn_TargetRenderer = () => {
-    return (
-        <span>Hold on...</span>
-    )
-}
+    return <span>Hold on...</span>;
+};

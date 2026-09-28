@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { Editor } from './components/editor';
 
 import './styles/public.scss';
+import './styles/menu.scss';
 import './lib/initAstratch';
 
 // 删除加载页面

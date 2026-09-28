@@ -14,6 +14,25 @@
         align-items: center;
         display: flex;
         flex: 1;
+        &.left {
+            .menus {
+                display: flex;
+                min-height: 0;
+                overflow: auto;
+                max-width: 25vw;
+                .menu {
+                    min-width: max-content;
+                    padding: 3px 10px;
+                    border-radius: 5px;
+                    font-size: medium;
+
+                    &:hover {
+                        background-color: $ui-quaternary;
+                        cursor: pointer;
+                    }
+                }
+            }
+        }
         &.center {
             justify-content: center;
             .quick-open-input {
@@ -27,6 +46,9 @@
                     font-size: x-small;
                     opacity: 0.5;
                 }
+                &:hover {
+                    cursor: pointer;
+                }
             }
         }
         &.right {
@@ -34,6 +56,7 @@
         }
     }
     .logo-icon {
+        margin-right: 15px;
         width: 15px;
         height: 15px;
     }

@@ -16,7 +16,10 @@ input {
 }
 
 span {
-    cursor: default;
+    cursor: inherit;
+    user-select: none;
+    // 让换行可用
+    white-space: break-spaces;
 }
 
 * {

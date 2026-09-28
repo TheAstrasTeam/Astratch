@@ -1,7 +1,7 @@
-import type { IQuickOpenMode } from "../..";
+import type { IQuickOpenMode } from '../..';
 
 import TargetIcon from '@as/targets/target.svg?react';
-import { QuickOpen_BuiltIn_TargetRenderer } from "./Renderer";
+import { QuickOpen_BuiltIn_TargetRenderer } from './Renderer';
 
 export default {
     translate: true,
@@ -12,4 +12,4 @@ export default {
     shortcut: [],
     prefix: '@',
     Renderer: QuickOpen_BuiltIn_TargetRenderer,
-} satisfies IQuickOpenMode
+} satisfies IQuickOpenMode;

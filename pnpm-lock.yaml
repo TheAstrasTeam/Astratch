@@ -52,6 +52,9 @@ importers:
 
   packages/gui:
     dependencies:
+      '@szhsin/react-menu':
+        specifier: ^4.5.2
+        version: 4.5.2(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       astratch-core:
         specifier: workspace:*
         version: link:../core
@@ -669,6 +672,12 @@ packages:
     engines: {node: '>=14'}
     peerDependencies:
       '@svgr/core': '*'
+
+  '@szhsin/react-menu@4.5.2':
+    resolution: {integrity: sha512-VIfCFGq997iHhDBR5Wrgx5XqwzLQj0Lj1PQV9XSrT/ymvdI4GE/oAKx81dXWfeXiZgyXTicDCfeGrjlAzjoYlQ==}
+    peerDependencies:
+      react: '>=16.14.0'
+      react-dom: '>=16.14.0'
 
   '@types/babel__core@7.20.5':
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
@@ -1678,6 +1687,12 @@ packages:
       '@types/react': '>=18'
       react: '>=18'
 
+  react-transition-state@2.4.0:
+    resolution: {integrity: sha512-d86g/nv4vsDBLBum8KSeb9S3aWDlptDQ4ydFvfCHk98ePFNILXq5Wu3tVgPXJrItxvMLtJ+XPjmGw0RmMyYMBg==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+
   react@19.3.0:
     resolution: {integrity: sha512-E8LUcbtBWt20bbl2YoHfx4ZDBdxVTfOKtCZn9cDSJ4l6/nuoApcpIBcj47t2wZoVX8g2ZHuMHbiShgCR1T5Sog==}
     engines: {node: '>=0.10.0'}
@@ -2492,6 +2507,12 @@ snapshots:
       svg-parser: 2.1.0
     transitivePeerDependencies:
       - supports-color
+
+  '@szhsin/react-menu@4.5.2(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+    dependencies:
+      react: 19.3.0
+      react-dom: 19.3.0(react@19.3.0)
+      react-transition-state: 2.4.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
 
   '@types/babel__core@7.20.5':
     dependencies:
@@ -3740,6 +3761,11 @@ snapshots:
       vfile: 6.0.3
     transitivePeerDependencies:
       - supports-color
+
+  react-transition-state@2.4.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
+    dependencies:
+      react: 19.3.0
+      react-dom: 19.3.0(react@19.3.0)
 
   react@19.3.0: {}
 

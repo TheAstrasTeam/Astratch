@@ -44,6 +44,7 @@ interface ICommandManager {
     commands: commandsStorage;
     addCommand(meta: ICommandSubmitMeta): {
         dispose: () => void;
+        id: string;
     };
     deleteCommand(id: string): void;
     getCommandMeta(id: string): ICommandMeta | undefined;
@@ -58,9 +59,11 @@ class CommandManager extends EventBus<ICommandManagerEventsType> implements ICom
     }
     addCommand(submitMeta: ICommandSubmitMeta): {
         dispose: () => void;
+        id: string;
     } {
+        const id = submitMeta.id ?? crypto.randomUUID();
         const meta: ICommandMeta = {
-            id: submitMeta.id ?? crypto.randomUUID(),
+            id,
             callback: submitMeta.callback,
             shortcuts: submitMeta.shortcuts ?? [],
             author: submitMeta.author,
@@ -74,14 +77,15 @@ class CommandManager extends EventBus<ICommandManagerEventsType> implements ICom
             meta.name = submitMeta.name;
             meta.description = submitMeta.description;
         }
-        this.commands.set(meta.id, meta);
+        this.commands.set(id, meta);
         this.emit('ADDED_COMMAND', {
-            id: meta.id,
+            id,
         });
         return {
             dispose: () => {
-                this.deleteCommand(meta.id);
+                this.deleteCommand(id);
             },
+            id,
         };
     }
     deleteCommand(id: string): void {

@@ -63,7 +63,7 @@ const QuickOpenPanel = ({ closing }: { closing: boolean }) => {
             window.removeEventListener('mouseup', handleMouseUp);
         };
     }, [closeQuickOpen]);
-    
+
     const handleEnteredMain = () => {
         isTouchingMain.current = true;
     };

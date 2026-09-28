@@ -3,6 +3,7 @@
     "version": "0.0.0",
     "type": "module",
     "dependencies": {
+        "@szhsin/react-menu": "^4.5.2",
         "astratch-core": "workspace:*",
         "astratch-i18n": "workspace:*",
         "astratch-vm": "workspace:*",
