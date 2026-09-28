@@ -16,17 +16,18 @@ describe('command Manager', () => {
     test('添加命令', () => {
         expect(commandManager.addCommand(testMeta)).toEqual({
             dispose: expect.any(Function) as () => void,
+            id,
         });
     });
     test('添加命令然后销毁', () => {
         const command = commandManager.addCommand(testMeta);
-        expect(command).toEqual({ dispose: expect.any(Function) as () => void });
+        expect(command).toEqual({ dispose: expect.any(Function) as () => void, id });
         command.dispose();
         expect(commandManager.getCommandMeta(id)).toEqual(undefined);
     });
     test('删除命令', () => {
         const command = commandManager.addCommand(testMeta);
-        expect(command).toEqual({ dispose: expect.any(Function) as () => void });
+        expect(command).toEqual({ dispose: expect.any(Function) as () => void, id });
         commandManager.deleteCommand(id);
         expect(commandManager.getCommandMeta(id)).toEqual(undefined);
     });
