@@ -1,4 +1,8 @@
 {
     "files": [],
-    "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }]
+    "references": [
+        { "path": "./packages/gui" },
+        { "path": "./packages/vm" },
+        { "path": "./packages/blockly" }
+    ]
 }

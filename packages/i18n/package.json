@@ -1,0 +1,21 @@
+{
+    "name": "astratch-i18n",
+    "version": "0.0.0",
+    "description": "",
+    "exports": {
+        ".": {
+            "types": "./src/index.ts",
+            "default": "./src/index.ts"
+        }
+    },
+    "keywords": [],
+    "author": "",
+    "license": "Apache-2.0",
+    "type": "module",
+    "dependencies": {
+        "i18next": "^26.4.2",
+        "i18next-browser-languagedetector": "^8.2.1",
+        "i18next-http-backend": "^4.0.2",
+        "react-i18next": "^17.0.14"
+    }
+}

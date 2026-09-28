@@ -1,0 +1,52 @@
+@use './styles.scss' as *;
+
+body {
+    margin: 0 !important;
+}
+
+input {
+    border: transparent 1px solid;
+    border-radius: 4px;
+    background-color: $ui-quaternary;
+    transition: border 0.1s ease;
+    outline: none;
+    &:focus {
+        border: $accent-primary 1px solid;
+    }
+}
+
+span {
+    cursor: inherit;
+    user-select: none;
+    // 让换行可用
+    white-space: break-spaces;
+}
+
+* {
+    box-sizing: border-box;
+    color: $ui-text;
+    font-size: small;
+    &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: $ui-tertiary;
+        border-radius: 0;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background-color: $ui-quaternary;
+    }
+
+    &::-webkit-scrollbar-button,
+    &::-webkit-scrollbar-corner {
+        display: none;
+        background: transparent;
+    }
+}

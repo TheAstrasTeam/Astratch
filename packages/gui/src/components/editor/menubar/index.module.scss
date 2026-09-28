@@ -1,0 +1,63 @@
+@use '../../../styles/styles.scss' as *;
+
+.main {
+    background-color: $ui-secondary;
+    display: flex;
+    height: 40px;
+    flex: 1;
+    padding: 10px;
+    gap: 10px;
+    align-items: center;
+    .left,
+    .center,
+    .right {
+        align-items: center;
+        display: flex;
+        flex: 1;
+        &.left {
+            .menus {
+                display: flex;
+                min-height: 0;
+                overflow: auto;
+                max-width: 25vw;
+                .menu {
+                    min-width: max-content;
+                    padding: 3px 10px;
+                    border-radius: 5px;
+                    font-size: medium;
+
+                    &:hover {
+                        background-color: $ui-quaternary;
+                        cursor: pointer;
+                    }
+                }
+            }
+        }
+        &.center {
+            justify-content: center;
+            .quick-open-input {
+                width: 50vw;
+                max-width: 600px;
+                border: $ui-quaternary 1px solid;
+                background-color: $ui-quaternary;
+                padding: 2px;
+                border-radius: 4px;
+                span {
+                    font-size: x-small;
+                    opacity: 0.5;
+                }
+                &:hover {
+                    cursor: pointer;
+                }
+            }
+        }
+        &.right {
+            justify-content: right;
+        }
+    }
+    .logo-icon {
+        margin-right: 15px;
+        width: 15px;
+        height: 15px;
+    }
+}

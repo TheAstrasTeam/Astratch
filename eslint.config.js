@@ -7,21 +7,19 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 import prettierConfig from 'eslint-config-prettier';
 
 export default defineConfig([
-    globalIgnores(['dist', 'node_modules', 'plugins', 'src/vm/blocks/fieldDropdown.ts']),
+    globalIgnores(['**/dist/**', '**/node_modules/**', '**/plugins/**']),
     {
         files: ['**/*.{ts,tsx}'],
         extends: [
             js.configs.recommended,
             ...tseslint.configs.strictTypeChecked,
             ...tseslint.configs.stylisticTypeChecked,
-            reactHooks.configs.flat.recommended,
-            reactRefresh.configs.vite,
             prettierConfig,
         ],
         languageOptions: {
             globals: globals.browser,
             parserOptions: {
-                project: ['./tsconfig.app.json', './tsconfig.node.json', './tsconfig.test.json'],
+                projectService: true,
                 tsconfigRootDir: import.meta.dirname,
             },
         },
@@ -48,13 +46,11 @@ export default defineConfig([
             '@typescript-eslint/explicit-function-return-type': 'off',
             '@typescript-eslint/no-explicit-any': 'error',
             'no-console': ['warn', { allow: ['warn', 'error'] }],
+            '@typescript-eslint/no-non-null-assertion': 'off',
         },
     },
     {
-        // vitest 的 mock 断言（vi.mocked(vm.emit)）会分离方法，与该规则冲突
-        files: ['tests/**/*.ts'],
-        rules: {
-            '@typescript-eslint/unbound-method': 'off',
-        },
+        files: ['packages/gui/**/*.{ts,tsx}'],
+        extends: [reactHooks.configs.flat.recommended, reactRefresh.configs.vite],
     },
 ]);

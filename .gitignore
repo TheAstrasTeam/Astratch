@@ -21,7 +21,4 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-# rust
-src/renderer/webgpu/target/
-src/renderer/webgpu/pkg
+*.tsbuildinfo
