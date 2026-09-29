@@ -16,7 +16,7 @@ export default () => {
             descriptionID: 'help_about_description',
             author: 'The Astras Team',
             callback: () => {
-                console.log('OPEN_ABOUT');
+                alert('OPEN_ABOUT');
             },
         }).id,
     });
@@ -29,7 +29,7 @@ export default () => {
             descriptionID: 'help_document_description',
             author: 'The Astras Team',
             callback: () => {
-                console.log('OPEN_DOCUMENT');
+                alert('OPEN_DOCUMENT');
             },
         }).id,
     });
@@ -45,7 +45,7 @@ export default () => {
             descriptionID: 'help_contributors_description',
             author: 'The Astras Team',
             callback: () => {
-                console.log('OPEN_CONTRIBUTORS');
+                alert('OPEN_CONTRIBUTORS');
             },
         }).id,
     });

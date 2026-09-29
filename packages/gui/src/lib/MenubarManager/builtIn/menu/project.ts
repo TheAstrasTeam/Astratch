@@ -17,7 +17,7 @@ export default () => {
             descriptionID: 'project_createProject_description',
             author: 'The Astras Team',
             callback: () => {
-                console.log('CREATE_PROJECT');
+                alert('CREATE_PROJECT');
             },
         }).id,
     });
@@ -31,7 +31,7 @@ export default () => {
             descriptionID: 'project_openProject_description',
             author: 'The Astras Team',
             callback: () => {
-                console.log('OPEN_PROJECT');
+                alert('OPEN_PROJECT');
             },
         }).id,
     });
@@ -45,7 +45,7 @@ export default () => {
             descriptionID: 'project_closeProject_description',
             author: 'The Astras Team',
             callback: () => {
-                console.log('CLOSE_PROJECT');
+                alert('CLOSE_PROJECT');
             },
         }).id,
     });
@@ -62,7 +62,7 @@ export default () => {
             descriptionID: 'project_saveProject_description',
             author: 'The Astras Team',
             callback: () => {
-                console.log('SAVE_PROJECT');
+                alert('SAVE_PROJECT');
             },
         }).id,
     });
@@ -87,7 +87,7 @@ export default () => {
                     descriptionID: 'editor_settings_theme_description',
                     author: 'The Astras Team',
                     callback: () => {
-                        console.log('OPEN_THEME_SETTINGS');
+                        alert('OPEN_THEME_SETTINGS');
                     },
                 }).id,
             },
@@ -100,7 +100,7 @@ export default () => {
                     descriptionID: 'editor_settings_shortcuts_description',
                     author: 'The Astras Team',
                     callback: () => {
-                        console.log('OPEN_SHORTCUTS_SETTINGS');
+                        alert('OPEN_SHORTCUTS_SETTINGS');
                     },
                 }).id,
             },
@@ -116,7 +116,7 @@ export default () => {
                     descriptionID: 'editor_settings_description',
                     author: 'The Astras Team',
                     callback: () => {
-                        console.log('OPEN_SETTINGS');
+                        alert('OPEN_SETTINGS');
                     },
                 }).id,
             },
@@ -132,7 +132,7 @@ export default () => {
             descriptionID: 'editor_exit_description',
             author: 'The Astras Team',
             callback: () => {
-                console.log('EXIT_EDITOR');
+                alert('EXIT_EDITOR');
             },
         }).id,
     });

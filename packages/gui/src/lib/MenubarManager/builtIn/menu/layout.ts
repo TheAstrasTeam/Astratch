@@ -16,7 +16,7 @@ export default () => {
             descriptionID: 'layout_openTarget_description',
             author: 'The Astras Team',
             callback: () => {
-                console.log('OPEN_TARGET');
+                alert('OPEN_TARGET');
             },
         }).id,
     });
@@ -30,7 +30,7 @@ export default () => {
             descriptionID: 'layout_openTarget_newWindow_description',
             author: 'The Astras Team',
             callback: () => {
-                console.log('OPEN_TARGET_TO_NEW_WINDOW');
+                alert('OPEN_TARGET_TO_NEW_WINDOW');
             },
         }).id,
     });
@@ -44,7 +44,7 @@ export default () => {
             descriptionID: 'layout_moveSelectedTarget_newWindow_description',
             author: 'The Astras Team',
             callback: () => {
-                console.log('MOVE_SELECTED_TARGET_TO_NEW_WINDOW');
+                alert('MOVE_SELECTED_TARGET_TO_NEW_WINDOW');
             },
         }).id,
     });
@@ -64,7 +64,7 @@ export default () => {
             descriptionID: 'layout_showSidebar_newWindow_description',
             author: 'The Astras Team',
             callback: () => {
-                console.log('SHOW_SIDEBAR');
+                alert('SHOW_SIDEBAR');
             },
         }).id,
     });
@@ -78,7 +78,7 @@ export default () => {
             descriptionID: 'layout_switchSidebarTo_newWindow_description',
             author: 'The Astras Team',
             callback: () => {
-                console.log('SWITCH_SIDEBAR');
+                alert('SWITCH_SIDEBAR');
             },
         }).id,
     });
@@ -96,7 +96,7 @@ export default () => {
             descriptionID: 'layout_showTargetsTree_newWindow_description',
             author: 'The Astras Team',
             callback: () => {
-                console.log('SHOW_TARGETS_TREE');
+                alert('SHOW_TARGETS_TREE');
             },
         }).id,
     });
@@ -114,7 +114,7 @@ export default () => {
             descriptionID: 'layout_moveWorkspaceCameraPos_newWindow_description',
             author: 'The Astras Team',
             callback: () => {
-                console.log('MOVE_WORKSPACE_CAMERA');
+                alert('MOVE_WORKSPACE_CAMERA');
             },
         }).id,
     });

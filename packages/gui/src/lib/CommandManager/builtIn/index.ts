@@ -7,7 +7,7 @@ export const loadBuiltInCommands = () => {
         author: 'The Astras Team',
         description: '一个测试命令',
         callback: () => {
-            console.log('Hello World!');
+            alert('Hello World!');
         },
     });
 };

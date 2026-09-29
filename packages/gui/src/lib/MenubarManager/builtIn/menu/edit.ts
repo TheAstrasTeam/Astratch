@@ -16,7 +16,7 @@ export default () => {
             descriptionID: 'edit_undo_description',
             author: 'The Astras Team',
             callback: () => {
-                console.log('UNDO');
+                alert('UNDO');
             },
         }).id,
     });
@@ -29,7 +29,7 @@ export default () => {
             descriptionID: 'edit_redo_description',
             author: 'The Astras Team',
             callback: () => {
-                console.log('REDO');
+                alert('REDO');
             },
         }).id,
     });
@@ -50,7 +50,7 @@ export default () => {
                     descriptionID: 'edit_create_target_entity_description',
                     author: 'The Astras Team',
                     callback: () => {
-                        console.log('CREATE_ENTITY');
+                        alert('CREATE_ENTITY');
                     },
                 }).id,
             },
@@ -63,7 +63,7 @@ export default () => {
                     descriptionID: 'edit_create_target_module_description',
                     author: 'The Astras Team',
                     callback: () => {
-                        console.log('CREATE_MODULE');
+                        alert('CREATE_MODULE');
                     },
                 }).id,
             },
@@ -79,7 +79,7 @@ export default () => {
             descriptionID: 'edit_addFolder_description',
             author: 'The Astras Team',
             callback: () => {
-                console.log('ADD_FOLDER');
+                alert('ADD_FOLDER');
             },
         }).id,
     });
@@ -96,7 +96,7 @@ export default () => {
             descriptionID: 'edit_deleteSelectedTarget_description',
             author: 'The Astras Team',
             callback: () => {
-                console.log('DELETE_TARGET');
+                alert('DELETE_TARGET');
             },
         }).id,
     });

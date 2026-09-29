@@ -14,7 +14,7 @@ export default () => {
         nameID: 'runtime_runProject',
         commandID: commandManager.addCommand({
             callback: () => {
-                console.log('RUN_PROJECT');
+                alert('RUN_PROJECT');
             },
             author: 'The Astras Team',
             translate: true,
@@ -29,7 +29,7 @@ export default () => {
         nameID: 'runtime_pauseProject',
         commandID: commandManager.addCommand({
             callback: () => {
-                console.log('PAUSE_PROJECT');
+                alert('PAUSE_PROJECT');
             },
             author: 'The Astras Team',
             translate: true,
@@ -44,7 +44,7 @@ export default () => {
         nameID: 'runtime_resumeProject',
         commandID: commandManager.addCommand({
             callback: () => {
-                console.log('RESUME_PROJECT');
+                alert('RESUME_PROJECT');
             },
             author: 'The Astras Team',
             translate: true,
@@ -59,7 +59,7 @@ export default () => {
         nameID: 'runtime_stopProject',
         commandID: commandManager.addCommand({
             callback: () => {
-                console.log('STOP_PROJECT');
+                alert('STOP_PROJECT');
             },
             author: 'The Astras Team',
             translate: true,
@@ -80,7 +80,7 @@ export default () => {
         nameID: 'debug_addBreakpointToSelectedBlock',
         commandID: commandManager.addCommand({
             callback: () => {
-                console.log('ADD_BREAKPOINT_TO_SELECTED_BLOCK');
+                alert('ADD_BREAKPOINT_TO_SELECTED_BLOCK');
             },
             author: 'The Astras Team',
             translate: true,
@@ -95,7 +95,7 @@ export default () => {
         nameID: 'debug_deleteBreakpointToSelectedBlock',
         commandID: commandManager.addCommand({
             callback: () => {
-                console.log('DELETE_BREAKPOINT_TO_SELECTED_BLOCK');
+                alert('DELETE_BREAKPOINT_TO_SELECTED_BLOCK');
             },
             author: 'The Astras Team',
             translate: true,
