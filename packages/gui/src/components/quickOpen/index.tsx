@@ -23,16 +23,18 @@ const HomeGoto = ({
     description,
     onClick,
 }: {
-    Img: FunctionComponent<SVGProps<SVGSVGElement>>;
+    Img: FunctionComponent<SVGProps<SVGSVGElement>> | undefined;
     name: string;
     description: string;
     command: string;
     onClick: () => void;
 }) => (
     <div className={styles.homeGoto} onClick={onClick}>
-        <div className={styles.photo}>
-            <Img />
-        </div>
+        {Img && (
+            <div className={styles.photo}>
+                <Img />
+            </div>
+        )}
         <div className={styles.texts}>
             <div className={styles.firstLine}>
                 <span>{name}</span>
