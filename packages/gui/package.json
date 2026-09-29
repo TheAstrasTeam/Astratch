@@ -11,7 +11,7 @@
         "highlight.js": "^11.12.0",
         "react": "^19.2.8",
         "react-dom": "^19.2.8",
-        "react-i18next": "^17.0.14",
+        "react-i18next": "^17.0.15",
         "react-markdown": "^10.1.0",
         "rehype-highlight": "^7.0.2",
         "rehype-raw": "^7.0.0",
@@ -20,19 +20,19 @@
         "zustand": "^5.0.15"
     },
     "devDependencies": {
-        "@babel/core": "^7.29.7",
+        "@babel/core": "^8.0.6",
         "@rolldown/plugin-babel": "^0.2.3",
         "@types/babel__core": "^7.20.5",
-        "@types/node": "^24.13.3",
+        "@types/node": "^26.6.2",
         "@types/react": "^19.2.18",
         "@types/react-dom": "^19.2.7",
         "@vitejs/plugin-react": "^6.1.1",
         "babel-plugin-react-compiler": "^1.0.0",
         "fake-indexeddb": "^6.2.5",
-        "sass": "^1.104.1",
+        "sass": "^1.105.0",
         "typescript": "^6.0.3",
-        "vite": "^8.3.0",
+        "vite": "^8.3.1",
         "vite-plugin-svgr": "^5.2.0",
-        "vitest": "^5.0.1"
+        "vitest": "^5.0.2"
     }
 }
