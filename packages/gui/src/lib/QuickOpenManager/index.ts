@@ -8,7 +8,7 @@ interface QuickOpenRendererProps {
     close: () => void;
 }
 
-type IQuickOpenMode = (
+type IQuickOpenMeta = (
     | {
           translate: false;
           name: string;
@@ -20,12 +20,32 @@ type IQuickOpenMode = (
           descriptionID: string;
       }
 ) & {
-    icon: FunctionComponent<SVGProps<SVGSVGElement>>;
+    icon: FunctionComponent<SVGProps<SVGSVGElement>> | undefined;
     id: string;
     /** 前缀，如 “@” “type” */
     prefix: string;
     Renderer: FunctionComponent<QuickOpenRendererProps>;
     shortcut: string[];
+};
+
+type IQuickOpenSubmitMeta = (
+    | {
+          translate: false;
+          name: string;
+          description: string;
+      }
+    | {
+          translate: true;
+          nameID: string;
+          descriptionID: string;
+      }
+) & {
+    icon?: FunctionComponent<SVGProps<SVGSVGElement>>;
+    id?: string;
+    /** 前缀，如 “@” “type” */
+    prefix: string;
+    Renderer: FunctionComponent<QuickOpenRendererProps>;
+    shortcut?: string[];
 };
 
 interface IQuickOpenManagerEventsType {
@@ -38,37 +58,46 @@ interface IQuickOpenManagerEventsType {
 }
 
 interface IQuickOpenManager {
-    modes: Map<string, IQuickOpenMode>;
+    modes: Map<string, IQuickOpenMeta>;
     // 添加一个模式并返回对应的卸载命令
-    addMode(meta: IQuickOpenMode): {
+    addMode(meta: IQuickOpenSubmitMeta): {
         dispose: () => void;
+        id: string;
     };
     deleteMode(id: string): void;
-    getMode(id: string): IQuickOpenMode | undefined;
-    listModes(): Map<string, IQuickOpenMode>;
+    getMode(id: string): IQuickOpenMeta | undefined;
+    listModes(): Map<string, IQuickOpenMeta>;
 }
 
 class QuickOpenManager extends EventBus<IQuickOpenManagerEventsType> implements IQuickOpenManager {
-    modes: Map<string, IQuickOpenMode>;
+    modes: Map<string, IQuickOpenMeta>;
     constructor() {
         super();
         this.modes = new Map();
     }
-    addMode(meta: IQuickOpenMode): {
+    addMode(meta: IQuickOpenSubmitMeta): {
         dispose: () => void;
+        id: string;
     } {
-        if (this.modes.has(meta.id))
+        const resultMeta = {
+            ...meta,
+            id: meta.id ?? crypto.randomUUID(),
+            icon: meta.icon ?? undefined,
+            shortcut: meta.shortcut ?? [],
+        } satisfies IQuickOpenMeta;
+        if (this.modes.has(resultMeta.id))
             throw new Error(
-                `Quick Open already exists "${meta.translate ? meta.nameID : meta.name}"(${meta.id}) mode`,
+                `Quick Open already exists "${resultMeta.translate ? resultMeta.nameID : resultMeta.name}"(${resultMeta.id}) mode`,
             );
-        this.modes.set(meta.id, meta);
+        this.modes.set(resultMeta.id, resultMeta);
         this.emit('ADDED_MODE', {
-            id: meta.id,
+            id: resultMeta.id,
         });
         return {
             dispose: () => {
-                this.deleteMode(meta.id);
+                this.deleteMode(resultMeta.id);
             },
+            id: resultMeta.id,
         };
     }
     deleteMode(id: string): void {
@@ -78,14 +107,14 @@ class QuickOpenManager extends EventBus<IQuickOpenManagerEventsType> implements 
             id,
         });
     }
-    getMode(id: string): IQuickOpenMode | undefined {
+    getMode(id: string): IQuickOpenMeta | undefined {
         return this.modes.get(id);
     }
-    listModes(): Map<string, IQuickOpenMode> {
+    listModes(): Map<string, IQuickOpenMeta> {
         return this.modes;
     }
 }
 
 const quickOpenManager = new QuickOpenManager();
 loadBuiltInQuickOpen();
-export { quickOpenManager, type IQuickOpenMode, type QuickOpenRendererProps };
+export { quickOpenManager, type IQuickOpenMeta as IQuickOpenMode, type QuickOpenRendererProps };
