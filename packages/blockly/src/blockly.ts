@@ -1,19 +1,9 @@
 import * as Blockly from 'blockly';
 import { registerAstratchRenderer } from './renderer';
 
-import * as AstratchToolbox from './plugins/astratch-toolbox/src';
-import { WorkspaceSearch } from './plugins/workspace-search/src';
-import { AshConnectionChecker } from './plugins/connectionRules';
-
 const workspaceMeta: Blockly.BlocklyOptions = {
     renderer: 'astratch',
     toolbox: undefined,
-    plugins: {
-        toolbox: AstratchToolbox.ContinuousToolbox,
-        flyoutsVerticalToolbox: AstratchToolbox.ContinuousFlyout,
-        metricsManager: AstratchToolbox.ContinuousMetrics,
-        connectionChecker: AshConnectionChecker,
-    },
 } as const;
 
 interface IBlocklyAdapter {
@@ -45,11 +35,9 @@ class BlocklyAdapter implements IBlocklyAdapter {
     >;
 
     private _isCreating = false;
-    protected _initWorkspace(workspacesID: string): void {
-        const workspaceSvg = this.workspaces[workspacesID].workspaceSvg;
-        const workspaceSearch = new WorkspaceSearch(workspaceSvg);
-        workspaceSearch.init();
-    }
+    // protected _initWorkspace(workspacesID: string): void {
+    //     const workspaceSvg = this.workspaces[workspacesID].workspaceSvg;
+    // }
     private init(): void {
         // TODO
     }
@@ -80,7 +68,7 @@ class BlocklyAdapter implements IBlocklyAdapter {
             };
             // 加载积木
             if (Data) Blockly.serialization.workspaces.load(Data, workspaceSvg);
-            this._initWorkspace(id);
+            // this._initWorkspace(id);
 
             Blockly.Events.enable();
         } finally {
