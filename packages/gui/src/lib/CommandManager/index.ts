@@ -27,6 +27,7 @@ type ICommandSubmitMeta = (
     shortcuts?: string[];
     author: string;
     id?: string;
+    isEnable?: () => boolean;
 };
 
 interface ICommandMeta {
@@ -36,6 +37,7 @@ interface ICommandMeta {
     name: string;
     callback: (data: unknown) => void | Promise<void>;
     shortcuts: string[];
+    isEnable: () => boolean;
 }
 
 type commandsStorage = Map<string, ICommandMeta>;
@@ -69,6 +71,7 @@ class CommandManager extends EventBus<ICommandManagerEventsType> implements ICom
             author: submitMeta.author,
             name: '',
             description: '',
+            isEnable: submitMeta.isEnable ?? (() => true),
         };
         if (submitMeta.translate) {
             meta.name = t(submitMeta.nameID);

@@ -5,7 +5,10 @@
     padding: 5px;
     border-radius: 5px;
     gap: 10px;
-    &:hover {
+    &.is-unenable {
+        opacity: 0.5;
+    }
+    &:not(.is-unenable):hover {
         background-color: $ui-quaternary;
     }
     .left {

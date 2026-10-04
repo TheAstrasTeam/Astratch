@@ -4,6 +4,7 @@ import type { QuickOpenRendererProps } from '../..';
 import { commandManager } from '../../../CommandManager';
 
 import styles from './index.module.scss';
+import classNames from 'classnames';
 
 export const QuickOpen_BuiltIn_Command: FunctionComponent<QuickOpenRendererProps> = ({ close }) => {
     const runCommand = (id: string) => {
@@ -16,9 +17,11 @@ export const QuickOpen_BuiltIn_Command: FunctionComponent<QuickOpenRendererProps
             {Array.from(commandManager.commands).map(([id, meta]) => (
                 <div
                     key={id}
-                    className={styles.command}
+                    className={classNames(styles.command, {
+                        [styles.isUnenable]: !meta.isEnable(),
+                    })}
                     onClick={() => {
-                        runCommand(id);
+                        if (meta.isEnable()) runCommand(id);
                     }}
                 >
                     <div className={styles.left}>
