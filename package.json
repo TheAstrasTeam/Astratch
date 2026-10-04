@@ -11,7 +11,12 @@
         "lint": "eslint . && tsc -b",
         "check": "prettier --check .",
         "format": "prettier --write .",
-        "test": "cd ./packages/gui && vitest run && cd ../../"
+        "test": "pnpm vm test && pnpm gui test",
+        "vm": "cd ./packages/vm && pnpm",
+        "gui": "cd ./packages/gui && pnpm",
+        "blockly": "cd ./packages/blockly && pnpm",
+        "i18n": "cd ./packages/i18n && pnpm",
+        "core": "cd ./packages/core && pnpm"
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",

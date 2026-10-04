@@ -1,32 +1,6 @@
 import type { IWorkspaceState } from 'astratch-blockly';
 
-const DEFAULT_EFFECTS: ITargetInfo['effects'] = {
-    brightness: 100,
-    color: 0,
-    fisheye: 0,
-    ghost: 0,
-    mosaic: 0,
-    pixelate: 0,
-    whirl: 0,
-} as const;
-
 interface ITargetInfo {
-    effects: {
-        /** 亮度 */
-        brightness: number;
-        /** 颜色 */
-        color: number;
-        /** 鱼眼 */
-        fisheye: number;
-        /** 透明度 */
-        ghost: number;
-        /** 马赛克 */
-        mosaic: number;
-        /** 像素 */
-        pixelate: number;
-        /** 漩涡 */
-        whirl: number;
-    };
     name: string;
     id: string;
     blocks: {
@@ -36,31 +10,20 @@ interface ITargetInfo {
 }
 
 interface ITarget extends ITargetInfo {
-    serialize(): ITargetInfo;
+    /** 序列化Target */
+    serialize(): unknown;
+    /** 反序列化Target */
+    deserialize(data: unknown): void;
 }
 
-class Target implements ITarget {
-    effects: {
-        brightness: number;
-        color: number;
-        fisheye: number;
-        ghost: number;
-        mosaic: number;
-        pixelate: number;
-        whirl: number;
-    };
-    name: string;
-    id: string;
-    blocks: {
-        script: Record<string, string>;
-        blocks: IWorkspaceState;
-    };
+abstract class Target implements ITarget {
+    declare name: ITarget['name'];
+    declare id: ITarget['id'];
+    declare blocks: ITarget['blocks'];
 
     constructor(meta: Partial<ITargetInfo>) {
-        this.effects = { ...DEFAULT_EFFECTS };
         this.name = meta.name ?? 'target';
         this.id = meta.id ?? crypto.randomUUID();
-        this.effects = meta.effects ?? { ...DEFAULT_EFFECTS };
         this.blocks = meta.blocks ?? {
             script: {},
             blocks: {
@@ -72,14 +35,12 @@ class Target implements ITarget {
             },
         };
     }
-    serialize(): ITargetInfo {
-        return {
-            effects: this.effects,
-            name: this.name,
-            id: this.id,
-            blocks: this.blocks,
-        };
+    /** 返回的应是**可序列化的**各自的 `Info` */
+    abstract serialize(): unknown;
+
+    deserialize(data: unknown): void {
+        Object.assign(this, data);
     }
 }
 
-export { Target, type ITarget };
+export { Target, type ITarget, type ITargetInfo };

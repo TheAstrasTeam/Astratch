@@ -2,6 +2,10 @@
     "name": "astratch-gui",
     "version": "0.0.0",
     "type": "module",
+    "scripts": {
+        "check-types": "tsc --noEmit",
+        "test": "vitest run"
+    },
     "dependencies": {
         "@szhsin/react-menu": "^4.5.2",
         "astratch-core": "workspace:*",

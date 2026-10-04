@@ -18,8 +18,8 @@ class VM extends EventBus<IVMEventsType> implements IVM {
     runtime: IRuntime;
     constructor() {
         super();
-        this.runtime = new Runtime();
+        this.runtime = new Runtime(this.emit.bind(this));
     }
 }
 
-export { VM };
+export { VM, type IVMEventsType };

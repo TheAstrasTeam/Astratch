@@ -9,7 +9,8 @@
         }
     },
     "scripts": {
-        "check-types": "tsc --noEmit"
+        "check-types": "tsc --noEmit",
+        "test": "vitest run"
     },
     "keywords": [],
     "author": "TheAstrasTeam",
@@ -18,6 +19,7 @@
     "devDependencies": {
         "astratch-blockly": "workspace:*",
         "astratch-core": "workspace:*",
-        "typescript": "^6.0.3"
+        "typescript": "^6.0.3",
+        "vitest": "^5.0.3"
     }
 }
