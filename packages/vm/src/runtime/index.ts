@@ -41,6 +41,10 @@ class Runtime implements IRuntime {
         const id = meta?.id ?? crypto.randomUUID();
         if (mode === 'entity') this.targets.entities.set(id, new Entity(meta ?? {}));
         else this.targets.modules.set(id, new Module(meta ?? {}));
+        this.emit('CREATE_TARGET', {
+            targetID: id,
+            mode,
+        });
         return id;
     }
 
@@ -49,11 +53,19 @@ class Runtime implements IRuntime {
             if (recordHistory) {
                 //TODO: 记录历史记录
             }
+            this.emit('REMOVE_TARGET', {
+                targetID: id,
+                mode,
+            });
             return this.targets.entities.delete(id);
         } else {
             if (recordHistory) {
                 //TODO: 记录历史记录
             }
+            this.emit('REMOVE_TARGET', {
+                targetID: id,
+                mode,
+            });
             return this.targets.modules.delete(id);
         }
     }
