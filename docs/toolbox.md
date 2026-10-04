@@ -92,7 +92,7 @@
 - `execute` 设置显示文字的颜色为`string`
 - `execute` 设置显示文字的边框颜色为`string`
 - `execute` 设置显示文字的边框宽度为`number`
-- `returns`-`number` 显示文字的[字号,边框宽度,像素长度]
+- `returns`-`number` 显示文字的[边框宽度,像素长度]
 - `returns`-`string` 显示文字的[颜色,边框颜色]
 
 ---
@@ -311,6 +311,7 @@
 - `returns`-`number` 当前的[年,月,日,星期,时,分,秒]
 
 ---
+> 计时器的作用域是这个目标
 
 - `returns`-`number` 计时器 `string`
 
