@@ -127,10 +127,19 @@
                 display: none;
                 flex-direction: column;
                 background-color: #0099ff;
+                align-items: center;
+                justify-content: center;
             }
             .errorMessage {
-                font-size: xx-large;
                 white-space: break-spaces;
+                color: #fff;
+                background-color: #00aaff;
+                z-index: 1000000;
+                padding: 5px;
+                border-radius: 5px;
+                max-height: 50vh;
+                max-width: 70vw;
+                overflow: auto;
             }
         </style>
     </head>
@@ -144,7 +153,7 @@
             </div>
         </div>
         <div class="error">
-            <span style="font-size: 64px">:(</span>
+            <span style="font-size: 64px; color: #fff">TAT</span>
             <span class="errorMessage">Unknown Error, check console for more information</span>
         </div>
         <div id="root"></div>
