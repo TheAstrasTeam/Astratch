@@ -228,7 +228,7 @@ class Entity extends Target implements IEntityInfo {
             audio: this.audio,
             linkData: this.linkData,
             tempData: this.tempData,
-            workspaceSvg: this.workspaceSvg
+            workspaceSvg: this.workspaceSvg,
         };
     }
 }

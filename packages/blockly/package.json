@@ -8,12 +8,19 @@
             "default": "./src/index.ts"
         }
     },
+    "scripts": {
+        "playground": "vite ./playground"
+    },
     "keywords": [],
     "author": "",
     "license": "Apache-2.0",
     "type": "module",
     "dependencies": {
-        "blockly": "^13.3.0",
-        "astratch-i18n": "workspace:*"
+        "astratch-i18n": "workspace:*",
+        "blockly": "^13.3.0"
+    },
+    "devDependencies": {
+        "vite": "^8.3.2",
+        "sass": "^1.105.0"
     }
 }

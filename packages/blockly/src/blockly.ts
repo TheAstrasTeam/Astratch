@@ -1,45 +1,53 @@
 import * as Blockly from 'blockly';
 import { registerAstratchRenderer } from './renderer';
 
+import { registerContinuousToolbox } from './plugins/astratch-toolbox/src';
+
+import './style.scss';
+
 const workspaceMeta: Blockly.BlocklyOptions = {
     renderer: 'astratch',
-    toolbox: undefined,
+    media: import.meta.resolve('./media'),
+    grid: {
+        spacing: 48,
+    },
+    scrollbars: true,
+    collapse: false,
+    disable: false,
+    zoom: {
+        controls: true,
+        wheel: true,
+        startScale: 0.9,
+        maxScale: 3,
+        minScale: 0.3,
+        scaleSpeed: 1.2,
+        // 这个捏可以让手机端用！
+        pinch: true,
+    },
+    plugins: {
+        flyoutsVerticalToolbox: 'ContinuousFlyout',
+        metricsManager: 'ContinuousMetrics',
+        toolbox: 'ContinuousToolbox',
+    },
 } as const;
 
-interface IBlocklyAdapter {
-    workspaces: Record<
-        string,
-        {
-            id: string;
-            DOM: HTMLDivElement;
-            workspaceSvg: Blockly.WorkspaceSvg;
-        }
-    >;
-    /**
-     * 新建工作区
-     * @param DOM 要注入的<div>
-     * @param Data 工作区序列化数据
-     * @param Options 自定义选项，无则使用默认配置: {@link workspaceMeta}
-     */
-    addWorkspace(
-        DOM: HTMLDivElement,
-        Data?: Record<string, unknown>,
-        Options?: Blockly.BlocklyOptions,
-    ): string;
-}
-
-class BlocklyAdapter implements IBlocklyAdapter {
+class BlocklyAdapter {
     workspaces: Record<
         string,
         { id: string; DOM: HTMLDivElement; workspaceSvg: Blockly.WorkspaceSvg }
     >;
+    Blockly: typeof Blockly = Blockly;
 
     private _isCreating = false;
     // protected _initWorkspace(workspacesID: string): void {
     //     const workspaceSvg = this.workspaces[workspacesID].workspaceSvg;
     // }
     private init(): void {
-        // TODO
+        // 删除自带的积木
+        for (const blockType of Object.keys(Blockly.Blocks)) {
+            Reflect.deleteProperty(Blockly.Blocks, blockType);
+        }
+        registerContinuousToolbox();
     }
 
     constructor() {
@@ -47,6 +55,12 @@ class BlocklyAdapter implements IBlocklyAdapter {
         registerAstratchRenderer();
         this.init();
     }
+    /**
+     * 新建工作区
+     * @param DOM 要注入的<div>
+     * @param Data 工作区序列化数据
+     * @param Options 自定义选项，无则使用默认配置: {@link workspaceMeta}
+     */
     addWorkspace(
         DOM: HTMLDivElement,
         Data?: Record<string, unknown>,
