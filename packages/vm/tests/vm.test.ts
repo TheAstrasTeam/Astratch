@@ -21,6 +21,7 @@ describe('VM', () => {
             test('使用自定义元信息导入目标', () => {
                 expect(
                     vm.runtime.createTarget('entity', {
+                        workspaceSvg: null,
                         effects: {
                             brightness: 0,
                             color: 0,

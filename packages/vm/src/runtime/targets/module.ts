@@ -70,6 +70,7 @@ class Module extends Target implements IModuleInfo {
             blocks: this.blocks,
             linkData: this.linkData,
             exportData: this.exportData,
+            workspaceSvg: this.workspaceSvg,
         };
     }
 }

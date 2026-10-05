@@ -22,6 +22,10 @@ span {
     white-space: break-spaces;
 }
 
+body {
+    background-color: $ui-primary;
+}
+
 * {
     box-sizing: border-box;
     color: $ui-text;

@@ -8,6 +8,7 @@ import {
     builtIn_themeIDs,
     builtIn_UIThemes,
 } from './builtIn';
+import { windowManager } from '../WindowManager';
 
 // 公共部分
 type TThemeMeta = { translate: false; name: string } | { translate: true; translateID: string };
@@ -78,7 +79,7 @@ interface IThemeManager {
         }[K]
     >;
     /** 应用一个主题 */
-    applyTheme(kind: 'accent' | 'ui', id: string): Promise<void>;
+    applyTheme(kind: 'accent' | 'ui', id: string, refreshOtherWindow?: boolean): Promise<void>;
 }
 
 interface IThemeDBStorage {
@@ -217,7 +218,7 @@ class ThemeManager extends EventBus<IThemeEventsType> implements IThemeManager {
         } satisfies IThemeDBStorage);
         await addDefaultThemes(true);
     }
-    async applyTheme(kind: 'accent' | 'ui', id: string): Promise<void> {
+    async applyTheme(kind: 'accent' | 'ui', id: string, refreshOtherWindow = true): Promise<void> {
         const themeConfig = await this.getThemeByDB(kind, id);
         if (!themeConfig) throw new Error(`Not't found theme of ${id}`);
         const styleID = kind === 'accent' ? THEME_DOM_ACCENT_ID : THEME_DOM_UI_ID;
@@ -254,6 +255,11 @@ class ThemeManager extends EventBus<IThemeEventsType> implements IThemeManager {
             id,
             kind,
         });
+        if (refreshOtherWindow) {
+            windowManager.forEachOther(windowTarget => {
+                void windowTarget.Astratch?.themeManager.applyTheme(kind, id, false);
+            });
+        }
     }
     async getTheme<K extends 'accent' | 'ui'>(
         kind: K,
@@ -312,6 +318,7 @@ class ThemeManager extends EventBus<IThemeEventsType> implements IThemeManager {
         return true;
     }
 }
+
 const themeManager = new ThemeManager();
 await themeManager.init();
 export { themeManager, type TTheme, type IThemeEventsType };

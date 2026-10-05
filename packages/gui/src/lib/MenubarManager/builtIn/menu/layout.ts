@@ -1,5 +1,7 @@
 import { menubarManager } from '../..';
 import { commandManager } from '../../../CommandManager';
+import { isChildWindow } from '../../../../utils/window';
+import { windowManager } from '../../../WindowManager';
 
 export default () => {
     const layoutID = menubarManager.addCategory('layout', {
@@ -17,6 +19,24 @@ export default () => {
             author: 'The Astras Team',
             callback: () => {
                 alert('OPEN_TARGET');
+            },
+        }).id,
+    });
+    // 打开新窗口
+    menubarManager.addValue('layout', layoutID, {
+        translate: true,
+        nameID: 'layout_openNewWindow',
+        isEnable: () => !isChildWindow,
+        commandID: commandManager.addCommand({
+            translate: true,
+            nameID: 'layout_openNewWindow',
+            descriptionID: 'layout_openNewWindow_description',
+            author: 'The Astras Team',
+            isEnable: () => !isChildWindow,
+            callback: () => {
+                void windowManager.newWindow().catch((error: unknown) => {
+                    console.error(error);
+                });
             },
         }).id,
     });

@@ -93,6 +93,9 @@ export default {
     layout_openTarget: '打开目标...',
     layout_openTarget_description: '打开一个项目里的目标',
 
+    layout_openNewWindow: '打开新窗口',
+    layout_openNewWindow_description: '打开一个新的子窗口来盛放别的东西',
+
     layout_openTarget_newWindow: '打开目标到新窗口...',
     layout_openTarget_newWindow_description: '打开一个项目里的目标作为新窗口',
 

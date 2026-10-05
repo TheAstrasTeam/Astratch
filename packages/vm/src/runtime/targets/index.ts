@@ -1,4 +1,4 @@
-import type { IWorkspaceState } from 'astratch-blockly';
+import type { Blockly, IWorkspaceState } from 'astratch-blockly';
 
 interface ITargetInfo {
     name: string;
@@ -7,6 +7,7 @@ interface ITargetInfo {
         script: Record<string, string>;
         blocks: IWorkspaceState;
     };
+    workspaceSvg: null | Blockly.WorkspaceSvg;
 }
 
 interface ITarget extends ITargetInfo {
@@ -14,12 +15,15 @@ interface ITarget extends ITargetInfo {
     serialize(): unknown;
     /** 反序列化Target */
     deserialize(data: unknown): void;
+    /** 选择一个工作区 */
+    selectWorkspace(workspaceSvg: Blockly.WorkspaceSvg): void;
 }
 
 abstract class Target implements ITarget {
-    declare name: ITarget['name'];
-    declare id: ITarget['id'];
-    declare blocks: ITarget['blocks'];
+    name: ITarget['name'];
+    id: ITarget['id'];
+    blocks: ITarget['blocks'];
+    workspaceSvg: ITarget['workspaceSvg'];
 
     constructor(meta: Partial<ITargetInfo>) {
         this.name = meta.name ?? 'target';
@@ -34,12 +38,17 @@ abstract class Target implements ITarget {
                 workspaceComments: [],
             },
         };
+        this.workspaceSvg = null;
     }
     /** 返回的应是**可序列化的**各自的 `Info` */
     abstract serialize(): unknown;
 
     deserialize(data: unknown): void {
         Object.assign(this, data);
+    }
+
+    selectWorkspace(workspaceSvg: Blockly.WorkspaceSvg): void {
+        this.workspaceSvg = workspaceSvg;
     }
 }
 

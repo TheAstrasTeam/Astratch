@@ -120,6 +120,19 @@
                 user-select: none;
             }
         </style>
+        <style>
+            .error {
+                width: 100vw;
+                height: 100vh;
+                display: none;
+                flex-direction: column;
+                background-color: #0099ff;
+            }
+            .errorMessage {
+                font-size: xx-large;
+                white-space: break-spaces;
+            }
+        </style>
     </head>
 
     <body>
@@ -130,6 +143,10 @@
                 <div class="circle" id="circle_3"></div>
             </div>
         </div>
+        <div class="error">
+            <span style="font-size: 64px">:(</span>
+            <span class="errorMessage">Unknown Error, check console for more information</span>
+        </div>
         <div id="root"></div>
         <noscript>
             <h1>Hold on!</h1>
@@ -139,5 +156,13 @@
             </span>
         </noscript>
         <script type="module" src="./main.tsx"></script>
+        <script>
+            window.onerror = e => {
+                const error = document.querySelector('.error');
+                if (error) error.style.display = 'flex';
+                const errorMessage = error.querySelector('.errorMessage');
+                if (errorMessage) errorMessage.textContent = e;
+            };
+        </script>
     </body>
 </html>

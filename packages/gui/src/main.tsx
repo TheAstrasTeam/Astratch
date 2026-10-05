@@ -6,7 +6,13 @@ import './styles/public.scss';
 import './styles/menu.scss';
 import './lib/initAstratch';
 
-// 删除加载页面
+if (!window.isSecureContext) {
+    document.querySelector('.errorMessage')!.textContent = `Astratch need secure context to run.
+To view the dist, use \`pnpm preview\`.`;
+    throw new Error('Astratch need run in safe page!');
+}
+
+// 删除加载页面和错误界面
 document.querySelectorAll('.loading').forEach(ele => {
     ele.remove();
 });
