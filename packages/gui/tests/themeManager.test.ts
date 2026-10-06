@@ -21,7 +21,7 @@ describe('ThemeManager', () => {
             'transparent-dark': '',
             'transparent-light': '',
             text: '',
-            'svg-filter': ''
+            'svg-filter': '',
         },
         translate: false as const,
         isDarkTheme: false as const,
