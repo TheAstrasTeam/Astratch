@@ -57,7 +57,7 @@ export class ContinuousToolbox extends Blockly.Toolbox {
         const collapseOtherCategoriesIcon = document.createElement('img');
         collapseOtherCategoriesIcon.src = collapseIcon;
         collapseOtherCategoriesButton.appendChild(collapseOtherCategoriesIcon)
-        const collapseOtherCategoriesLabel = t('blocks:utils.collapseOther');
+        const collapseOtherCategoriesLabel = t('blocks:utils_collapseOther');
         collapseOtherCategoriesButton.type = 'button';
         collapseOtherCategoriesButton.classList.add('ash-toolbox-tools-collapseAll');
         collapseOtherCategoriesButton.title = collapseOtherCategoriesLabel;

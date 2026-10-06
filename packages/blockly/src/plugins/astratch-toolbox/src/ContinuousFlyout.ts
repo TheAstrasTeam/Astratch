@@ -151,7 +151,7 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
         this.searchInput.style.height = `${ContinuousFlyout.SEARCH_BAR_HEIGHT}px`;
         this.searchInput.classList.add('continuousFlyoutSearchInput');
 
-        const searchLabel = t('blocks:utils.searchBlocks');
+        const searchLabel = t('blocks:utils_searchBlocks');
         this.searchInput.placeholder = searchLabel;
         this.searchInput.setAttribute('aria-label', searchLabel);
         this.searchInput.addEventListener('input', () => {
@@ -530,7 +530,7 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
         if (!results.length) {
             results.push({
                 kind: 'LABEL',
-                text: t('blocks:utils.noSearchResults'),
+                text: t('blocks:utils_noSearchResults'),
                 id: 'continuousFlyoutSearchNoResults',
             });
         }
