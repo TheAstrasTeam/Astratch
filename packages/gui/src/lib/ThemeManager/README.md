@@ -66,6 +66,7 @@
         'transparent-dark': string;
         'transparent-light': string;
         'text': string;
+        'svg-filter': 'invert(1)' | 'invert(0)',
     };
 }
 ```
@@ -85,3 +86,4 @@
 - transparent-dark: 若你是**暗色**，则填**主色的透明版**，否则填**图标主色的透明版**
 - transparent-light: 若你是**暗色**，则填**图标主色的透明版**，否则**填主色的透明版**
 - text: 文字的颜色
+- svg-filter: 若是暗色填 'invert(1)' 否则 'invert(0)'

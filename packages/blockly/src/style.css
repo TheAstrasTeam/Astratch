@@ -1,0 +1,29 @@
+input {
+    border: transparent 1px solid;
+    border-radius: 4px;
+    background-color: var(--ui-quaternary);
+    transition: border 0.1s ease;
+    outline: none;
+}
+input:focus {
+    border: var(--accent-primary) 1px solid;
+}
+
+.blocklyZoom,
+.blocklyTrash {
+    filter: var(--ui-svg-filter);
+}
+
+/* 这个不能放blockly的css注册 */
+.continuousFlyoutSearchInput::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 16px;
+    width: 16px;
+    background-image: url('./assets/close.svg');
+    filter: var(--ui-svg-filter);
+    background-repeat: round;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+}

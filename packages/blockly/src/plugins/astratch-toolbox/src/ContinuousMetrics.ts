@@ -34,13 +34,13 @@ export class ContinuousMetrics extends Blockly.MetricsManager {
             // Note: Not actually supported at this time due to ContinuousToolbox
             // only supporting a vertical flyout. But included for completeness.
             if (
-                toolboxPosition == Blockly.TOOLBOX_AT_TOP ||
-                toolboxPosition == Blockly.TOOLBOX_AT_BOTTOM
+                toolboxPosition === Blockly.TOOLBOX_AT_TOP ||
+                toolboxPosition === Blockly.TOOLBOX_AT_BOTTOM
             ) {
                 svgMetrics.height -= toolboxMetrics.height + flyoutMetrics.height;
             } else if (
-                toolboxPosition == Blockly.TOOLBOX_AT_LEFT ||
-                toolboxPosition == Blockly.TOOLBOX_AT_RIGHT
+                toolboxPosition === Blockly.TOOLBOX_AT_LEFT ||
+                toolboxPosition === Blockly.TOOLBOX_AT_RIGHT
             ) {
                 svgMetrics.width -= toolboxMetrics.width + flyoutMetrics.width;
             }
@@ -66,11 +66,11 @@ export class ContinuousMetrics extends Blockly.MetricsManager {
         const toolboxPosition = toolboxMetrics.position;
         let absoluteLeft = 0;
 
-        if (this.workspace_.getToolbox() && toolboxPosition == Blockly.TOOLBOX_AT_LEFT) {
+        if (this.workspace_.getToolbox() && toolboxPosition === Blockly.TOOLBOX_AT_LEFT) {
             absoluteLeft = toolboxMetrics.width + flyoutMetrics.width;
         }
         let absoluteTop = 0;
-        if (this.workspace_.getToolbox() && toolboxPosition == Blockly.TOOLBOX_AT_TOP) {
+        if (this.workspace_.getToolbox() && toolboxPosition === Blockly.TOOLBOX_AT_TOP) {
             absoluteTop = toolboxMetrics.height + flyoutMetrics.height;
         }
         return {

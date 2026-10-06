@@ -2,6 +2,27 @@
  * @license
  * Copyright 2020 Google LLC
  * SPDX-License-Identifier: Apache-2.0
+ *
+ * 由 AstrasTeam 修改于 2026/6/26:
+ * - 修改 getInitialFlyoutContents 函数来保证作用域
+ * - 修改 convertToolboxItemToFlyoutItems 对于动态积木栏的处理
+ *
+ * 由 AstrasTeam 修改于 2026/7/24:
+ * - 覆盖了 createToolboxItem 方法来让DOM拥有id
+ *
+ * 由 AstrasTeam 修改于 2026/7/25:
+ * - 将 getCategoryByName 改为 getCategoryById
+ * - 将 selectCategoryByName 改为 selectCategoryById
+ * - 将 flyout 上的 label 加入 id
+ * - 让滚动时可以自动展开toolbox
+ * - 加入滚动时的动画
+ * - 将工具箱操作按钮拆分到 ContinuousToolboxControls
+ * - 增加收起选中路径以外分类的操作
+ * - 支持由宿主注入按钮的国际化文本
+ *
+ * 由 AstrasTeam 修改于 2026/9/5:
+ * - selectCategoryById 改为滚动分类列表容器（contentsDiv_）而非整个工具箱，
+ *   与滚动条归属 .blocklyToolboxCategoryGroup 的 CSS 调整配套
  */
 
 /**
@@ -11,8 +32,7 @@
 import * as Blockly from 'blockly/core';
 import { ContinuousFlyout } from './ContinuousFlyout';
 import { t } from 'astratch-i18n';
-
-export const TOOLBOX_WIDTH = 130 as const;
+import collapseIcon from '../../../assets/collapse.svg';
 
 /**
  * Class for continuous toolbox.
@@ -29,20 +49,26 @@ export class ContinuousToolbox extends Blockly.Toolbox {
 
     protected override createDom_(workspace: Blockly.WorkspaceSvg): HTMLDivElement {
         const container = super.createDom_(workspace);
+
         const controls = document.createElement('div');
         controls.classList.add('ash-toolbox-tools');
 
         const collapseOtherCategoriesButton = document.createElement('button');
+        const collapseOtherCategoriesIcon = document.createElement('img');
+        collapseOtherCategoriesIcon.src = collapseIcon;
+        collapseOtherCategoriesButton.appendChild(collapseOtherCategoriesIcon)
         const collapseOtherCategoriesLabel = t('blocks:utils.collapseOther');
         collapseOtherCategoriesButton.type = 'button';
         collapseOtherCategoriesButton.classList.add('ash-toolbox-tools-collapseAll');
         collapseOtherCategoriesButton.title = collapseOtherCategoriesLabel;
+
         collapseOtherCategoriesButton.setAttribute('aria-label', collapseOtherCategoriesLabel);
         collapseOtherCategoriesButton.addEventListener('click', () => {
             this.collapseOtherCategories();
         });
 
         controls.appendChild(collapseOtherCategoriesButton);
+
         container.prepend(controls);
         return container;
     }

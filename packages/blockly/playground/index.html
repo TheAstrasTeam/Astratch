@@ -8,6 +8,13 @@
     </head>
     <body style="display: flex; width: 100vw; height: 100vh; margin: 0; flex-direction: column">
         <h1>Astratch Blockly Playground</h1>
+        <div>
+            <span>Theme:</span>
+            <select id="themeSelect">
+                <option value="dark" selected>Dark</option>
+                <option value="light">Light</option>
+            </select>
+        </div>
         <div id="app" style="flex: 1"></div>
         <script type="module" src="main.js"></script>
     </body>

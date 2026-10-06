@@ -19,6 +19,7 @@ const light = {
         'transparent-dark': '#eeeeee70',
         'transparent-light': '#11111170',
         text: '#111111',
+        'svg-filter': 'invert(0)',
     },
 } satisfies TTheme;
 

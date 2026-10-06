@@ -42,6 +42,7 @@ type TUITheme = {
         'transparent-dark': string;
         'transparent-light': string;
         text: string;
+        'svg-filter': string;
     };
 } & TThemeMeta;
 
@@ -235,7 +236,7 @@ class ThemeManager extends EventBus<IThemeEventsType> implements IThemeManager {
             Object.entries(themeConfig.scheme).forEach(ui => {
                 cssString += `--ui-${ui[0]}: ${
                     themeConfig.kind === 'ui'
-                        ? themeConfig.mixWithAccent
+                        ? themeConfig.mixWithAccent && ui[0] !== 'svg-filter' // svg-filter 不应该被处理
                             ? `color-mix(in srgb, ${ui[1]} 95%, var(--accent-primary))`
                             : ui[1]
                         : ui[1]

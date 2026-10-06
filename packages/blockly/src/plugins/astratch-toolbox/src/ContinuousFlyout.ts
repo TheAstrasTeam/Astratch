@@ -2,6 +2,23 @@
  * @license
  * Copyright 2020 Google LLC
  * SPDX-License-Identifier: Apache-2.0
+ *
+ * 由 AstrasTeam 修改于 2026/6/27:
+ * - 覆盖 getFlyoutScale 为返回固定值
+ * - 增加 FLYOUT_SCALE 常量
+ *
+ * 由 AstrasTeam 修改于 2026/7/25:
+ * - 修改 name 定位为 id 定位
+ * - 修改滚动的代码，让它更精确
+ * - 将 if (this.scrollTarget) 改为 if (this.scrollTarget !== undefined)
+ * - 在 flyout 顶部增加积木搜索框（by AI）
+ * - 更新 Astratch Toolbox 注册入口的错误提示
+ *
+ * 由 AstrasTeam 修改于 2026/8/14:
+ * - 增加 MAX_FLYOUT_WIDTH 常量，限制 flyout 最大宽度（by AI）
+ * - 在 reflowInternal_ 中对 width_ 封顶，防止积木变宽导致 flyout 跟着变宽
+ * - 为 svgGroup 增加 astratchContinuousFlyout 类，配合 CSS 实现悬停显示完整积木
+ * - 在 position() 中将背景路径覆盖为直角矩形，去掉默认圆角，更像 Scratch 的工具箱 flyout
  */
 
 /**
@@ -30,7 +47,8 @@ interface SearchEntry {
  * Class for continuous flyout.
  */
 export class ContinuousFlyout extends Blockly.VerticalFlyout {
-    private static readonly SEARCH_BAR_HEIGHT = 40;
+    private static readonly SEARCH_BAR_HEIGHT = 20;
+    private static readonly SEARCH_BAR_PADDING = 0;
 
     /**
      * Flyout的缩放
@@ -115,12 +133,13 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
             {
                 class: 'continuousFlyoutSearch',
                 x: 0,
-                y: 0,
+                y: ContinuousFlyout.SEARCH_BAR_PADDING,
                 width: 0,
                 height: ContinuousFlyout.SEARCH_BAR_HEIGHT,
             },
             svgGroup,
         );
+        this.searchForeignObject.style.overflow = 'visible';
 
         const container = document.createElement('div');
         container.classList.add('continuousFlyoutSearchContainer');
@@ -129,6 +148,7 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
         this.searchInput.type = 'search';
         this.searchInput.autocomplete = 'off';
         this.searchInput.spellcheck = false;
+        this.searchInput.style.height = `${ContinuousFlyout.SEARCH_BAR_HEIGHT}px`;
         this.searchInput.classList.add('continuousFlyoutSearchInput');
 
         const searchLabel = t('blocks:utils.searchBlocks');
@@ -157,7 +177,9 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
     /** 在所有 flyout 内容上方预留固定搜索框的空间。 */
     protected override layout_(contents: Blockly.FlyoutItem[]) {
         super.layout_(contents);
-        const offset = ContinuousFlyout.SEARCH_BAR_HEIGHT / this.getFlyoutScale();
+        const offset =
+            (ContinuousFlyout.SEARCH_BAR_HEIGHT + ContinuousFlyout.SEARCH_BAR_PADDING) /
+            this.getFlyoutScale();
         for (const item of contents) {
             item.getElement().moveBy(0, offset);
         }
@@ -202,7 +224,9 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
         if (verticalScrollbar) {
             verticalScrollbar.setPosition(
                 verticalScrollbar.position.x,
-                this.SCROLLBAR_MARGIN + ContinuousFlyout.SEARCH_BAR_HEIGHT,
+                this.SCROLLBAR_MARGIN +
+                    ContinuousFlyout.SEARCH_BAR_HEIGHT +
+                    ContinuousFlyout.SEARCH_BAR_PADDING,
             );
         }
 
@@ -237,7 +261,9 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
      */
     private recordScrollPositions() {
         this.scrollPositions.clear();
-        const searchOffset = ContinuousFlyout.SEARCH_BAR_HEIGHT / this.getFlyoutScale();
+        const searchOffset =
+            (ContinuousFlyout.SEARCH_BAR_HEIGHT + ContinuousFlyout.SEARCH_BAR_HEIGHT) /
+            this.getFlyoutScale();
         this.getContents()
             .filter(this.toolboxItemIsLabel.bind(this))
             .map(item => item.getElement())
@@ -403,8 +429,9 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
     /** 返回搜索栏在像素坐标或 flyout 工作区坐标中的高度。 */
     getSearchBarHeight(getWorkspaceCoordinates = false): number {
         return getWorkspaceCoordinates
-            ? ContinuousFlyout.SEARCH_BAR_HEIGHT / this.getWorkspace().scale
-            : ContinuousFlyout.SEARCH_BAR_HEIGHT;
+            ? (ContinuousFlyout.SEARCH_BAR_HEIGHT + ContinuousFlyout.SEARCH_BAR_HEIGHT) /
+                  this.getWorkspace().scale
+            : ContinuousFlyout.SEARCH_BAR_HEIGHT + ContinuousFlyout.SEARCH_BAR_HEIGHT;
     }
 
     /**

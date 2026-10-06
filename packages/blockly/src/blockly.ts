@@ -1,12 +1,12 @@
 import * as Blockly from 'blockly';
-import { registerAstratchRenderer } from './renderer';
 
-import { registerContinuousToolbox } from './plugins/astratch-toolbox/src';
-
-import './style.scss';
+import './style.css';
+import './blockStyle.css';
+import { registerAstratchToolbox } from './plugins/astratch-toolbox/src';
 
 const workspaceMeta: Blockly.BlocklyOptions = {
-    renderer: 'astratch',
+    renderer: 'zelos',
+    theme: 'astratch',
     media: import.meta.resolve('./media'),
     grid: {
         spacing: 48,
@@ -43,16 +43,37 @@ class BlocklyAdapter {
     //     const workspaceSvg = this.workspaces[workspacesID].workspaceSvg;
     // }
     private init(): void {
+        registerAstratchToolbox();
+        Blockly.Scrollbar.scrollbarThickness = 10;
+        Blockly.Theme.defineTheme('astratch', {
+            name: 'scratch',
+            base: Blockly.Themes.Zelos,
+            startHats: true, // 给Hat一个帽子，就和 Scratch 一样
+            componentStyles: {
+                workspaceBackgroundColour: 'var(--ui-secondary)',
+                toolboxBackgroundColour: 'var(--ui-tertiary)',
+                toolboxForegroundColour: 'var(--ui-secondary-icon)',
+                flyoutBackgroundColour: 'var(--ui-primary)',
+                flyoutForegroundColour: 'var(--ui-primary-icon)',
+                scrollbarColour: 'var(--ui-quaternary)',
+                insertionMarkerColour: '#555555',
+                cursorColour: 'var(--ui-quaternary)',
+                selectedGlowColour: '#555555',
+                flyoutOpacity: 0.5,
+            },
+            fontStyle: {
+                weight: 'normal',
+                size: 12,
+            },
+        });
         // 删除自带的积木
         for (const blockType of Object.keys(Blockly.Blocks)) {
             Reflect.deleteProperty(Blockly.Blocks, blockType);
         }
-        registerContinuousToolbox();
     }
 
     constructor() {
         this.workspaces = {};
-        registerAstratchRenderer();
         this.init();
     }
     /**
