@@ -24,10 +24,10 @@
         "zustand": "^5.0.15"
     },
     "devDependencies": {
-        "@babel/core": "^8.0.6",
+        "@babel/core": "^8.0.7",
         "@rolldown/plugin-babel": "^0.2.3",
         "@types/babel__core": "^7.20.5",
-        "@types/node": "^26.6.4",
+        "@types/node": "^26.6.5",
         "@types/react": "^19.2.18",
         "@types/react-dom": "^19.2.7",
         "@vitejs/plugin-react": "^6.1.2",
@@ -35,7 +35,7 @@
         "fake-indexeddb": "^6.2.5",
         "sass": "^1.105.1",
         "typescript": "^6.0.3",
-        "vite": "^8.3.3",
+        "vite": "^8.3.4",
         "vite-plugin-svgr": "^5.2.0",
         "vitest": "^5.0.3"
     }
