@@ -20,7 +20,7 @@
         "blockly": "^13.3.0"
     },
     "devDependencies": {
-        "vite": "^8.3.3",
+        "vite": "^8.3.4",
         "sass": "^1.105.1"
     }
 }
