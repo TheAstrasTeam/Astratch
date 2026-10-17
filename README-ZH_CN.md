@@ -1,7 +1,7 @@
 <p align="center">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./src/assets/lightLogo.svg" alt="Astratch Light Logo">
-      <img src="./src/assets/darkLogo.svg" alt="Astratch Dark Logo" width="50%">
+      <source media="(prefers-color-scheme: dark)" srcset="./docs/lightLogo.svg" alt="Astratch Light Logo">
+      <img src="./docs/darkLogo.svg" alt="Astratch Dark Logo" width="50%">
     </picture><br />
     <img src="https://img.shields.io/github/stars/TheAstrasTeam/Astratch?style=social" alt="Stars" />
     <img src="https://img.shields.io/github/forks/TheAstrasTeam/Astratch?style=social" alt="Forks" />
@@ -11,7 +11,7 @@
     <hr />
 </p>
 
-> _搭建起玩具和工具的桥梁。_
+> _从积木开始，搭建一切_
 
 `Astratch` 是一个图形化集成开发环境，它希望可以让您以“搭积木”的方式搭出 _任何东西* ，就像Scratch一样。
 

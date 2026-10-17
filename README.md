@@ -1,7 +1,7 @@
 <p align="center">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./src/assets/lightLogo.svg" alt="Astratch Light Logo">
-      <img src="./src/assets/darkLogo.svg" alt="Astratch Dark Logo" width="50%">
+      <source media="(prefers-color-scheme: dark)" srcset="./docs/lightLogo.svg" alt="Astratch Light Logo">
+      <img src="./docs/darkLogo.svg" alt="Astratch Dark Logo" width="50%">
     </picture><br />
     <img src="https://img.shields.io/github/stars/TheAstrasTeam/Astratch?style=social" alt="Stars" />
     <img src="https://img.shields.io/github/forks/TheAstrasTeam/Astratch?style=social" alt="Forks" />
@@ -11,7 +11,7 @@
     <hr />
 </p>
 
-> _Bridging the gap between toys and tools._
+> _Build Anything From Blocks_
 
 `Astratch` is a graphical IDE that aims to let you build _anything_ by "snapping blocks together," just like Scratch.
 
