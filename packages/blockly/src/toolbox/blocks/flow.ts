@@ -64,13 +64,14 @@ export const initFlowBlocks = () => {
             this.jsonInit({
                 ...connections,
                 message0: t('blocks:flow.repeatTimes'),
-                args0: [numberInput('TIMES'), emptySlot('INDEX')],
                 message1: '%1',
                 args1: [statementInput('DO')],
                 colour: TOOLBOX_COLOR.flow,
             });
         },
-    } as Blockly.Block;
+    } as Blockly.Block & {
+        updateShape(): void;
+    };
 
     blocklyAdapter.Blockly.Blocks[OPCODES.forEach] = {
         init() {

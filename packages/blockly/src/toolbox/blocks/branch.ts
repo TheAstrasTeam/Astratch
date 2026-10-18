@@ -26,36 +26,18 @@ import addBranchIcon from './assets/addBrach.svg';
 import addEndBranchIcon from './assets/addEndBrach.svg';
 import removeBranchIcon from './assets/minus.svg';
 
-const ICON_SIZE = 20;
-
-/**
- * 如果积木的可变状态。
- *
- * @author AI
- */
-interface BranchState {
-    elseIfCount?: number;
-    hasElse?: boolean;
-}
-
-/**
- * 带动态分支的如果积木。
- *
- * @author AI
- */
-interface IIfBlock extends Blockly.Block {
-    elseIfCount_: number;
-    mutate_(action: () => void): void;
-    updateTail_(): void;
-    addElseIf_(): void;
-    removeElseIf_(index?: number): void;
-    addElse_(): void;
-    removeElse_(): void;
-    saveExtraState(): BranchState | null;
-    loadExtraState(state: BranchState): void;
-}
-
 export const initBranchBlocks = () => {
+    /**
+     * 如果积木的可变状态
+     *
+     * @author AI
+     */
+
+    interface BranchState {
+        elseIfCount?: number;
+        hasElse?: boolean;
+    }
+
     blocklyAdapter.Blockly.Blocks[OPCODES.if] = {
         elseIfCount_: 0,
         init() {
@@ -99,7 +81,7 @@ export const initBranchBlocks = () => {
             const tailInput = this.appendDummyInput('TAIL')
                 .setAlign(Blockly.inputs.Align.RIGHT)
                 .appendField(
-                    new Blockly.FieldImage(addBranchIcon, ICON_SIZE, ICON_SIZE, undefined, () => {
+                    new Blockly.FieldImage(addBranchIcon, 20, 20, undefined, () => {
                         this.mutate_(() => {
                             this.addElseIf_();
                         });
@@ -109,8 +91,8 @@ export const initBranchBlocks = () => {
                 tailInput.appendField(
                     new Blockly.FieldImage(
                         addEndBranchIcon,
-                        ICON_SIZE,
-                        ICON_SIZE,
+                        20,
+                        20,
                         undefined,
                         () => {
                             this.mutate_(() => {
@@ -128,8 +110,8 @@ export const initBranchBlocks = () => {
                 .appendField(
                     new Blockly.FieldImage(
                         removeBranchIcon,
-                        ICON_SIZE,
-                        ICON_SIZE,
+                        20,
+                        20,
                         undefined,
                         () => {
                             this.mutate_(() => {
@@ -177,8 +159,8 @@ export const initBranchBlocks = () => {
                 .appendField(
                     new Blockly.FieldImage(
                         removeBranchIcon,
-                        ICON_SIZE,
-                        ICON_SIZE,
+                        20,
+                        20,
                         undefined,
                         () => {
                             this.mutate_(() => {
@@ -196,7 +178,17 @@ export const initBranchBlocks = () => {
             this.removeInput('ELSE');
             this.updateTail_();
         },
-    } as IIfBlock;
+    } as Blockly.Block & {
+        elseIfCount_: number;
+        mutate_(action: () => void): void;
+        updateTail_(): void;
+        addElseIf_(): void;
+        removeElseIf_(index?: number): void;
+        addElse_(): void;
+        removeElse_(): void;
+        saveExtraState(): BranchState | null;
+        loadExtraState(state: BranchState): void;
+    };
 
     blocklyAdapter.Blockly.Blocks[OPCODES.match] = {
         init() {

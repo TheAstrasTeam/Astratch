@@ -177,14 +177,6 @@ export const initRenderBlocks = () => {
         },
     } as Blockly.Block;
 
-    interface ISetXYBlock extends Blockly.Block {
-        isArrayInput: boolean;
-        isInit: boolean;
-        xNumber: number;
-        yNumber: number;
-        updateShape(): void;
-    }
-
     const xyBlock = (isSet: boolean) =>
         ({
             init() {
@@ -287,7 +279,13 @@ export const initRenderBlocks = () => {
                 if (changedEvent.blockId === yInput.id)
                     this.yNumber = changedEvent.newValue as number;
             },
-        }) as ISetXYBlock;
+        }) as Blockly.Block & {
+            isArrayInput: boolean;
+            isInit: boolean;
+            xNumber: number;
+            yNumber: number;
+            updateShape(): void;
+        };
 
     blocklyAdapter.Blockly.Blocks[OPCODES.setXY] = xyBlock(true);
     blocklyAdapter.Blockly.Blocks[OPCODES.changeXY] = xyBlock(false);

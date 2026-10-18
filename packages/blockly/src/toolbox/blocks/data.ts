@@ -65,12 +65,6 @@ export const initDataBlocks = () => {
         },
     } as Blockly.Block;
 
-    interface IBooleanBlock extends Blockly.Block {
-        isEnable: boolean;
-        updateShape(): void;
-        updateColor(): void;
-    }
-
     blocklyAdapter.Blockly.Blocks[OPCODES.boolean] = {
         init() {
             this.jsonInit({
@@ -127,7 +121,11 @@ export const initDataBlocks = () => {
             this.isEnable = state.isEnable;
             this.updateShape();
         },
-    } as IBooleanBlock;
+    } as Blockly.Block & {
+        isEnable: boolean;
+        updateShape(): void;
+        updateColor(): void;
+    };
 
     blocklyAdapter.Blockly.Blocks[OPCODES.null] = {
         init() {
