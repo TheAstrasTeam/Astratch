@@ -27,12 +27,11 @@ In short, `Astratch` draws on the strengths of other `Scratch editors`, using **
 
 `Astratch` clones, modifies, and uses several plugins from [blockly-examples](https://github.com/RaspberryPiFoundation/blockly-samples):
 
-- [Continuous Toolbox](./plugins/astratch-toolbox/) (Renamed to Astratch Toolbox)
-- [field-angle](./plugins/field-angle/)
-- [field-colour-hsv-sliders](./plugins/field-colour-hsv-sliders/)
-- [field-colour](./plugins/field-colour/)
-- [field-grid-dropdown](./plugins/field-grid-dropdown/)
-- [workspace-search](./plugins/workspace-search/)
+- [Continuous Toolbox](./packages/blockly/src/plugins/astratch-toolbox/) (Renamed to Astratch Toolbox)
+- [field-angle](./packages/blockly/src/plugins/fields/field_angle.ts)- [field-colour-hsv-sliders](./packages/blockly/src/plugins/fields/field_colour_hsv_sliders.ts)
+- [field-colour](./packages/blockly/src/plugins/fields/field_colour.ts)
+- [field-grid-dropdown](./packages/blockly/src/plugins/fields/field_grid/)
+- [field-multiline-input](./packages/blockly/src/plugins/fields/field_multilineinput.ts)
 
 We have modified some of these plugins to better fit the _vision_ of `Astratch`. We comply with the `Apache License v2.0`, and each modified file is annotated at the beginning.
 

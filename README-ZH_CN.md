@@ -27,12 +27,12 @@
 
 `Astratch` 克隆&修改&使用了 [blockly-samples](https://github.com/RaspberryPiFoundation/blockly-samples) 其中的部分插件：
 
-- [Continuous Toolbox](./plugins/astratch-toolbox/)（改名为了 Astratch Toolbox）
-- [field-angle](./plugins/field-angle/)
-- [field-colour-hsv-sliders](./plugins/field-colour-hsv-sliders/)
-- [field-colour](./plugins/field-colour/)
-- [field-grid-dropdown](./plugins/field-grid-dropdown/)
-- [workspace-search](./plugins/workspace-search/)
+- [Continuous Toolbox](./packages/blockly/src/plugins/astratch-toolbox/)（改名为了 Astratch Toolbox）
+- [field-angle](./packages/blockly/src/plugins/fields/field_angle.ts)
+- [field-colour-hsv-sliders](./packages/blockly/src/plugins/fields/field_colour_hsv_sliders.ts)
+- [field-colour](./packages/blockly/src/plugins/fields/field_colour.ts)
+- [field-grid-dropdown](./packages/blockly/src/plugins/fields/field_grid/)
+- [field-multiline-input](./packages/blockly/src/plugins/fields/field_multilineinput.ts)
 
 我们对其中的插件进行了部分修改使其更加适配 `Astratch` 的_设想_，我们遵守`Apache License v2.0`，在每个更改的文件开头均有标注。
 
@@ -41,7 +41,6 @@
 `Astratch` 使用了以下开源仓库的图标：
 
 - [Material Symbols](https://github.com/google/material-design-icons)
-- [Typicons](https://github.com/stephenhutchings/typicons.font)
 
 再次表达我们的非常感谢！
 
