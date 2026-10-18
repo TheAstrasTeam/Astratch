@@ -14,4 +14,4 @@ export interface IWorkspaceState {
     workspaceComments?: IBlockly.serialization.workspaceComments.State[];
 }
 
-export { OPCODES, type TOPCODES_VALUE } from './toolbox/default/opcodes';
+export { OPCODES, type TOPCODES_VALUE } from './toolbox/opcodes';

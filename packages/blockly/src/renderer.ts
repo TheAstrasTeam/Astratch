@@ -5,6 +5,7 @@
  */
 
 import * as Blockly from 'blockly';
+import { OPCODES } from './toolbox/opcodes';
 
 const ARRAY_SHAPE_TYPE = 6;
 const OBJECT_SHAPE_TYPE = 7;
@@ -277,9 +278,57 @@ class AstratchConstantProvider extends Blockly.zelos.ConstantProvider {
     }
 }
 
+/**
+ * 在 zelos 的排版结果上补齐“纯图标行”的紧凑处理。
+ *
+ * zelos 只压缩只含一个文本/图片的行。末尾并排两个加号按钮时这一行会高出一圈，
+ * 这里对只含多个图片字段、且上下都有连接槽的行套用同样的压缩量。
+ *
+ * @author AI
+ */
+class AstratchRenderInfo extends Blockly.zelos.RenderInfo {
+    protected override finalizeVerticalAlignment_() {
+        super.finalizeVerticalAlignment_();
+        if (this.outputConnection) return;
+        for (let i = 2; i < this.rows.length - 1; i += 2) {
+            const row = this.rows[i];
+            const prevSpacer = this.rows[i - 1] as Blockly.blockRendering.SpacerRow;
+            const nextSpacer = this.rows[i + 1] as Blockly.blockRendering.SpacerRow;
+            const hasPrevNotch =
+                i === 2 ? this.topRow.hasPreviousConnection : prevSpacer.followsStatement;
+            const hasNextNotch =
+                i + 2 >= this.rows.length - 1
+                    ? this.bottomRow.hasNextConnection
+                    : nextSpacer.precedesStatement;
+            const fields = row.elements.filter(
+                elem => !Blockly.blockRendering.Types.isSpacer(elem),
+            );
+            if (
+                !hasPrevNotch ||
+                !hasNextNotch ||
+                fields.length < 2 ||
+                !fields.every(
+                    elem =>
+                        Blockly.blockRendering.Types.isField(elem) &&
+                        elem.field instanceof Blockly.FieldImage,
+                )
+            ) {
+                continue;
+            }
+            prevSpacer.height -= this.constants_.SMALL_PADDING;
+            nextSpacer.height -= this.constants_.SMALL_PADDING;
+            row.height -= this.constants_.MEDIUM_PADDING;
+        }
+    }
+}
+
 class AstratchRenderer extends Blockly.zelos.Renderer {
     protected override makeConstants_() {
         return new AstratchConstantProvider();
+    }
+
+    protected override makeRenderInfo_(block: Blockly.BlockSvg) {
+        return new AstratchRenderInfo(this, block);
     }
 
     protected override makeDrawer_(block: Blockly.BlockSvg, info: Blockly.zelos.RenderInfo) {
@@ -287,7 +336,7 @@ class AstratchRenderer extends Blockly.zelos.Renderer {
     }
 }
 
-/** 为所有空 Function 插槽绘制不依赖字体的 SVG 函数提示。 */
+/** 为所有空 Function 插槽绘制不依赖字体的 SVG 函数提示 */
 class AstratchDrawer extends Blockly.zelos.Drawer {
     override draw() {
         for (const child of Array.from(this.block_.getSvgRoot().children)) {
@@ -321,6 +370,41 @@ class AstratchDrawer extends Blockly.zelos.Drawer {
             this.block_.getSvgRoot(),
         );
         hint.setAttribute('focusable', 'false');
+    }
+    protected override recordSizeOnBlock_(): void {
+        super.recordSizeOnBlock_();
+        if (this.block_.type !== OPCODES.string) return;
+        const root = this.block_.getSvgRoot();
+
+        root.querySelectorAll('.ashStringSlotHint').forEach(e => {
+            if (e.getAttribute('data-owner') === this.block_.id) e.remove();
+        });
+
+        const base = {
+            class: 'ashStringSlotHint',
+            'data-owner': this.block_.id,
+            'pointer-events': 'none',
+            'aria-hidden': 'true',
+            focusable: 'false',
+        };
+        Blockly.utils.dom.createSvgElement(
+            'path',
+            {
+                ...base,
+                d: 'M0 1.44922C0 0.975261 0.213009 0.610677 0.213009 0.610677C0.426019 0.246094 0.933615 0 0.933615 0L1.16022 0.419271C0.779523 0.601563 0.616367 0.833985 0.616367 0.833985C0.453211 1.06641 0.453211 1.44922 0.453211 1.44922L1.03332 1.44922L1.03332 2.48828L0 2.48828L0 1.44922ZM1.39589 1.44922C1.39589 0.975261 1.6089 0.610677 1.6089 0.610677C1.82191 0.246094 2.32951 0 2.32951 0L2.56518 0.419271C2.18448 0.601563 2.02132 0.833985 2.02132 0.833985C1.85817 1.06641 1.85817 1.44922 1.85817 1.44922L2.43828 1.44922L2.43828 2.48828L1.39589 2.48828L1.39589 1.44922Z',
+                transform: 'translate(5 5) scale(4)',
+            },
+            root,
+        );
+        Blockly.utils.dom.createSvgElement(
+            'path',
+            {
+                ...base,
+                d: 'M0 2.06901C0.371633 1.88672 0.534789 1.6543 0.534789 1.6543C0.697945 1.42188 0.697945 1.03906 0.697945 1.03906L0.126899 1.03906L0.126899 0L1.16022 0L1.16022 1.03906C1.16022 1.51302 0.947211 1.8776 0.947211 1.8776C0.734202 2.24219 0.226606 2.48828 0.226606 2.48828L0 2.06901ZM1.39589 2.06901C1.77659 1.88672 1.93974 1.6543 1.93974 1.6543C2.1029 1.42188 2.1029 1.03906 2.1029 1.03906L1.52279 1.03906L1.52279 0L2.56518 0L2.56518 1.03906C2.56518 1.51302 2.35217 1.8776 2.35217 1.8776C2.13916 2.24219 1.63156 2.48828 1.63156 2.48828L1.39589 2.06901Z',
+                transform: `translate(${String(this.block_.width - 15)} ${String(this.block_.height - 15)}) scale(4)`,
+            },
+            root,
+        );
     }
 }
 

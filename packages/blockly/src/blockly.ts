@@ -3,9 +3,13 @@ import * as Blockly from 'blockly';
 import './style.css';
 import './blockStyle.css';
 import { registerAstratchToolbox } from './plugins/astratch-toolbox/src';
+import { registerAstratchRenderer } from './renderer';
+import { FieldMultilineInput } from './plugins/fields/field_multilineinput';
+import { FieldColourHsvSliders } from './plugins/fields/field_colour_hsv_sliders';
+import { FieldAngle } from './plugins/fields/field_angle';
 
 const workspaceMeta: Blockly.BlocklyOptions = {
-    renderer: 'zelos',
+    renderer: 'astratch',
     theme: 'astratch',
     media: import.meta.resolve('./media'),
     grid: {
@@ -31,10 +35,67 @@ const workspaceMeta: Blockly.BlocklyOptions = {
     },
 } as const;
 
+type TASSET_TYPE = 'font' | 'image' | 'audio' | 'any' | 'text';
+type TASSET_INFO = {
+    name: string;
+} & (
+    | {
+          type: 'font';
+          // TODO: 确定类型
+          raw: unknown;
+      }
+    | {
+          type: 'image';
+          // TODO: 确定类型
+          raw: unknown;
+      }
+    | {
+          type: 'audio';
+          // TODO: 确定类型
+          raw: unknown;
+      }
+    | {
+          type: 'text';
+          raw: string;
+      }
+);
+
+interface IHANDLE_TYPE {
+    /** 全部事件 */
+    ALL: unknown;
+    ADD_BLOCK: Blockly.Events.BlockCreate;
+    CHANGE_BLOCK: Blockly.Events.BlockChange;
+    DELETED_BLOCK: Blockly.Events.BlockDelete;
+    DRAG_BLOCK: Blockly.Events.BlockDrag;
+    MOVE_BLOCK: Blockly.Events.BlockMove;
+    GET_MENU: {
+        type: 'entities' | 'modules' | 'targets';
+        /**
+         * 用于处理项的地方，由 Astratch-Blockly 提供
+         *
+         * 若工作区未创建完成，它会放进队列里而不是直接执行
+         * */
+        handler(data: [string, string][]): void;
+    };
+    GET_ASSET: {
+        type: TASSET_TYPE;
+        handler(assetHandle: string): void;
+    };
+    GET_ASSET_INFO: {
+        assetHandle: string;
+        handler(assetInfo: TASSET_INFO): void;
+    };
+}
+
 class BlocklyAdapter {
     workspaces: Record<
         string,
-        { id: string; DOM: HTMLDivElement; workspaceSvg: Blockly.WorkspaceSvg }
+        {
+            id: string;
+            DOM: HTMLDivElement;
+            workspaceSvg: Blockly.WorkspaceSvg;
+            handler: <K extends keyof IHANDLE_TYPE>(type: K, data: IHANDLE_TYPE[K]) => void;
+        }
     >;
     Blockly: typeof Blockly = Blockly;
 
@@ -43,7 +104,11 @@ class BlocklyAdapter {
     //     const workspaceSvg = this.workspaces[workspacesID].workspaceSvg;
     // }
     private init(): void {
-        registerAstratchToolbox();
+        Blockly.fieldRegistry.register('text_input', FieldMultilineInput);
+        Blockly.fieldRegistry.register('color_input', FieldColourHsvSliders);
+        Blockly.fieldRegistry.register('angle_input', FieldAngle);
+        registerAstratchRenderer();
+
         Blockly.Scrollbar.scrollbarThickness = 10;
         Blockly.Theme.defineTheme('astratch', {
             name: 'scratch',
@@ -70,12 +135,42 @@ class BlocklyAdapter {
         for (const blockType of Object.keys(Blockly.Blocks)) {
             Reflect.deleteProperty(Blockly.Blocks, blockType);
         }
+        registerAstratchToolbox();
     }
+
+    private waitingEvents: {
+        workspaceID: string;
+        event(): void;
+    }[] = [];
 
     constructor() {
         this.workspaces = {};
         this.init();
     }
+
+    private handleChangeListener(e: Blockly.Events.Abstract, existingWorkspaceID?: string): void {
+        const workspaceID = existingWorkspaceID ?? e.workspaceId;
+        if (!workspaceID) return;
+        const handler = this.workspaces[workspaceID].handler;
+        switch (e.type) {
+            case 'change':
+                handler('CHANGE_BLOCK', e as unknown as Blockly.Events.BlockChange);
+                return;
+            case 'create':
+                handler('ADD_BLOCK', e as unknown as Blockly.Events.BlockCreate);
+                return;
+            case 'drag':
+                handler('DRAG_BLOCK', e as unknown as Blockly.Events.BlockDrag);
+                return;
+            case 'move':
+                handler('MOVE_BLOCK', e as unknown as Blockly.Events.BlockMove);
+                return;
+            case 'delete':
+                handler('DELETED_BLOCK', e as unknown as Blockly.Events.BlockDelete);
+                return;
+        }
+    }
+
     /**
      * 新建工作区
      * @param DOM 要注入的<div>
@@ -84,6 +179,7 @@ class BlocklyAdapter {
      */
     addWorkspace(
         DOM: HTMLDivElement,
+        handler: <K extends keyof IHANDLE_TYPE>(type: K, data: IHANDLE_TYPE[K]) => void,
         Data?: Record<string, unknown>,
         Options?: Blockly.BlocklyOptions,
     ): string {
@@ -93,24 +189,50 @@ class BlocklyAdapter {
             );
         this._isCreating = true;
         Blockly.Events.disable();
-        const id = crypto.randomUUID();
+        let id: string | null;
         try {
             const workspaceSvg = Blockly.inject(DOM, { ...workspaceMeta, ...Options });
+            id = workspaceSvg.id;
             this.workspaces[id] = {
                 id,
                 DOM,
                 workspaceSvg,
+                handler,
             };
             // 加载积木
             if (Data) Blockly.serialization.workspaces.load(Data, workspaceSvg);
             // this._initWorkspace(id);
-
             Blockly.Events.enable();
+            workspaceSvg.addChangeListener(this.handleChangeListener.bind(this));
         } finally {
             this._isCreating = false;
+
+            this.waitingEvents = this.waitingEvents.filter(event => {
+                if (event.workspaceID === id) {
+                    event.event();
+                    return false;
+                }
+                return true;
+            });
         }
         return id;
+    }
+
+    emit<K extends keyof IHANDLE_TYPE>(block: Blockly.Block, type: K, data: IHANDLE_TYPE[K]) {
+        // 对于Flyout中的积木，需要获取父工作区的ID
+        const id =
+            (block.workspace as unknown as Blockly.IFlyout).targetWorkspace?.id ??
+            block.workspace.id;
+        if (this._isCreating)
+            this.waitingEvents.push({
+                workspaceID: id,
+                event: () => {
+                    this.workspaces[id].handler(type, data);
+                },
+            });
+        else this.workspaces[id].handler(type, data);
     }
 }
 
 export const blocklyAdapter = new BlocklyAdapter();
+export type { TASSET_TYPE, TASSET_INFO };

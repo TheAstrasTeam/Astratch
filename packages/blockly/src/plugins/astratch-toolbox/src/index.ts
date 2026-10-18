@@ -257,30 +257,11 @@ g.astratchFlyoutGroupLevel1 text {
     font-size: larger !important;
 }
 
-/*  Blockly 下拉框、提示框、注释框、取色与缩放（HTML 浮层，不属于积木 SVG）  */
-.blocklyDropDownDiv {
-    background-color: var(--ui-secondary);
-    border-color: var(--ui-tertiary);
-}
-.blocklyDropDownDiv span {
-    color: var(--ui-text);
-}
-.blocklyDropDownDiv hr {
-    border-top: 1px solid var(--ui-tertiary);
-}
-
-.fieldColourEyedropper {
-    color: var(--ui-text);
-}
-
 /* Blockly 注释框内的文字颜色（不随主题变化） */
 .blocklyComment .blocklyTextarea {
     color: #000 !important;
 }
 
-.fieldColourSlider {
-    background-color: var(--ui-secondary);
-}
 .blocklyZoom.blocklyZoomReset {
     transform: translateY(10px);
 }
