@@ -17,10 +17,10 @@
     "type": "module",
     "dependencies": {
         "astratch-i18n": "workspace:*",
-        "blockly": "^13.3.0"
+        "blockly": "^13.4.0"
     },
     "devDependencies": {
         "vite": "^8.3.4",
-        "sass": "^1.105.1"
+        "sass": "^1.105.2"
     }
 }
