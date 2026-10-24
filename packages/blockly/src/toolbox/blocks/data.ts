@@ -108,6 +108,15 @@ export const initDataBlocks = () => {
                 ) {
                     this.isEnable = !this.isEnable;
                     this.updateShape();
+                    this.workspace.fireChangeListener(
+                        new Blockly.Events.BlockChange(
+                            this,
+                            'mutation',
+                            null,
+                            JSON.stringify({ isEnable: !this.isEnable }),
+                            JSON.stringify({ isEnable: this.isEnable }),
+                        ),
+                    );
                 }
             } else if ((event as Blockly.Events.BlockMove).type === Blockly.Events.BLOCK_MOVE)
                 this.updateColor();
