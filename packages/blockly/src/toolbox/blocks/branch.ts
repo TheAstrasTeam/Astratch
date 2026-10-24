@@ -28,8 +28,6 @@ import removeBranchIcon from './assets/minus.svg';
 
 export const initBranchBlocks = () => {
     /**
-     * 如果积木的可变状态
-     *
      * @author AI
      */
 
@@ -89,17 +87,11 @@ export const initBranchBlocks = () => {
                 );
             if (!this.getInput('ELSE'))
                 tailInput.appendField(
-                    new Blockly.FieldImage(
-                        addEndBranchIcon,
-                        20,
-                        20,
-                        undefined,
-                        () => {
-                            this.mutate_(() => {
-                                this.addElse_();
-                            });
-                        },
-                    ),
+                    new Blockly.FieldImage(addEndBranchIcon, 20, 20, undefined, () => {
+                        this.mutate_(() => {
+                            this.addElse_();
+                        });
+                    }),
                 );
         },
         addElseIf_() {
@@ -108,17 +100,11 @@ export const initBranchBlocks = () => {
             const input = this.appendValueInput(`IF${String(index)}`)
                 .setCheck(TYPES.BOOLEAN)
                 .appendField(
-                    new Blockly.FieldImage(
-                        removeBranchIcon,
-                        20,
-                        20,
-                        undefined,
-                        () => {
-                            this.mutate_(() => {
-                                this.removeElseIf_(index);
-                            });
-                        },
-                    ),
+                    new Blockly.FieldImage(removeBranchIcon, 20, 20, undefined, () => {
+                        this.mutate_(() => {
+                            this.removeElseIf_(index);
+                        });
+                    }),
                 )
                 .appendField(t('blocks:branch.elseIf'));
             input.connection!.setShadowState({
@@ -133,7 +119,6 @@ export const initBranchBlocks = () => {
             this.moveInputBefore('TAIL', null);
         },
         removeElseIf_(index?: number) {
-            // 删中间的分支：先把这一行的积木弹回工作区，再把后面的分支逐个上移，保持编号连续
             const at = index ?? this.elseIfCount_;
             const input = this.getInput(`IF${String(at)}`);
             const condition = input?.connection?.targetBlock();
@@ -157,17 +142,11 @@ export const initBranchBlocks = () => {
         addElse_() {
             this.appendDummyInput('ELSE_HEAD')
                 .appendField(
-                    new Blockly.FieldImage(
-                        removeBranchIcon,
-                        20,
-                        20,
-                        undefined,
-                        () => {
-                            this.mutate_(() => {
-                                this.removeElse_();
-                            });
-                        },
-                    ),
+                    new Blockly.FieldImage(removeBranchIcon, 20, 20, undefined, () => {
+                        this.mutate_(() => {
+                            this.removeElse_();
+                        });
+                    }),
                 )
                 .appendField(t('blocks:branch.else'));
             this.appendStatementInput('ELSE');
@@ -195,7 +174,13 @@ export const initBranchBlocks = () => {
             this.jsonInit({
                 ...connections,
                 message0: t('blocks:branch.match'),
-                args0: [unknownInput('VALUE')],
+                args0: [
+                    {
+                        type: 'input_value',
+                        name: 'VALUE',
+                        check: ['String', 'Number', 'Boolean', null],
+                    },
+                ],
                 message1: '%1',
                 args1: [statementInput('DO', 'MatchBranch')],
                 colour: TOOLBOX_COLOR.branch,
@@ -205,6 +190,10 @@ export const initBranchBlocks = () => {
 
     blocklyAdapter.Blockly.Blocks[OPCODES.matchCase] = {
         init() {
+            this.state_string = '';
+            this.state_number = 0;
+            this.state_boolean = false;
+
             this.jsonInit({
                 ...matchBranchConnections,
                 message0: t('blocks:branch.matchCase'),
@@ -214,7 +203,117 @@ export const initBranchBlocks = () => {
                 colour: TOOLBOX_COLOR.branch,
             });
         },
-    } as Blockly.Block;
+        onchange(e) {
+            switch (e.type) {
+                case 'move': {
+                    // 自动适配类型
+                    // 事实上match只设计了string,number,boolean,null可查看类型
+                    const event = e as unknown as Blockly.Events.BlockMove;
+                    let parent: Blockly.Block | null = this.getParent();
+                    // 找上层直到无效
+                    // 这个理论不会有问题，因为实际设计就是找到最近的
+                    while (!(!parent || parent.type === OPCODES.match)) parent = parent.getParent();
+
+                    if (!parent) break;
+                    if (parent.id !== event.newParentId && parent.id !== event.oldParentId) return;
+
+                    const type = parent.getInput('VALUE')?.connection?.targetConnection?.getCheck();
+
+                    const input = this.getInput('VALUE');
+                    if (!input) break;
+
+                    input.connection?.targetConnection?.getSourceBlock().dispose();
+                    input.setCheck(type ?? null);
+                    const typeExceptNull = type ?? [null];
+
+                    // 若提供类型不唯一则不提供自动选择
+                    if (typeExceptNull.length > 1) break;
+
+                    switch (typeExceptNull[0]) {
+                        case 'String':
+                            input.connection?.setShadowState({
+                                type: OPCODES.string,
+                                fields: {
+                                    TEXT: this.state_string,
+                                },
+                            });
+                            break;
+                        case 'Number':
+                            input.connection?.setShadowState({
+                                type: OPCODES.number,
+                                fields: {
+                                    NUM: this.state_number,
+                                },
+                            });
+                            break;
+                        case 'Boolean':
+                            input.connection?.setShadowState({
+                                type: OPCODES.boolean,
+                                extraState: {
+                                    isEnable: this.state_boolean,
+                                },
+                            });
+                            break;
+                    }
+                    break;
+                }
+                case 'change': {
+                    // 修改内部值积木时保存值的处理
+                    const event = e as unknown as Blockly.Events.BlockChange;
+                    const input = this.getInput('VALUE');
+                    if (!input) return;
+                    const connectBlock = input.connection?.targetConnection;
+                    if (!connectBlock) return;
+                    if (event.blockId !== connectBlock.getSourceBlock().id) return;
+                    switch (connectBlock.targetConnection?.getShadowState()?.type) {
+                        case OPCODES.string:
+                            this.state_string =
+                                (connectBlock.targetConnection
+                                    .targetBlock()
+                                    ?.getFieldValue('TEXT') as string | null) ?? '';
+                            break;
+                        case OPCODES.number:
+                            this.state_number =
+                                (connectBlock.targetConnection
+                                    .targetBlock()
+                                    ?.getFieldValue('NUM') as number | null) ?? 0;
+                            break;
+                        case OPCODES.boolean:
+                            this.state_boolean =
+                                (
+                                    connectBlock.targetConnection
+                                        .targetBlock()
+                                        ?.saveExtraState?.() as {
+                                        isEnable: boolean | undefined;
+                                    }
+                                ).isEnable ?? false;
+                            break;
+                    }
+                    break;
+                }
+            }
+        },
+        saveExtraState() {
+            return {
+                state_string: this.state_string,
+                state_number: this.state_number,
+                state_boolean: this.state_boolean,
+            };
+        },
+        loadExtraState(state: {
+            state_string: string;
+            state_number: number;
+            state_boolean: boolean;
+        }) {
+            this.state_string = state.state_string;
+            this.state_number = state.state_number;
+            this.state_boolean = state.state_boolean;
+        },
+    } as Blockly.Block & {
+        state_string: string;
+        state_number: number;
+        state_boolean: boolean;
+    };
 
     blocklyAdapter.Blockly.Blocks[OPCODES.matchDefault] = {
         init() {
