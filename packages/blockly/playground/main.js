@@ -19,7 +19,7 @@ if (select)
     };
 
 const handler = (type, data) => {
-    console.log(`Got event "${type}": `, data);
+    console.debug(`Got event "${type}": `, data);
     if (type === 'GET_MENU' && data.type === 'entities') {
         data.handler([['A', 'a'], ['B', 'b']])
     }
