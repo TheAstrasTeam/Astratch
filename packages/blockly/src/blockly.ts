@@ -7,6 +7,7 @@ import { registerAstratchRenderer } from './renderer';
 import { FieldMultilineInput } from './plugins/fields/field_multilineinput';
 import { FieldColourHsvSliders } from './plugins/fields/field_colour_hsv_sliders';
 import { FieldAngle } from './plugins/fields/field_angle';
+import { ashConnectionChecker } from './connectionChecker';
 
 const workspaceMeta: Blockly.BlocklyOptions = {
     renderer: 'astratch',
@@ -32,6 +33,7 @@ const workspaceMeta: Blockly.BlocklyOptions = {
         flyoutsVerticalToolbox: 'ContinuousFlyout',
         metricsManager: 'ContinuousMetrics',
         toolbox: 'ContinuousToolbox',
+        connectionChecker: ashConnectionChecker,
     },
 } as const;
 
@@ -174,6 +176,7 @@ class BlocklyAdapter {
     /**
      * 新建工作区
      * @param DOM 要注入的<div>
+     * @param handler 各种事件的处理区
      * @param Data 工作区序列化数据
      * @param Options 自定义选项，无则使用默认配置: {@link workspaceMeta}
      */
