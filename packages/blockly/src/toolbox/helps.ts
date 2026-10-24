@@ -1,4 +1,4 @@
-import { Blockly } from '..';
+import { Blockly, type TOPCODES_VALUE } from '..';
 
 /**
  * 对于链接积木的配置项
@@ -65,7 +65,7 @@ export const TYPES = {
     OBJECT: 'Object',
     ARRAY: 'Array',
     /** 也就是 any */
-    UNKNOWN: 'Unknown',
+    UNKNOWN: null,
     FUNCTION: 'Function',
 } as const;
 
@@ -292,6 +292,77 @@ export class FieldImageText extends Blockly.FieldImage {
             undefined,
             options,
         );
+    }
+}
+
+export class DraggableParamBlock {
+    block: Blockly.Block;
+    inputID: string;
+    blockType: TOPCODES_VALUE;
+    /** 块类型 */
+    type: string | string[] | null;
+
+    private innerBlockID: string | undefined;
+
+    onchange(event: Blockly.Events.Abstract) {
+        if (event.type !== 'drag') return;
+        const dragEvent = event as unknown as Blockly.Events.BlockDrag;
+        if (!dragEvent.blockId) return;
+        const dragBlock = this.block.workspace.getBlockById(dragEvent.blockId);
+        if (!dragBlock) return;
+        if (dragBlock.type === this.blockType) {
+            const dragCurrentBlock = dragBlock as Blockly.Block & {
+                name?: string;
+                parentID?: string;
+            };
+            if (dragCurrentBlock.parentID !== this.block.id) return;
+            // 重新加入积木
+            this.updateValueBlock();
+        }
+    }
+
+    updateValueBlock() {
+        const input = this.block.getInput(this.inputID);
+        if (!input?.connection) return;
+        if (input.connection.isConnected()) return;
+        input.setCheck(this.type);
+        const valueBlock = this.block.workspace.newBlock(this.blockType) as Blockly.BlockSvg;
+        if (!valueBlock.outputConnection || !valueBlock.loadExtraState) throw new Error(`Can't add block to workspace`);
+        valueBlock.loadExtraState({
+            parentID: this.block.id,
+        });
+        valueBlock.initSvg();
+        valueBlock.render();
+        input.connection.connect(valueBlock.outputConnection);
+        this.innerBlockID = valueBlock.id;
+    }
+
+    loadExtraState(blockID: string) {
+        this.block.getInput(this.inputID)?.connection?.targetBlock()?.dispose();
+        this.innerBlockID = blockID;
+    }
+
+    getInnerBlockID(): string | undefined {
+        return this.innerBlockID;
+    }
+
+    /**
+     * 配置一个可无限拖出的输入框
+     * @param block 期望加入可无限拖出积木的实例
+     * @param inputID 输入框的ID
+     * @param blockType 其中无限拖出积木的OPCODE
+     * @param type 它的类型，不确定为null
+     */
+    constructor(
+        block: Blockly.Block,
+        inputID: string,
+        blockType: TOPCODES_VALUE,
+        type: string | string[] | null,
+    ) {
+        this.block = block;
+        this.inputID = inputID;
+        this.blockType = blockType;
+        this.type = type;
     }
 }
 

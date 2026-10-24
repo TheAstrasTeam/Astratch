@@ -14,14 +14,16 @@ import {
     arrayInput,
     booleanInput,
     connections,
-    emptySlot,
+    DraggableParamBlock,
     endConnections,
     numberInput,
+    returnConnections,
     statementInput,
+    unknownInput,
 } from '../helps';
 import { OPCODES } from '../opcodes';
 import { blocklyAdapter } from '../../blockly';
-import type { Blockly } from '../..';
+import { Blockly } from '../..';
 
 export const initFlowBlocks = () => {
     blocklyAdapter.Blockly.Blocks[OPCODES.wait] = {
@@ -59,18 +61,113 @@ export const initFlowBlocks = () => {
         },
     } as Blockly.Block;
 
+    blocklyAdapter.Blockly.Blocks[OPCODES.repeatTimeCount] = {
+        init() {
+            this.name = t('blocks:flow.repeatTimeCount');
+            this.parentID = '';
+            this.jsonInit({
+                ...returnConnections,
+                output: 'Number',
+                colour: TOOLBOX_COLOR.flow,
+            });
+            this.updateShape();
+        },
+        updateShape() {
+            this.removeInput('NAME', true);
+            this.appendDummyInput('NAME').appendField(this.name);
+        },
+        loadExtraState(state: { parentID: string }) {
+            this.parentID = state.parentID;
+        },
+        saveExtraState() {
+            return {
+                parentID: this.parentID,
+            };
+        },
+    } as Blockly.Block & {
+        name: string;
+        parentID: string;
+        updateShape(): void;
+    };
+
+    blocklyAdapter.Blockly.Blocks[OPCODES.repeatTimeValue] = {
+        init() {
+            this.name = t('blocks:flow.repeatTimeValue');
+            this.parentID = '';
+            this.jsonInit({
+                ...returnConnections,
+                output: null,
+                colour: TOOLBOX_COLOR.flow,
+            });
+            this.updateShape();
+        },
+        updateShape() {
+            this.setOutput(true, this.typeID);
+            this.removeInput('NAME', true);
+            this.appendDummyInput('NAME').appendField(this.name);
+        },
+        loadExtraState(state: { parentID: string; typeID: string }) {
+            this.parentID = state.parentID;
+            this.typeID = state.typeID;
+        },
+        saveExtraState() {
+            return {
+                parentID: this.parentID,
+                typeID: this.typeID,
+            };
+        },
+        onchange(event) {
+            if (event.type !== 'click') return;
+            const clickEvent = event as unknown as Blockly.Events.Click;
+            if (clickEvent.blockId === this.id) {
+                this.name = crypto.randomUUID();
+                this.updateShape();
+            }
+        },
+    } as Blockly.Block & {
+        name: string;
+        parentID: string;
+        typeID: string;
+        updateShape(): void;
+    };
+
     blocklyAdapter.Blockly.Blocks[OPCODES.repeatTimes] = {
         init() {
             this.jsonInit({
                 ...connections,
                 message0: t('blocks:flow.repeatTimes'),
+                args0: [numberInput('TIMES'), numberInput('INDEX')],
                 message1: '%1',
                 args1: [statementInput('DO')],
                 colour: TOOLBOX_COLOR.flow,
             });
+
+            this.countBlock = new DraggableParamBlock(
+                this,
+                'INDEX',
+                OPCODES.repeatTimeCount,
+                'Number',
+            );
+            this.updateShape();
+        },
+        updateShape() {
+            this.countBlock.updateValueBlock();
+        },
+        onchange(event) {
+            this.countBlock.onchange(event);
+        },
+        loadExtraState(state: { countBlockID: string }) {
+            this.getInput('INDEX')?.connection?.targetBlock()?.dispose();
+            this.countBlock.loadExtraState(state.countBlockID);
+        },
+        saveExtraState() {
+            return {
+                countBlockID: this.countBlock.getInnerBlockID(),
+            };
         },
     } as Blockly.Block & {
         updateShape(): void;
+        countBlock: DraggableParamBlock;
     };
 
     blocklyAdapter.Blockly.Blocks[OPCODES.forEach] = {
@@ -78,13 +175,45 @@ export const initFlowBlocks = () => {
             this.jsonInit({
                 ...connections,
                 message0: t('blocks:flow.forEach'),
-                args0: [arrayInput('ARRAY'), emptySlot('ITEM'), emptySlot('INDEX')],
+                args0: [arrayInput('ARRAY'), unknownInput('ITEM'), numberInput('INDEX')],
                 message1: '%1',
                 args1: [statementInput('DO')],
                 colour: TOOLBOX_COLOR.flow,
             });
+            this.countBlock = new DraggableParamBlock(
+                this,
+                'INDEX',
+                OPCODES.repeatTimeCount,
+                'Number',
+            );
+            this.valueBlock = new DraggableParamBlock(this, 'ITEM', OPCODES.repeatTimeValue, null);
+            this.updateShape();
         },
-    } as Blockly.Block;
+        updateShape() {
+            this.countBlock.updateValueBlock();
+            this.valueBlock.updateValueBlock();
+        },
+        onchange(event) {
+            this.countBlock.onchange(event);
+            this.valueBlock.onchange(event);
+        },
+        loadExtraState(state: { countBlockID: string; valueBlockID: string }) {
+            this.getInput('INDEX')?.connection?.targetBlock()?.dispose();
+            this.getInput('ITEM')?.connection?.targetBlock()?.dispose();
+            this.countBlock.loadExtraState(state.countBlockID);
+            this.valueBlock.loadExtraState(state.valueBlockID);
+        },
+        saveExtraState() {
+            return {
+                countBlockID: this.countBlock.getInnerBlockID(),
+                valueBlockID: this.valueBlock.getInnerBlockID(),
+            };
+        },
+    } as Blockly.Block & {
+        updateShape(): void;
+        countBlock: DraggableParamBlock;
+        valueBlock: DraggableParamBlock;
+    };
 
     blocklyAdapter.Blockly.Blocks[OPCODES.breakLoop] = {
         init() {

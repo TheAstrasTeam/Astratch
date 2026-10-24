@@ -1,10 +1,3 @@
-/**
- * 全部基础积木的 opcode。
- *
- * 命名规则：`<子分类>.<积木名>`，与工具箱的分类保持一致。
- *
- * @author AI
- */
 const OPCODES = {
     // 呈现 - 运动
     forward: 'motion.forward',
@@ -72,6 +65,8 @@ const OPCODES = {
     waitUntil: 'flow.waitUntil',
     repeatWhile: 'flow.repeatWhile',
     repeatTimes: 'flow.repeatTimes',
+    repeatTimeCount: 'flow.repeatTimeCount',
+    repeatTimeValue: 'flow.repeatTimeValue',
     forEach: 'flow.forEach',
     breakLoop: 'flow.break',
     continueLoop: 'flow.continue',
