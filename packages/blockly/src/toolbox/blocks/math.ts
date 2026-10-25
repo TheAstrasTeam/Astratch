@@ -18,7 +18,8 @@ import {
 } from '../helps';
 import { OPCODES } from '../opcodes';
 import { blocklyAdapter } from '../../blockly';
-import type { Blockly } from '../..';
+import { Blockly } from '../..';
+import { MutateByLength } from '../mutateByLength';
 
 const ROUND_OPTIONS = [
     [t('blocks:option.round.abs'), 'abs'],
@@ -171,6 +172,143 @@ export const initMathBlocks = () => {
             });
         },
     } as Blockly.Block;
+
+    // 比较
+    blocklyAdapter.Blockly.Blocks[OPCODES.compare] = {
+        init() {
+            this.inputsType = null;
+            this.state_boolean = [];
+            this.state_number = [];
+            this.state_string = [];
+            this.mutateHandle = new MutateByLength(
+                this,
+                (input, prefix, isInit, length) => {
+                    if (prefix === 'input_') {
+                        input.setCheck(this.inputsType);
+                        const currentBlock = input.connection?.targetBlock();
+                        if (currentBlock?.isShadow()) currentBlock.dispose();
+                        switch (this.inputsType) {
+                            case 'String':
+                                input.connection?.setShadowState({
+                                    type: OPCODES.string,
+                                    fields: {
+                                        TEXT: this.state_string[length] ?? '',
+                                    },
+                                });
+                                break;
+                            case 'Boolean':
+                                input.connection?.setShadowState({
+                                    type: OPCODES.boolean,
+                                    extraState: {
+                                        isEnable: this.state_boolean[length] ?? false,
+                                    },
+                                });
+                                break;
+                            case 'Number':
+                                input.connection?.setShadowState({
+                                    type: OPCODES.number,
+                                    fields: {
+                                        NUM: this.state_number[length] ?? 0,
+                                    },
+                                });
+                                break;
+                        }
+                    } else if (isInit)
+                        input.appendField(
+                            new Blockly.FieldDropdown([
+                                ['=', '='],
+                                ['>', '>'],
+                                ['≥', '>='],
+                                ['<', '<'],
+                                ['≤', '<='],
+                                ['≠', '!='],
+                            ]),
+                        );
+                },
+                'input_',
+                'input_symbol_',
+            );
+            this.jsonInit({
+                ...returnConnections,
+                output: TYPES.BOOLEAN,
+                colour: TOOLBOX_COLOR.math,
+            });
+            this.updateShape();
+        },
+        updateShape() {
+            this.mutateHandle.updateShape();
+        },
+        saveExtraState() {
+            return {
+                ...this.mutateHandle.saveExtraState(),
+                inputsType: this.inputsType ?? 'null',
+                state_string: this.state_string,
+                state_number: this.state_number,
+                state_boolean: this.state_boolean,
+            };
+        },
+        loadExtraState(state: {
+            length: number;
+            inputsType: string;
+            state_string: string[];
+            state_number: number[];
+            state_boolean: boolean[];
+        }) {
+            this.mutateHandle.loadExtraState(state);
+            this.inputsType = state.inputsType === 'null' ? null : state.inputsType;
+            this.state_string = state.state_string;
+            this.state_number = state.state_number;
+            this.state_boolean = state.state_boolean;
+            this.updateShape();
+        },
+        onchange(event) {
+            if (!['move', 'delete', 'change'].includes(event.type)) return;
+            let expectedType: string | null = null;
+            this.mutateHandle.getValueInputs().forEach((input, length) => {
+                const block = input.connection?.targetBlock();
+                if (block?.isShadow()) {
+                    switch (input.connection?.getShadowState()?.type) {
+                        case OPCODES.string:
+                            this.state_string[length] =
+                                (block.getFieldValue('TEXT') as string | null) ?? '';
+                            break;
+                        case OPCODES.number:
+                            this.state_number[length] =
+                                (block.getFieldValue('NUM') as number | null) ?? 0;
+                            break;
+                        case OPCODES.boolean:
+                            this.state_boolean[length] =
+                                (
+                                    block.saveExtraState?.() as {
+                                        isEnable: boolean | undefined;
+                                    }
+                                ).isEnable ?? false;
+                            break;
+                    }
+                    return;
+                }
+                // 填入的积木类型
+                const check = block?.outputConnection?.getCheck();
+                if (check?.length != 1) return;
+                const finalType = check[0];
+                if (finalType !== expectedType && expectedType)
+                    throw new Error(
+                        `The type of latest input is ${expectedType}, But found ${finalType}.\nBTW, may it's a bug. Please report to The Astras Team!`,
+                    );
+                expectedType = finalType;
+            });
+            if (expectedType === this.inputsType) return;
+            this.inputsType = expectedType;
+            this.updateShape();
+        },
+    } as Blockly.Block & {
+        mutateHandle: MutateByLength<'input_', 'input_symbol_'>;
+        inputsType: string | null;
+        updateShape(): void;
+        state_string: string[];
+        state_number: number[];
+        state_boolean: boolean[];
+    };
 
     // 逻辑
     blocklyAdapter.Blockly.Blocks[OPCODES.and] = {

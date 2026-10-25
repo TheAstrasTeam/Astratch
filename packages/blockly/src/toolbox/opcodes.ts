@@ -112,6 +112,9 @@ const OPCODES = {
     constant: 'math.constant',
     random: 'math.random',
 
+    // 计算 - 比较
+    compare: 'math.compare',
+
     // 计算 - 逻辑
     and: 'logic.and',
     or: 'logic.or',

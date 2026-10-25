@@ -268,6 +268,15 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                     },
                     {
                         kind: 'category',
+                        id: 'compare',
+                        name: t('blocks:category.compare'),
+                        colour: TOOLBOX_COLOR.math,
+                        contents: [
+                            block(OPCODES.compare),
+                        ],
+                    },
+                    {
+                        kind: 'category',
                         id: 'logic',
                         name: t('blocks:category.logic'),
                         colour: TOOLBOX_COLOR.math,

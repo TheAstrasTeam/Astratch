@@ -17,6 +17,7 @@ export default {
     'category.detect': '检测',
     'category.calc': '计算',
     'category.math': '数学',
+    'category.compare': '比较',
     'category.logic': '逻辑',
     'category.string': '字符串',
     'category.data': '数据',

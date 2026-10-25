@@ -349,6 +349,8 @@
 
 ### 逻辑
 
+- `returns`-`boolean` `unknown` [=,<,<=,>,>=,!=] `unknown` +(`unknown` [=,<,<=,>,>=,!=] `unknown`)
+
 - `returns`-`boolean` `boolean` 且 `boolean` +(`boolean` 且 `boolean`)
 - `returns`-`boolean` `boolean` 或 `boolean` +(`boolean` 或 `boolean`)
 - `returns`-`boolean` `boolean` 不成立
