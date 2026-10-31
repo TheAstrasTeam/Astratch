@@ -100,6 +100,11 @@ interface IHANDLE_TYPE {
  */
 export let revertDrag = false;
 
+// eslint-disable-next-line @typescript-eslint/unbound-method
+const originalBumpBlock = Blockly.BlockSvg.prototype.bumpNeighbours;
+// eslint-disable-next-line @typescript-eslint/unbound-method
+const originalBumpConnection = Blockly.RenderedConnection.prototype.bumpAwayFrom;
+
 class BlocklyAdapter {
     workspaces: Record<
         string,
@@ -156,8 +161,29 @@ class BlocklyAdapter {
         event(): void;
     }[] = [];
 
-    constructor(RevertDrag?: boolean) {
+    /** 禁用防遮挡 */
+    disableBump() {
+        Blockly.BlockSvg.prototype.bumpNeighbours = () => {
+            /* empty */
+        };
+        Blockly.RenderedConnection.prototype.bumpAwayFrom = () => {
+            /* empty */
+        };
+    }
+    /** 启用防遮挡 */
+    enableBump() {
+        Blockly.BlockSvg.prototype.bumpNeighbours = originalBumpBlock;
+        Blockly.RenderedConnection.prototype.bumpAwayFrom = originalBumpConnection;
+    }
+
+    /**
+     * @param RevertDrag 反转拖动
+     * @param disableBump 禁用防遮挡
+     */
+    constructor(RevertDrag?: boolean, disableBump = true) {
         revertDrag = RevertDrag ?? false;
+        if (disableBump) this.disableBump();
+        else this.enableBump();
         this.workspaces = {};
         this.init();
     }
