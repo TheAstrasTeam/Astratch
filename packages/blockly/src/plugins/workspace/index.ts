@@ -100,6 +100,8 @@ function patchGesture(Gesture: Blockly.Gesture) {
      */
     const originalCreateDragger = patchedGesture.createDragger.bind(patchedGesture);
     patchedGesture.createDragger = (draggable: Blockly.IDraggable): Blockly.IDragger => {
+        // 不是说好flyout会用workspace的手势吗，为什么这里不是
+        if (draggable.workspace.isFlyout) return originalCreateDragger(draggable);
         const manager = ashMultiSelectorManager.getWorkspace(draggable.workspace.id)!;
 
         const selected = manager
