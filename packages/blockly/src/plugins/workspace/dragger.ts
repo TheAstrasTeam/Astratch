@@ -18,7 +18,7 @@ export class AshMultiBlockDragStrategy extends Blockly.dragging.BlockDragStrateg
     ) {
         super(primary);
         this.roots = roots;
-        this.originalStrategy = originalStrategy
+        this.originalStrategy = originalStrategy;
     }
 
     override startDrag(e?: PointerEvent | KeyboardEvent): Blockly.IDraggable {
@@ -26,6 +26,7 @@ export class AshMultiBlockDragStrategy extends Blockly.dragging.BlockDragStrateg
         const layerManager = this.block.workspace.getLayerManager();
         for (const block of this.roots) {
             if (block === this.block) continue;
+            if (block.getParent()) block.unplug(true);
             const start = block.getRelativeToSurfaceXY();
             block.setDragging(true);
             block.moveDuringDrag(start);
@@ -83,6 +84,12 @@ export class AshMultiBlockDragStrategy extends Blockly.dragging.BlockDragStrateg
                 Blockly.Events.fire(event);
                 Blockly.blockAnimations.disposeUiEffect(block);
                 block.dispose();
+                continue;
+            }
+
+            // 应连接的块不应移动
+            if (block.getParent()) {
+                block.setDragging(false);
                 continue;
             }
 
