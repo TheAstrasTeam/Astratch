@@ -12,9 +12,9 @@ const TOOLBOX_COLOR = {
     textField: '#FFFFFF',
     textFieldText: '#575E75',
     enable: '#11aa22',
-    unenable: '#aa1212'
+    unenable: '#aa1212',
 } as const;
 
 type TDEFAULT_TOOLBOX_COLOR = (typeof TOOLBOX_COLOR)[keyof typeof TOOLBOX_COLOR];
 
-export { TOOLBOX_COLOR , type TDEFAULT_TOOLBOX_COLOR };
+export { TOOLBOX_COLOR, type TDEFAULT_TOOLBOX_COLOR };

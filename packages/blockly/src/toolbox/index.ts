@@ -121,7 +121,9 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                             block(OPCODES.show),
                             block(OPCODES.hide),
                             block(OPCODES.visible, undefined, 12),
-                            block(OPCODES.switchCostume, { COSTUME: shadow(OPCODES.assetSelector) }),
+                            block(OPCODES.switchCostume, {
+                                COSTUME: shadow(OPCODES.assetSelector),
+                            }),
                             block(OPCODES.costume, undefined, 12),
                             block(OPCODES.changeEffect, { VALUE: num(25) }),
                             block(OPCODES.setEffect, { VALUE: num(0) }),
@@ -271,9 +273,7 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                         id: 'compare',
                         name: t('blocks:category.compare'),
                         colour: TOOLBOX_COLOR.math,
-                        contents: [
-                            block(OPCODES.compare),
-                        ],
+                        contents: [block(OPCODES.compare)],
                     },
                     {
                         kind: 'category',

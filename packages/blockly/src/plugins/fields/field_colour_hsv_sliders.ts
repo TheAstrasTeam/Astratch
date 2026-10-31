@@ -6,7 +6,7 @@
  * 由 AstrasTeam 修改于 2026/6/29:
  * - 重写 getScaledBBox 方法
  * - 新增 颜色预览、HEX输入框
- * 
+ *
  * 由 AstrasTeam 修改于 2026/10/11:
  * - 修改显示样式
  */

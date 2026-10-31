@@ -75,10 +75,10 @@ const KEY_CHARS = [
 
 /** 文档里 `keys` 列出的全部按键。 */
 export const KEY_OPTIONS = [
-    ...'0123456789'.split('').map((key) => [key, key]),
-    ...'abcdefghijklmnopqrstuvwxyz'.split('').map((key) => [key, key]),
-    ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map((key) => [key, key]),
-    ...KEY_CHARS.map((key) => [key, key]),
-    ...KEY_NAMES.map((key) => [key, key]),
+    ...'0123456789'.split('').map(key => [key, key]),
+    ...'abcdefghijklmnopqrstuvwxyz'.split('').map(key => [key, key]),
+    ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(key => [key, key]),
+    ...KEY_CHARS.map(key => [key, key]),
+    ...KEY_NAMES.map(key => [key, key]),
     [t('blocks:option.key.any'), 'ANY'],
 ];

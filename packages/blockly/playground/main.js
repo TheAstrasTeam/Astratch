@@ -21,22 +21,24 @@ if (select)
 const handler = (type, data) => {
     console.debug(`Got event "${type}": `, data);
     if (type === 'GET_MENU' && data.type === 'entities') {
-        data.handler([['A', 'a'], ['B', 'b']])
+        data.handler([
+            ['A', 'a'],
+            ['B', 'b'],
+        ]);
     }
     if (type === 'GET_ASSET') {
         data.handler('testHandle');
     }
     if (type === 'GET_ASSET_INFO') {
         data.handler({
-            name: String('你好'+ crypto.randomUUID()),
+            name: String('你好' + crypto.randomUUID()),
             type: 'text',
-            raw: 'Hello World!'
-        })
+            raw: 'Hello World!',
+        });
     }
-}
+};
 
-const id = blocklyAdapter.addWorkspace(document.querySelector('#app'), handler,
-    undefined, {
+const id = blocklyAdapter.addWorkspace(document.querySelector('#app'), handler, undefined, {
     toolbox: getToolbox(),
 });
 

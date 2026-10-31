@@ -27,3 +27,21 @@ input:focus {
     border-radius: 50%;
     transition: background-color 0.3s ease;
 }
+
+.ashBlocklySelectArea {
+    fill: var(--accent-transparent);
+    stroke-width: 2px;
+    stroke: var(--accent-primary);
+    pointer-events: none;
+}
+
+[class*='ashBlocklyPathSelected'],
+[class*='blocklyPathSelected'] {
+    fill: none;
+    filter: var(--blocklySelectedGlowFilter);
+}
+
+[id*='blocklySelectedGlowFilter'] feFlood {
+    flood-color: var(--accent-transparent) !important;
+    flood-opacity: 1 !important;
+}

@@ -327,7 +327,8 @@ export class DraggableParamBlock {
         if (input.connection.isConnected()) return;
         input.setCheck(this.type);
         const valueBlock = this.block.workspace.newBlock(this.blockType) as Blockly.BlockSvg;
-        if (!valueBlock.outputConnection || !valueBlock.loadExtraState) throw new Error(`Can't add block to workspace`);
+        if (!valueBlock.outputConnection || !valueBlock.loadExtraState)
+            throw new Error(`Can't add block to workspace`);
         valueBlock.loadExtraState({
             parentID: this.block.id,
         });

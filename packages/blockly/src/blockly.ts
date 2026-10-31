@@ -8,6 +8,9 @@ import { FieldMultilineInput } from './plugins/fields/field_multilineinput';
 import { FieldColourHsvSliders } from './plugins/fields/field_colour_hsv_sliders';
 import { FieldAngle } from './plugins/fields/field_angle';
 import { ashConnectionChecker } from './connectionChecker';
+import { inject } from './inject';
+import { ashMultiSelectorManager } from './plugins/workspace/multiSelector';
+import { ashWorkspaceMultiDragger } from './plugins/workspace/dragger';
 
 const workspaceMeta: Blockly.BlocklyOptions = {
     renderer: 'astratch',
@@ -34,6 +37,7 @@ const workspaceMeta: Blockly.BlocklyOptions = {
         metricsManager: 'ContinuousMetrics',
         toolbox: 'ContinuousToolbox',
         connectionChecker: ashConnectionChecker,
+        blockDragger: ashWorkspaceMultiDragger,
     },
 } as const;
 
@@ -89,6 +93,13 @@ interface IHANDLE_TYPE {
     };
 }
 
+/**
+ * 是否反转缩放和选取的操作
+ * 若为false，则左键选取、中键移动
+ * 若为true ，则左键移动、中键选取
+ */
+export let revertDrag = false;
+
 class BlocklyAdapter {
     workspaces: Record<
         string,
@@ -125,7 +136,7 @@ class BlocklyAdapter {
                 scrollbarColour: 'var(--ui-quaternary)',
                 insertionMarkerColour: '#555555',
                 cursorColour: 'var(--ui-quaternary)',
-                selectedGlowColour: '#555555',
+                selectedGlowColour: 'var(--accent-quaternary)',
                 flyoutOpacity: 0.5,
             },
             fontStyle: {
@@ -145,7 +156,8 @@ class BlocklyAdapter {
         event(): void;
     }[] = [];
 
-    constructor() {
+    constructor(RevertDrag?: boolean) {
+        revertDrag = RevertDrag ?? false;
         this.workspaces = {};
         this.init();
     }
@@ -194,8 +206,9 @@ class BlocklyAdapter {
         Blockly.Events.disable();
         let id: string | null;
         try {
-            const workspaceSvg = Blockly.inject(DOM, { ...workspaceMeta, ...Options });
+            const workspaceSvg = inject(DOM, { ...workspaceMeta, ...Options });
             id = workspaceSvg.id;
+            ashMultiSelectorManager.registerWorkspace(workspaceSvg, id);
             this.workspaces[id] = {
                 id,
                 DOM,
@@ -234,6 +247,11 @@ class BlocklyAdapter {
                 },
             });
         else this.workspaces[id].handler(type, data);
+    }
+
+    setWorkspaceRevertDrag(value: boolean): void {
+        revertDrag = value;
+        // 工作区于每次修改都会读，所以不需要刷新
     }
 }
 

@@ -613,7 +613,7 @@ export class FieldMultilineInput extends Blockly.FieldTextInput {
                 const [startLine, endLine] = [start, end].map(
                     offset => htmlInput.value.slice(0, offset).split('\n').length - 1,
                 );
-                const TAB_STR = ' '.repeat(FieldMultilineInput.TAB_LENGTH)
+                const TAB_STR = ' '.repeat(FieldMultilineInput.TAB_LENGTH);
                 // 多选或按下shift（删除前缩进）则会执行第一个分支
                 // 判断实际选择的行数，因为如果判断start和end的话
                 // 你可能只是想替换词呢
@@ -633,8 +633,7 @@ export class FieldMultilineInput extends Blockly.FieldTextInput {
                             totalLineIndexCounter += FieldMultilineInput.TAB_LENGTH;
                             return `${TAB_STR}${textLine}`;
                         }
-                        if (!textLine.startsWith(TAB_STR))
-                            return textLine;
+                        if (!textLine.startsWith(TAB_STR)) return textLine;
                         if (startLine === index)
                             firstLineIndexCounter = -FieldMultilineInput.TAB_LENGTH;
                         totalLineIndexCounter -= FieldMultilineInput.TAB_LENGTH;
@@ -662,10 +661,7 @@ export class FieldMultilineInput extends Blockly.FieldTextInput {
                     htmlInput.dispatchEvent(new Event('input'));
                 } else {
                     /**  下面的方法有参考 {@link insertNewline} */
-                    this.setValue(
-                        `${value.slice(0, start)}${TAB_STR}${value.slice(end)}`,
-                        true,
-                    );
+                    this.setValue(`${value.slice(0, start)}${TAB_STR}${value.slice(end)}`, true);
                     htmlInput.value = this.getEditorText_(this.value_);
                     htmlInput.selectionStart = htmlInput.selectionEnd =
                         start + FieldMultilineInput.TAB_LENGTH;

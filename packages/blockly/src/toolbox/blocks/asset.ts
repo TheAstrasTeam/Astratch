@@ -16,7 +16,7 @@ export const initAssetBlocks = () => {
                 ...returnConnections,
                 message0: '',
                 colour: TOOLBOX_COLOR.asset,
-                output: 'Object'
+                output: 'Object',
             });
             this.assetHandler = new AssetHandler(this, 'text', this.updateShape.bind(this));
             this.isInit = false;
