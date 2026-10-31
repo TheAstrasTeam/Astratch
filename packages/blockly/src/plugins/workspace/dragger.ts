@@ -5,11 +5,111 @@ import { ashMultiSelectorManager, WorkspaceMultiSelectorManager } from './multiS
  * @author AI
  * @checked
  */
+export class AshMultiBlockDragStrategy extends Blockly.dragging.BlockDragStrategy {
+    private others: { block: Blockly.BlockSvg; start: Blockly.utils.Coordinate }[] = [];
+    private lastLoc: Blockly.utils.Coordinate | null = null;
+    private readonly roots: Blockly.BlockSvg[];
+    private readonly originalStrategy: Blockly.IDragStrategy;
+
+    constructor(
+        primary: Blockly.BlockSvg,
+        roots: Blockly.BlockSvg[],
+        originalStrategy: Blockly.IDragStrategy,
+    ) {
+        super(primary);
+        this.roots = roots;
+        this.originalStrategy = originalStrategy
+    }
+
+    override startDrag(e?: PointerEvent | KeyboardEvent): Blockly.IDraggable {
+        const result = super.startDrag(e);
+        const layerManager = this.block.workspace.getLayerManager();
+        for (const block of this.roots) {
+            if (block === this.block) continue;
+            const start = block.getRelativeToSurfaceXY();
+            block.setDragging(true);
+            block.moveDuringDrag(start);
+            layerManager?.moveToDragLayer(block, false);
+            this.others.push({ block, start });
+        }
+        return result;
+    }
+
+    override drag(newLoc: Blockly.utils.Coordinate, e?: PointerEvent | KeyboardEvent): void {
+        super.drag(newLoc, e);
+        this.lastLoc = newLoc;
+        const delta = Blockly.utils.Coordinate.difference(newLoc, this.startLoc!);
+        for (const { block, start } of this.others) {
+            block.moveDuringDrag(Blockly.utils.Coordinate.sum(start, delta));
+        }
+    }
+
+    override endDrag(
+        e: PointerEvent | KeyboardEvent | undefined,
+        disposition: Blockly.DragDisposition,
+    ): void {
+        try {
+            super.endDrag(e, disposition);
+            this.finishOthers(disposition);
+        } finally {
+            this.block.setDragStrategy(this.originalStrategy);
+        }
+    }
+
+    override revertDrag(): void {
+        try {
+            super.revertDrag();
+            this.finishOthers(Blockly.DragDisposition.REVERT);
+        } finally {
+            this.block.setDragStrategy(this.originalStrategy);
+        }
+    }
+
+    private finishOthers(disposition: Blockly.DragDisposition): void {
+        const layerManager = this.block.workspace.getLayerManager();
+        const delta =
+            this.lastLoc && this.startLoc
+                ? Blockly.utils.Coordinate.difference(this.lastLoc, this.startLoc)
+                : new Blockly.utils.Coordinate(0, 0);
+
+        for (const { block, start } of this.others) {
+            if (block.isDeadOrDying()) continue;
+
+            if (disposition === Blockly.DragDisposition.DELETE) {
+                const event = new Blockly.Events.BlockMove(block);
+                event.setReason(['drag']);
+                event.oldCoordinate = start;
+                event.recordNew();
+                Blockly.Events.fire(event);
+                Blockly.blockAnimations.disposeUiEffect(block);
+                block.dispose();
+                continue;
+            }
+
+            block.moveDuringDrag(start);
+            if (disposition === Blockly.DragDisposition.COMMIT) {
+                block.moveTo(Blockly.utils.Coordinate.sum(start, delta), ['drag']);
+            }
+            block.setDragging(false);
+            layerManager?.moveOffDragLayer(block, Blockly.layers.BLOCK, false);
+        }
+        this.others = [];
+    }
+}
+
+/**
+ * @author AI
+ * @checked
+ */
 export class ashWorkspaceMultiDragger implements Blockly.IDragger {
     private draggingBlock: Blockly.BlockSvg;
-    /** 每个参与拖拽的“根块”各配一个 Blockly 内置 Dragger */
-    private draggers: Blockly.IDragger[] = [];
-    /** Blockly 事件组 */
+    /** 被按住的块的Dragger */
+    private draggingBlockDragger: Blockly.IDragger | null = null;
+    /**
+     * 其余的块
+     * > 它们是跟随主块的dragger，因为一起创建会有性能问题
+     */
+    private othersBlock: { block: Blockly.BlockSvg; start: Blockly.utils.Coordinate }[] = [];
     private group: string | null = null;
     private workspaceMSM: WorkspaceMultiSelectorManager | undefined;
 
@@ -26,18 +126,41 @@ export class ashWorkspaceMultiDragger implements Blockly.IDragger {
         const isMulti = selected.includes(this.draggingBlock);
         const blocks = isMulti ? selected : [this.draggingBlock];
 
-        // 不会额外移动子块
         const selectedSet = new Set(blocks);
-        const roots = blocks.filter(block => {
-            const parent = block.getParent() as Blockly.BlockSvg | null;
-            return !parent || !selectedSet.has(parent);
-        });
+        const roots = new Set(
+            blocks.filter(block => {
+                const parent = block.getParent() as Blockly.BlockSvg | null;
+                return !parent || !selectedSet.has(parent);
+            }),
+        );
+
+        // 被按住的块可能因为“祖先也被选中”而被过滤掉，往上找到它所属的根块
+        let primaryRoot = this.draggingBlock;
+        while (!roots.has(primaryRoot) && primaryRoot.getParent()) {
+            primaryRoot = primaryRoot.getParent() as Blockly.BlockSvg;
+        }
 
         if (isMulti) this.workspaceMSM?.setIgnoreUnselect(true);
 
-        this.draggers = roots.map(block => new Blockly.dragging.Dragger(block));
-        for (const dragger of this.draggers) dragger.onDragStart(e);
-        this.group = Blockly.Events.getGroup() || null; // 第一个 Dragger 会创建事件组
+        // 主块走Dragger
+        this.draggingBlockDragger = new Blockly.dragging.Dragger(primaryRoot);
+        this.draggingBlockDragger.onDragStart(e);
+
+        // 其它块手动开拖动
+        // Blockly的拖动会focus，多个直接性能爆炸
+        // 我无疑是悲伤的
+        const workspace = this.draggingBlock.workspace;
+        const layerManager = workspace.getLayerManager();
+        for (const block of roots) {
+            if (block === primaryRoot) continue;
+            const start = block.getRelativeToSurfaceXY();
+            block.setDragging(true);
+            block.moveDuringDrag(start);
+            layerManager?.moveToDragLayer(block, false);
+            this.othersBlock.push({ block, start });
+        }
+
+        this.group = Blockly.Events.getGroup() || null;
         return this.draggingBlock;
     }
 
@@ -45,7 +168,11 @@ export class ashWorkspaceMultiDragger implements Blockly.IDragger {
         e: PointerEvent | KeyboardEvent | undefined,
         totalDelta: Blockly.utils.Coordinate,
     ): void {
-        for (const dragger of this.draggers) dragger.onDrag(e, totalDelta);
+        this.draggingBlockDragger?.onDrag(e, totalDelta);
+        const delta = this.toWorkspaceDelta(totalDelta);
+        for (const { block, start } of this.othersBlock) {
+            block.moveDuringDrag(Blockly.utils.Coordinate.sum(start, delta));
+        }
     }
 
     onDragEnd(
@@ -67,24 +194,55 @@ export class ashWorkspaceMultiDragger implements Blockly.IDragger {
         totalDelta: Blockly.utils.Coordinate,
         revert: boolean,
     ): void {
-        for (const dragger of this.draggers) {
-            if (this.group) Blockly.Events.setGroup(this.group);
-            if (revert) dragger.onDragRevert(e, totalDelta);
-            else dragger.onDragEnd(e, totalDelta);
+        if (this.group) Blockly.Events.setGroup(this.group);
+        if (revert) this.draggingBlockDragger?.onDragRevert(e, totalDelta);
+        else this.draggingBlockDragger?.onDragEnd(e, totalDelta);
+        // Dragger.onDragEnd 内部会把 group 清掉，补回来
+        if (this.group) Blockly.Events.setGroup(this.group);
+
+        const delta = this.toWorkspaceDelta(totalDelta);
+        const layerManager = this.draggingBlock.workspace.getLayerManager();
+        const isDeleted = !!this.draggingBlock?.isDeadOrDying();
+        for (const { block, start } of this.othersBlock) {
+            if (block.isDeadOrDying()) continue;
+            if (isDeleted) {
+                const moveEvent = new Blockly.Events.BlockMove(block);
+                moveEvent.setReason(['drag']);
+                moveEvent.oldCoordinate = start;
+                moveEvent.recordNew();
+                Blockly.Events.fire(moveEvent);
+                Blockly.blockAnimations.disposeUiEffect(block);
+                block.dispose();
+                continue;
+            }
+            if (!block.getParent()) {
+                // 让事件的旧位置是对的
+                // 我去这太牛逼了我怎么没想到
+                block.moveDuringDrag(start);
+                if (!revert) {
+                    block.moveTo(Blockly.utils.Coordinate.sum(start, delta), ['drag']);
+                }
+            }
+            block.setDragging(false);
+            layerManager?.moveOffDragLayer(block, Blockly.layers.BLOCK, false); // ← focus = false
         }
+
         Blockly.Events.setGroup(false);
-        this.draggers = [];
-        this.group = null;
+        this.draggingBlockDragger = null;
+        this.othersBlock = [];
         this.workspaceMSM?.setIgnoreUnselect(false);
 
-        // 清理被删除的块
         this.workspaceMSM
             ?.getSelectedBlocks()
             .filter(selection => selection.blockSvg.isDeadOrDying())
             .forEach(selection => this.workspaceMSM!.unselectBlock(selection.blockSvg));
     }
-}
 
+    private toWorkspaceDelta(totalDelta: Blockly.utils.Coordinate): Blockly.utils.Coordinate {
+        const scale = this.draggingBlock.workspace.scale || 1;
+        return new Blockly.utils.Coordinate(totalDelta.x / scale, totalDelta.y / scale);
+    }
+}
 export class ashWorkspaceSelector extends Blockly.WorkspaceDragger {
     areaSvg: SVGRectElement | null = null;
     private workspaceSvg: Blockly.WorkspaceSvg;
@@ -149,8 +307,7 @@ export class ashWorkspaceSelector extends Blockly.WorkspaceDragger {
         this.workspaceMSM?.setIgnoreUnselect(false);
         // 每次都选择会导致冲突然后爆掉focus...
         // 简单来说，偶尔无法删除
-        const lastBlock = this.workspaceMSM?.getSelectedBlocks().at(-1)?.blockSvg;
-        if (lastBlock) Blockly.getFocusManager().focusNode(lastBlock);
+        this.workspaceMSM?.focusLastBlock();
         const anim = this.areaSvg?.animate([{ opacity: '1' }, { opacity: '0' }], {
             duration: 100,
         });
@@ -174,11 +331,11 @@ export class ashWorkspaceSelector extends Blockly.WorkspaceDragger {
         );
         if (!this.workspaceMSM) throw new Error(`Can't find workspace.`);
         this.workspaceSvg.getAllBlocks().filter(block => {
+            if (block.isDeadOrDying() || block.isShadow()) return;
             if (!selectingRect.intersects(block.getBoundingRectangleWithoutChildren())) {
                 if (this.workspaceMSM!.isSelected(block)) this.workspaceMSM!.unselectBlock(block);
                 return;
             }
-            if (block.isDeadOrDying() || block.isShadow()) return;
             this.workspaceMSM!.selectBlock(block, false);
         });
     }

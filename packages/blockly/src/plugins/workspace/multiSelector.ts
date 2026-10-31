@@ -92,6 +92,12 @@ export class WorkspaceMultiSelectorManager {
         this.selections = [];
     }
 
+    /** 用Blockly的选中最后一个选中的积木 */
+    focusLastBlock() {
+        const lastBlock = this.getSelectedBlocks().at(-1)?.blockSvg;
+        if (lastBlock) Blockly.getFocusManager().focusNode(lastBlock);
+    }
+
     isSelected(block: Blockly.BlockSvg): boolean {
         return !!this.selections.find(selection => selection.blockSvg === block);
     }

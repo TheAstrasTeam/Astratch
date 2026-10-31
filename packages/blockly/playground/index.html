@@ -6,14 +6,18 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Astratch Blockly Playground</title>
     </head>
-    <body style="display: flex; width: 100vw; height: 100vh; margin: 0; flex-direction: column">
-        <h1>Astratch Blockly Playground</h1>
-        <div>
-            <span>Theme:</span>
-            <select id="themeSelect">
-                <option value="dark" selected>Dark</option>
-                <option value="light">Light</option>
-            </select>
+    <body style="display: flex; width: 100vw; height: 100vh; margin: 0; flex-direction: column;">
+        <div style="padding: 5px;">
+            <span style="font-size: x-large;">Astratch Blockly Playground</span>
+            <div>
+                <span>Theme:</span>
+                <select id="themeSelect">
+                    <option value="dark" selected>Dark</option>
+                    <option value="light">Light</option>
+                </select>
+                <button id="spawnRandomBlocks">Add Random Blocks</button>
+                <button id="reloadWorkspace">Reload Workspace</button>
+            </div>
         </div>
         <div id="app" style="flex: 1"></div>
         <script type="module" src="main.js"></script>

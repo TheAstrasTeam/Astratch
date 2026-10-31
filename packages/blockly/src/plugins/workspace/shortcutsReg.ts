@@ -75,8 +75,9 @@ export const registerMultiSelectShortcuts = () => {
             const workspaceMSM = ashMultiSelectorManager.getWorkspace(workspace.id);
             workspace.getAllBlocks().forEach(block => {
                 if (block && block.isMovable() && !block.isDeadOrDying())
-                    workspaceMSM?.selectBlock(block);
+                    workspaceMSM?.selectBlock(block, false);
             });
+            workspaceMSM?.focusLastBlock();
             Blockly.Events.setGroup(group);
             return true;
         },

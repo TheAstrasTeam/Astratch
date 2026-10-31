@@ -1,6 +1,6 @@
 import * as Blockly from 'blockly';
 import { revertDrag } from '../../blockly';
-import { ashWorkspaceSelector } from './dragger';
+import { ashWorkspaceSelector, AshMultiBlockDragStrategy } from './dragger';
 import { ashMultiSelectorManager } from './multiSelector';
 
 // @ts-expect-error 扩展基类是有必要的
@@ -21,6 +21,7 @@ interface IPatchGesture extends Blockly.Gesture {
     startComment: Blockly.comments.RenderedWorkspaceComment | null;
     startIcon: Blockly.IIcon | null;
     setTargetBlock(block: Blockly.BlockSvg): void;
+    createDragger(draggable: Blockly.IDraggable): Blockly.IDragger;
 }
 
 /**
@@ -29,6 +30,7 @@ interface IPatchGesture extends Blockly.Gesture {
  */
 function patchGesture(Gesture: Blockly.Gesture) {
     const patchedGesture = Gesture as unknown as IPatchGesture;
+
     patchedGesture.updateIsDraggingWorkspace = () => {
         if (!patchedGesture.startWorkspace_) {
             throw new Error(
@@ -52,6 +54,7 @@ function patchGesture(Gesture: Blockly.Gesture) {
 
         patchedGesture.workspaceDragger.startDrag();
     };
+
     patchedGesture.handleWsStart = (e: PointerEvent, ws: Blockly.WorkspaceSvg) => {
         if (patchedGesture.gestureHasStarted) {
             throw Error(
@@ -77,6 +80,7 @@ function patchGesture(Gesture: Blockly.Gesture) {
 
         patchedGesture.doStart(e);
     };
+
     patchedGesture.setTargetBlock = (block: Blockly.BlockSvg) => {
         if (block.isShadow()) {
             patchedGesture.setTargetBlock(block.getParent()!);
@@ -88,6 +92,44 @@ function patchGesture(Gesture: Blockly.Gesture) {
                 .getWorkspace(patchedGesture.startWorkspace_?.id ?? '')
                 ?.unselectAll();
         }
+    };
+
+    /**
+     * @author AI
+     * @checked
+     */
+    const originalCreateDragger = patchedGesture.createDragger.bind(patchedGesture);
+    patchedGesture.createDragger = (draggable: Blockly.IDraggable): Blockly.IDragger => {
+        const manager = ashMultiSelectorManager.getWorkspace(draggable.workspace.id)!;
+
+        const selected = manager
+            .getSelectedBlocks()
+            .map(selection => selection.blockSvg)
+            .filter(b => !b.isDeadOrDying() && b.isMovable());
+
+        const block = selected.find(b => b === draggable);
+        if (block && selected.length > 1) {
+            // 只保留根块
+            const selectedSet = new Set(selected);
+            const roots = selected.filter(b => {
+                const parent = b.getParent();
+                return !parent || !selectedSet.has(parent);
+            });
+
+            // 被按住的块可能不是根（祖先也被选中），往上找它所属的根
+            const rootSet = new Set(roots);
+            let primaryRoot = block;
+            while (!rootSet.has(primaryRoot) && primaryRoot.getParent()) {
+                primaryRoot = primaryRoot.getParent() as Blockly.BlockSvg;
+            }
+
+            primaryRoot.setDragStrategy(
+                new AshMultiBlockDragStrategy(primaryRoot, roots, primaryRoot.getDragStrategy()),
+            );
+            return new Blockly.dragging.Dragger(primaryRoot);
+        }
+
+        return originalCreateDragger(draggable);
     };
 }
 

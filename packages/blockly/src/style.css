@@ -38,10 +38,7 @@ input:focus {
 [class*='ashBlocklyPathSelected'],
 [class*='blocklyPathSelected'] {
     fill: none;
-    filter: var(--blocklySelectedGlowFilter);
-}
-
-[id*='blocklySelectedGlowFilter'] feFlood {
-    flood-color: var(--accent-transparent) !important;
-    flood-opacity: 1 !important;
+    stroke: var(--accent-transparent) !important;
+    stroke-width: 4px;
+    filter: none !important;
 }
