@@ -143,7 +143,7 @@ class BlocklyAdapter {
                 scrollbarColour: 'var(--ui-quaternary)',
                 insertionMarkerColour: '#555555',
                 cursorColour: 'var(--ui-quaternary)',
-                selectedGlowColour: 'var(--accent-quaternary)',
+                selectedGlowColour: 'var(--accent-highlight)',
                 flyoutOpacity: 0.5,
             },
             fontStyle: {
