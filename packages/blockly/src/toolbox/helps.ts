@@ -1,4 +1,4 @@
-import { Blockly, type TOPCODES_VALUE } from '..';
+import { Blockly, blocklyAdapter, type TOPCODES_VALUE } from '..';
 
 /**
  * 对于链接积木的配置项
@@ -295,6 +295,34 @@ export class FieldImageText extends Blockly.FieldImage {
     }
 }
 
+/**
+ * 参数名统一存放在**父积木**上（`inputID → name`），随父积木的 extraState 序列化。
+ * 参数积木只负责显示，被拖出/重建都不会丢名字。
+ *
+ * @author AI
+ * @checked
+ */
+type ParamParentBlock = Blockly.Block & {
+    paramNames?: Record<string, string>;
+    paramNamesWrapped?: boolean;
+};
+
+/** 由 {@link RenamingParamBlock} 生成的参数积木 */
+type ParamBlock = Blockly.Block & {
+    paramID: string;
+    parentID: string;
+    name: string;
+    typeID: string | string[] | null;
+    canRename: boolean;
+    updateShape(): void;
+};
+
+const paramNames = (block: Blockly.Block) => ((block as ParamParentBlock).paramNames ??= {});
+
+/** 参数积木所属的父积木：优先实际连接，其次序列化时记下的 parentID */
+const paramParent = (block: Blockly.Block) =>
+    block.getParent() ?? block.workspace.getBlockById((block as ParamBlock).parentID);
+
 export class DraggableParamBlock {
     block: Blockly.Block;
     inputID: string;
@@ -309,28 +337,25 @@ export class DraggableParamBlock {
         const dragEvent = event as unknown as Blockly.Events.BlockDrag;
         if (!dragEvent.blockId) return;
         const dragBlock = this.block.workspace.getBlockById(dragEvent.blockId);
-        if (!dragBlock) return;
-        if (dragBlock.type === this.blockType) {
-            const dragCurrentBlock = dragBlock as Blockly.Block & {
-                name?: string;
-                parentID?: string;
-            };
-            if (dragCurrentBlock.parentID !== this.block.id) return;
-            // 重新加入积木
-            this.updateValueBlock();
-        }
+        if (dragBlock?.type !== this.blockType) return;
+        if ((dragBlock as ParamBlock).parentID !== this.block.id) return;
+        // 参数积木被拖出后补一个新的
+        this.updateValueBlock();
     }
 
     updateValueBlock() {
         const input = this.block.getInput(this.inputID);
-        if (!input?.connection) return;
-        if (input.connection.isConnected()) return;
+        if (!input?.connection || input.connection.isConnected()) return;
         input.setCheck(this.type);
         const valueBlock = this.block.workspace.newBlock(this.blockType) as Blockly.BlockSvg;
         if (!valueBlock.outputConnection || !valueBlock.loadExtraState)
             throw new Error(`Can't add block to workspace`);
+        // 名称不写在参数积木的 state 里，它自己会从父积木读
         valueBlock.loadExtraState({
+            paramID: this.inputID,
             parentID: this.block.id,
+            canRename: true,
+            typeID: this.type,
         });
         valueBlock.initSvg();
         valueBlock.render();
@@ -343,16 +368,15 @@ export class DraggableParamBlock {
         this.innerBlockID = blockID;
     }
 
-    getInnerBlockID(): string | undefined {
+    getInnerBlockID() {
         return this.innerBlockID;
     }
 
     /**
-     * 配置一个可无限拖出的输入框
      * @param block 期望加入可无限拖出积木的实例
-     * @param inputID 输入框的ID
-     * @param blockType 其中无限拖出积木的OPCODE
-     * @param type 它的类型，不确定为null
+     * @param inputID 输入框的 ID
+     * @param blockType 其中无限拖出积木的 OPCODE
+     * @param type 它的类型，不确定为 null
      */
     constructor(
         block: Blockly.Block,
@@ -364,7 +388,89 @@ export class DraggableParamBlock {
         this.inputID = inputID;
         this.blockType = blockType;
         this.type = type;
+
+        // 参数名挂在父积木上，把它并进父积木的 extraState（同一父积木只包一次）
+        const wrapped = block as ParamParentBlock;
+        if (wrapped.paramNamesWrapped) return;
+        wrapped.paramNamesWrapped = true;
+        const save = block.saveExtraState?.bind(block);
+        const load = block.loadExtraState?.bind(block);
+        block.saveExtraState = () => ({
+            ...((save?.() ?? {}) as Record<string, unknown>),
+            paramNames: paramNames(block),
+        });
+        block.loadExtraState = (state: { paramNames?: Record<string, string> } | undefined) => {
+            wrapped.paramNames = { ...state?.paramNames };
+            load?.(state);
+        };
     }
 }
+
+/**
+ * 参数积木的定义
+ */
+export const RenamingParamBlock = (paramID: string, initialName: string, color: string) =>
+    ({
+        init() {
+            this.paramID = paramID;
+            this.canRename = false;
+            this.name = initialName;
+            this.parentID = '';
+            this.jsonInit({ ...returnConnections, output: null, colour: color });
+            this.updateShape();
+        },
+        updateShape() {
+            const parent = paramParent(this);
+            this.name = (parent && paramNames(parent)[this.paramID]) ?? initialName;
+            this.setOutput(true, this.typeID);
+            this.removeInput('NAME', true);
+            this.appendDummyInput('NAME').appendField(this.name);
+        },
+        loadExtraState(state: {
+            paramID: string;
+            parentID: string;
+            typeID: string | string[] | null;
+            canRename: boolean;
+        }) {
+            this.paramID = state.paramID;
+            this.parentID = state.parentID;
+            this.typeID = state.typeID;
+            this.canRename = state.canRename;
+            this.updateShape();
+        },
+        saveExtraState() {
+            // 名称由父积木保存
+            return {
+                paramID: this.paramID,
+                parentID: this.parentID,
+                typeID: this.typeID,
+                canRename: this.canRename,
+            };
+        },
+        onchange(event) {
+            if (!this.canRename) return;
+            if (event.type === 'click') {
+                if ((event as unknown as Blockly.Events.Click).blockId !== this.id) return;
+                blocklyAdapter.emit(this, 'RENAME_PARAM', {
+                    oldName: this.name,
+                    handler: newName => {
+                        for (const block of this.workspace.getAllBlocks(false)) {
+                            if (!('paramID' in block)) continue;
+                            const paramBlock = block as ParamBlock;
+                            if (paramBlock.paramID !== this.paramID) continue;
+                            const parent = paramParent(paramBlock);
+                            if (!parent) continue;
+                            paramNames(parent)[paramBlock.paramID] = newName;
+                            paramBlock.name = newName;
+                            paramBlock.updateShape();
+                        }
+                    },
+                });
+            } else if (event.type === 'drag') {
+                if ((event as unknown as Blockly.Events.BlockDrag).blockId === this.id)
+                    this.canRename = false;
+            }
+        },
+    }) as ParamBlock;
 
 export { type TTYPES };

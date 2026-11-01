@@ -18,7 +18,7 @@ import {
     DraggableParamBlock,
     endConnections,
     numberInput,
-    returnConnections,
+    RenamingParamBlock,
     statementInput,
     unknownInput,
 } from '../helps';
@@ -67,75 +67,17 @@ export const initFlowBlocks = () => {
         },
     } as Blockly.Block;
 
-    blocklyAdapter.Blockly.Blocks[OPCODES.repeatTimeCount] = {
-        init() {
-            this.name = t('blocks:flow.repeatTimeCount');
-            this.parentID = '';
-            this.jsonInit({
-                ...returnConnections,
-                output: 'Number',
-                colour: TOOLBOX_COLOR.flow,
-            });
-            this.updateShape();
-        },
-        updateShape() {
-            this.removeInput('NAME', true);
-            this.appendDummyInput('NAME').appendField(this.name);
-        },
-        loadExtraState(state: { parentID: string }) {
-            this.parentID = state.parentID;
-        },
-        saveExtraState() {
-            return {
-                parentID: this.parentID,
-            };
-        },
-    } as Blockly.Block & {
-        name: string;
-        parentID: string;
-        updateShape(): void;
-    };
+    blocklyAdapter.Blockly.Blocks[OPCODES.repeatTimeCount] = RenamingParamBlock(
+        OPCODES.repeatTimeCount,
+        t('blocks:flow.repeatTimeCount'),
+        TOOLBOX_COLOR.flow,
+    );
 
-    blocklyAdapter.Blockly.Blocks[OPCODES.repeatTimeValue] = {
-        init() {
-            this.name = t('blocks:flow.repeatTimeValue');
-            this.parentID = '';
-            this.jsonInit({
-                ...returnConnections,
-                output: null,
-                colour: TOOLBOX_COLOR.flow,
-            });
-            this.updateShape();
-        },
-        updateShape() {
-            this.setOutput(true, this.typeID);
-            this.removeInput('NAME', true);
-            this.appendDummyInput('NAME').appendField(this.name);
-        },
-        loadExtraState(state: { parentID: string; typeID: string }) {
-            this.parentID = state.parentID;
-            this.typeID = state.typeID;
-        },
-        saveExtraState() {
-            return {
-                parentID: this.parentID,
-                typeID: this.typeID,
-            };
-        },
-        onchange(event) {
-            if (event.type !== 'click') return;
-            const clickEvent = event as unknown as Blockly.Events.Click;
-            if (clickEvent.blockId === this.id) {
-                this.name = crypto.randomUUID();
-                this.updateShape();
-            }
-        },
-    } as Blockly.Block & {
-        name: string;
-        parentID: string;
-        typeID: string;
-        updateShape(): void;
-    };
+    blocklyAdapter.Blockly.Blocks[OPCODES.repeatTimeValue] = RenamingParamBlock(
+        OPCODES.repeatTimeCount,
+        t('blocks:flow.repeatTimeValue'),
+        TOOLBOX_COLOR.flow,
+    );
 
     blocklyAdapter.Blockly.Blocks[OPCODES.repeatTimes] = {
         init() {

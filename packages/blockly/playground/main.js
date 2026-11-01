@@ -38,6 +38,9 @@ const handler = (type, data) => {
             raw: 'Hello World!',
         });
     }
+    if (type === 'RENAME_PARAM') {
+        data.handler(prompt(`Rename "${data.oldName}" to`, data.oldName))
+    }
 };
 
 const id = blocklyAdapter.addWorkspace(document.querySelector('#app'), handler, undefined, {

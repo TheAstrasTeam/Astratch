@@ -89,6 +89,10 @@ interface IHANDLE_TYPE {
         assetHandle: string;
         handler(assetInfo: TASSET_INFO): void;
     };
+    RENAME_PARAM: {
+        oldName: string;
+        handler(newName: string): void
+    }
 }
 
 /**
