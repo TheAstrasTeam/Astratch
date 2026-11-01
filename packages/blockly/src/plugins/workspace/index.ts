@@ -22,6 +22,7 @@ interface IPatchGesture extends Blockly.Gesture {
     startIcon: Blockly.IIcon | null;
     setTargetBlock(block: Blockly.BlockSvg): void;
     createDragger(draggable: Blockly.IDraggable): Blockly.IDragger;
+    startBlock: Blockly.BlockSvg | null;
 }
 
 /**
@@ -91,6 +92,83 @@ function patchGesture(Gesture: Blockly.Gesture) {
             ashMultiSelectorManager
                 .getWorkspace(patchedGesture.startWorkspace_?.id ?? '')
                 ?.unselectAll();
+        }
+    };
+
+    const originalHandleBlockStart = patchedGesture.handleBlockStart.bind(patchedGesture);
+    patchedGesture.handleBlockStart = (e: PointerEvent, block: Blockly.BlockSvg) => {
+        // 没有代表点击的正是选中的块
+        if (patchedGesture.startBlock) return;
+        const workspace = ashMultiSelectorManager.getWorkspace(block.workspace.id ?? '');
+        if (!workspace) return;
+        originalHandleBlockStart(e, block);
+        function onCtrl() {
+            if (!workspace) return;
+            if (workspace.isSelected(block)) {
+                workspace.unselectBlock(block);
+                if (workspace.getSelectedBlocks().length) {
+                    workspace.focusLastBlock();
+                } else {
+                    Blockly.getFocusManager().focusNode(block.workspace);
+                }
+            } else {
+                workspace.selectBlock(block, false);
+            }
+        }
+
+        if (e.ctrlKey) {
+            onCtrl();
+            return;
+        } else if (e.shiftKey) {
+            /**
+             * @author AI
+             * @checked
+             * AI制作的BFS算法，因为可以检查嵌套关系故用
+             */
+            interface BfsNode {
+                block: Blockly.BlockSvg;
+                prev: BfsNode | null;
+                step: number;
+            }
+
+            const start: BfsNode = { block, prev: null, step: 0 };
+            const queue: BfsNode[] = [start];
+            const seen = new Set<string>([block.id]);
+
+            let found: BfsNode | null = null;
+
+            while (queue.length && !found) {
+                const node = queue.shift()!;
+                if (node.block !== block && workspace.isSelected(node.block)) {
+                    found = node;
+                    break;
+                }
+                for (const neighbor of [node.block.getParent(), ...node.block.getChildren(false)]) {
+                    if (!neighbor || seen.has(neighbor.id)) continue;
+                    seen.add(neighbor.id);
+                    queue.push({ block: neighbor, prev: node, step: node.step + 1 });
+                }
+            }
+
+            if (!found) {
+                onCtrl();
+                return;
+            }
+
+            // 还原路径
+            const path: Blockly.BlockSvg[] = [];
+            for (let node: BfsNode | null = found; node; node = node.prev) {
+                path.push(node.block);
+            }
+
+            // 选中路径上的所有块
+            for (const block of path) {
+                workspace.selectBlock(block, false);
+            }
+            Blockly.getFocusManager().focusNode(block);
+        } else {
+            if (!workspace.isSelected(block)) workspace.unselectAll();
+            workspace.selectBlock(block, false);
         }
     };
 
