@@ -12,6 +12,7 @@ import { t } from 'astratch-i18n';
 import { TOOLBOX_COLOR } from '../color';
 import {
     arrayInput,
+    BlockIcon,
     booleanInput,
     connections,
     DraggableParamBlock,
@@ -24,6 +25,11 @@ import {
 import { OPCODES } from '../opcodes';
 import { blocklyAdapter } from '../../blockly';
 import { Blockly } from '../..';
+
+import Break from './assets/break.svg';
+import Continue from './assets/continue.svg';
+import StopProject from './assets/stopProject.svg';
+import ExitScript from './assets/exitScript.svg';
 
 export const initFlowBlocks = () => {
     blocklyAdapter.Blockly.Blocks[OPCODES.wait] = {
@@ -222,6 +228,7 @@ export const initFlowBlocks = () => {
                 message0: t('blocks:flow.break'),
                 colour: TOOLBOX_COLOR.flow,
             });
+            this.addIcon(new BlockIcon(this, Break));
         },
     } as Blockly.Block;
 
@@ -232,6 +239,7 @@ export const initFlowBlocks = () => {
                 message0: t('blocks:flow.continue'),
                 colour: TOOLBOX_COLOR.flow,
             });
+            this.addIcon(new BlockIcon(this, Continue));
         },
     } as Blockly.Block;
 
@@ -242,6 +250,7 @@ export const initFlowBlocks = () => {
                 message0: t('blocks:flow.exitScript'),
                 colour: TOOLBOX_COLOR.flow,
             });
+            this.addIcon(new BlockIcon(this, ExitScript));
         },
     } as Blockly.Block;
 
@@ -252,6 +261,7 @@ export const initFlowBlocks = () => {
                 message0: t('blocks:flow.stopProject'),
                 colour: TOOLBOX_COLOR.flow,
             });
+            this.addIcon(new BlockIcon(this, StopProject));
         },
     } as Blockly.Block;
 };
