@@ -10,7 +10,6 @@ import { FieldAngle } from './plugins/fields/field_angle';
 import { ashConnectionChecker } from './connectionChecker';
 import { inject } from './inject';
 import { ashMultiSelectorManager } from './plugins/workspace/multiSelector';
-import { ashWorkspaceMultiDragger } from './plugins/workspace/dragger';
 
 const workspaceMeta: Blockly.BlocklyOptions = {
     renderer: 'astratch',
@@ -37,7 +36,6 @@ const workspaceMeta: Blockly.BlocklyOptions = {
         metricsManager: 'ContinuousMetrics',
         toolbox: 'ContinuousToolbox',
         connectionChecker: ashConnectionChecker,
-        blockDragger: ashWorkspaceMultiDragger,
     },
 } as const;
 

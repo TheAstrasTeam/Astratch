@@ -3,6 +3,7 @@ import * as Blockly from 'blockly';
 import { getToolbox } from '../src/toolbox/index';
 import { dark, light } from './theme';
 import { OPCODES } from '../src';
+import { ashMultiSelectorManager } from '../src/plugins/workspace/multiSelector';
 
 const style = document.createElement('style');
 // 默认是暗色
@@ -65,4 +66,5 @@ if (reloadWorkspace)
 Object.assign(window, {
     blockly: Blockly,
     workspace,
+    workspaceMSM: ashMultiSelectorManager.getWorkspace(workspace.id)
 });

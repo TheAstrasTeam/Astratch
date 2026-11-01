@@ -9,7 +9,10 @@ export class WorkspaceMultiSelectorManager {
     private selections: {
         id: string;
         blockSvg: Blockly.BlockSvg;
-        highlightPath: Blockly.blockRendering.IPathObject;
+        highlightPath: {
+            pathObject: Blockly.blockRendering.IPathObject;
+            observer: MutationObserver;
+        };
     }[];
     /** 是否在触发单选时取消选择 */
     private ignoreUnselect = false;
@@ -18,39 +21,31 @@ export class WorkspaceMultiSelectorManager {
         this.workspaceSVG = workspaceSVG;
         this.id = id;
         this.selections = [];
-        this.workspaceSVG.addChangeListener(e => {
-            if (e.type === 'selected' && !this.ignoreUnselect) {
-                const focusedBlock = Blockly.getSelected();
-                if (focusedBlock instanceof Blockly.BlockSvg && !this.isSelected(focusedBlock))
-                    this.unselectAll();
-            } else if (e.type === 'change' || e.type === 'create') {
-                this.selections.forEach(selection => {
-                    if (e instanceof Blockly.Events.BlockCreate && e.ids?.includes(selection.id))
-                        selection.highlightPath.setPath(this.getBlockPath(selection.blockSvg));
-                });
-                console.log(e);
-            }
-        });
     }
 
-    private getBlockPath(block: Blockly.BlockSvg): string {
-        return (
-            (
-                block.getSvgRoot().getElementsByClassName('blocklyPath')[0] as SVGPathElement
-            ).getAttribute('d') ?? ''
-        );
-    }
-
-    private createPathObject(block: Blockly.BlockSvg): Blockly.blockRendering.IPathObject {
+    private createPathObject(
+        block: Blockly.BlockSvg,
+    ): (typeof this.selections)[number]['highlightPath'] {
         const pathObject = this.workspaceSVG
             .getRenderer()
             .makePathObject(block.getSvgRoot(), block.style);
         pathObject.applyColour?.(block);
         pathObject.updateMovable(block.isMovable() || block.isInFlyout);
-        pathObject.setPath(this.getBlockPath(block));
+
+        const realPath = block
+            .getSvgRoot()
+            .getElementsByClassName('blocklyPath')[0] as SVGPathElement;
+
+        const update = () => pathObject.setPath(realPath.getAttribute('d') ?? '');
+        update();
+
+        const observer = new MutationObserver(update);
+        observer.observe(realPath, { attributes: true, attributeFilter: ['d', 'transform'] });
+
         pathObject.svgPath.classList.add('ashBlocklyPathSelected');
         pathObject.updateSelected(true);
-        return pathObject;
+
+        return { pathObject, observer };
     }
 
     setIgnoreUnselect(isIgnoreUnselect: boolean): void {
@@ -74,13 +69,12 @@ export class WorkspaceMultiSelectorManager {
     unselectBlock(block: Blockly.BlockSvg): boolean {
         let result = false;
         this.selections = this.selections.filter(selection => {
-            if (selection.id === block.id) {
-                result = true;
-                selection.highlightPath.updateSelected(false);
-                selection.highlightPath.svgPath?.remove();
-                return false;
-            }
-            return true;
+            if (selection.id !== block.id) return true;
+            result = true;
+            selection.highlightPath.observer.disconnect();
+            selection.highlightPath.pathObject.updateSelected(false);
+            selection.highlightPath.pathObject.svgPath?.remove();
+            return false;
         });
         return result;
     }
