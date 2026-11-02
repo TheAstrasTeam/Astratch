@@ -2,8 +2,6 @@ import * as Blockly from 'blockly';
 import { registerMultiSelectShortcuts } from './shortcutsReg';
 
 export class WorkspaceMultiSelectorManager {
-    static readonly CLASS_NAME = 'ashBlock-multi-selected';
-
     protected workspaceSVG: Blockly.WorkspaceSvg;
     protected id: string;
     private selections: {

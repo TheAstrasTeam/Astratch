@@ -206,7 +206,7 @@ function deleteSelection(workspace: Blockly.WorkspaceSvg): void {
     try {
         workspace.hideChaff();
         for (const block of toDelete) {
-            if (block.isDeadOrDying() || block.isInFlyout || 'paramID' in block) continue;
+            if (block.isDeadOrDying() || block.isInFlyout) continue;
             if (!block.isDeletable()) continue;
             if (block.outputConnection) block.dispose(false, true);
             else block.dispose(true, true);

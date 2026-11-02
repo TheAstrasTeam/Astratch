@@ -320,8 +320,10 @@ type ParamBlock = Blockly.Block & {
 const paramNames = (block: Blockly.Block) => ((block as ParamParentBlock).paramNames ??= {});
 
 /** 参数积木所属的父积木：优先实际连接，其次序列化时记下的 parentID */
-const paramParent = (block: Blockly.Block) =>
-    block.getParent() ?? block.workspace.getBlockById((block as ParamBlock).parentID);
+const paramParent = (block: Blockly.Block) => {
+    if ((block.getParent() as ParamBlock | null)?.parentID) return block.getParent();
+    return block.workspace.getBlockById((block as ParamBlock).parentID);
+};
 
 export class DraggableParamBlock {
     block: Blockly.Block;
@@ -406,6 +408,7 @@ export const RenamingParamBlock = (paramID: string, initialName: string, color: 
             this.parentID = '';
             this.jsonInit({ ...returnConnections, output: null, colour: color });
             this.updateShape();
+            this.setDeletable(false);
         },
         updateShape() {
             const parent = paramParent(this);
@@ -441,13 +444,6 @@ export const RenamingParamBlock = (paramID: string, initialName: string, color: 
             };
         },
         onchange(event) {
-            if (event.type === 'move') {
-                const parent = this.getParent();
-                if (parent) {
-                    this.parentID = parent.id;
-                    this.updateShape();
-                }
-            }
             if (!this.canRename) return;
             if (event.type === 'click') {
                 if ((event as unknown as Blockly.Events.Click).blockId !== this.id) return;
@@ -469,8 +465,10 @@ export const RenamingParamBlock = (paramID: string, initialName: string, color: 
                     },
                 });
             } else if (event.type === 'drag') {
-                if ((event as unknown as Blockly.Events.BlockDrag).blockId === this.id)
+                if ((event as unknown as Blockly.Events.BlockDrag).blockId === this.id) {
                     this.canRename = false;
+                    this.setDeletable(true);
+                }
             }
         },
     }) as ParamBlock;
