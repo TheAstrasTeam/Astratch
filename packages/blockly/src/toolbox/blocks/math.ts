@@ -53,53 +53,75 @@ const CHAR_OPTIONS = [
 
 export const initMathBlocks = () => {
     // 数学
-    blocklyAdapter.Blockly.Blocks[OPCODES.add] = {
-        init() {
-            this.jsonInit({
-                ...returnConnections,
-                message0: t('blocks:math.add'),
-                args0: [numberInput('A'), numberInput('B')],
-                output: TYPES.NUMBER,
-                colour: TOOLBOX_COLOR.math,
-            });
-        },
-    } as Blockly.Block;
+    const _spawnMathBlocks = (symbol: string) =>
+        ({
+            init() {
+                this.jsonInit({
+                    ...returnConnections,
+                    output: TYPES.NUMBER,
+                    colour: TOOLBOX_COLOR.math,
+                });
+                this.state_number = [];
+                this.mutateHandle = new MutateByLength(
+                    this,
+                    (input, prefix, isInit, length) => {
+                        if (prefix === 'number') {
+                            input.setCheck('Number');
+                            const currentBlock = input.connection?.targetBlock();
+                            if (currentBlock?.isShadow()) currentBlock.dispose();
+                            input.connection?.setShadowState({
+                                type: OPCODES.number,
+                                fields: {
+                                    NUM: this.state_number[length] ?? 1,
+                                },
+                            });
+                        } else if (isInit) input.appendField(symbol);
+                    },
+                    'number',
+                    'addTip',
+                    1,
+                );
+                this.updateShape();
+            },
+            onchange(event) {
+                if (!['change'].includes(event.type)) return;
+                this.mutateHandle.getValueInputs().forEach((input, length) => {
+                    const block = input.connection?.targetBlock();
+                    if (block?.isShadow()) {
+                        this.state_number[length] =
+                            (block.getFieldValue('NUM') as number | null) ?? 1;
+                        return;
+                    }
+                });
+                this.updateShape();
+            },
+            updateShape() {
+                this.mutateHandle.updateShape();
+            },
+            saveExtraState() {
+                return {
+                    ...this.mutateHandle.saveExtraState(),
+                    state_number: this.state_number,
+                };
+            },
+            loadExtraState(state: { length: number; state_number: number[] }) {
+                this.mutateHandle.loadExtraState(state);
+                this.state_number = state.state_number;
+                this.updateShape();
+            },
+        }) as Blockly.Block & {
+            mutateHandle: MutateByLength<'number', 'addTip'>;
+            state_number: number[];
+            updateShape(): void;
+        };
 
-    blocklyAdapter.Blockly.Blocks[OPCODES.subtract] = {
-        init() {
-            this.jsonInit({
-                ...returnConnections,
-                message0: t('blocks:math.subtract'),
-                args0: [numberInput('A'), numberInput('B')],
-                output: TYPES.NUMBER,
-                colour: TOOLBOX_COLOR.math,
-            });
-        },
-    } as Blockly.Block;
+    blocklyAdapter.Blockly.Blocks[OPCODES.add] = _spawnMathBlocks('+');
 
-    blocklyAdapter.Blockly.Blocks[OPCODES.multiply] = {
-        init() {
-            this.jsonInit({
-                ...returnConnections,
-                message0: t('blocks:math.multiply'),
-                args0: [numberInput('A'), numberInput('B')],
-                output: TYPES.NUMBER,
-                colour: TOOLBOX_COLOR.math,
-            });
-        },
-    } as Blockly.Block;
+    blocklyAdapter.Blockly.Blocks[OPCODES.subtract] = _spawnMathBlocks('-');
 
-    blocklyAdapter.Blockly.Blocks[OPCODES.divide] = {
-        init() {
-            this.jsonInit({
-                ...returnConnections,
-                message0: t('blocks:math.divide'),
-                args0: [numberInput('A'), numberInput('B')],
-                output: TYPES.NUMBER,
-                colour: TOOLBOX_COLOR.math,
-            });
-        },
-    } as Blockly.Block;
+    blocklyAdapter.Blockly.Blocks[OPCODES.multiply] = _spawnMathBlocks('*');
+
+    blocklyAdapter.Blockly.Blocks[OPCODES.divide] = _spawnMathBlocks('/');
 
     blocklyAdapter.Blockly.Blocks[OPCODES.power] = {
         init() {
@@ -311,29 +333,74 @@ export const initMathBlocks = () => {
     };
 
     // 逻辑
-    blocklyAdapter.Blockly.Blocks[OPCODES.and] = {
-        init() {
-            this.jsonInit({
-                ...returnConnections,
-                message0: t('blocks:logic.and'),
-                args0: [booleanInput('A'), booleanInput('B')],
-                output: TYPES.BOOLEAN,
-                colour: TOOLBOX_COLOR.math,
-            });
-        },
-    } as Blockly.Block;
+    const _spawnBooleanBlocks = (symbol: string) =>
+        ({
+            init() {
+                this.jsonInit({
+                    ...returnConnections,
+                    output: TYPES.BOOLEAN,
+                    colour: TOOLBOX_COLOR.math,
+                });
+                this.state_boolean = [];
+                this.mutateHandle = new MutateByLength(
+                    this,
+                    (input, prefix, isInit, length) => {
+                        if (prefix === 'value') {
+                            input.setCheck('Boolean');
+                            const currentBlock = input.connection?.targetBlock();
+                            if (currentBlock?.isShadow()) currentBlock.dispose();
+                            input.connection?.setShadowState({
+                                type: OPCODES.boolean,
+                                extraState: {
+                                    isEnable: this.state_boolean[length] ?? false,
+                                },
+                            });
+                        } else if (isInit) input.appendField(symbol);
+                    },
+                    'value',
+                    'tip',
+                    1,
+                );
+                this.updateShape();
+            },
+            onchange(event) {
+                if (!['change'].includes(event.type)) return;
+                this.mutateHandle.getValueInputs().forEach((input, length) => {
+                    const block = input.connection?.targetBlock();
+                    if (block?.isShadow()) {
+                        this.state_boolean[length] =
+                            (
+                                block.saveExtraState?.() as {
+                                    isEnable: boolean | undefined;
+                                }
+                            ).isEnable ?? false;
+                        return;
+                    }
+                });
+                this.updateShape();
+            },
+            updateShape() {
+                this.mutateHandle.updateShape();
+            },
+            saveExtraState() {
+                return {
+                    ...this.mutateHandle.saveExtraState(),
+                    state_boolean: this.state_boolean,
+                };
+            },
+            loadExtraState(state: { length: number; state_boolean: boolean[] }) {
+                this.mutateHandle.loadExtraState(state);
+                this.state_boolean = state.state_boolean;
+                this.updateShape();
+            },
+        }) as Blockly.Block & {
+            mutateHandle: MutateByLength<'value', 'tip'>;
+            state_boolean: boolean[];
+            updateShape(): void;
+        };
+    blocklyAdapter.Blockly.Blocks[OPCODES.and] = _spawnBooleanBlocks(t('blocks:logic.and'));
 
-    blocklyAdapter.Blockly.Blocks[OPCODES.or] = {
-        init() {
-            this.jsonInit({
-                ...returnConnections,
-                message0: t('blocks:logic.or'),
-                args0: [booleanInput('A'), booleanInput('B')],
-                output: TYPES.BOOLEAN,
-                colour: TOOLBOX_COLOR.math,
-            });
-        },
-    } as Blockly.Block;
+    blocklyAdapter.Blockly.Blocks[OPCODES.or] = _spawnBooleanBlocks(t('blocks:logic.or'));
 
     blocklyAdapter.Blockly.Blocks[OPCODES.not] = {
         init() {

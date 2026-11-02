@@ -141,8 +141,8 @@ export default {
     'math.random': '在 %1 和 %2 之间取随机数',
 
     // 计算 - 逻辑
-    'logic.and': '%1 且 %2',
-    'logic.or': '%1 或 %2',
+    'logic.and': '且',
+    'logic.or': '或',
     'logic.not': '%1 不成立',
 
     // 计算 - 字符串

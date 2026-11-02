@@ -39,7 +39,7 @@ const handler = (type, data) => {
         });
     }
     if (type === 'RENAME_PARAM') {
-        data.handler(prompt(`Rename "${data.oldName}" to`, data.oldName))
+        data.handler(prompt(`Rename "${data.oldName}" to`, data.oldName));
     }
 };
 
@@ -47,27 +47,31 @@ const id = blocklyAdapter.addWorkspace(document.querySelector('#app'), handler, 
     toolbox: getToolbox(),
 });
 
-const workspace = blocklyAdapter.workspaces[id]
+const workspace = blocklyAdapter.workspaces[id];
 
 const spawnRandomBlocksButton = document.getElementById('spawnRandomBlocks');
-if (spawnRandomBlocksButton) 
+if (spawnRandomBlocksButton)
     spawnRandomBlocksButton.onclick = () => {
-        for(let i=0;i<=50;i+=1) {
-            const newBlock = workspace.workspaceSvg.newBlock(Object.values(OPCODES)[Math.floor(Math.random() * Object.values(OPCODES).length)]);
-            newBlock.moveTo(new Blockly.utils.Coordinate(Math.random() * 1000,Math.random() * 1000));
-            newBlock.initSvg();     
+        for (let i = 0; i <= 50; i += 1) {
+            const newBlock = workspace.workspaceSvg.newBlock(
+                Object.values(OPCODES)[Math.floor(Math.random() * Object.values(OPCODES).length)],
+            );
+            newBlock.moveTo(
+                new Blockly.utils.Coordinate(Math.random() * 1000, Math.random() * 1000),
+            );
+            newBlock.initSvg();
             newBlock.render();
         }
-    }
-const reloadWorkspace = document.getElementById('reloadWorkspace')
+    };
+const reloadWorkspace = document.getElementById('reloadWorkspace');
 if (reloadWorkspace)
     reloadWorkspace.onclick = () => {
         const project = Blockly.serialization.workspaces.save(workspace.workspaceSvg);
-        Blockly.serialization.workspaces.load(project, workspace.workspaceSvg)
-    }
+        Blockly.serialization.workspaces.load(project, workspace.workspaceSvg);
+    };
 
 Object.assign(window, {
     blockly: Blockly,
     workspace,
-    workspaceMSM: ashMultiSelectorManager.getWorkspace(workspace.id)
+    workspaceMSM: ashMultiSelectorManager.getWorkspace(workspace.id),
 });

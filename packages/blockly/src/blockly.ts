@@ -91,8 +91,8 @@ interface IHANDLE_TYPE {
     };
     RENAME_PARAM: {
         oldName: string;
-        handler(newName: string): void
-    }
+        handler(newName: string): void;
+    };
 }
 
 /**
