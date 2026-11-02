@@ -330,8 +330,6 @@ export class DraggableParamBlock {
     /** 块类型 */
     type: string | string[] | null;
 
-    private innerBlockID: string | undefined;
-
     onchange(event: Blockly.Events.Abstract) {
         if (event.type !== 'drag') return;
         const dragEvent = event as unknown as Blockly.Events.BlockDrag;
@@ -360,16 +358,6 @@ export class DraggableParamBlock {
         valueBlock.initSvg();
         valueBlock.render();
         input.connection.connect(valueBlock.outputConnection);
-        this.innerBlockID = valueBlock.id;
-    }
-
-    loadExtraState(blockID: string) {
-        this.block.getInput(this.inputID)?.connection?.targetBlock()?.dispose();
-        this.innerBlockID = blockID;
-    }
-
-    getInnerBlockID() {
-        return this.innerBlockID;
     }
 
     /**
@@ -421,7 +409,12 @@ export const RenamingParamBlock = (paramID: string, initialName: string, color: 
         },
         updateShape() {
             const parent = paramParent(this);
-            this.name = (parent && paramNames(parent)[this.paramID]) ?? initialName;
+            if (parent) {
+                this.parentID = parent.id;
+                this.name = paramNames(parent)[this.paramID] ?? initialName;
+            } else {
+                this.name = initialName;
+            }
             this.setOutput(true, this.typeID);
             this.removeInput('NAME', true);
             this.appendDummyInput('NAME').appendField(this.name);
@@ -448,18 +441,27 @@ export const RenamingParamBlock = (paramID: string, initialName: string, color: 
             };
         },
         onchange(event) {
+            if (event.type === 'move') {
+                const parent = this.getParent();
+                if (parent) {
+                    this.parentID = parent.id;
+                    this.updateShape();
+                }
+            }
             if (!this.canRename) return;
             if (event.type === 'click') {
                 if ((event as unknown as Blockly.Events.Click).blockId !== this.id) return;
                 blocklyAdapter.emit(this, 'RENAME_PARAM', {
                     oldName: this.name,
                     handler: newName => {
+                        const myParent = paramParent(this);
+                        if (!myParent) return;
                         for (const block of this.workspace.getAllBlocks(false)) {
                             if (!('paramID' in block)) continue;
                             const paramBlock = block as ParamBlock;
                             if (paramBlock.paramID !== this.paramID) continue;
                             const parent = paramParent(paramBlock);
-                            if (!parent) continue;
+                            if (parent !== myParent) continue;
                             paramNames(parent)[paramBlock.paramID] = newName;
                             paramBlock.name = newName;
                             paramBlock.updateShape();

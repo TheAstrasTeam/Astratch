@@ -74,7 +74,7 @@ export const initFlowBlocks = () => {
     );
 
     blocklyAdapter.Blockly.Blocks[OPCODES.repeatTimeValue] = RenamingParamBlock(
-        OPCODES.repeatTimeCount,
+        OPCODES.repeatTimeValue,
         t('blocks:flow.repeatTimeValue'),
         TOOLBOX_COLOR.flow,
     );
@@ -104,14 +104,8 @@ export const initFlowBlocks = () => {
         onchange(event) {
             this.countBlock.onchange(event);
         },
-        loadExtraState(state: { countBlockID: string }) {
+        loadExtraState(_) {
             this.getInput('INDEX')?.connection?.targetBlock()?.dispose();
-            this.countBlock.loadExtraState(state.countBlockID);
-        },
-        saveExtraState() {
-            return {
-                countBlockID: this.countBlock.getInnerBlockID(),
-            };
         },
     } as Blockly.Block & {
         updateShape(): void;
@@ -145,17 +139,9 @@ export const initFlowBlocks = () => {
             this.countBlock.onchange(event);
             this.valueBlock.onchange(event);
         },
-        loadExtraState(state: { countBlockID: string; valueBlockID: string }) {
+        loadExtraState(_) {
             this.getInput('INDEX')?.connection?.targetBlock()?.dispose();
             this.getInput('ITEM')?.connection?.targetBlock()?.dispose();
-            this.countBlock.loadExtraState(state.countBlockID);
-            this.valueBlock.loadExtraState(state.valueBlockID);
-        },
-        saveExtraState() {
-            return {
-                countBlockID: this.countBlock.getInnerBlockID(),
-                valueBlockID: this.valueBlock.getInnerBlockID(),
-            };
         },
     } as Blockly.Block & {
         updateShape(): void;
