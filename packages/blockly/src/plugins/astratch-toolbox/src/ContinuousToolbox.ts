@@ -34,6 +34,11 @@ import { ContinuousFlyout } from './ContinuousFlyout';
 import { t } from 'astratch-i18n';
 import collapseIcon from '../../../assets/collapse.svg';
 
+import Location from './assets/location.svg';
+import Selection from './assets/select.svg';
+// import State from './assets/state.svg';
+import { ashMultiSelectorManager } from '../../workspace/multiSelector';
+
 /**
  * Class for continuous toolbox.
  */
@@ -46,6 +51,57 @@ export class ContinuousToolbox extends Blockly.Toolbox {
     private refreshDebouncer?: ReturnType<typeof setTimeout>;
     private static readonly TOOLBOX_WIDTH = 120;
     private preserveSelectionDuringPointerDown = false;
+
+    private createInfoTexts(): HTMLDivElement {
+        const _createInfoBox = (
+            img: string,
+            defaultText: string,
+        ): { box: HTMLDivElement; text: HTMLSpanElement } => {
+            const box = document.createElement('div');
+            box.classList.add('ash-toolbox-infoBox-box');
+            const image = document.createElement('img');
+            image.classList.add('ash-toolbox-infoBox-icon');
+            image.src = img;
+            const text = document.createElement('span');
+            text.classList.add('ash-toolbox-infoBox-text');
+            text.textContent = defaultText;
+            box.appendChild(image);
+            box.appendChild(text);
+            return { box, text };
+        };
+        const container = document.createElement('div');
+        container.classList.add('ash-toolbox-infoBox');
+
+        // 坐标
+        const positionBox = _createInfoBox(Location, '0,0');
+        // 选中积木
+        const selectionBox = _createInfoBox(
+            Selection,
+            t('blocks:toolbox.selectInfo', {
+                blockLength: 0,
+            }),
+        );
+        // TODO: 这里本应为状态，但实际上还不确定该加什么
+        // const stateBox = _createInfoBox(State, 'state');
+
+        this.getWorkspace().addChangeListener(event => {
+            console.log(event);
+            if (event.type === 'viewport_change') {
+                const viewPort_Event = event as unknown as Blockly.Events.ViewportChange;
+                positionBox.text.textContent = `${viewPort_Event.viewLeft?.toFixed(0)},${viewPort_Event.viewTop?.toFixed(0)}`;
+            } else if (event.type === 'selected') {
+                const workspaceMSM = ashMultiSelectorManager.getWorkspace(this.getWorkspace().id);
+                selectionBox.text.textContent = t('blocks:toolbox.selectInfo', {
+                    blockLength: workspaceMSM?.getSelectedBlocks().length ?? 0,
+                });
+            }
+        });
+
+        container.appendChild(positionBox.box);
+        container.appendChild(selectionBox.box);
+        // container.appendChild(stateBox.box);
+        return container;
+    }
 
     protected override createDom_(workspace: Blockly.WorkspaceSvg): HTMLDivElement {
         const container = super.createDom_(workspace);
@@ -70,6 +126,7 @@ export class ContinuousToolbox extends Blockly.Toolbox {
         controls.appendChild(collapseOtherCategoriesButton);
 
         container.prepend(controls);
+        container.appendChild(this.createInfoTexts());
         return container;
     }
 

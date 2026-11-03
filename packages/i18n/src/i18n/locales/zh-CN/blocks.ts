@@ -1,4 +1,5 @@
 export default {
+    'toolbox.selectInfo': '已选 {{blockLength}} 个积木',
     utils_noSearchResults: '没有找到积木',
     utils_searchBlocks: '搜索积木...',
     utils_collapseOther: '折叠其它积木栏',

@@ -123,6 +123,7 @@ export function registerAstratchToolbox(): void {
     font-size: 0.65rem;
 }
 .blocklyToolboxCategory {
+    border-radius: 0px 5px 5px 0px;
     border-width: 2px !important;
     margin-bottom: 0 !important
 }
@@ -271,6 +272,25 @@ g.astratchFlyoutGroupLevel1 text {
 
 .blocklyToolboxCategoryIcon {
     filter: var(--ui-svg-filter) invert(1);
+}
+
+.ash-toolbox-infoBox-icon {
+    filter: var(--ui-svg-filter);
+    width: 16px;
+    height: auto;
+}
+.ash-toolbox-infoBox-box {
+    display: flex;
+    align-items: center;
+    padding: 2px;
+}
+.ash-toolbox-infoBox-text {
+    font-size: 0.65rem;
+    flex: 1
+}
+.ash-toolbox-infoBox {
+    opacity: 0.7;
+    margin: 2px
 }
   `);
 }
