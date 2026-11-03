@@ -313,7 +313,7 @@ export const registerMultiSelectShortcuts = () => {
                 e.preventDefault();
                 const manager = ashMultiSelectorManager.getWorkspace(workspace.id);
                 workspace.getAllBlocks().forEach(block => {
-                    if (block && block.isMovable() && !block.isDeadOrDying())
+                    if (block && block.isMovable() && !block.isDeadOrDying() && !block.isShadow())
                         manager?.selectBlock(block, false);
                 });
                 manager?.focusLastBlock();
