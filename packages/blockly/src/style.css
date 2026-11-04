@@ -3,7 +3,7 @@ input:not(.blocklyHtmlInput) {
     border-radius: 4px;
     background-color: var(--ui-quaternary);
     transition: border 0.1s ease;
-    outline: none;
+    outline: none !important;
 }
 input:focus {
     border: var(--accent-primary) 1px solid;
@@ -91,4 +91,8 @@ input:focus {
     x: 0px;
     ry: 6px;
     rx: 6px;
+}
+
+.blocklyMenuItem.unMatch {
+    display: none;
 }

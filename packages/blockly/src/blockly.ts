@@ -10,6 +10,7 @@ import { FieldAngle } from './plugins/fields/field_angle';
 import { ashConnectionChecker } from './connectionChecker';
 import { inject } from './inject';
 import { ashMultiSelectorManager } from './plugins/workspace/multiSelector';
+import { AshMenu } from './plugins/dropdown/menu';
 
 const workspaceMeta: Blockly.BlocklyOptions = {
     renderer: 'astratch',
@@ -127,6 +128,8 @@ class BlocklyAdapter {
         Blockly.fieldRegistry.register('text_input', FieldMultilineInput);
         Blockly.fieldRegistry.register('color_input', FieldColourHsvSliders);
         Blockly.fieldRegistry.register('angle_input', FieldAngle);
+        Blockly.fieldRegistry.unregister('field_dropdown');
+        Blockly.fieldRegistry.register('field_dropdown', AshMenu);
         registerAstratchRenderer();
 
         Blockly.Scrollbar.scrollbarThickness = 10;

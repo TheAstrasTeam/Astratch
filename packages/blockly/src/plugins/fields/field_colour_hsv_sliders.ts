@@ -830,10 +830,6 @@ Blockly.Css.register(`
     width: ${FieldColourHsvSliders.THUMB_RADIUS * 2}px;
     height: ${FieldColourHsvSliders.THUMB_RADIUS * 2}px;
 }
-.blocklyDropDownContent input:not(.fieldColourHexInput):focus {
-    border: none;
-    outline: none;
-}
 .fieldColourHexInput {
     height: 24px;
     width: 120px
