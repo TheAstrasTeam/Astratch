@@ -51,9 +51,6 @@ export {
 export type { LabelFlyoutItem };
 
 export function registerAstratchToolbox(): void {
-    // 更细的滚动条（默认约 11px，改为 8px），在 inject 创建滚动条前设置
-    Blockly.Scrollbar.scrollbarThickness = 8;
-
     Blockly.registry.register(
         Blockly.registry.Type.TOOLBOX_ITEM,
         Blockly.ToolboxCategory.registrationName,
@@ -149,7 +146,7 @@ export function registerAstratchToolbox(): void {
     box-sizing: border-box;
     width: 100%;
     min-width: 0;
-    border-radius: 0;
+    border-radius: 0 5px 2px 0;
     background-color: var(--ui-tertiary);
     transition: border-radius 0.2s ease
 }

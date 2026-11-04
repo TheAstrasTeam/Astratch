@@ -1,4 +1,4 @@
-input {
+input:not(.blocklyHtmlInput) {
     border: transparent 1px solid;
     border-radius: 4px;
     background-color: var(--ui-quaternary);
@@ -7,6 +7,11 @@ input {
 }
 input:focus {
     border: var(--accent-primary) 1px solid;
+}
+
+.blocklyHtmlInput {
+    /* 在暗色模式下它会变成暗色 */
+    color-scheme: light;
 }
 
 .blocklyZoom,
@@ -41,4 +46,49 @@ input:focus {
     stroke: var(--accent-transparent) !important;
     stroke-width: 4px;
     filter: none !important;
+}
+
+/* 我们打算让工作区变的圆滑点 */
+.blocklyMainBackground {
+    stroke: transparent !important;
+}
+.injectionDiv {
+    border-radius: 5px;
+}
+.blocklyScrollbarHorizontal,
+.blocklyScrollbarVertical {
+    overflow: visible;
+}
+.blocklyScrollbarHorizontal .blocklyScrollbarHandle {
+    transition:
+        height 0.3s ease,
+        y 0.3s ease,
+        rx 0.3s ease,
+        ry 0.3s ease,
+        fill 0.3s ease;
+}
+.blocklyScrollbarVertical .blocklyScrollbarHandle {
+    transition:
+        width 0.3s ease,
+        x 0.3s ease,
+        rx 0.3s ease,
+        ry 0.3s ease,
+        fill 0.3s ease;
+}
+
+.blocklyScrollbarHorizontal .blocklyScrollbarHandle:hover {
+    height: 12px;
+    y: 0px;
+    ry: 6px;
+    rx: 6px;
+}
+.blocklyScrollbarHorizontal .blocklyScrollbarHandle:active,
+.blocklyScrollbarVertical .blocklyScrollbarHandle:active {
+    fill: var(--ui-transparent-light) !important;
+}
+.blocklyScrollbarVertical .blocklyScrollbarHandle:hover {
+    width: 12px;
+    x: 0px;
+    ry: 6px;
+    rx: 6px;
 }
