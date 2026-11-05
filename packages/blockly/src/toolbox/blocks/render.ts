@@ -355,7 +355,7 @@ export const initRenderBlocks = () => {
                 ...connections,
                 message0: t('blocks:display.setSize'),
                 args0: [numberInput('SIZE')],
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -366,7 +366,7 @@ export const initRenderBlocks = () => {
                 ...connections,
                 message0: t('blocks:display.changeSize'),
                 args0: [numberInput('SIZE')],
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -377,7 +377,7 @@ export const initRenderBlocks = () => {
                 ...returnConnections,
                 message0: t('blocks:display.size'),
                 output: TYPES.NUMBER,
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -388,7 +388,7 @@ export const initRenderBlocks = () => {
             this.jsonInit({
                 ...connections,
                 message0: t('blocks:display.show'),
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -398,7 +398,7 @@ export const initRenderBlocks = () => {
             this.jsonInit({
                 ...connections,
                 message0: t('blocks:display.hide'),
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -409,7 +409,7 @@ export const initRenderBlocks = () => {
                 ...returnConnections,
                 message0: t('blocks:display.visible'),
                 output: TYPES.BOOLEAN,
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -421,7 +421,7 @@ export const initRenderBlocks = () => {
                 ...connections,
                 message0: t('blocks:display.switchCostume'),
                 args0: [objectInput('COSTUME')],
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -432,7 +432,7 @@ export const initRenderBlocks = () => {
                 ...returnConnections,
                 message0: t('blocks:display.costume'),
                 output: TYPES.STRING,
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -444,7 +444,7 @@ export const initRenderBlocks = () => {
                 ...connections,
                 message0: t('blocks:display.changeEffect'),
                 args0: [dropdown('EFFECT', EFFECT_OPTIONS), numberInput('VALUE')],
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -455,7 +455,7 @@ export const initRenderBlocks = () => {
                 ...connections,
                 message0: t('blocks:display.setEffect'),
                 args0: [dropdown('EFFECT', EFFECT_OPTIONS), numberInput('VALUE')],
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -467,7 +467,7 @@ export const initRenderBlocks = () => {
                 message0: t('blocks:display.effect'),
                 args0: [dropdown('EFFECT', EFFECT_OPTIONS)],
                 output: TYPES.NUMBER,
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -479,7 +479,7 @@ export const initRenderBlocks = () => {
                 ...connections,
                 message0: t('blocks:display.setBlendMode'),
                 args0: [dropdown('BLEND', BLEND_OPTIONS)],
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -490,7 +490,7 @@ export const initRenderBlocks = () => {
                 ...returnConnections,
                 message0: t('blocks:display.blendMode'),
                 output: TYPES.STRING,
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -501,7 +501,7 @@ export const initRenderBlocks = () => {
             this.jsonInit({
                 ...connections,
                 message0: t('blocks:display.setClip'),
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -511,7 +511,7 @@ export const initRenderBlocks = () => {
             this.jsonInit({
                 ...connections,
                 message0: t('blocks:display.resetClip'),
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -522,7 +522,7 @@ export const initRenderBlocks = () => {
                 ...returnConnections,
                 message0: t('blocks:display.clip'),
                 output: TYPES.ARRAY,
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -534,7 +534,7 @@ export const initRenderBlocks = () => {
                 ...connections,
                 message0: t('blocks:display.changeLayer'),
                 args0: [dropdown('DIRECTION', LAYER_OPTIONS), numberInput('COUNT')],
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -545,7 +545,7 @@ export const initRenderBlocks = () => {
                 ...connections,
                 message0: t('blocks:display.setLayer'),
                 args0: [numberInput('LAYER')],
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -556,7 +556,7 @@ export const initRenderBlocks = () => {
                 ...returnConnections,
                 message0: t('blocks:display.layer'),
                 output: TYPES.NUMBER,
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -568,7 +568,7 @@ export const initRenderBlocks = () => {
                 ...connections,
                 message0: t('blocks:text.show'),
                 args0: [stringInput('TEXT')],
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -579,7 +579,7 @@ export const initRenderBlocks = () => {
                 ...connections,
                 message0: t('blocks:text.setFont'),
                 args0: [objectInput('ASSET')],
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -590,7 +590,7 @@ export const initRenderBlocks = () => {
                 ...connections,
                 message0: t('blocks:text.setTextColor'),
                 args0: [stringInput('COLOR')],
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -601,7 +601,7 @@ export const initRenderBlocks = () => {
                 ...connections,
                 message0: t('blocks:text.setTextBorderColor'),
                 args0: [stringInput('COLOR')],
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -612,7 +612,7 @@ export const initRenderBlocks = () => {
                 ...connections,
                 message0: t('blocks:text.setTextBorderWidth'),
                 args0: [numberInput('WIDTH')],
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -624,7 +624,7 @@ export const initRenderBlocks = () => {
                 message0: t('blocks:text.metric'),
                 args0: [dropdown('METRIC', TEXT_METRIC_OPTIONS)],
                 output: TYPES.NUMBER,
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -636,7 +636,7 @@ export const initRenderBlocks = () => {
                 message0: t('blocks:text.color'),
                 args0: [dropdown('COLOR', TEXT_COLOR_OPTIONS)],
                 output: TYPES.STRING,
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -646,7 +646,7 @@ export const initRenderBlocks = () => {
             this.jsonInit({
                 ...connections,
                 message0: t('blocks:text.stop'),
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -657,7 +657,7 @@ export const initRenderBlocks = () => {
                 ...returnConnections,
                 message0: t('blocks:text.showing'),
                 output: TYPES.BOOLEAN,
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -668,7 +668,7 @@ export const initRenderBlocks = () => {
                 ...returnConnections,
                 message0: t('blocks:text.font'),
                 output: TYPES.STRING,
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;
@@ -679,7 +679,7 @@ export const initRenderBlocks = () => {
                 ...returnConnections,
                 message0: t('blocks:text.content'),
                 output: TYPES.STRING,
-                colour: TOOLBOX_COLOR.render,
+                colour: TOOLBOX_COLOR.motion_display,
             });
         },
     } as Blockly.Block;

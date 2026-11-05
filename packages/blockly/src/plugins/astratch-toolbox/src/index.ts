@@ -146,9 +146,9 @@ export function registerAstratchToolbox(): void {
     box-sizing: border-box;
     width: 100%;
     min-width: 0;
-    border-radius: 0 5px 2px 0;
-    background-color: var(--ui-tertiary);
-    transition: border-radius 0.2s ease
+    border-radius: 0 5px 2px 0 !important;
+    background-color: var(--ui-tertiary) !important;
+    transition: border-radius 0.2s ease !important;
 }
 .continuousFlyoutSearchInput:focus {
     border-radius: 5px

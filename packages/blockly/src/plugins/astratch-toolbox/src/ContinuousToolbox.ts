@@ -85,7 +85,6 @@ export class ContinuousToolbox extends Blockly.Toolbox {
         // const stateBox = _createInfoBox(State, 'state');
 
         this.getWorkspace().addChangeListener(event => {
-            console.log(event);
             if (event.type === 'viewport_change') {
                 const viewPort_Event = event as unknown as Blockly.Events.ViewportChange;
                 positionBox.text.textContent = `${viewPort_Event.viewLeft?.toFixed(0)},${viewPort_Event.viewTop?.toFixed(0)}`;

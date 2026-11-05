@@ -118,7 +118,7 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                         kind: 'category',
                         id: 'display',
                         name: t('blocks:category.display'),
-                        colour: TOOLBOX_COLOR.render,
+                        colour: TOOLBOX_COLOR.motion_display,
                         contents: [
                             block(OPCODES.setSize, { SIZE: num(100) }),
                             block(OPCODES.changeSize, { SIZE: num(10) }),
@@ -153,7 +153,7 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                         kind: 'category',
                         id: 'text',
                         name: t('blocks:category.text'),
-                        colour: TOOLBOX_COLOR.render,
+                        colour: TOOLBOX_COLOR.motion_display,
                         contents: [
                             block(OPCODES.showText, { TEXT: str('Hello') }),
                             block(OPCODES.setFont, {
@@ -170,6 +170,79 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                             block(OPCODES.textFont),
                             block(OPCODES.textContent, undefined),
                         ],
+                    },
+                ],
+            },
+            {
+                kind: 'category',
+                id: 'audio',
+                name: t('blocks:category.audio'),
+                colour: TOOLBOX_COLOR.audio,
+                contents: [
+                    block(OPCODES.playAllAudio),
+                    block(OPCODES.setAllAudioEffect, {
+                        VALUE: num(100),
+                    }),
+                    block(OPCODES.stopAllAudio),
+                    sep(24),
+                    block(OPCODES.getAllAudio),
+                    sep(),
+                    block(OPCODES.playAudio),
+                    block(OPCODES.stopOrPlayAudio, {
+                        AUDIO_NAME: str(''),
+                    }),
+                    block(OPCODES.stopAndDeleteAudio, {
+                        AUDIO_NAME: str(''),
+                    }),
+                    block(OPCODES.setAudioEffect, {
+                        AUDIO_NAME: str(''),
+                        VALUE: num(100),
+                    }),
+                    block(OPCODES.isExistingAudio, {
+                        AUDIO_NAME: str(''),
+                    }),
+                    block(OPCODES.isPlayingAudio, {
+                        AUDIO_NAME: str(''),
+                    }),
+                    block(OPCODES.getAudioEffect, {
+                        AUDIO_NAME: str(''),
+                    }),
+                ],
+            },
+            {
+                kind: 'category',
+                id: 'asset',
+                name: t('blocks:category.asset'),
+                colour: TOOLBOX_COLOR.asset,
+                contents: [
+                    {
+                        kind: 'category',
+                        id: 'selector',
+                        name: t('blocks:category.asset.selector'),
+                        colour: TOOLBOX_COLOR.asset,
+                        contents: [block(OPCODES.assetSelector)],
+                    },
+                ],
+            },
+            {
+                kind: 'category',
+                id: 'entity',
+                name: t('blocks:category.entity'),
+                colour: TOOLBOX_COLOR.entity,
+                contents: [
+                    {
+                        kind: 'category',
+                        id: 'entity_tempEntity',
+                        name: t('blocks:category.entity.tempEntity'),
+                        colour: TOOLBOX_COLOR.entity,
+                        contents: [],
+                    },
+                    {
+                        kind: 'category',
+                        id: 'entity_data',
+                        name: t('blocks:category.entity.data'),
+                        colour: TOOLBOX_COLOR.entity,
+                        contents: [],
                     },
                 ],
             },
@@ -389,17 +462,18 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                     },
                 ],
             },
-            {
-                kind: 'category',
-                id: 'function',
-                name: t('blocks:category.function'),
-                colour: TOOLBOX_COLOR.function,
-                contents: [
-                    block(OPCODES.execute, undefined),
-                    block(OPCODES.executeReturn, undefined),
-                    block(OPCODES.inlineFunction, undefined),
-                ],
-            },
+            // TODO: 函数是后期内容
+            // {
+            //     kind: 'category',
+            //     id: 'function',
+            //     name: t('blocks:category.function'),
+            //     colour: TOOLBOX_COLOR.function,
+            //     contents: [
+            //         block(OPCODES.execute, undefined),
+            //         block(OPCODES.executeReturn, undefined),
+            //         block(OPCODES.inlineFunction, undefined),
+            //     ],
+            // },
         ],
     };
 };

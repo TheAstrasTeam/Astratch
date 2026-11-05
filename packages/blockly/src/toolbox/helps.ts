@@ -115,7 +115,9 @@ export const dropdown = (name: string, options: string[][]) => ({
     options,
 });
 
-export const getTextInput = (input: Blockly.Input | undefined | null): Blockly.Block | null | undefined => {
+export const getTextInput = (
+    input: Blockly.Input | undefined | null,
+): Blockly.Block | null | undefined => {
     return input?.connection?.targetConnection?.targetConnection?.targetBlock();
 };
 

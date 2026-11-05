@@ -10,6 +10,12 @@ export default {
     'category.direction': '方向',
     'category.display': '显示',
     'category.text': '文字',
+    'category.audio': '音频',
+    'category.asset': '资源',
+    'category.asset.selector': '选择器',
+    'category.entity': '实体',
+    'category.entity.tempEntity': '临时实体',
+    'category.entity.data': '实体数据',
     'category.event': '事件',
     'category.flow': '流程',
     'category.branch': '分支',
@@ -78,6 +84,32 @@ export default {
     'text.showing': '正在显示文字',
     'text.font': '显示文字的字体资源名称',
     'text.content': '显示文字的内容',
+
+    // 音频
+    'audio.playAll': '%1 所有音频',
+    audio_play: '播放',
+    pause: '暂停',
+    'audio.stopAll': '停止所有音频',
+    'audio.setAllEffect': '设置所有音频的 %1 效果为 %2 %%',
+    voice: '音量',
+    tone: '音调',
+    balance: '平衡',
+    speed: '速度',
+    'audio.getAllAudio': '获取所有音频',
+    'audio.playAudio': '播放音频',
+    'audio.playAudio_setName': '并设置名为',
+    'audio.stopOrPlayAudio': '%1 名为 %2 的音频',
+    'audio.stopAndDeleteAudio': '停止并删除名为 %1 的音频',
+    'audio.setAudioEffect': '将名为 %1 的音频的 %2 设为 %3 %%',
+    'audio.isExistingAudio': '存在名为 %1 的音频',
+    'audio.isPlayingAudio': '正在播放名为 %1 的音频',
+    'audio.getAudioUsingAsset': '名为 %1 的音频正用的资源',
+    'audio.getAudioEffect': '名为 %1 的音频的 %2',
+    // 资源
+
+    // 实体
+    // 实体-临时实体
+    // 实体-数据
 
     // 事件
     'event.whenStartClicked_1': '当',

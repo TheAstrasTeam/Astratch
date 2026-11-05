@@ -51,6 +51,21 @@ const OPCODES = {
     textFont: 'text.font',
     textContent: 'text.content',
 
+    // 音频
+    playAllAudio: 'audio.playAll',
+    stopAllAudio: 'audio.stopAll',
+    setAllAudioEffect: 'audio.setAllAudioEffect',
+    getAllAudio: 'audio.getAllAudio',
+    playAudio: 'audio.playAudio',
+    stopOrPlayAudio: 'audio.stopOrPlayAudio',
+    stopAndDeleteAudio: 'audio.stopAndDeleteAudio',
+    setAudioEffect: 'audio.setAudioEffect',
+    isExistingAudio: 'audio.isExistingAudio',
+    isPlayingAudio: 'audio.isPlayingAudio',
+    getAudioUsingAsset: 'audio.getAudioUsingAsset',
+    getAudioEffect: 'audio.getAudioEffect',
+
+    // 资源
     assetSelector: 'asset.selector',
 
     // 事件
