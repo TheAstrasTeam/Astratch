@@ -115,6 +115,10 @@ export const dropdown = (name: string, options: string[][]) => ({
     options,
 });
 
+export const getTextInput = (input: Blockly.Input | undefined | null): Blockly.Block | null | undefined => {
+    return input?.connection?.targetConnection?.targetConnection?.targetBlock();
+};
+
 export class BlockIcon extends Blockly.icons.Icon {
     protected iconSource: string | undefined;
     private size = 26;
