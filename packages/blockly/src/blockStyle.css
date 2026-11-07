@@ -68,6 +68,11 @@ g.blocklyImageField[role='button']:hover {
     opacity: 0.2;
 }
 
+.ashGetterSlotHint {
+    fill: #ffffff;
+    fill-opacity: 0.2;
+}
+
 .block-icon {
     opacity: 1 !important;
     pointer-events: none;

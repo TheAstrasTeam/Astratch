@@ -21,36 +21,6 @@ import { blocklyAdapter } from '../../blockly';
 import { Blockly } from '../..';
 import { MutateByLength } from '../mutateByLength';
 
-const ROUND_OPTIONS = [
-    [t('blocks:option.round.abs'), 'abs'],
-    [t('blocks:option.round.ceil'), 'ceil'],
-    [t('blocks:option.round.floor'), 'floor'],
-    [t('blocks:option.round.round'), 'round'],
-];
-
-const UNARY_OPTIONS = [
-    [t('blocks:option.unary.sqrt'), 'sqrt'],
-    [t('blocks:option.unary.cbrt'), 'cbrt'],
-    [t('blocks:option.unary.sin'), 'sin'],
-    [t('blocks:option.unary.cos'), 'cos'],
-    [t('blocks:option.unary.tan'), 'tan'],
-    [t('blocks:option.unary.asin'), 'asin'],
-    [t('blocks:option.unary.acos'), 'acos'],
-    [t('blocks:option.unary.atan'), 'atan'],
-    [t('blocks:option.unary.ln'), 'ln'],
-    [t('blocks:option.unary.log'), 'log'],
-];
-
-const CONSTANT_OPTIONS = [
-    [t('blocks:option.constant.pi'), 'pi'],
-    [t('blocks:option.constant.e'), 'e'],
-];
-
-const CHAR_OPTIONS = [
-    [t('blocks:option.char.enter'), 'enter'],
-    [t('blocks:option.char.tab'), 'tab'],
-];
-
 export const initMathBlocks = () => {
     // 数学
     const _spawnMathBlocks = (symbol: string) =>
@@ -152,7 +122,15 @@ export const initMathBlocks = () => {
             this.jsonInit({
                 ...returnConnections,
                 message0: t('blocks:math.round'),
-                args0: [numberInput('NUM'), dropdown('MODE', ROUND_OPTIONS)],
+                args0: [
+                    numberInput('NUM'),
+                    dropdown('MODE', [
+                        [t('blocks:option.round.abs'), 'abs'],
+                        [t('blocks:option.round.ceil'), 'ceil'],
+                        [t('blocks:option.round.floor'), 'floor'],
+                        [t('blocks:option.round.round'), 'round'],
+                    ]),
+                ],
                 output: TYPES.NUMBER,
                 colour: TOOLBOX_COLOR.math,
             });
@@ -164,7 +142,21 @@ export const initMathBlocks = () => {
             this.jsonInit({
                 ...returnConnections,
                 message0: t('blocks:math.unary'),
-                args0: [dropdown('FN', UNARY_OPTIONS), numberInput('NUM')],
+                args0: [
+                    dropdown('FN', [
+                        [t('blocks:option.unary.sqrt'), 'sqrt'],
+                        [t('blocks:option.unary.cbrt'), 'cbrt'],
+                        [t('blocks:option.unary.sin'), 'sin'],
+                        [t('blocks:option.unary.cos'), 'cos'],
+                        [t('blocks:option.unary.tan'), 'tan'],
+                        [t('blocks:option.unary.asin'), 'asin'],
+                        [t('blocks:option.unary.acos'), 'acos'],
+                        [t('blocks:option.unary.atan'), 'atan'],
+                        [t('blocks:option.unary.ln'), 'ln'],
+                        [t('blocks:option.unary.log'), 'log'],
+                    ]),
+                    numberInput('NUM'),
+                ],
                 output: TYPES.NUMBER,
                 colour: TOOLBOX_COLOR.math,
             });
@@ -176,7 +168,12 @@ export const initMathBlocks = () => {
             this.jsonInit({
                 ...returnConnections,
                 message0: t('blocks:math.constant'),
-                args0: [dropdown('CONSTANT', CONSTANT_OPTIONS)],
+                args0: [
+                    dropdown('CONSTANT', [
+                        [t('blocks:option.constant.pi'), 'pi'],
+                        [t('blocks:option.constant.e'), 'e'],
+                    ]),
+                ],
                 output: TYPES.NUMBER,
                 colour: TOOLBOX_COLOR.math,
             });
@@ -417,15 +414,64 @@ export const initMathBlocks = () => {
     // 字符串
     blocklyAdapter.Blockly.Blocks[OPCODES.join] = {
         init() {
+            this.state_string = [];
+            this.mutateHandle = new MutateByLength(
+                this,
+                (input, prefix, _, length) => {
+                    if (prefix === 'string') {
+                        input.setCheck('String');
+                        const currentBlock = input.connection?.targetBlock();
+                        if (currentBlock?.isShadow()) currentBlock.dispose();
+                        input.connection?.setShadowState({
+                            type: OPCODES.string,
+                            fields: {
+                                TEXT: this.state_string[length] ?? '',
+                            },
+                        });
+                    }
+                },
+                'string',
+                'stringTip',
+            );
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:string.join'),
-                args0: [stringInput('A'), stringInput('B')],
                 output: TYPES.STRING,
                 colour: TOOLBOX_COLOR.math,
             });
+            this.appendDummyInput('JOIN_TEXT').appendField(t('blocks:string.join'));
+            this.updateShape();
         },
-    } as Blockly.Block;
+        onchange(event) {
+            if (!['change'].includes(event.type)) return;
+            this.mutateHandle.getValueInputs().forEach((input, length) => {
+                const block = input.connection?.targetBlock();
+                if (block?.isShadow()) {
+                    this.state_string[length] =
+                        (block.getFieldValue('TEXT') as string | null) ?? '';
+                    return;
+                }
+            });
+            this.updateShape();
+        },
+        updateShape() {
+            this.mutateHandle.updateShape();
+        },
+        saveExtraState() {
+            return {
+                ...this.mutateHandle.saveExtraState(),
+                state_string: this.state_string,
+            };
+        },
+        loadExtraState(state: { length: number; state_string: string[] }) {
+            this.mutateHandle.loadExtraState(state);
+            this.state_string = state.state_string;
+            this.updateShape();
+        },
+    } as Blockly.Block & {
+        mutateHandle: MutateByLength<'string', 'stringTip'>;
+        state_string: string[];
+        updateShape(): void;
+    };
 
     blocklyAdapter.Blockly.Blocks[OPCODES.letterOf] = {
         init() {
@@ -468,7 +514,12 @@ export const initMathBlocks = () => {
             this.jsonInit({
                 ...returnConnections,
                 message0: t('blocks:string.char'),
-                args0: [dropdown('CHAR', CHAR_OPTIONS)],
+                args0: [
+                    dropdown('CHAR', [
+                        [t('blocks:option.char.enter'), 'enter'],
+                        [t('blocks:option.char.tab'), 'tab'],
+                    ]),
+                ],
                 output: TYPES.STRING,
                 colour: TOOLBOX_COLOR.math,
             });

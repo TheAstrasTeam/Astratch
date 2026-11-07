@@ -290,11 +290,34 @@ export const initRenderBlocks = () => {
     blocklyAdapter.Blockly.Blocks[OPCODES.setXY] = xyBlock(true);
     blocklyAdapter.Blockly.Blocks[OPCODES.changeXY] = xyBlock(false);
 
+    blocklyAdapter.Blockly.Blocks[OPCODES.getX] = {
+        init() {
+            this.jsonInit({
+                ...returnConnections,
+                output: 'Number',
+                message0: t('blocks:motion.getX'),
+                colour: TOOLBOX_COLOR.render,
+            });
+        },
+    } as Blockly.Block;
+    blocklyAdapter.Blockly.Blocks[OPCODES.getY] = {
+        init() {
+            this.jsonInit({
+                ...returnConnections,
+                output: 'Number',
+                message0: t('blocks:motion.getY'),
+                colour: TOOLBOX_COLOR.render,
+            });
+        },
+    } as Blockly.Block;
+    
+
     // 方向
     blocklyAdapter.Blockly.Blocks[OPCODES.turnLeft] = {
         init() {
             this.jsonInit({
-                ...connections,
+                ...returnConnections,
+                output: 'Number',
                 message0: t('blocks:motion.turnLeft'),
                 args0: [numberInput('DEGREES')],
                 colour: TOOLBOX_COLOR.render,

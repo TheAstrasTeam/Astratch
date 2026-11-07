@@ -26,6 +26,9 @@
 - `execute` 将坐标设为 [number, number]
 - `execute` 将坐标增加 [number, number]
 
+- `returns`-`number` x 坐标
+- `returns`-`number` y 坐标
+
 ### 方向
 
 - `execute` <左转图标>|左转 number 度
@@ -145,23 +148,23 @@
 
 ---
 
-> 临时资源是全局共享的
+<!-- > 临时资源是全局共享的
 
-- `execute` 添加类型为[类型]，名称为`string`的临时资源
+- `execute` 添加类型为[文本,图片,音频,视频,字体]，名称为`string`的临时资源
     - [类型] 会打开 `类型制作器`
 - `execute` 将名称为`string`的临时资源的内容设为`typeof  [类型]`
     - 填写的值的类型取决于[类型]的值
 - `execute` 删除名称为`string`的临时资源
     - 如果其它地方使用了被删除（也就是不存在）的资源，返回**空白资源**
 - `returns`-`boolean` 存在名称为`string`的临时资源
-- `returns`-`AssetHandle` 名称为`string`的临时资源
+- `returns`-`AssetHandle` 名称为`string`的临时资源 -->
 
 ---
 
-- `returns`-`number` 资源`AssetHandle`的字节长度
+- `returns`-`number` 资源`AssetHandle`的长度
 
-- `returns`-`number` <图片>资源`AssetHandle`的[长度,宽度]
-    - [长度,宽度] 均为像素数量
+- `returns`-`number` <图片>资源`AssetHandle`的[宽度,高度]
+    - [宽度,高度] 均为像素数量
 - `returns`-`string` <图片>资源`AssetHandle`的类型
     - [类型] 诸如`svg`, `png`等
 
@@ -173,7 +176,7 @@
 
 ---
 
-- `returns`-`object`：获取模板 `string`
+- `returns`-`object`：模板 `string`
     - 点击`string`会打开模板选择器
 - `returns`-`string`： <br /> 通过模板 `object` 创建实例<br /> 附带数据 [...values]
     - 返回指向实例的唯一ID，因此返回string
@@ -198,33 +201,17 @@
 
 ### 数据
 
-- `returns`-`string` 此实体实例
+- `returns`-`string` 此实例
     - 该块不会出现在`模块`中
     - 若为实体模板，获取的是当前对应的运行实例
-- `returns`-`string[]` 获取基于模板 `object` 的所有实例
+- `returns`-`string[]` 基于模板 `object` 的所有实例
     - 按下`object`打开实体选择器
-- `returns`-`string[]` 所有的实体实例
+- `returns`-`string[]` 所有的实例
 
 ---
 
-- `returns`-`number`: <br />`string`实例的[`x坐标`,`y坐标`,`大小`,`方向`,`当前层级`,`显示文字的字号`,`显示文字的边框宽度`,`显示文字的像素长度`]
-
-- `returns`-`boolean`: <br /> `string`实例[`正在显示`,`正在显示文字`]
-
-- `returns`-`string`: <br /> `string`实例的[`当前显示的造型`,`显示文字的字体资源名称`,`显示文字的内容`,`显示文字的颜色`,`显示文字的边框颜色`]
-
-- `returns`-`object[]`: <br /> `string`实例的[所有音频的名称,所有计时器的名称]
-
-    ```
-    {
-        target: string
-        ID: string
-    }[]
-    ```
-    - 普通的音频互动可以识别这个格式,因为实际上默认的名字会被处理为上面格式再使用。
-
-- `returns`-`unknown`: <br /> `string`实例的`string`数据
-    - 点击第二个`string`打开数据选择器
+- `returns`-`unknown`: <br /> `string`实例的`return-block`
+    - `return-block` 里可以塞一个返回值积木，它将会在对应实体的地方执行并回传
 
 ## 事件
 

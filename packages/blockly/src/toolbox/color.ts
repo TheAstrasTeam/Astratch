@@ -4,7 +4,7 @@ const TOOLBOX_COLOR = {
     motion_display: '#3352ff',
     audio: '#c230c7',
     asset: '#00b661',
-    entity: '#f1ec5a',
+    entity: '#86c139',
     event: '#ffbf00',
     flow: '#ffab19',
     branch: '#ff9b19',

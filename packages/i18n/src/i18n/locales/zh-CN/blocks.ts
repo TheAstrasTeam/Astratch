@@ -3,6 +3,7 @@ export default {
     utils_noSearchResults: '没有找到积木',
     utils_searchBlocks: '搜索积木...',
     utils_collapseOther: '折叠其它积木栏',
+    'text.example': '你好世界',
 
     // 分类
     'category.render': '呈现',
@@ -12,7 +13,6 @@ export default {
     'category.text': '文字',
     'category.audio': '音频',
     'category.asset': '资源',
-    'category.asset.selector': '选择器',
     'category.entity': '实体',
     'category.entity.tempEntity': '临时实体',
     'category.entity.data': '实体数据',
@@ -43,6 +43,8 @@ export default {
     'motion.changeY': '将 y 坐标增加 %1',
     'motion.setXY': '将坐标设为',
     'motion.changeXY': '将坐标增加',
+    'motion.getX': 'x 坐标',
+    'motion.getY': 'y 坐标',
 
     // 呈现 - 方向
     'motion.turnLeft': '左转 %1 度',
@@ -86,6 +88,8 @@ export default {
     'text.content': '显示文字的内容',
 
     // 音频
+    'audio.example': '砰',
+
     'audio.playAll': '%1 所有音频',
     audio_play: '播放',
     pause: '暂停',
@@ -106,9 +110,27 @@ export default {
     'audio.getAudioUsingAsset': '名为 %1 的音频正用的资源',
     'audio.getAudioEffect': '名为 %1 的音频的 %2',
     // 资源
+    'asset.allAssetsName': '所有资源的名称',
+    'asset.getAssetHandle': '资源 %1 的内容',
+    'asset.getTempAssetLength': '资源 %1 的长度',
+    'asset.getImageTempAssetLH': '资源 %1 的 %2',
+    width: '宽度',
+    height: '高度',
+    'asset.getImageTempAssetMIME': '资源 %1 的类型',
+    'asset.getAudioTempAssetTotalTime': '资源 %1 的音频长度',
 
     // 实体
     // 实体-临时实体
+    'entity.createInstanceByTemplate': '通过模板 %1 创建实例',
+    'entity.activeInstance': '激活实例 %1',
+    'entity.pauseInstance': '暂停实例 %1',
+    'entity.removeInstance': '删除实例 %1',
+    'entity.applyParentEntityAttr': '应用父实体的属性',
+    'entity.thisInstance': '此实例',
+    'entity.getInstanceBasedTemplate': '基于模板 %1 的所有实例',
+    'entity.getAllInstance': '所有的实例',
+    'entity.getInstanceAttr': '%1 实例的 %2',
+
     // 实体-数据
 
     // 事件
@@ -156,6 +178,7 @@ export default {
     'sensing.startTimer': '开始名为 %1 的计时器',
     'sensing.resetTimer': '重置名为 %1 的计时器',
     'sensing.stopTimer': '结束并删除名为 %1 的计时器',
+    'timer.example': '按住时长',
 
     // 感知 - 检测
     'sensing.touching': '碰到 %1',
@@ -179,12 +202,14 @@ export default {
     'logic.not': '%1 不成立',
 
     // 计算 - 字符串
-    'string.join': '连接 %1 和 %2',
+    'string.join': '连接',
     'string.letterOf': '%1 的第 %2 位',
     'string.substring': '%1 的第 %2 到 %3 位',
     'string.split': '以 %1 拆分 %2',
+    'split.example': '你好',
     'string.char': '字符 %1',
     'string.contains': '%1 包含 %2',
+    'contains.example': '世界',
     'string.length': '%1 的长度',
 
     // 数据 - 输入框
@@ -214,7 +239,7 @@ export default {
 
     // 数据 - 临时数据
     'temp.get': '临时数据 %1',
-    'temp.define': '定义临时数据 %1 为 ',
+    'temp.define': '定义临时数据 %1 为 %2',
     'temp.delete': '删除临时数据 %1',
     'temp.has': '临时数据 %1 可用',
 

@@ -33,13 +33,21 @@ const handler = (type, data) => {
     }
     if (type === 'GET_ASSET_INFO') {
         data.handler({
-            name: String('你好' + crypto.randomUUID()),
+            name: String(crypto.randomUUID()),
             type: 'text',
             raw: 'Hello World!',
         });
     }
     if (type === 'RENAME_PARAM') {
         data.handler(prompt(`Rename "${data.oldName}" to`, data.oldName));
+    }
+    if (type === 'GET_TEMPLATE') {
+        data.handler('testHandle');
+    }
+    if (type === 'GET_TEMPLATE_INFO') {
+        data.handler({
+            name: String(crypto.randomUUID()),
+        });
     }
 };
 

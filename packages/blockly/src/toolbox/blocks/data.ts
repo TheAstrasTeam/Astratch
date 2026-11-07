@@ -141,7 +141,7 @@ export const initDataBlocks = () => {
             this.jsonInit({
                 message0: t('blocks:math.null'),
                 output: TYPES.UNKNOWN,
-                colour: TOOLBOX_COLOR.textField,
+                colour: TOOLBOX_COLOR.data,
             });
         },
     } as Blockly.Block;
@@ -344,7 +344,7 @@ export const initDataBlocks = () => {
             this.jsonInit({
                 ...connections,
                 message0: t('blocks:temp.define'),
-                args0: [stringInput('NAME')],
+                args0: [stringInput('NAME'), unknownInput('VALUE')],
                 colour: TOOLBOX_COLOR.data,
             });
         },

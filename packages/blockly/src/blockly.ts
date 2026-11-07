@@ -65,6 +65,10 @@ type TASSET_INFO = {
       }
 );
 
+interface ITEMPLATE_INFO {
+    name: string;
+}
+
 interface IHANDLE_TYPE {
     /** 全部事件 */
     ALL: unknown;
@@ -89,6 +93,13 @@ interface IHANDLE_TYPE {
     GET_ASSET_INFO: {
         assetHandle: string;
         handler(assetInfo: TASSET_INFO): void;
+    };
+    GET_TEMPLATE: {
+        handler(templateHandle: string): void;
+    };
+    GET_TEMPLATE_INFO: {
+        templateHandle: string;
+        handler(templateInfo: ITEMPLATE_INFO): void;
     };
     RENAME_PARAM: {
         oldName: string;
@@ -288,3 +299,4 @@ class BlocklyAdapter {
 
 export const blocklyAdapter = new BlocklyAdapter();
 export type { TASSET_TYPE, TASSET_INFO };
+export type { ITEMPLATE_INFO };

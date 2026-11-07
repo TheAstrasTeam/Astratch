@@ -192,19 +192,19 @@ export function registerAstratchToolbox(): void {
     fill: var(--ui-tertiary);
     color: var(--ui-text);
     border-radius: 5px;
-    margin: 5px;
-
-    .blocklyFlyoutButton .blocklyFlyoutButtonShadow:hover {
-        filter: brightness(0.5);
-    }
+    margin: 5px; 
+}
+.blocklyFlyoutButton .blocklyFlyoutButtonShadow:hover {
+    filter: brightness(0.5);
 }
 .blocklyFlyoutButton:hover {
     border: var(--ui-transparent-dark) 1px solid;
 
-    & .blocklyFlyoutButtonShadow {
-        stroke: var(--ui-transparent-dark);
-        stroke-width: 1px;
-    }
+    
+}
+.blocklyFlyoutButton:hover .blocklyFlyoutButtonShadow {
+    stroke: var(--ui-transparent-dark);
+    stroke-width: 1px;
 }
 .blocklyFlyoutButton:active {
     filter: 1.2;
@@ -234,7 +234,7 @@ export function registerAstratchToolbox(): void {
     border-radius: 5px;
 }
 .ash-toolbox-tools button:hover {
-    border-color: var(--ui-transparent-dark);
+    border-color: var(--ui-transparent-light);
 }
 .ash-toolbox-tools img {
     width: 12px;

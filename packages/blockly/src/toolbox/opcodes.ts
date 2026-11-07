@@ -7,6 +7,8 @@ const OPCODES = {
     changeX: 'motion.changeX',
     changeY: 'motion.changeY',
     setXY: 'motion.setXY',
+    getX: 'motion.getX',
+    getY: 'motion.getY',
     changeXY: 'motion.changeXY',
     entitiesMenu: 'menu.entities',
 
@@ -67,6 +69,32 @@ const OPCODES = {
 
     // 资源
     assetSelector: 'asset.selector',
+
+    allAssetsName: 'asset.allAssetsName',
+    getAssetHandle: 'asset.getAssetHandle',
+    addTempAsset: 'asset.addTempAsset',
+    setTempContent: 'asset.setTempContent',
+    removeTempAsset: 'asset.removeTempAsset',
+    isExitingTempAsset: 'asset.isExitingTempAsset',
+    getTempAsset: 'asset.getTempAsset',
+
+    getTempAssetLength: 'asset.getTempAssetLength',
+    getImageTempAssetLH: 'asset.getImageTempAssetLH',
+    getImageTempAssetMIME: 'asset.getImageTempAssetMIME',
+    getAudioTempAssetTotalTime: 'asset.getAudioTempAssetTotalTime',
+
+    // 实体
+    getTemplate: 'entity.getTemplate',
+    createInstanceByTemplate: 'entity.createInstanceByTemplate',
+    activeInstance: 'entity.activeInstance',
+    pauseInstance: 'entity.pauseInstance',
+    removeInstance: 'entity.removeInstance',
+    applyParentEntityAttr: 'entity.applyParentEntityAttr',
+
+    thisInstance: 'entity.getThisInstance',
+    getInstanceBasedTemplate: 'entity.getInstanceBasedTemplate',
+    getAllInstance: 'entity.getAllInstance',
+    getInstanceAttr: 'entity.getInstanceAttr',
 
     // 事件
     whenStartClicked: 'event.whenStartClicked',

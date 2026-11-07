@@ -123,9 +123,11 @@ export const getTextInput = (
 
 export class BlockIcon extends Blockly.icons.Icon {
     protected iconSource: string | undefined;
+    protected sourceBlock: Blockly.Block;
     private size = 26;
     constructor(sourceBlock: Blockly.Block, iconSource: string) {
         super(sourceBlock);
+        this.sourceBlock = sourceBlock;
         this.iconSource = iconSource;
     }
 
@@ -177,10 +179,11 @@ export class BlockIcon extends Blockly.icons.Icon {
 
     setOffsetInBlock(offset: Blockly.utils.Coordinate): void {
         this.offsetInBlock = offset;
+        const isReturn = !!this.sourceBlock.outputConnection;
         this.svgRoot?.setAttribute(
             'transform',
-            // 保证视觉对齐
-            `translate(${String(this.offsetInBlock.x + 2)}, ${String(this.offsetInBlock.y + 2)})`,
+            // 保证视觉对齐，这个返回值积木需要特殊照顾（）
+            `translate(${String(this.offsetInBlock.x + (isReturn ? 8 : 2))}, ${String(this.offsetInBlock.y + (isReturn ? 0 : 2))})`,
         );
     }
 }

@@ -11,10 +11,10 @@ export const num = (v: string | number) => ({
     },
 });
 
-export const str = (v: string) => ({
+export const str = (v?: string) => ({
     shadow: {
         type: OPCODES.string,
-        fields: { TEXT: v },
+        fields: { TEXT: v ?? t('blocks:text.example') },
     },
 });
 
@@ -96,6 +96,9 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                             sep(),
                             block(OPCODES.setXY),
                             block(OPCODES.changeXY, undefined),
+                            sep(),
+                            block(OPCODES.getX),
+                            block(OPCODES.getY),
                         ],
                     },
                     {
@@ -155,7 +158,7 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                         name: t('blocks:category.text'),
                         colour: TOOLBOX_COLOR.motion_display,
                         contents: [
-                            block(OPCODES.showText, { TEXT: str('Hello') }),
+                            block(OPCODES.showText, { TEXT: str() }),
                             block(OPCODES.setFont, {
                                 ASSET: shadow(OPCODES.assetSelector),
                             }),
@@ -189,23 +192,23 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                     sep(),
                     block(OPCODES.playAudio),
                     block(OPCODES.stopOrPlayAudio, {
-                        AUDIO_NAME: str(''),
+                        AUDIO_NAME: str(t('blocks:audio.example')),
                     }),
                     block(OPCODES.stopAndDeleteAudio, {
-                        AUDIO_NAME: str(''),
+                        AUDIO_NAME: str(t('blocks:audio.example')),
                     }),
                     block(OPCODES.setAudioEffect, {
-                        AUDIO_NAME: str(''),
+                        AUDIO_NAME: str(t('blocks:audio.example')),
                         VALUE: num(100),
                     }),
                     block(OPCODES.isExistingAudio, {
-                        AUDIO_NAME: str(''),
+                        AUDIO_NAME: str(t('blocks:audio.example')),
                     }),
                     block(OPCODES.isPlayingAudio, {
-                        AUDIO_NAME: str(''),
+                        AUDIO_NAME: str(t('blocks:audio.example')),
                     }),
                     block(OPCODES.getAudioEffect, {
-                        AUDIO_NAME: str(''),
+                        AUDIO_NAME: str(t('blocks:audio.example')),
                     }),
                 ],
             },
@@ -215,13 +218,17 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                 name: t('blocks:category.asset'),
                 colour: TOOLBOX_COLOR.asset,
                 contents: [
-                    {
-                        kind: 'category',
-                        id: 'selector',
-                        name: t('blocks:category.asset.selector'),
-                        colour: TOOLBOX_COLOR.asset,
-                        contents: [block(OPCODES.assetSelector)],
-                    },
+                    block(OPCODES.assetSelector),
+                    sep(24),
+                    block(OPCODES.allAssetsName),
+                    block(OPCODES.getAssetHandle, { HANDLE: shadow(OPCODES.assetSelector) }),
+                    sep(),
+                    block(OPCODES.getImageTempAssetMIME, { HANDLE: shadow(OPCODES.assetSelector) }),
+                    block(OPCODES.getImageTempAssetLH, { HANDLE: shadow(OPCODES.assetSelector) }),
+                    block(OPCODES.getAudioTempAssetTotalTime, {
+                        HANDLE: shadow(OPCODES.assetSelector),
+                    }),
+                    block(OPCODES.getTempAssetLength, { HANDLE: shadow(OPCODES.assetSelector) }),
                 ],
             },
             {
@@ -235,14 +242,41 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                         id: 'entity_tempEntity',
                         name: t('blocks:category.entity.tempEntity'),
                         colour: TOOLBOX_COLOR.entity,
-                        contents: [],
+                        contents: [
+                            block(OPCODES.getTemplate),
+                            block(OPCODES.createInstanceByTemplate, {
+                                TEMPLATE: shadow(OPCODES.getTemplate),
+                            }),
+                            block(OPCODES.activeInstance, {
+                                HANDLE: {
+                                    shadow: {
+                                        type: OPCODES.createInstanceByTemplate,
+                                        inputs: {
+                                            TEMPLATE: shadow(OPCODES.getTemplate),
+                                        },
+                                    },
+                                },
+                            }),
+                            block(OPCODES.pauseInstance),
+                            block(OPCODES.removeInstance),
+                            sep(24),
+                            block(OPCODES.applyParentEntityAttr),
+                        ],
                     },
                     {
                         kind: 'category',
                         id: 'entity_data',
                         name: t('blocks:category.entity.data'),
                         colour: TOOLBOX_COLOR.entity,
-                        contents: [],
+                        contents: [
+                            block(OPCODES.thisInstance),
+                            block(OPCODES.getInstanceBasedTemplate, {
+                                TEMPLATE: shadow(OPCODES.getTemplate),
+                            }),
+                            block(OPCODES.getAllInstance),
+                            sep(),
+                            block(OPCODES.getInstanceAttr),
+                        ],
                     },
                 ],
             },
@@ -317,10 +351,10 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                             block(OPCODES.daysSince2000),
                             block(OPCODES.currentTime, undefined),
                             sep(),
-                            block(OPCODES.timer, { NAME: str('') }),
-                            block(OPCODES.startTimer, { NAME: str('') }),
-                            block(OPCODES.resetTimer, { NAME: str('') }),
-                            block(OPCODES.stopTimer, { NAME: str('') }),
+                            block(OPCODES.timer, { NAME: str(t('blocks:timer.example')) }),
+                            block(OPCODES.startTimer, { NAME: str(t('blocks:timer.example')) }),
+                            block(OPCODES.resetTimer, { NAME: str(t('blocks:timer.example')) }),
+                            block(OPCODES.stopTimer, { NAME: str(t('blocks:timer.example')) }),
                         ],
                     },
                     {
@@ -381,13 +415,17 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                         name: t('blocks:category.string'),
                         colour: TOOLBOX_COLOR.math,
                         contents: [
-                            block(OPCODES.join, { A: str(''), B: str('') }),
-                            block(OPCODES.letterOf, { STRING: str('') }),
-                            block(OPCODES.substring, { STRING: str('') }),
-                            block(OPCODES.split, { SEPARATOR: str(''), STRING: str('') }),
+                            block(OPCODES.join),
+                            block(OPCODES.letterOf, { STRING: str(), INDEX: num('1') }),
+                            block(OPCODES.substring, {
+                                STRING: str(),
+                                FROM: num('1'),
+                                TO: num('2'),
+                            }),
+                            block(OPCODES.split, { SEPARATOR: str(t('blocks:split.example')), STRING: str() }),
                             block(OPCODES.char, undefined),
-                            block(OPCODES.contains, { STRING: str(''), SUBSTRING: str('') }),
-                            block(OPCODES.stringLength, { STRING: str('') }),
+                            block(OPCODES.contains, { STRING: str(), SUBSTRING: str(t('blocks:contains.example')) }),
+                            block(OPCODES.stringLength, { STRING: str() }),
                         ],
                     },
                 ],
