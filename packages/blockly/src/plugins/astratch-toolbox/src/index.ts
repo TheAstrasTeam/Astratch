@@ -51,9 +51,6 @@ export {
 export type { LabelFlyoutItem };
 
 export function registerAstratchToolbox(): void {
-    // 更细的滚动条（默认约 11px，改为 8px），在 inject 创建滚动条前设置
-    Blockly.Scrollbar.scrollbarThickness = 8;
-
     Blockly.registry.register(
         Blockly.registry.Type.TOOLBOX_ITEM,
         Blockly.ToolboxCategory.registrationName,
@@ -123,6 +120,7 @@ export function registerAstratchToolbox(): void {
     font-size: 0.65rem;
 }
 .blocklyToolboxCategory {
+    border-radius: 0px 5px 5px 0px;
     border-width: 2px !important;
     margin-bottom: 0 !important
 }
@@ -148,9 +146,9 @@ export function registerAstratchToolbox(): void {
     box-sizing: border-box;
     width: 100%;
     min-width: 0;
-    border-radius: 0;
-    background-color: var(--ui-tertiary);
-    transition: border-radius 0.2s ease
+    border-radius: 0 5px 2px 0 !important;
+    background-color: var(--ui-tertiary) !important;
+    transition: border-radius 0.2s ease !important;
 }
 .continuousFlyoutSearchInput:focus {
     border-radius: 5px
@@ -194,19 +192,19 @@ export function registerAstratchToolbox(): void {
     fill: var(--ui-tertiary);
     color: var(--ui-text);
     border-radius: 5px;
-    margin: 5px;
-
-    .blocklyFlyoutButton .blocklyFlyoutButtonShadow:hover {
-        filter: brightness(0.5);
-    }
+    margin: 5px; 
+}
+.blocklyFlyoutButton .blocklyFlyoutButtonShadow:hover {
+    filter: brightness(0.5);
 }
 .blocklyFlyoutButton:hover {
     border: var(--ui-transparent-dark) 1px solid;
 
-    & .blocklyFlyoutButtonShadow {
-        stroke: var(--ui-transparent-dark);
-        stroke-width: 1px;
-    }
+    
+}
+.blocklyFlyoutButton:hover .blocklyFlyoutButtonShadow {
+    stroke: var(--ui-transparent-dark);
+    stroke-width: 1px;
 }
 .blocklyFlyoutButton:active {
     filter: 1.2;
@@ -236,7 +234,7 @@ export function registerAstratchToolbox(): void {
     border-radius: 5px;
 }
 .ash-toolbox-tools button:hover {
-    border-color: var(--ui-transparent-dark);
+    border-color: var(--ui-transparent-light);
 }
 .ash-toolbox-tools img {
     width: 12px;
@@ -257,30 +255,11 @@ g.astratchFlyoutGroupLevel1 text {
     font-size: larger !important;
 }
 
-/*  Blockly 下拉框、提示框、注释框、取色与缩放（HTML 浮层，不属于积木 SVG）  */
-.blocklyDropDownDiv {
-    background-color: var(--ui-secondary);
-    border-color: var(--ui-tertiary);
-}
-.blocklyDropDownDiv span {
-    color: var(--ui-text);
-}
-.blocklyDropDownDiv hr {
-    border-top: 1px solid var(--ui-tertiary);
-}
-
-.fieldColourEyedropper {
-    color: var(--ui-text);
-}
-
 /* Blockly 注释框内的文字颜色（不随主题变化） */
 .blocklyComment .blocklyTextarea {
     color: #000 !important;
 }
 
-.fieldColourSlider {
-    background-color: var(--ui-secondary);
-}
 .blocklyZoom.blocklyZoomReset {
     transform: translateY(10px);
 }
@@ -290,6 +269,25 @@ g.astratchFlyoutGroupLevel1 text {
 
 .blocklyToolboxCategoryIcon {
     filter: var(--ui-svg-filter) invert(1);
+}
+
+.ash-toolbox-infoBox-icon {
+    filter: var(--ui-svg-filter);
+    width: 16px;
+    height: auto;
+}
+.ash-toolbox-infoBox-box {
+    display: flex;
+    align-items: center;
+    padding: 2px;
+}
+.ash-toolbox-infoBox-text {
+    font-size: 0.65rem;
+    flex: 1
+}
+.ash-toolbox-infoBox {
+    opacity: 0.7;
+    margin: 2px
 }
   `);
 }

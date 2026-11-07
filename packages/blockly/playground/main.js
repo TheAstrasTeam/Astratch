@@ -1,7 +1,9 @@
 import { blocklyAdapter } from '../src/blockly';
 import * as Blockly from 'blockly';
-import { getDefaultToolbox } from '../src/toolbox/default/index';
+import { getToolbox } from '../src/toolbox/index';
 import { dark, light } from './theme';
+import { OPCODES } from '../src';
+import { ashMultiSelectorManager } from '../src/plugins/workspace/multiSelector';
 
 const style = document.createElement('style');
 // 默认是暗色
@@ -18,11 +20,66 @@ if (select)
         else style.textContent = light;
     };
 
-const id = blocklyAdapter.addWorkspace(document.querySelector('#app'), undefined, {
-    toolbox: getDefaultToolbox(),
+const handler = (type, data) => {
+    console.debug(`Got event "${type}": `, data);
+    if (type === 'GET_MENU' && data.type === 'entities') {
+        data.handler([
+            ['A', 'a'],
+            ['B', 'b'],
+        ]);
+    }
+    if (type === 'GET_ASSET') {
+        data.handler('testHandle');
+    }
+    if (type === 'GET_ASSET_INFO') {
+        data.handler({
+            name: String(crypto.randomUUID()),
+            type: 'text',
+            raw: 'Hello World!',
+        });
+    }
+    if (type === 'RENAME_PARAM') {
+        data.handler(prompt(`Rename "${data.oldName}" to`, data.oldName));
+    }
+    if (type === 'GET_TEMPLATE') {
+        data.handler('testHandle');
+    }
+    if (type === 'GET_TEMPLATE_INFO') {
+        data.handler({
+            name: String(crypto.randomUUID()),
+        });
+    }
+};
+
+const id = blocklyAdapter.addWorkspace(document.querySelector('#app'), handler, undefined, {
+    toolbox: getToolbox(),
 });
+
+const workspace = blocklyAdapter.workspaces[id];
+
+const spawnRandomBlocksButton = document.getElementById('spawnRandomBlocks');
+if (spawnRandomBlocksButton)
+    spawnRandomBlocksButton.onclick = () => {
+        for (let i = 0; i <= 50; i += 1) {
+            const newBlock = workspace.workspaceSvg.newBlock(
+                Object.values(OPCODES)[Math.floor(Math.random() * Object.values(OPCODES).length)],
+            );
+            newBlock.moveTo(
+                new Blockly.utils.Coordinate(Math.random() * 1000, Math.random() * 1000),
+            );
+            newBlock.initSvg();
+            newBlock.render();
+        }
+    };
+const reloadWorkspace = document.getElementById('reloadWorkspace');
+if (reloadWorkspace)
+    reloadWorkspace.onclick = () => {
+        const project = Blockly.serialization.workspaces.save(workspace.workspaceSvg);
+        Blockly.serialization.workspaces.load(project, workspace.workspaceSvg);
+    };
 
 Object.assign(window, {
     blockly: Blockly,
-    workspace: blocklyAdapter.workspaces[id],
+    workspace,
+    workspaceMSM: ashMultiSelectorManager.getWorkspace(workspace.id),
 });

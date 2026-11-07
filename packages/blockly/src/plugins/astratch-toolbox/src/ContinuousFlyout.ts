@@ -213,13 +213,6 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
     override position() {
         super.position();
 
-        // 将 flyout 背景改为直角矩形，去掉 Blockly 默认的圆角
-        if (this.svgBackground_) {
-            const w = this.width_;
-            const h = this.height_;
-            this.svgBackground_.setAttribute('d', `M 0,0 h ${w} v ${h} h ${-w} z`);
-        }
-
         const verticalScrollbar = this.getWorkspace().scrollbar?.vScroll;
         if (verticalScrollbar) {
             verticalScrollbar.setPosition(

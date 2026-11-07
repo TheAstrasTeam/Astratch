@@ -26,6 +26,9 @@
 - `execute` 将坐标设为 [number, number]
 - `execute` 将坐标增加 [number, number]
 
+- `returns`-`number` x 坐标
+- `returns`-`number` y 坐标
+
 ### 方向
 
 - `execute` <左转图标>|左转 number 度
@@ -108,13 +111,13 @@
 
 ## 音频
 
-> 音频在目标和模块都能播放，因此统称目标
+> 音频在实体和模块都能播放，因此统称目标
 
 > 音频是分目标管理的，这意味着若a目标播放名称为a的音频，b目标是找不到的。
 
 - `execute` [暂停,播放]所有音频
 - `execute` 停止所有音频
-- `execute` 将所有音频的[音量,音调,左右平衡]设为`number`%
+- `execute` 将所有音频的[音量,音调,左右平衡,速度]设为`number`%
     - 会覆盖其它音频的效果
 
 - `returns`-`string[]` 所有音频的名称
@@ -145,23 +148,23 @@
 
 ---
 
-> 临时资源是全局共享的
+<!-- > 临时资源是全局共享的
 
-- `execute` 添加类型为[类型]，名称为`string`的临时资源
+- `execute` 添加类型为[文本,图片,音频,视频,字体]，名称为`string`的临时资源
     - [类型] 会打开 `类型制作器`
 - `execute` 将名称为`string`的临时资源的内容设为`typeof  [类型]`
     - 填写的值的类型取决于[类型]的值
 - `execute` 删除名称为`string`的临时资源
     - 如果其它地方使用了被删除（也就是不存在）的资源，返回**空白资源**
 - `returns`-`boolean` 存在名称为`string`的临时资源
-- `returns`-`AssetHandle` 名称为`string`的临时资源
+- `returns`-`AssetHandle` 名称为`string`的临时资源 -->
 
 ---
 
-- `returns`-`number` 资源`AssetHandle`的字节长度
+- `returns`-`number` 资源`AssetHandle`的长度
 
-- `returns`-`number` <图片>资源`AssetHandle`的[长度,宽度]
-    - [长度,宽度] 均为像素数量
+- `returns`-`number` <图片>资源`AssetHandle`的[宽度,高度]
+    - [宽度,高度] 均为像素数量
 - `returns`-`string` <图片>资源`AssetHandle`的类型
     - [类型] 诸如`svg`, `png`等
 
@@ -169,63 +172,46 @@
 
 ## 实体
 
-### 克隆体
-
-- [定义一个模板]
-    - 定义模板名称
-    - 定义接受的参数，和函数基本一致，例如“`(string)色的按钮，点击后触发(function)`”
+### 临时实体
 
 ---
 
-当属于模板`object`的克隆体碰到[鼠标指针,...实体]时{}
-
----
-
-- `returns`-`object` ...模板
-    - 例如“`<图标> | (string)色的按钮，点击后触发(function)`”
-    - 和函数值基本一致
-
----
-
+- `returns`-`object`：模板 `string`
+    - 点击`string`会打开模板选择器
 - `returns`-`string`： <br /> 通过模板 `object` 创建实例<br /> 附带数据 [...values]
     - 返回指向实例的唯一ID，因此返回string
     - 类似构造了实例
 - `execute` 激活实例`string`
-    - 也就是“创建克隆体”
+    - 该块不会出现在`模块`中
     - 如果传入了一个不存在的实例，什么都不做
+- `execute` 停止实例`string`
+    - ID依然可用，实例会停止执行任何脚本
 - `execute` 删除实例`string`
-    - 删除ID为`string`的克隆体实例&数据实例，ID变为无效
+    - 删除ID为`string`的实例，ID变为无效
+
+> 删除实例，停止实例，激活实例 对于实体可用但不推荐用
+> 因此会警告
 
 ---
 
 - `execute` 应用父实体的属性
-    - 该块不会出现在`模块`中
+    - 该块只会出现在`实体模板`中
     - 继承：xy坐标、方向、大小、造型、文字、特效、混合模式、裁剪
+    - 父实体取决于“激活实例”的触发方
 
 ### 数据
 
-- `returns`-`string` 此实体实例
+- `returns`-`string` 此实例
     - 该块不会出现在`模块`中
-    - 是的，克隆体和实体本质是同一种东西，所以它们都可以返回实例
-    - 克隆体实例内会返回创建并激活（这俩行为肯定在一起）它的实例
-- `returns`-`string[]` 所有的实体实例
+    - 若为实体模板，获取的是当前对应的运行实例
+- `returns`-`string[]` 基于模板 `object` 的所有实例
+    - 按下`object`打开实体选择器
+- `returns`-`string[]` 所有的实例
 
 ---
 
-- `returns`-`number`: <br />`string`实例的[`x坐标`,`y坐标`,`大小`,`方向`,`当前层级`,`显示文字的字号`,`显示文字的边框宽度`,`显示文字的像素长度`]
-
-- `returns`-`boolean`: <br /> `string`实例[`正在显示`,`正在显示文字`]
-
-- `returns`-`string`: <br /> `string`实例的[`当前显示的造型`,`显示文字的字体资源名称`,`显示文字的内容`,`显示文字的颜色`,`显示文字的边框颜色`]
-
-- `returns`-`object[]`: <br /> `string`实例的[所有音频的名称,所有计时器的名称]
-    ```
-    {
-        target: string
-        ID: string
-    }[]
-    ```
-    - 普通的音频互动可以识别这个格式,因为实际上默认的名字会被处理为上面格式再使用。
+- `returns`-`unknown`: <br /> `string`实例的`return-block`
+    - `return-block` 里可以塞一个返回值积木，它将会在对应实体的地方执行并回传
 
 ## 事件
 
@@ -240,7 +226,6 @@
 
 - `event` 当此实体被[按下,松开]
     - 该块不会出现在`模块`内
-    - 它只能检测`实体`，而不能检测`克隆体实例` （因为如果可用，**同个克隆体实例，链接到被使用的实体若不同，行为也有可能不同**。如果要解决，需提供返回“我是谁”的积木，但是这和*通过Scratch的局部变量实现ID*有何**本质区别**？)
 
 - `event` 当项目运行了 `number` 秒后
     - 该块只会在成立后运行一次
@@ -348,6 +333,8 @@
 - `returns`-`number` 在`number`和`number`之间取随机数
 
 ### 逻辑
+
+- `returns`-`boolean` `unknown` [=,<,<=,>,>=,!=] `unknown` +(`unknown` [=,<,<=,>,>=,!=] `unknown`)
 
 - `returns`-`boolean` `boolean` 且 `boolean` +(`boolean` 且 `boolean`)
 - `returns`-`boolean` `boolean` 或 `boolean` +(`boolean` 或 `boolean`)

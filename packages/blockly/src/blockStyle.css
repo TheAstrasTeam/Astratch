@@ -19,33 +19,20 @@
 }
 
 .injectionDiv [class*='math_number']:not([class*='blocklyFlyout'] *):hover,
-.injectionDiv [class*='operator_logic_boolean']:not([class*='blocklyFlyout'] *):hover,
+.injectionDiv [class*='type.boolean']:not([class*='blocklyFlyout'] *):hover,
 .injectionDiv [class*='menu']:not([class*='blocklyFlyout'] *):hover,
-.injectionDiv [class*='text']:not([class*='blocklyFlyout'] *):hover {
+.injectionDiv [class*='text']:not([class*='blocklyFlyout'] *):hover,
+.injectionDiv [class*='asset.selector']:not([class*='blocklyFlyout'] *):hover {
     cursor: pointer !important;
 }
 .injectionDiv [class*='math_number']:not([class*='blocklyFlyout'] *):hover path,
-.injectionDiv [class*='operator_logic_boolean']:not([class*='blocklyFlyout'] *):hover path,
+.injectionDiv [class*='type.boolean']:not([class*='blocklyFlyout'] *):hover path,
 .injectionDiv [class*='menu']:not([class*='blocklyFlyout'] *):hover path,
-.injectionDiv [class*='text']:not([class*='blocklyFlyout'] *):hover path {
+.injectionDiv [class*='text']:not([class*='blocklyFlyout'] *):hover path,
+.injectionDiv [class*='asset.selector']:not([class*='blocklyFlyout'] *):hover path {
     stroke: var(--ui-secondary-icon) !important;
     stroke-width: 3px;
     stroke-opacity: 0.5;
-}
-.injectionDiv
-    [class*='math_number']:not([class*='blocklyFlyout'] *)
-    [class*='operator_logic_boolean']:active,
-.injectionDiv
-    [class*='operator_logic_boolean']:not([class*='blocklyFlyout'] *)
-    [class*='operator_logic_boolean']:active,
-.injectionDiv
-    [class*='menu']:not([class*='blocklyFlyout'] *)
-    [class*='operator_logic_boolean']:active,
-.injectionDiv
-    [class*='text']:not([class*='blocklyFlyout'] *)
-    [class*='operator_logic_boolean']:active {
-    cursor: pointer !important;
-    filter: brightness(0.5);
 }
 
 /*  积木控件  */
@@ -75,4 +62,18 @@ g.blocklyImageField[role='button']:hover {
     stroke-linejoin: round;
     stroke-opacity: 0.2;
     stroke-width: 2.15;
+}
+.ashStringSlotHint {
+    fill: #000;
+    opacity: 0.2;
+}
+
+.ashGetterSlotHint {
+    fill: #ffffff;
+    fill-opacity: 0.2;
+}
+
+.block-icon {
+    opacity: 1 !important;
+    pointer-events: none;
 }
