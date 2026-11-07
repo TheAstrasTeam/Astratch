@@ -1,13 +1,7 @@
 import { t } from 'astratch-i18n';
 
 import { TOOLBOX_COLOR } from '../color';
-import {
-    BlockIcon,
-    TYPES,
-    connections,
-    objectInput,
-    returnConnections,
-} from '../helps';
+import { BlockIcon, TYPES, connections, objectInput, returnConnections } from '../helps';
 import { OPCODES } from '../opcodes';
 import { blocklyAdapter } from '../../blockly';
 import * as Blockly from 'blockly';

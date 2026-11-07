@@ -310,7 +310,6 @@ export const initRenderBlocks = () => {
             });
         },
     } as Blockly.Block;
-    
 
     // 方向
     blocklyAdapter.Blockly.Blocks[OPCODES.turnLeft] = {

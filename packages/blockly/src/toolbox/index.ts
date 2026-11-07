@@ -422,9 +422,15 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                                 FROM: num('1'),
                                 TO: num('2'),
                             }),
-                            block(OPCODES.split, { SEPARATOR: str(t('blocks:split.example')), STRING: str() }),
+                            block(OPCODES.split, {
+                                SEPARATOR: str(t('blocks:split.example')),
+                                STRING: str(),
+                            }),
                             block(OPCODES.char, undefined),
-                            block(OPCODES.contains, { STRING: str(), SUBSTRING: str(t('blocks:contains.example')) }),
+                            block(OPCODES.contains, {
+                                STRING: str(),
+                                SUBSTRING: str(t('blocks:contains.example')),
+                            }),
                             block(OPCODES.stringLength, { STRING: str() }),
                         ],
                     },

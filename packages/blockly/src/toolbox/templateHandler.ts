@@ -10,10 +10,7 @@ export class TemplateHandler {
     storageName: string | null = null;
     onUpdateTemplate: ((info: ITEMPLATE_INFO) => void) | undefined = undefined;
 
-    constructor(
-        block: Blockly.Block,
-        onUpdateTemplate: (info: ITEMPLATE_INFO) => void,
-    ) {
+    constructor(block: Blockly.Block, onUpdateTemplate: (info: ITEMPLATE_INFO) => void) {
         this.block = block;
         this.onUpdateTemplate = onUpdateTemplate;
     }
