@@ -8,7 +8,7 @@ import {
     type TMenubarManagerPositions,
     type TMenubarManagerValueMeta,
 } from '../../lib/MenubarManager';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { commandManager } from '../../lib/CommandManager';
 
 export const Menubar_RendererMenu = ({
@@ -18,6 +18,30 @@ export const Menubar_RendererMenu = ({
     Button: ReactNode;
     pos: TMenubarManagerPositions;
 }) => {
+    const [times, setUpdateTimes] = useState(0);
+    useEffect(() => {
+        const update = () => {
+            setUpdateTimes(time => time + 1);
+        };
+        menubarManager.off('ADDED_CATEGORY', update);
+        menubarManager.off('ADDED_VALUE', update);
+        menubarManager.off('DELETED_CATEGORY', update);
+        menubarManager.off('DELETED_VALUE', update);
+        menubarManager.off('EDITED_CATEGORY', update);
+        menubarManager.on('ADDED_CATEGORY', update);
+        menubarManager.on('ADDED_VALUE', update);
+        menubarManager.on('DELETED_CATEGORY', update);
+        menubarManager.on('DELETED_VALUE', update);
+        menubarManager.on('EDITED_CATEGORY', update);
+        return () => {
+            menubarManager.off('ADDED_CATEGORY', update);
+            menubarManager.off('ADDED_VALUE', update);
+            menubarManager.off('DELETED_CATEGORY', update);
+            menubarManager.off('DELETED_VALUE', update);
+            menubarManager.off('EDITED_CATEGORY', update);
+        };
+    }, []);
+
     const renderValue = (value: TMenubarManagerValueMeta) => {
         if (value.isDivider) return <MenuDivider />;
         const text = value.translate ? t(`gui:${value.nameID}`) : value.name;
@@ -40,7 +64,7 @@ export const Menubar_RendererMenu = ({
         );
     };
     return (
-        <Menu Button={Button}>
+        <Menu key={times} Button={Button}>
             {Array.from(menubarManager.listPosition(pos)).map(([_, category], index) => (
                 <React.Fragment key={category.meta.id}>
                     {/* 第一个 category 不需要分隔符 */}
