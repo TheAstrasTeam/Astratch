@@ -10,6 +10,9 @@ import './lib/initAstratch';
 document.querySelectorAll('.loading').forEach(ele => {
     ele.remove();
 });
+document.querySelectorAll('.logo').forEach(ele => {
+    ele.removeAttribute('hidden');
+});
 
 if (!window.isSecureContext) {
     throw new Error(`Astratch need secure context to run.
