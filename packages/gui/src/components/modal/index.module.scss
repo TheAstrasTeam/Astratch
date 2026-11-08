@@ -1,0 +1,133 @@
+@use '../../styles/styles.scss' as *;
+
+.main {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    & .modal {
+        flex-direction: column;
+        display: flex;
+        pointer-events: all;
+        position: fixed;
+        background-color: $ui-secondary;
+        box-shadow: 0 0 17px 0px var(--ui-primary);
+        border-radius: 5px;
+        & .titlebar {
+            border-radius: 5px 5px 3px 3px;
+            display: flex;
+            width: 100%;
+            height: 25px;
+            background-color: $ui-tertiary;
+            user-select: none;
+            touch-action: none;
+            align-items: center;
+            padding: 5px;
+        }
+        & .resize-height {
+            border-radius: 5px;
+            position: absolute;
+            z-index: 1;
+            transition: background-color 0.2s ease;
+            height: 3px;
+            width: 100%;
+            touch-action: none;
+            cursor: ns-resize;
+            &[data-side='top'] {
+                top: 0;
+                left: 0;
+                transform: translateY(-3px);
+            }
+            &[data-side='bottom'] {
+                bottom: 0;
+                left: 0;
+                transform: translateY(3px);
+            }
+            &:hover,
+            &:active {
+                background-color: $accent-secondary;
+            }
+            &::before {
+                content: '';
+                position: absolute;
+                inset: -5px;
+            }
+        }
+        & .resize-width {
+            border-radius: 5px;
+            position: absolute;
+            z-index: 1;
+            transition: background-color 0.2s ease;
+            height: 100%;
+            width: 3px;
+            touch-action: none;
+            cursor: ew-resize;
+            &[data-side='left'] {
+                top: 0;
+                left: 0;
+                transform: translateX(-3px);
+            }
+            &[data-side='right'] {
+                top: 0;
+                right: 0;
+                transform: translateX(3px);
+            }
+            &:hover,
+            &:active {
+                background-color: $accent-secondary;
+            }
+            &::before {
+                content: '';
+                position: absolute;
+                inset: -5px;
+            }
+        }
+        /*
+            角落只是命中区，本身不画东西：
+            悬停 / 拖动时由下面那条规则点亮相邻的两条边，形成 L 形，
+            和 VS Code 的行为一致
+        */
+        & .resize-corner {
+            position: absolute;
+            z-index: 2;
+            width: 8px;
+            height: 8px;
+            background-color: transparent;
+            touch-action: none;
+            &[data-side='top-left'] {
+                top: 0;
+                left: 0;
+                cursor: nwse-resize;
+            }
+            &[data-side='top-right'] {
+                top: 0;
+                right: 0;
+                cursor: nesw-resize;
+            }
+            &[data-side='bottom-left'] {
+                bottom: 0;
+                left: 0;
+                cursor: nesw-resize;
+            }
+            &[data-side='bottom-right'] {
+                bottom: 0;
+                right: 0;
+                cursor: nwse-resize;
+            }
+        }
+        /*
+            角落激活时，把它相邻的两条边一起高亮。
+            用 data-side 的前缀 / 后缀匹配，避免为四个角各写一遍：
+            top-left / top-right 都含 top，bottom-* 都含 bottom，*-left / *-right 同理
+        */
+        &:has(.resize-corner[data-side*='top']:is(:hover, :active)) .resize-height[data-side='top'],
+        &:has(.resize-corner[data-side*='bottom']:is(:hover, :active))
+            .resize-height[data-side='bottom'],
+        &:has(.resize-corner[data-side*='left']:is(:hover, :active))
+            .resize-width[data-side='left'],
+        &:has(.resize-corner[data-side*='right']:is(:hover, :active))
+            .resize-width[data-side='right'] {
+            background-color: $accent-secondary;
+        }
+    }
+}

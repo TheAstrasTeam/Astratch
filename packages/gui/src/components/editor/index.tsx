@@ -3,6 +3,7 @@ import { Menubar } from './menubar';
 import styles from './index.module.scss';
 import { BottomBar } from './bottomBar';
 import { Workspace } from '../workspace';
+import { Modal_coverLayer } from '../modal';
 
 export const Editor = () => {
     return (
@@ -13,6 +14,7 @@ export const Editor = () => {
                 <BottomBar />
             </div>
             <QuickOpen_coverLayer />
+            <Modal_coverLayer />
         </div>
     );
 };

@@ -6,15 +6,15 @@ import './styles/public.scss';
 import './styles/menu.scss';
 import './lib/initAstratch';
 
-if (!window.isSecureContext) {
-    throw new Error(`Astratch need secure context to run.
-To view the dist, use \`pnpm preview\`.`);
-}
-
-// 删除加载页面和错误界面
+// 删除加载页面
 document.querySelectorAll('.loading').forEach(ele => {
     ele.remove();
 });
+
+if (window.isSecureContext) {
+    throw new Error(`Astratch need secure context to run.
+To view the dist, use \`pnpm preview\`.`);
+}
 
 const root = document.getElementById('root');
 if (root)
