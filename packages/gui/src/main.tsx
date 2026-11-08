@@ -11,7 +11,7 @@ document.querySelectorAll('.loading').forEach(ele => {
     ele.remove();
 });
 
-if (window.isSecureContext) {
+if (!window.isSecureContext) {
     throw new Error(`Astratch need secure context to run.
 To view the dist, use \`pnpm preview\`.`);
 }
