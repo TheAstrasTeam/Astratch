@@ -130,4 +130,7 @@ export default {
 
     help_source: '源码',
     help_source_description: '查看 Astratch 的开源仓库',
+
+    target: '目标',
+    targets: '目标',
 };

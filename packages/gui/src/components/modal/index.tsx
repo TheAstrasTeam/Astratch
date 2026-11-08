@@ -113,8 +113,7 @@ const ModalItem = ({
     }, []);
 
     // 缓存用
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const content = useMemo(() => info.renderer(), [info.renderer]);
+    const content = useMemo(() => info.renderer, [info.renderer]);
 
     const handleDragStart = (event: ReactPointerEvent<HTMLDivElement>) => {
         if (event.button !== 0 || !info.canMove) return;

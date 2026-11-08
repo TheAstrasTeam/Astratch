@@ -1,4 +1,53 @@
+@use '../../styles/styles.scss' as *;
+
 .main {
     display: flex;
     flex: 1;
+    padding: 10px;
+}
+
+.sidebar {
+    display: flex;
+    padding: 5px;
+    flex-direction: column;
+    min-width: 20vw;
+    background-color: $ui-secondary;
+    box-shadow: 0 0 5 0 $ui-transparent-dark;
+    border: 1px solid $ui-tertiary;
+    border-radius: 10px 2px 2px 10px;
+    & .sidebar-items {
+        display: flex;
+        list-style-type: none;
+        padding: 0;
+        padding-bottom: 5px;
+        margin: 0;
+
+        & .sidebar-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            width: 25px;
+            height: 25px;
+            svg {
+                width: 20px;
+                height: auto;
+                filter: brightness(0.5);
+            }
+            &:hover {
+                svg {
+                    filter: brightness(1);
+                }
+            }
+            &.selected {
+                svg {
+                    filter: brightness(1);
+                }
+                background-color: $ui-quaternary;
+            }
+        }
+    }
+    & .title {
+        font-weight: bolder;
+    }
 }

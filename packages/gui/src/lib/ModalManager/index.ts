@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { create, type StoreApi, type UseBoundStore } from 'zustand';
 
 export interface IModalInfo {
-    renderer: () => ReactNode;
+    renderer: ReactNode;
     id: string;
     x: number;
     y: number;
@@ -16,7 +16,7 @@ export interface IModalInfo {
 }
 
 interface IModalSubmitInfo {
-    renderer: () => ReactNode;
+    renderer: ReactNode;
     id?: string;
     x?: number;
     y?: number;
