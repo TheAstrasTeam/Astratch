@@ -39,12 +39,12 @@
 /* 积木图片按钮 */
 g.blocklyImageField[role='button'] {
     padding: 5px;
-    outline: 2px solid #ffffff50;
+    outline: 3px solid #ffffff50;
     border-radius: 5px;
-    transition: outline-width 0.3s ease-in-out;
+    transition: outline-color 0.1s ease-in-out;
 }
 g.blocklyImageField[role='button']:hover {
-    outline-width: 4px;
+    outline-color: #ffffff;
 }
 
 [class*='ashFunctionValueText'] text {

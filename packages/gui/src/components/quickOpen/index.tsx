@@ -1,49 +1,80 @@
-import {
-    useEffect,
-    useRef,
-    useState,
-    type AnimationEvent,
-    type FunctionComponent,
-    type SVGProps,
-} from 'react';
+import { useEffect, useRef, useState, type AnimationEvent } from 'react';
 import classNames from 'classnames';
 import { t } from 'astratch-i18n';
 
-import { useQuickOpen } from './api';
+import { keydownHandler, useQuickOpen } from './api';
 import { quickOpenManager } from '../../lib/QuickOpenManager';
 
 import { Hr } from '../hr';
 
 import styles from './index.module.scss';
 
-const HomeGoto = ({
-    Img,
-    name,
-    command,
-    description,
-    onClick,
-}: {
-    Img: FunctionComponent<SVGProps<SVGSVGElement>> | undefined;
-    name: string;
-    description: string;
-    command: string;
-    onClick: () => void;
-}) => (
-    <div className={styles.homeGoto} onClick={onClick}>
-        {Img && (
-            <div className={styles.photo}>
-                <Img />
-            </div>
-        )}
-        <div className={styles.texts}>
-            <div className={styles.firstLine}>
-                <span>{name}</span>
-                <div className={styles.gotoCommand}>{command}</div>
-            </div>
-            <span className={styles.description}>{description}</span>
+const HomeGoto = ({ setInputContent }: { setInputContent: (text: string) => void }) => {
+    const [highlightedIndex, setHighlightedIndex] = useState(0);
+
+    const items = Array.from(quickOpenManager.listModes());
+
+    const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+    useEffect(() => {
+        keydownHandler.registerQuickOpenKeydown(key => {
+            if (key === 'ArrowDown') {
+                setHighlightedIndex(index => Math.min(index + 1, items.length - 1));
+            } else if (key === 'ArrowUp') {
+                setHighlightedIndex(index => Math.max(index - 1, 0));
+            } else {
+                setInputContent(`${items[highlightedIndex][1].prefix} `);
+            }
+        });
+        return () => {
+            keydownHandler.registerQuickOpenKeydown(null);
+        };
+    }, [highlightedIndex, items, items.length, setInputContent]);
+
+    useEffect(() => {
+        itemRefs.current[highlightedIndex]?.scrollIntoView({ block: 'nearest' });
+    }, [highlightedIndex]);
+
+    return (
+        <div className={styles.home}>
+            {items.map(([, item], index) => {
+                const Icon = item.icon;
+                return (
+                    <div
+                        className={classNames(styles.homeGoto, {
+                            [styles.isHovering]: highlightedIndex === index,
+                        })}
+                        onClick={() => {
+                            setInputContent(`${item.prefix} `);
+                        }}
+                        key={item.id}
+                        ref={el => {
+                            itemRefs.current[index] = el;
+                        }}
+                        onMouseEnter={() => {
+                            setHighlightedIndex(index);
+                        }}
+                    >
+                        {Icon && (
+                            <div className={styles.photo}>
+                                <Icon />
+                            </div>
+                        )}
+                        <div className={styles.texts}>
+                            <div className={styles.firstLine}>
+                                <span>{item.translate ? t(item.nameID) : item.name}</span>
+                                <div className={styles.gotoCommand}>{item.prefix}</div>
+                            </div>
+                            <span className={styles.description}>
+                                {item.translate ? t(item.descriptionID) : item.description}
+                            </span>
+                        </div>
+                    </div>
+                );
+            })}
         </div>
-    </div>
-);
+    );
+};
 
 const QuickOpenPanel = ({ closing }: { closing: boolean }) => {
     const { closeQuickOpen, finishCloseQuickOpen } = useQuickOpen(state => state);
@@ -104,22 +135,7 @@ const QuickOpenPanel = ({ closing }: { closing: boolean }) => {
             );
         }
 
-        return (
-            <div className={styles.home}>
-                {items.map(([, item]) => (
-                    <HomeGoto
-                        key={item.id}
-                        Img={item.icon}
-                        name={item.translate ? t(item.nameID) : item.name}
-                        description={item.translate ? t(item.descriptionID) : item.description}
-                        command={item.prefix}
-                        onClick={() => {
-                            setInputContent(`${item.prefix} `);
-                        }}
-                    />
-                ))}
-            </div>
-        );
+        return <HomeGoto setInputContent={setInputContent} />;
     };
 
     return (
@@ -136,6 +152,18 @@ const QuickOpenPanel = ({ closing }: { closing: boolean }) => {
                 value={inputText}
                 onChange={event => {
                     setInputText(event.target.value);
+                }}
+                onKeyDown={event => {
+                    if (
+                        event.key === 'ArrowUp' ||
+                        event.key === 'ArrowDown' ||
+                        event.key === 'Enter'
+                    ) {
+                        if (keydownHandler.handler) {
+                            event.preventDefault();
+                            keydownHandler.handler(event.key);
+                        }
+                    }
                 }}
             />
             <Hr />

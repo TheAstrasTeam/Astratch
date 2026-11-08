@@ -32,7 +32,7 @@
             border-radius: 5px;
             padding: 5px;
             gap: 10px;
-            &:hover {
+            &.is-hovering {
                 background-color: $ui-quaternary;
             }
             .photo {

@@ -8,7 +8,7 @@
     &.is-unenable {
         opacity: 0.5;
     }
-    &:not(.is-unenable):hover {
+    &:not(.is-unenable).is-hovering {
         background-color: $ui-quaternary;
     }
     .left {

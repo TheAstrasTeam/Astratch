@@ -54,3 +54,7 @@ body {
         background: transparent;
     }
 }
+
+*:focus {
+    outline-color: $accent-highlight;
+}

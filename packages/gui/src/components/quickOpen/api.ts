@@ -25,3 +25,15 @@ export const useQuickOpen: UseBoundStore<StoreApi<IUseQuickOpen>> = create(set =
         set(state => (state.phase === 'closing' ? { phase: 'closed' } : {}));
     },
 }));
+
+const keydownHandler: {
+    handler: ((key: 'ArrowUp' | 'ArrowDown' | 'Enter') => void) | null;
+    registerQuickOpenKeydown(fn: ((key: 'ArrowUp' | 'ArrowDown' | 'Enter') => void) | null): void;
+} = {
+    handler: null,
+    registerQuickOpenKeydown(fn: ((key: 'ArrowUp' | 'ArrowDown' | 'Enter') => void) | null) {
+        keydownHandler.handler = fn;
+    },
+};
+
+export { keydownHandler };
