@@ -1,0 +1,85 @@
+@use '../../../../../styles/styles.scss' as *;
+
+.targets-node {
+    padding-left: 20px;
+    border-left: transparent 1px solid;
+    transition: border-color 1s ease;
+    overflow: visible;
+    flex: 1;
+    margin-top: 0;
+}
+
+.target-node {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 2px;
+    border-radius: 3px;
+    transition: background-color 0.1s ease;
+    & svg {
+        width: 18px;
+        height: auto;
+    }
+    min-width: max-content;
+    &:hover {
+        background-color: $ui-quaternary;
+    }
+}
+
+.targets-tree {
+    display: flex;
+    flex-direction: column;
+    padding-left: 0;
+    flex: 1;
+    overflow: visible;
+    &:hover {
+        & .targets-node {
+            border-color: $ui-quaternary;
+        }
+    }
+    & .target-button,
+    & .folder-expand-button {
+        font-size: 14px;
+        background-color: transparent;
+        border: none;
+    }
+}
+.main {
+    & .target-button,
+    & .folder-expand-button {
+        font-size: 14px;
+        background-color: transparent;
+        border: none;
+    }
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: auto;
+    & .targets-list {
+        overflow: auto;
+        flex: 1;
+    }
+}
+
+.target-dialog {
+    display: flex;
+    flex-direction: column;
+    & svg {
+        width: 32px;
+        height: auto;
+    }
+}
+
+.project-bar {
+    display: flex;
+    padding: 2px;
+    padding-left: 10px;
+    & svg {
+        width: 18px;
+        height: auto;
+    }
+    & .project-name {
+        padding-left: 5px;
+        font-size: large;
+    }
+}

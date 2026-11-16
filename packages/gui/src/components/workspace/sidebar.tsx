@@ -3,8 +3,11 @@ import { sidebar } from '../../lib/SidebarManager';
 import styles from './index.module.scss';
 import classNames from 'classnames';
 
-export const Sidebar = () => {
+export const Sidebar = ({ width }: { width: string }) => {
     const [selectedItem, setSelectedItem] = useState<string | null>(null);
+    const [Renderer, setRenderer] = useState<ReturnType<
+        NonNullable<ReturnType<typeof sidebar.getRenderer>>
+    > | null>(null);
     const [updateTimes, setUpdateTimes] = useState(0);
     useEffect(() => {
         const update = () => {
@@ -18,9 +21,9 @@ export const Sidebar = () => {
             sidebar.off('ADDED_ITEM', update);
             sidebar.off('DELETED_ITEM', update);
         };
-    });
+    }, []);
     return (
-        <div className={styles.sidebar}>
+        <div className={styles.sidebar} style={{ width }}>
             <ul key={updateTimes} className={styles.sidebarItems}>
                 {sidebar.listItem().map(item => {
                     const Icon = item.Icon;
@@ -28,19 +31,33 @@ export const Sidebar = () => {
                         <li
                             onPointerDown={() => {
                                 setSelectedItem(item.id);
+                                if (selectedItem)
+                                    sidebar.setStorage(selectedItem, Renderer!.storage());
+                                setRenderer(sidebar.getRenderer(item.id)!);
                             }}
                             key={item.id}
-                            className={classNames(styles.sidebarItem, {
-                                [styles.selected]: item.id === selectedItem,
-                            })}
                         >
-                            <Icon />
+                            <button
+                                className={classNames(styles.sidebarItem, {
+                                    [styles.selected]: item.id === selectedItem,
+                                })}
+                                onClick={() => {
+                                    setSelectedItem(item.id);
+                                    if (selectedItem)
+                                        sidebar.setStorage(selectedItem, Renderer!.storage());
+                                    setRenderer(sidebar.getRenderer(item.id)!);
+                                }}
+                            >
+                                <Icon />
+                            </button>
                         </li>
                     );
                 })}
             </ul>
             <span className={styles.title}>{sidebar.storage.get(selectedItem ?? '')?.name}</span>
-            <div style={{ flex: '1' }}>{sidebar.getRenderer(selectedItem ?? '')}</div>
+            <div className={styles.content}>
+                {Renderer ? <Renderer.Node {...sidebar.readStorageFromID(selectedItem!)!} /> : null}
+            </div>
             <div>Stage</div>
         </div>
     );

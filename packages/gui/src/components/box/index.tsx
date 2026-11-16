@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import classNames from 'classnames';
 
@@ -7,12 +7,14 @@ import { MarkdownArea } from '../markdown';
 
 interface IBox extends React.ComponentProps<'div'> {
     tip?: string;
-    tipMode?: 'markdown' | 'html' | 'text';
+    Tip?: ReactNode;
+    tipMode?: 'markdown' | 'html' | 'text' | 'react';
     tipPosition?: 'pointer' | 'dom';
 }
 
 export const Box = ({
     tip,
+    Tip,
     tipMode = 'text',
     tipPosition = 'pointer',
     children,
@@ -143,6 +145,8 @@ export const Box = ({
                 return <MarkdownArea>{tip ?? ''}</MarkdownArea>;
             case 'text':
                 return <span>{tip ?? ''}</span>;
+            case 'react':
+                return <>{Tip}</>;
         }
     };
 
@@ -156,7 +160,7 @@ export const Box = ({
             {children}
 
             {['show', 'hiding'].includes(tipAniMode) &&
-                tip &&
+                (tip ?? Tip) &&
                 createPortal(
                     <div
                         ref={tipRef}

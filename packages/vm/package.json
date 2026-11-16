@@ -17,9 +17,13 @@
     "license": "Apache-2.0",
     "type": "module",
     "devDependencies": {
+        "@types/sharedworker": "^0.0.235",
         "astratch-blockly": "workspace:*",
         "astratch-core": "workspace:*",
         "typescript": "^6.0.3",
         "vitest": "^5.0.5"
+    },
+    "dependencies": {
+        "comlink": "^4.4.2"
     }
 }

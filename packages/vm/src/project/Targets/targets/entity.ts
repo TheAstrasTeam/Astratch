@@ -1,4 +1,6 @@
+import type { IEvents } from 'astratch-core';
 import { type ITargetInfo, Target } from '.';
+import type { IVMEventsType } from '../../../vm';
 
 interface IEntityInfo extends ITargetInfo {
     effects: {
@@ -123,13 +125,6 @@ interface IEntityInfo extends ITargetInfo {
                 from: string;
             }
         >;
-        cloneTemple: Map<
-            string,
-            {
-                ID: string;
-                from: string;
-            }
-        >;
         data: Map<
             string,
             {
@@ -148,6 +143,8 @@ interface IEntityInfo extends ITargetInfo {
             >
         >;
     };
+    /** 这个实体是模板吗 */
+    isTemplate: boolean;
 }
 
 class Entity extends Target implements IEntityInfo {
@@ -163,9 +160,10 @@ class Entity extends Target implements IEntityInfo {
     align: IEntityInfo['align'];
     tempData: IEntityInfo['tempData'];
     linkData: IEntityInfo['linkData'];
+    isTemplate: IEntityInfo['isTemplate'];
 
-    constructor(meta: Partial<IEntityInfo>) {
-        super({ ...meta });
+    constructor(meta: Partial<IEntityInfo>, emitMethod: IEvents<IVMEventsType>['emit']) {
+        super({ ...meta }, emitMethod);
         this.effects = meta.effects ?? {
             brightness: 100,
             color: 0,
@@ -205,11 +203,11 @@ class Entity extends Target implements IEntityInfo {
         this.tempData = meta.tempData ?? (new Map() as IEntityInfo['tempData']);
         this.linkData = meta.linkData ?? {
             function: new Map(),
-            cloneTemple: new Map(),
             data: new Map(),
             custom: {},
         };
         this.align = meta.align ?? 0;
+        this.isTemplate = meta.isTemplate ?? false;
     }
     serialize(): IEntityInfo {
         return {
@@ -229,7 +227,19 @@ class Entity extends Target implements IEntityInfo {
             linkData: this.linkData,
             tempData: this.tempData,
             workspaceSvg: this.workspaceSvg,
+            isTemplate: this.isTemplate,
+            parent: this.parent,
         };
+    }
+
+    setParent(newPathID: string | null): void {
+        this.emit('MOVE_TARGET', {
+            mode: 'entity',
+            targetID: this.id,
+            from: this.parent,
+            to: newPathID,
+        });
+        this.parent = newPathID;
     }
 }
 

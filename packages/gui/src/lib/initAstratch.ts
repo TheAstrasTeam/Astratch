@@ -1,4 +1,3 @@
-/** @author AI */
 import { commandManager } from './CommandManager';
 import { DB } from './DBManager';
 import { menubarManager } from './MenubarManager';
@@ -6,6 +5,7 @@ import { quickOpenManager } from './QuickOpenManager';
 import { themeManager } from './ThemeManager';
 import { windowManager } from './WindowManager';
 import { childID, isChildWindow, parentWindow } from '../utils/window';
+import { vm } from './vm';
 
 const Astratch = {
     themeManager,
@@ -14,6 +14,7 @@ const Astratch = {
     quickOpenManager,
     commandManager,
     windowManager,
+    vm,
 };
 Object.assign(window, { Astratch });
 

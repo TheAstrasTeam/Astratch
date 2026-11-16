@@ -19,7 +19,7 @@ export const Menubar = () => {
                             key={pos}
                             Button={
                                 <div className={styles.menu}>
-                                    <span>{t(`gui:menu_${pos}`)}</span>
+                                    <button>{t(`gui:menu_${pos}`)}</button>
                                 </div>
                             }
                             pos={pos}

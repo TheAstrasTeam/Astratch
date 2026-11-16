@@ -1,16 +1,11 @@
 import { Target, type ITargetInfo } from '.';
+import type { IEvents } from 'astratch-core';
+import type { IVMEventsType } from '../../../vm';
 
 interface IModuleInfo extends ITargetInfo {
     /** 链接的数据 */
     linkData: {
         function: Map<
-            string,
-            {
-                ID: string;
-                from: string;
-            }
-        >;
-        cloneTemple: Map<
             string,
             {
                 ID: string;
@@ -38,7 +33,6 @@ interface IModuleInfo extends ITargetInfo {
     /** 导出的数据 */
     exportData: {
         function: string[];
-        cloneTemple: string[];
         data: string[];
         custom: Record<string, string[]>;
     };
@@ -47,17 +41,15 @@ interface IModuleInfo extends ITargetInfo {
 class Module extends Target implements IModuleInfo {
     linkData: IModuleInfo['linkData'];
     exportData: IModuleInfo['exportData'];
-    constructor(meta: Partial<IModuleInfo>) {
-        super({ ...meta });
+    constructor(meta: Partial<IModuleInfo>, emitMethod: IEvents<IVMEventsType>['emit']) {
+        super({ ...meta }, emitMethod);
         this.linkData = meta.linkData ?? {
             function: new Map(),
-            cloneTemple: new Map(),
             data: new Map(),
             custom: {},
         };
         this.exportData = meta.exportData ?? {
             function: [],
-            cloneTemple: [],
             data: [],
             custom: {},
         };
@@ -71,7 +63,18 @@ class Module extends Target implements IModuleInfo {
             linkData: this.linkData,
             exportData: this.exportData,
             workspaceSvg: this.workspaceSvg,
+            parent: this.parent,
         };
+    }
+
+    setParent(newPathID: string | null): void {
+        this.emit('MOVE_TARGET', {
+            mode: 'module',
+            targetID: this.id,
+            from: this.parent,
+            to: newPathID,
+        });
+        this.parent = newPathID;
     }
 }
 

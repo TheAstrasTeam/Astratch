@@ -176,6 +176,7 @@
                 if (error) error.style.display = 'flex';
                 const errorMessage = error.querySelector('.errorMessage');
                 if (errorMessage) errorMessage.textContent = e;
+                document.querySelector('#root')?.remove();
             };
         </script>
     </body>

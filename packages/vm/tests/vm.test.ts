@@ -1,26 +1,34 @@
 import { beforeEach, describe, expect, test } from 'vitest';
-import { VM } from '../src/index';
+import { vm } from '../src/index';
 
 describe('VM', () => {
-    let vm: VM;
+    let testVM: typeof vm;
     beforeEach(() => {
-        vm = new VM();
+        testVM = vm;
+        testVM.createProject({
+            name: 'test',
+            id: '0',
+            author: [],
+        });
     });
     describe('目标', () => {
         test('创建目标', () => {
             for (let i = 0; i <= 200; i += 1)
-                expect(vm.runtime.createTarget('entity')).toEqual(expect.any(String));
+                expect(testVM.getProject!.getTargets.createTarget('entity')).toEqual(
+                    expect.any(String),
+                );
         });
         test('创建并删除目标', () => {
-            const id = vm.runtime.createTarget('entity');
+            const id = testVM.getProject!.getTargets.createTarget('entity');
             expect(id).toEqual(expect.any(String));
-            expect(vm.runtime.removeTarget('entity', id)).toEqual(true);
-            expect(vm.runtime.removeTarget('module', id)).toEqual(false);
+            expect(testVM.getProject!.getTargets.removeTarget('entity', id)).toEqual(true);
+            expect(testVM.getProject!.getTargets.removeTarget('module', id)).toEqual(false);
         });
         describe('使用自定义元信息', () => {
             test('使用自定义元信息导入目标', () => {
                 expect(
-                    vm.runtime.createTarget('entity', {
+                    testVM.getProject!.getTargets.createTarget('entity', {
+                        isTemplate: false,
                         workspaceSvg: null,
                         effects: {
                             brightness: 0,
@@ -55,7 +63,6 @@ describe('VM', () => {
                         tempData: new Map(),
                         linkData: {
                             function: new Map(),
-                            cloneTemple: new Map(),
                             data: new Map(),
                             custom: {},
                         },
@@ -65,13 +72,14 @@ describe('VM', () => {
                             script: {},
                             blocks: { blocks: { languageVersion: 1, blocks: [] } },
                         },
+                        parent: null,
                     }),
                 ).toEqual('test!');
             });
             test('使用不完整的元信息导入Target', () => {
                 expect(
                     // @ts-expect-error 缺失是有意的
-                    vm.runtime.createTarget('entity', {
+                    testVM.getProject!.Targets.createTarget('entity', {
                         id: 'test!',
                     }),
                 ).toEqual('test!');

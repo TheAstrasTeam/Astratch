@@ -5,6 +5,7 @@
     padding: 5px;
     border-radius: 5px;
     gap: 10px;
+    min-height: max-content;
     &.is-unenable {
         opacity: 0.5;
     }

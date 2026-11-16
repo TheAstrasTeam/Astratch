@@ -1,35 +1,82 @@
 import { EventBus } from 'astratch-core';
-import { Runtime, type IRuntime } from './runtime';
+import { Project, type IProjectMeta } from './project';
+import * as Comlink from 'comlink';
+import type { TTARGETS } from './project/Targets';
+
+export * from './project';
 
 interface IVMEventsType {
     SWITCH_TARGET: {
         targetID: string;
-        mode: 'entity' | 'module';
+        mode: TTARGETS;
     };
     UPDATE_PROJECT: {
         targetID: string;
-        mode: 'entity' | 'module';
+        mode: TTARGETS;
     };
     CREATE_TARGET: {
         targetID: string;
-        mode: 'entity' | 'module';
+        mode: TTARGETS;
     };
     REMOVE_TARGET: {
-        mode: 'entity' | 'module';
+        mode: TTARGETS;
         targetID: string;
+    };
+    MOVE_TARGET: {
+        mode: TTARGETS;
+        targetID: string;
+        from: string | null;
+        to: string | null;
+    };
+
+    ADD_PATH: {
+        mode: TTARGETS;
+        pathID: string;
+    };
+    DELETE_PATH: {
+        mode: TTARGETS;
+        pathID: string;
     };
 }
 
-interface IVM {
-    runtime: IRuntime;
-}
+class VM extends EventBus<IVMEventsType> {
+    /**
+     * ASH是单例的，因此有且只能有一个项目在同源编辑
+     */
+    private project: Project | undefined;
 
-class VM extends EventBus<IVMEventsType> implements IVM {
-    runtime: IRuntime;
-    constructor() {
+    /**
+     * @param projectMeta 如果要自动创建项目
+     */
+    constructor(projectMeta?: IProjectMeta) {
         super();
-        this.runtime = new Runtime(this.emit.bind(this));
+        if (projectMeta) this.createProject(projectMeta);
+    }
+
+    /** 创建一个新项目 */
+    createProject(projectMeta: IProjectMeta) {
+        this.project = new Project(this.emit.bind(this), projectMeta);
+    }
+
+    isCreatedProject() {
+        return !!this.project;
+    }
+
+    get getProject(): Project | undefined {
+        return this.project ? Comlink.proxy(this.project) : undefined;
+    }
+
+    test() {
+        console.log('Hello World!');
     }
 }
+const vm = new VM();
+export { vm, type IVMEventsType, type VM };
 
-export { VM, type IVMEventsType };
+try {
+    (self as unknown as SharedWorkerGlobalScope).onconnect = event => {
+        Comlink.expose(vm, event.ports[0]);
+    };
+} catch {
+    console.warn('Self is undefined');
+}

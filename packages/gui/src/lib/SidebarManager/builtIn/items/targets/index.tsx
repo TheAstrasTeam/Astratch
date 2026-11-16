@@ -1,11 +1,13 @@
 import { t } from 'astratch-i18n';
-import { type ISidebarSubmitItem } from '../../';
+import { type ISidebarSubmitItem } from '../../..';
 import Icon from '@as/targets/target.svg?react';
-
-const Renderer = <div>Hello World!</div>;
+import { Renderer } from './Renderer';
 
 export default {
     Renderer,
     Icon,
     name: t('gui:target'),
+    enable: () => {
+        return true;
+    },
 } satisfies ISidebarSubmitItem;

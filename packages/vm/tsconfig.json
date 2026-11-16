@@ -5,8 +5,8 @@
         "outDir": "./dist",
         "rootDir": "./src",
         "declaration": true,
-        "declarationMap": true
+        "declarationMap": true,
+        "types": ["sharedworker"]
     },
-    // vm 以源码形式引用 astratch-blockly，需带上其非 TS 资源的全局类型声明
-    "include": ["src", "../blockly/src/assets.d.ts"]
+    "include": ["src"]
 }

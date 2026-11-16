@@ -11,20 +11,37 @@ interface ISideBarEventTypes {
     };
 }
 
-interface ISidebarItem {
+export interface ISidebarItem {
     id: string;
     alt: string;
-    Renderer: ReactNode;
+    /**
+     * 返回一个渲染器的函数，其中 latestStorage 存储着上次返回的 storage
+     * storage 会在组件切换时触发
+     */
+    Renderer: () => {
+        Node: (latestStorage: Record<string, unknown>) => ReactNode;
+        storage: () => Record<string, unknown>;
+    };
+    latestStorage: Record<string, unknown>;
     Icon: FunctionComponent<SVGProps<SVGSVGElement>>;
     name: string;
+    enable: () => boolean;
 }
 
 export interface ISidebarSubmitItem {
     id?: string;
     alt?: string;
-    Renderer: ReactNode;
+    /**
+     * 返回一个渲染器的函数，其中 latestStorage 存储着上次返回的 storage
+     * storage 会在组件切换时触发
+     */
+    Renderer: () => {
+        Node: (latestStorage: Record<string, unknown>) => ReactNode;
+        storage: () => Record<string, unknown>;
+    };
     Icon: FunctionComponent<SVGProps<SVGSVGElement>>;
     name: string;
+    enable: () => boolean;
 }
 
 class Sidebar extends EventBus<ISideBarEventTypes> {
@@ -44,6 +61,7 @@ class Sidebar extends EventBus<ISideBarEventTypes> {
             ...item,
             id,
             alt: item.alt ?? '',
+            latestStorage: {},
         } satisfies ISidebarItem;
         this.storage.set(id, itemResult);
         this.emit('ADDED_ITEM', {
@@ -52,11 +70,11 @@ class Sidebar extends EventBus<ISideBarEventTypes> {
         return id;
     }
 
-    getRenderer(id: string) {
+    getRenderer(/** item的ID */ id: string) {
         return this.storage.get(id)?.Renderer;
     }
 
-    removeItem(id: string) {
+    removeItem(/** item的ID */ id: string) {
         if (this.storage.delete(id)) {
             this.emit('DELETED_ITEM', {
                 id,
@@ -66,14 +84,14 @@ class Sidebar extends EventBus<ISideBarEventTypes> {
         return false;
     }
 
-    moveItemToLast(id: string) {
+    moveItemToLast(/** item的ID */ id: string) {
         const value = this.storage.get(id);
         if (!value) return;
         this.storage.delete(id);
         this.storage.set(id, value);
     }
 
-    moveItemToTop(id: string) {
+    moveItemToTop(/** item的ID */ id: string) {
         if (!this.storage.has(id)) return;
         const entries = [...this.storage];
         const i = entries.findIndex(([k]) => k === id);
@@ -84,6 +102,16 @@ class Sidebar extends EventBus<ISideBarEventTypes> {
 
     listItem() {
         return Array.from(this.storage).map(item => item[1]);
+    }
+
+    /** 设置组件的存储 */
+    setStorage(/** item的ID */ id: string, latestStorage: Record<string, unknown>) {
+        if (!this.storage.has(id)) return;
+        this.storage.get(id)!.latestStorage = latestStorage;
+    }
+
+    readStorageFromID(/** item的ID */ id: string) {
+        return this.storage.get(id)?.latestStorage;
     }
 }
 

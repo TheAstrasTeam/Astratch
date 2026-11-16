@@ -3,10 +3,23 @@
 .main {
     display: flex;
     flex: 1;
-    padding: 10px;
+    align-items: center;
+    padding: 5px;
+    & .size-handle {
+        height: 95%;
+        border-radius: 999px;
+        width: 5px;
+        transition: background-color 0.5s ease;
+        background-color: transparent;
+        &:hover {
+            cursor: ew-resize;
+            background-color: $accent-secondary;
+        }
+    }
 }
 
 .sidebar {
+    height: 100%;
     display: flex;
     padding: 5px;
     flex-direction: column;
@@ -14,13 +27,14 @@
     background-color: $ui-secondary;
     box-shadow: 0 0 5 0 $ui-transparent-dark;
     border: 1px solid $ui-tertiary;
-    border-radius: 10px 2px 2px 10px;
+    border-radius: 3px 0 0 3px;
     & .sidebar-items {
         display: flex;
         list-style-type: none;
         padding: 0;
         padding-bottom: 5px;
         margin: 0;
+        gap: 4px;
 
         & .sidebar-item {
             display: flex;
@@ -29,6 +43,7 @@
             border-radius: 5px;
             width: 25px;
             height: 25px;
+            background-color: transparent;
             svg {
                 width: 20px;
                 height: auto;
@@ -36,8 +51,9 @@
             }
             &:hover {
                 svg {
-                    filter: brightness(1);
+                    filter: invert(0.5) brightness(1);
                 }
+                background-color: $ui-secondary;
             }
             &.selected {
                 svg {
@@ -49,5 +65,22 @@
     }
     & .title {
         font-weight: bolder;
+        padding: 5px;
     }
+    & .content {
+        display: flex;
+        flex: 1;
+    }
+}
+
+.workspace {
+    display: flex;
+    padding: 5px;
+    flex-direction: column;
+    min-width: 20vw;
+    background-color: $ui-secondary;
+    box-shadow: 0 0 5 0 $ui-transparent-dark;
+    border: 1px solid $ui-tertiary;
+    border-radius: 0 3px 3px 0;
+    height: 100%;
 }

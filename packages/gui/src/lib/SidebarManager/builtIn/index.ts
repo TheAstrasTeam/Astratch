@@ -1,6 +1,6 @@
 import { sidebar, type ISidebarSubmitItem } from '..';
 
-const builtIn_Items: Record<string, ISidebarSubmitItem> = import.meta.glob('./items/*.tsx', {
+const builtIn_Items: Record<string, ISidebarSubmitItem> = import.meta.glob('./items/**/index.tsx', {
     eager: true,
     import: 'default',
 });

@@ -4,6 +4,13 @@ body {
     margin: 0 !important;
 }
 
+button {
+    background-color: $ui-tertiary;
+    border: none;
+    padding: 2px;
+    border-radius: 4px;
+}
+
 input {
     border: transparent 1px solid;
     border-radius: 4px;
@@ -30,6 +37,8 @@ body {
     box-sizing: border-box;
     color: $ui-text;
     font-size: small;
+    min-height: 0;
+    min-width: 0;
     &::-webkit-scrollbar {
         width: 8px;
         height: 8px;
@@ -57,4 +66,11 @@ body {
 
 *:focus {
     outline-color: $accent-highlight;
+}
+
+ul {
+    list-style-type: initial;
+}
+li {
+    display: block;
 }

@@ -1,1 +1,1 @@
-export { VM } from './vm';
+export * from './vm';

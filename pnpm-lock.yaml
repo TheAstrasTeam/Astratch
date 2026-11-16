@@ -74,6 +74,9 @@ importers:
       classnames:
         specifier: ^2.5.1
         version: 2.5.1
+      comlink:
+        specifier: ^4.4.2
+        version: 4.4.2
       highlight.js:
         specifier: ^11.12.0
         version: 11.12.0
@@ -164,7 +167,14 @@ importers:
         version: 17.1.9(i18next@26.5.11(typescript@6.0.3))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3)
 
   packages/vm:
+    dependencies:
+      comlink:
+        specifier: ^4.4.2
+        version: 4.4.2
     devDependencies:
+      '@types/sharedworker':
+        specifier: ^0.0.235
+        version: 0.0.235
       astratch-blockly:
         specifier: workspace:*
         version: link:../blockly
@@ -821,6 +831,9 @@ packages:
   '@types/react@19.3.0':
     resolution: {integrity: sha512-N0rFCuH9YoxG9/m61l9MfpJKfmLOVU0em7ipIz6TRgSSkvReLB9vL85GB+yr8Bs5leqpvg96JSwF4ZS1s4viQg==}
 
+  '@types/sharedworker@0.0.235':
+    resolution: {integrity: sha512-y18jX49izexrh7oTmVdycUm6qJfyIl2C7ns5YnX8QeujENof8sWZ9s1s+87mWv9DofYSF1Q5vP46xfXRe8APIg==}
+
   '@types/unist@2.0.11':
     resolution: {integrity: sha512-CmBKiL6NNo/OqgmMn95Fk9Whlp2mtvIv+KNpQKN2F4SjvrEesubTRWGYSg+BnWZOnlCaSTU1sMpsBOzgbYhnsA==}
 
@@ -1011,6 +1024,9 @@ packages:
 
   classnames@2.5.1:
     resolution: {integrity: sha512-saHYOzhIQs6wy2sVxTM6bUDsQO4F50V9RQ22qBpEdCW+I+/Wmke2HOl6lS6dTpdxVhb88/I6+Hs+438c3lfUow==}
+
+  comlink@4.4.2:
+    resolution: {integrity: sha512-OxGdvBmJuNKSCMO4NTl1L47VRp6xn2wG4F/2hYzB6tiCb709otOxtEYCSvK80PtjODfXXZu8ds+Nw5kVCjqd2g==}
 
   comma-separated-tokens@2.0.3:
     resolution: {integrity: sha512-Fu4hJdvzeylCfQPp9SGWidpzrMs7tTrlu6Vb8XGaRGck8QSNZJJp538Wrb60Lax4fPwR64ViY468OIUTbRlGZg==}
@@ -2780,6 +2796,8 @@ snapshots:
     dependencies:
       csstype: 3.2.3
 
+  '@types/sharedworker@0.0.235': {}
+
   '@types/unist@2.0.11': {}
 
   '@types/unist@3.0.3': {}
@@ -2974,6 +2992,8 @@ snapshots:
       readdirp: 5.1.1
 
   classnames@2.5.1: {}
+
+  comlink@4.4.2: {}
 
   comma-separated-tokens@2.0.3: {}
 

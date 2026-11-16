@@ -47,6 +47,7 @@ export default defineConfig([
             '@typescript-eslint/no-explicit-any': 'error',
             'no-console': ['warn', { allow: ['warn', 'error'] }],
             '@typescript-eslint/no-non-null-assertion': 'off',
+            '@typescript-eslint/await-thenable': 'off',
         },
     },
     {

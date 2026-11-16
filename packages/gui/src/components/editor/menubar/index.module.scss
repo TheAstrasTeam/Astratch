@@ -13,19 +13,27 @@
         align-items: center;
         display: flex;
         flex: 1;
+        min-width: auto;
         &.left {
             .menus {
                 display: flex;
                 min-height: 0;
                 overflow: auto;
                 max-width: 25vw;
+                padding: 0;
+                & div {
+                    min-width: auto;
+                }
                 .menu {
                     min-width: max-content;
-                    padding: 3px 10px;
-                    border-radius: 5px;
                     font-size: medium;
-
-                    &:hover {
+                    & button {
+                        background-color: transparent;
+                        padding: 3px 10px;
+                        border-radius: 5px;
+                        border: none;
+                    }
+                    & button:hover {
                         background-color: $ui-quaternary;
                         cursor: pointer;
                     }
