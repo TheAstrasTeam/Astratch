@@ -1,7 +1,10 @@
 import { Menu as SzMenu, type MenuInstance, type MenuProps } from '@szhsin/react-menu';
 import { useEffect, useRef, type MouseEventHandler, type ReactNode } from 'react';
 
-/** @author AI */
+/**
+ * @author AI
+ * @checked
+ */
 
 type MenuWrapperProps = Omit<MenuProps, 'menuButton' | 'instanceRef' | 'portal' | 'children'> & {
     Button: ReactNode;
@@ -19,6 +22,7 @@ export const Menu = ({
 }: MenuWrapperProps) => {
     const menuRef = useRef<MenuInstance>(null);
     const pressedTriggerRef = useRef(false);
+    const openedInstanceRef = useRef<MenuInstance | null>(null);
 
     const openMenu = () => {
         const nextMenuInstance = menuRef.current;
@@ -27,6 +31,7 @@ export const Menu = ({
             activeMenuInstance.closeMenu();
         }
         activeMenuInstance = nextMenuInstance;
+        openedInstanceRef.current = nextMenuInstance;
         nextMenuInstance.openMenu();
     };
 
@@ -58,7 +63,7 @@ export const Menu = ({
             {...restProps}
             onMouseUp={handleMouseUp}
             onMenuChange={event => {
-                if (!event.open && activeMenuInstance === menuRef.current) {
+                if (!event.open && activeMenuInstance === openedInstanceRef.current) {
                     activeMenuInstance = null;
                 }
                 onMenuChange?.(event);
@@ -68,7 +73,7 @@ export const Menu = ({
             menuButton={
                 <div
                     onMouseEnter={e => {
-                        if (e.buttons === 1) {
+                        if (e.buttons === 1 && activeMenuInstance) {
                             pressedTriggerRef.current = true;
                             openMenu();
                         }
