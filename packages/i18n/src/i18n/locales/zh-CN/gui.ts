@@ -136,4 +136,9 @@ export default {
 
     sidebar: '侧边栏',
     'sidebar.hide': '隐藏侧边栏',
+
+    createProject: '创建项目',
+    openProject: '打开项目',
+    recentProject: '最近的项目',
+    'start.fromWhere': '从哪开始？',
 };

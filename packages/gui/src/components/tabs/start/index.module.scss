@@ -1,0 +1,50 @@
+@use '../../../styles/styles.scss' as *;
+
+.main {
+    display: flex;
+    padding: 125px;
+    flex: 1;
+    align-items: flex-start;
+    background-color: var(--ui-primary);
+    flex-direction: column;
+    border-radius: 5px;
+    justify-content: center;
+    gap: 10px;
+    & .random-title {
+        font-size: 48px;
+        font-weight: bolder;
+    }
+    & .logo {
+        svg {
+            width: 200px;
+            height: auto;
+        }
+    }
+    & .button {
+        margin-left: 25px;
+        background-color: transparent;
+        border-left: $accent-primary 2px solid;
+        border-radius: 0 5px 5px 0;
+        padding: 5px;
+        padding-left: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 250px;
+        & svg {
+            width: 25px;
+            height: auto;
+        }
+        &:hover {
+            background-color: $ui-secondary;
+        }
+        &:active {
+            filter: brightness(0.8);
+        }
+    }
+    & .title {
+        font-size: large;
+        font-weight: bolder;
+        margin-bottom: 10px;
+    }
+}

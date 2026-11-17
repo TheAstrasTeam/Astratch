@@ -56,6 +56,7 @@ export const SplitPanel = ({
 
     const onResize = (event: PointerEvent<HTMLDivElement>) => {
         if (event.buttons !== 1 || !isMoving.current) return;
+        event.preventDefault();
         const rect = event.currentTarget.getBoundingClientRect();
         const total = direction === 'horizontal' ? rect.width : rect.height;
         if (total === 0) return;

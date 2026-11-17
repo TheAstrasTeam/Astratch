@@ -15,6 +15,7 @@
     background-color: $ui-secondary;
     box-shadow: 0 0 5 0 $ui-transparent-dark;
     border: 1px solid $ui-tertiary;
+    border-radius: 5px;
     & .sidebar-menu {
         display: flex;
         justify-content: space-between;
@@ -78,9 +79,6 @@
     display: flex;
     padding: 5px;
     flex-direction: column;
-    background-color: $ui-secondary;
-    box-shadow: 0 0 5 0 $ui-transparent-dark;
-    border: 1px solid $ui-tertiary;
     height: 100%;
     flex: 1;
 }
