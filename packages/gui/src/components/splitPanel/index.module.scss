@@ -1,0 +1,32 @@
+@use '../../styles/styles.scss' as *;
+
+.main {
+    display: flex;
+    flex: 1;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    & .first-element,
+    & .second-element {
+        display: flex;
+    }
+    & .size-handle {
+        height: 95%;
+        border-radius: 999px;
+        width: 5px;
+        transition: background-color 0.5s ease;
+        background-color: transparent;
+        &.vertical {
+            height: 5px;
+            width: 95%;
+        }
+        &:active,
+        &:hover {
+            cursor: ew-resize;
+            &.vertical {
+                cursor: ns-resize;
+            }
+            background-color: $accent-secondary;
+        }
+    }
+}

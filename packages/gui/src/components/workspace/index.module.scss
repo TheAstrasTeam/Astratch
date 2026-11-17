@@ -5,17 +5,6 @@
     flex: 1;
     align-items: center;
     padding: 5px;
-    & .size-handle {
-        height: 95%;
-        border-radius: 999px;
-        width: 5px;
-        transition: background-color 0.5s ease;
-        background-color: transparent;
-        &:hover {
-            cursor: ew-resize;
-            background-color: $accent-secondary;
-        }
-    }
 }
 
 .sidebar {
@@ -23,12 +12,23 @@
     display: flex;
     padding: 5px;
     flex-direction: column;
-    min-width: 20vw;
     background-color: $ui-secondary;
     box-shadow: 0 0 5 0 $ui-transparent-dark;
     border: 1px solid $ui-tertiary;
-    border-radius: 3px 0 0 3px;
+    & .sidebar-menu {
+        display: flex;
+        justify-content: space-between;
+        & .sidebar-tools {
+            width: 25px;
+            height: 25px;
+            & svg {
+                width: 20px;
+                height: auto;
+            }
+        }
+    }
     & .sidebar-items {
+        overflow: auto;
         display: flex;
         list-style-type: none;
         padding: 0;
@@ -71,16 +71,16 @@
         display: flex;
         flex: 1;
     }
+    flex: 1;
 }
 
 .workspace {
     display: flex;
     padding: 5px;
     flex-direction: column;
-    min-width: 20vw;
     background-color: $ui-secondary;
     box-shadow: 0 0 5 0 $ui-transparent-dark;
     border: 1px solid $ui-tertiary;
-    border-radius: 0 3px 3px 0;
     height: 100%;
+    flex: 1;
 }

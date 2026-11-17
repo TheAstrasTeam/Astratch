@@ -1,12 +1,5 @@
 import styles from './index.module.scss';
 
-export const EditingWorkspace = ({ width }: { width: string }) => {
-    return (
-        <div
-            className={styles.workspace}
-            style={{
-                width,
-            }}
-        ></div>
-    );
+export const EditingWorkspace = () => {
+    return <div className={styles.workspace}></div>;
 };

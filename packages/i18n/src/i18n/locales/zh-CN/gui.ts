@@ -133,4 +133,7 @@ export default {
 
     target: '目标',
     targets: '目标',
+
+    sidebar: '侧边栏',
+    'sidebar.hide': '隐藏侧边栏',
 };

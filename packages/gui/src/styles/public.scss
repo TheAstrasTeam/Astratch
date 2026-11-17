@@ -9,6 +9,9 @@ button {
     border: none;
     padding: 2px;
     border-radius: 4px;
+    &:hover {
+        background-color: $ui-quaternary;
+    }
 }
 
 input {
@@ -72,5 +75,6 @@ ul {
     list-style-type: initial;
 }
 li {
+    min-width: max-content;
     display: block;
 }
