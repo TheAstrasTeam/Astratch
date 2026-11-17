@@ -49,10 +49,10 @@ type IQuickOpenSubmitMeta = (
 };
 
 interface IQuickOpenManagerEventsType {
-    ADDED_MODE: {
+    ADD_MODE: {
         id: string;
     };
-    DELETED_MODE: {
+    DELETE_MODE: {
         id: string;
     };
 }
@@ -90,7 +90,7 @@ class QuickOpenManager extends EventBus<IQuickOpenManagerEventsType> implements 
                 `Quick Open already exists "${resultMeta.translate ? resultMeta.nameID : resultMeta.name}"(${resultMeta.id}) mode`,
             );
         this.modes.set(resultMeta.id, resultMeta);
-        this.emit('ADDED_MODE', {
+        this.emit('ADD_MODE', {
             id: resultMeta.id,
         });
         return {
@@ -103,7 +103,7 @@ class QuickOpenManager extends EventBus<IQuickOpenManagerEventsType> implements 
     deleteMode(id: string): void {
         if (!this.modes.has(id)) return;
         this.modes.delete(id);
-        this.emit('DELETED_MODE', {
+        this.emit('DELETE_MODE', {
             id,
         });
     }

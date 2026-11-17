@@ -23,22 +23,22 @@ export const Menubar_RendererMenu = ({
         const update = () => {
             setUpdateTimes(time => time + 1);
         };
-        menubarManager.off('ADDED_CATEGORY', update);
-        menubarManager.off('ADDED_VALUE', update);
-        menubarManager.off('DELETED_CATEGORY', update);
-        menubarManager.off('DELETED_VALUE', update);
-        menubarManager.off('EDITED_CATEGORY', update);
-        menubarManager.on('ADDED_CATEGORY', update);
-        menubarManager.on('ADDED_VALUE', update);
-        menubarManager.on('DELETED_CATEGORY', update);
-        menubarManager.on('DELETED_VALUE', update);
-        menubarManager.on('EDITED_CATEGORY', update);
+        menubarManager.off('ADD_CATEGORY', update);
+        menubarManager.off('ADD_VALUE', update);
+        menubarManager.off('DELETE_CATEGORY', update);
+        menubarManager.off('DELETE_VALUE', update);
+        menubarManager.off('EDIT_CATEGORY', update);
+        menubarManager.on('ADD_CATEGORY', update);
+        menubarManager.on('ADD_VALUE', update);
+        menubarManager.on('DELETE_CATEGORY', update);
+        menubarManager.on('DELETE_VALUE', update);
+        menubarManager.on('EDIT_CATEGORY', update);
         return () => {
-            menubarManager.off('ADDED_CATEGORY', update);
-            menubarManager.off('ADDED_VALUE', update);
-            menubarManager.off('DELETED_CATEGORY', update);
-            menubarManager.off('DELETED_VALUE', update);
-            menubarManager.off('EDITED_CATEGORY', update);
+            menubarManager.off('ADD_CATEGORY', update);
+            menubarManager.off('ADD_VALUE', update);
+            menubarManager.off('DELETE_CATEGORY', update);
+            menubarManager.off('DELETE_VALUE', update);
+            menubarManager.off('EDIT_CATEGORY', update);
         };
     }, []);
 

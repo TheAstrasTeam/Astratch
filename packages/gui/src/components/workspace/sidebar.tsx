@@ -18,13 +18,13 @@ export const Sidebar = ({ hideSidebar }: { hideSidebar: (value: boolean) => void
         const update = () => {
             setUpdateTimes(value => value + 1);
         };
-        sidebar.off('ADDED_ITEM', update);
-        sidebar.off('DELETED_ITEM', update);
-        sidebar.on('ADDED_ITEM', update);
-        sidebar.on('DELETED_ITEM', update);
+        sidebar.off('ADD_ITEM', update);
+        sidebar.off('DELETE_ITEM', update);
+        sidebar.on('ADD_ITEM', update);
+        sidebar.on('DELETE_ITEM', update);
         return () => {
-            sidebar.off('ADDED_ITEM', update);
-            sidebar.off('DELETED_ITEM', update);
+            sidebar.off('ADD_ITEM', update);
+            sidebar.off('DELETE_ITEM', update);
         };
     }, []);
     return (

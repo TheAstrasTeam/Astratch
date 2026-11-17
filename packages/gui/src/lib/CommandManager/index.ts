@@ -3,10 +3,10 @@ import { t } from 'astratch-i18n';
 import { loadBuiltInCommands } from './builtIn';
 
 interface ICommandManagerEventsType {
-    ADDED_COMMAND: {
+    ADD_COMMAND: {
         id: string;
     };
-    DELETED_COMMAND: {
+    DELETE_COMMAND: {
         id: string;
     };
 }
@@ -81,7 +81,7 @@ class CommandManager extends EventBus<ICommandManagerEventsType> implements ICom
             meta.description = submitMeta.description;
         }
         this.commands.set(id, meta);
-        this.emit('ADDED_COMMAND', {
+        this.emit('ADD_COMMAND', {
             id,
         });
         return {
@@ -93,7 +93,7 @@ class CommandManager extends EventBus<ICommandManagerEventsType> implements ICom
     }
     deleteCommand(id: string): void {
         this.commands.delete(id);
-        this.emit('DELETED_COMMAND', {
+        this.emit('DELETE_COMMAND', {
             id,
         });
     }

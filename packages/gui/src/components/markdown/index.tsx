@@ -28,7 +28,7 @@ await _addStyleCSS((await themeManager.getUsingTheme('ui')).isDarkTheme);
 
 export const MarkdownArea = ({ children, ...props }: { children: string }) => {
     useEffect(() => {
-        const handleAppliedTheme = (data: IThemeEventsType['APPLIED_THEME']) => {
+        const handleAppliedTheme = (data: IThemeEventsType['APPLY_THEME']) => {
             void (async () => {
                 if (data.kind === 'accent') return;
                 const themeConfig = await themeManager.getTheme('ui', data.id);
@@ -36,10 +36,10 @@ export const MarkdownArea = ({ children, ...props }: { children: string }) => {
                 await _addStyleCSS(themeConfig.isDarkTheme);
             })();
         };
-        themeManager.off('APPLIED_THEME', handleAppliedTheme);
-        themeManager.on('APPLIED_THEME', handleAppliedTheme);
+        themeManager.off('APPLY_THEME', handleAppliedTheme);
+        themeManager.on('APPLY_THEME', handleAppliedTheme);
         return () => {
-            themeManager.off('APPLIED_THEME', handleAppliedTheme);
+            themeManager.off('APPLY_THEME', handleAppliedTheme);
         };
     }, []);
     return (

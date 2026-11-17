@@ -3,10 +3,10 @@ import type { FunctionComponent, ReactNode, SVGProps } from 'react';
 import { loadBuiltInSidebarItems } from './builtIn';
 
 interface ISideBarEventTypes {
-    ADDED_ITEM: {
+    ADD_ITEM: {
         id: string;
     };
-    DELETED_ITEM: {
+    DELETE_ITEM: {
         id: string;
     };
 }
@@ -64,7 +64,7 @@ class Sidebar extends EventBus<ISideBarEventTypes> {
             latestStorage: {},
         } satisfies ISidebarItem;
         this.storage.set(id, itemResult);
-        this.emit('ADDED_ITEM', {
+        this.emit('ADD_ITEM', {
             id,
         });
         return id;
@@ -76,7 +76,7 @@ class Sidebar extends EventBus<ISideBarEventTypes> {
 
     removeItem(/** item的ID */ id: string) {
         if (this.storage.delete(id)) {
-            this.emit('DELETED_ITEM', {
+            this.emit('DELETE_ITEM', {
                 id,
             });
             return true;

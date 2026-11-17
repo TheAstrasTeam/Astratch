@@ -93,15 +93,15 @@ interface IThemeDBStorage {
 }
 
 interface IThemeEventsType {
-    APPLIED_THEME: {
+    APPLY_THEME: {
         id: string;
         kind: 'accent' | 'ui';
     };
-    DELETED_THEME: {
+    DELETE_THEME: {
         id: string;
         kind: 'accent' | 'ui';
     };
-    ADDED_THEME: {
+    ADD_THEME: {
         id: string;
         kind: 'accent' | 'ui';
     };
@@ -172,7 +172,7 @@ class ThemeManager extends EventBus<IThemeEventsType> implements IThemeManager {
             id,
         };
         await this.addThemeToDB(themeConfig);
-        this.emit('ADDED_THEME', {
+        this.emit('ADD_THEME', {
             id,
             kind: themeConfig.kind,
         });
@@ -252,7 +252,7 @@ class ThemeManager extends EventBus<IThemeEventsType> implements IThemeManager {
         }
         styleDOM.textContent = cssString;
         await this.setUsingThemeToDB(kind, id);
-        this.emit('APPLIED_THEME', {
+        this.emit('APPLY_THEME', {
             id,
             kind,
         });
@@ -312,7 +312,7 @@ class ThemeManager extends EventBus<IThemeEventsType> implements IThemeManager {
         const themeConfig = themeStorage.themes[kind][id] as TAccentTheme | TUITheme | undefined;
         if (!themeConfig) return false;
         await this.deleteThemeFromDB(kind, id);
-        this.emit('DELETED_THEME', {
+        this.emit('DELETE_THEME', {
             id,
             kind,
         });

@@ -6,23 +6,23 @@ const MenubarManagerPositions = ['project', 'edit', 'run', 'layout', 'help'] as 
 type TMenubarManagerPositions = (typeof MenubarManagerPositions)[number];
 
 interface IMenubarManagerEventsType {
-    ADDED_VALUE: {
+    ADD_VALUE: {
         id: string;
         position: TMenubarManagerPositions;
     };
-    ADDED_CATEGORY: {
+    ADD_CATEGORY: {
         id: string;
         position: TMenubarManagerPositions;
     };
-    DELETED_VALUE: {
+    DELETE_VALUE: {
         id: string;
         position: TMenubarManagerPositions;
     };
-    DELETED_CATEGORY: {
+    DELETE_CATEGORY: {
         id: string;
         position: TMenubarManagerPositions;
     };
-    EDITED_CATEGORY: undefined;
+    EDIT_CATEGORY: undefined;
 }
 
 type TMenubarManagerValueMeta =
@@ -209,7 +209,7 @@ class MenubarManager extends EventBus<IMenubarManagerEventsType> implements IMen
             category,
         };
         categoryData.children.push(data);
-        this.emit('ADDED_VALUE', {
+        this.emit('ADD_VALUE', {
             id: data.id,
             position: pos,
         });
@@ -226,11 +226,11 @@ class MenubarManager extends EventBus<IMenubarManagerEventsType> implements IMen
             },
             children: [],
         });
-        this.emit('ADDED_CATEGORY', {
+        this.emit('ADD_CATEGORY', {
             id,
             position: pos,
         });
-        this.emit('EDITED_CATEGORY', undefined);
+        this.emit('EDIT_CATEGORY', undefined);
         return id;
     }
     deleteValue(pos: TMenubarManagerPositions, id: string): boolean {
@@ -239,11 +239,11 @@ class MenubarManager extends EventBus<IMenubarManagerEventsType> implements IMen
             if (value.id === id) {
                 parent.splice(index, 1);
                 result = true;
-                this.emit('DELETED_VALUE', {
+                this.emit('DELETE_VALUE', {
                     id: value.id,
                     position: pos,
                 });
-                this.emit('EDITED_CATEGORY', undefined);
+                this.emit('EDIT_CATEGORY', undefined);
 
                 return true;
             }
@@ -254,11 +254,11 @@ class MenubarManager extends EventBus<IMenubarManagerEventsType> implements IMen
     deleteCategory(pos: TMenubarManagerPositions, id: string): boolean {
         const isDeleted = this.listPosition(pos).delete(id);
         if (isDeleted) {
-            this.emit('DELETED_CATEGORY', {
+            this.emit('DELETE_CATEGORY', {
                 id: id,
                 position: pos,
             });
-            this.emit('EDITED_CATEGORY', undefined);
+            this.emit('EDIT_CATEGORY', undefined);
         }
         return isDeleted;
     }
@@ -285,7 +285,7 @@ class MenubarManager extends EventBus<IMenubarManagerEventsType> implements IMen
         if (!_value) return;
         map.delete(id);
         map.set(id, _value);
-        this.emit('EDITED_CATEGORY', undefined);
+        this.emit('EDIT_CATEGORY', undefined);
     }
     moveCategoryLayerToTop(pos: TMenubarManagerPositions, id: string): void {
         const map = this.listPosition(pos);
@@ -298,7 +298,7 @@ class MenubarManager extends EventBus<IMenubarManagerEventsType> implements IMen
         for (const [k, v] of _mapWithoutValue) {
             map.set(k, v);
         }
-        this.emit('EDITED_CATEGORY', undefined);
+        this.emit('EDIT_CATEGORY', undefined);
     }
     listPosition(
         pos: TMenubarManagerPositions,

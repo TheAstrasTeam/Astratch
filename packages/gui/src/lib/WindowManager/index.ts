@@ -5,7 +5,7 @@ interface IWindowManagerEventTypes {
     CREATE_WINDOW: {
         id: string;
     };
-    DELETED_WINDOW: {
+    DELETE_WINDOW: {
         id: string;
     };
 }
@@ -53,7 +53,7 @@ class WindowManager extends EventBus<IWindowManagerEventTypes> {
 
     deleteWindow(id: string): boolean {
         if (!this.windowStorage.delete(id)) return false;
-        this.emit('DELETED_WINDOW', { id });
+        this.emit('DELETE_WINDOW', { id });
         return true;
     }
 

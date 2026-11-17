@@ -3,10 +3,10 @@ import type { FunctionComponent } from 'react';
 import { loadBuiltInBottomBarItems } from './builtIn';
 
 interface IBottomBarManagerEventTypes {
-    ADDED_BOTTOM_ITEM: {
+    ADD_BOTTOM_ITEM: {
         id: string;
     };
-    DELETED_BOTTOM_ITEM: {
+    DELETE_BOTTOM_ITEM: {
         id: string;
     };
 }
@@ -75,7 +75,7 @@ class BottomBarManager extends EventBus<IBottomBarManagerEventTypes> {
             },
         } satisfies BottomBarItem;
         this.items.set(id, result);
-        this.emit('ADDED_BOTTOM_ITEM', {
+        this.emit('ADD_BOTTOM_ITEM', {
             id,
         });
         return id;
@@ -84,7 +84,7 @@ class BottomBarManager extends EventBus<IBottomBarManagerEventTypes> {
     deleteItem(id: string): boolean {
         if (!this.items.has(id)) return false;
 
-        this.emit('DELETED_BOTTOM_ITEM', {
+        this.emit('DELETE_BOTTOM_ITEM', {
             id,
         });
         return this.items.delete(id);
