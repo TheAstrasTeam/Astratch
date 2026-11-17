@@ -31,7 +31,7 @@ interface IVMEventsType {
     RENAME_TARGET: {
         mode: TTARGETS;
         targetID: string;
-    }
+    };
 
     ADD_PATH: {
         mode: TTARGETS;

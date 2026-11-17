@@ -86,9 +86,9 @@ export const TargetsList = () => {
                 {_entitiesList.map(target => {
                     if (!target.isFolder) return;
                     return (
-                        <li key={target.folder.id} className={styles.folderNode}>
+                        <li key={target.folder.id}>
                             <Box
-                                className={styles.targetNode}
+                                className={classNames(styles.targetNode, styles.folderNode)}
                                 onClick={() => {
                                     if (expandIDs.includes(target.folder.id))
                                         setCollapse(target.folder.id);

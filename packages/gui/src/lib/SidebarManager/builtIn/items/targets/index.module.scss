@@ -1,7 +1,8 @@
 @use '../../../../../styles/styles.scss' as *;
 
 .targets-node {
-    padding-left: 20px;
+    margin-left: 20px;
+    padding: 0;
     border-left: transparent 1px solid;
     transition: border-color 1s ease;
     overflow: visible;
@@ -26,24 +27,6 @@
     }
 }
 
-.targets-tree {
-    display: flex;
-    flex-direction: column;
-    padding-left: 0;
-    flex: 1;
-    overflow: visible;
-    &:hover {
-        & .targets-node {
-            border-color: $ui-quaternary;
-        }
-    }
-    & .target-button,
-    & .folder-expand-button {
-        font-size: 14px;
-        background-color: transparent;
-        border: none;
-    }
-}
 .main {
     & .target-button,
     & .folder-expand-button {
@@ -59,6 +42,15 @@
         overflow: auto;
         flex: 1;
     }
+    &:hover {
+        & .targets-node {
+            border-color: $ui-quaternary;
+        }
+    }
+}
+
+.folder-node {
+    border-left: $accent-primary 2px solid;
 }
 
 .target-dialog {
