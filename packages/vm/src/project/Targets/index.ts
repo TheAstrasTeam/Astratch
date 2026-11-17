@@ -51,13 +51,13 @@ class Targets {
     ): string {
         const id = meta?.id ?? crypto.randomUUID();
         if (mode === 'entity') {
-            this.targets.entities.set(id, new Entity(meta ?? {}, this.emit.bind(this)));
+            this.targets.entities.set(id, new Entity({ ...meta, id }, this.emit.bind(this)));
             // 给对应的path添加children
             if (meta?.parent)
                 this.getPath.entities.getPath(meta.parent)?.children.push({ isPath: false, id });
             this.cache_isAlreadyGetEntitiesCache = false;
         } else {
-            this.targets.modules.set(id, new Module(meta ?? {}, this.emit.bind(this)));
+            this.targets.modules.set(id, new Module({ ...meta, id }, this.emit.bind(this)));
             // 给对应的path添加children
             if (meta?.parent)
                 this.getPath.modules.getPath(meta.parent)?.children.push({ isPath: false, id });
@@ -70,15 +70,17 @@ class Targets {
         return id;
     }
 
-    renameTarget(mode: TTARGETS, id: string, newName: string, silence = false): void {
+    renameTarget(mode: TTARGETS, id: string, newName: string): boolean {
         const target = this.targets[mode === 'entity' ? 'entities' : 'modules'].get(id);
-        if (!target) {
-            if (silence) return;
-            else throw new Error(` The ${id} (${mode}) is not found.`);
-        }
+        if (!target) return false;
         if (mode === 'entity') this.cache_isAlreadyGetEntitiesCache = false;
         else this.cache_isAlreadyGetModulesCache = false;
         target.name = newName;
+        this.emit('RENAME_TARGET', {
+            mode,
+            targetID: target.id,
+        });
+        return true;
     }
 
     /**
@@ -94,7 +96,14 @@ class Targets {
                 targetID: id,
                 mode,
             });
-            this.cache_isAlreadyGetModulesCache = false;
+            const map = this.getPath.entities.pathsStorage;
+            map.forEach((path, key) => {
+                const newPathChildren = path.children.filter(newPath => newPath.id !== id);
+                const newPath = path;
+                newPath.children = newPathChildren;
+                map.set(key, newPath);
+            });
+            this.cache_isAlreadyGetEntitiesCache = false;
             return this.targets.entities.delete(id);
         } else {
             if (recordHistory) {
@@ -104,7 +113,14 @@ class Targets {
                 targetID: id,
                 mode,
             });
-            this.cache_isAlreadyGetEntitiesCache = false;
+            const map = this.getPath.modules.pathsStorage;
+            map.forEach((path, key) => {
+                const newPathChildren = path.children.filter(newPath => newPath.id !== id);
+                const newPath = path;
+                newPath.children = newPathChildren;
+                map.set(key, newPath);
+            });
+            this.cache_isAlreadyGetModulesCache = false;
             return this.targets.modules.delete(id);
         }
     }

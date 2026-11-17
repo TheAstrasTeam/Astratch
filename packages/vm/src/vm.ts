@@ -28,6 +28,10 @@ interface IVMEventsType {
         from: string | null;
         to: string | null;
     };
+    RENAME_TARGET: {
+        mode: TTARGETS;
+        targetID: string;
+    }
 
     ADD_PATH: {
         mode: TTARGETS;
