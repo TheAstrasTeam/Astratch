@@ -18,6 +18,25 @@ Single - line;
 /** @author AI */
 ```
 
+and add the following after review:
+
+```ts
+/**
+ * ...
+ * @checked
+ */
+```
+
+You need to ensure that your changes can pass the merge check.
+
+### Comments
+
+Since this is a project related to the maintenance of Chinese communities, we require you to
+use **Chinese/bilingual comments**. You can write comments in your preferred language and
+include the corresponding Chinese before submitting the PR.
+
+This is not mandatory, but it will indeed facilitate better review.
+
 You need to make sure it passes the merge checks.
 
 ## Development
