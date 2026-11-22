@@ -141,4 +141,19 @@ export default {
     openProject: '打开项目',
     recentProject: '最近的项目',
     'start.fromWhere': '从哪开始？',
+
+    'bottomBar.editingTabHint': '正在聚焦：',
+
+    'tab.start': '开始',
+
+    workspace: '工作区',
+    'workspace.drag.tip': '松开鼠标以放置',
+    'workspace.swapPanel': '互换面板',
+    'workspace.closeTopPanel': '关闭上侧面板',
+    'workspace.closeLeftPanel': '关闭左侧面板',
+    'workspace.closeBottomPanel': '关闭下侧面板',
+    'workspace.closeRightPanel': '关闭右侧面板',
+    'workspace.switchDirection': '切换面板方向',
+    'workspace.empty.tip': '啥也没有...',
+    'workspace.closeElement': '关闭"{{title}}"',
 };

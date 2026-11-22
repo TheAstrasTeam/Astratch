@@ -6,6 +6,7 @@ import { themeManager } from './ThemeManager';
 import { windowManager } from './WindowManager';
 import { childID, isChildWindow, parentWindow } from '../utils/window';
 import { vm } from './vm';
+import { tabsManager } from './TabsManager';
 
 const Astratch = {
     themeManager,
@@ -15,6 +16,7 @@ const Astratch = {
     commandManager,
     windowManager,
     vm,
+    tabsManager,
 };
 Object.assign(window, { Astratch });
 

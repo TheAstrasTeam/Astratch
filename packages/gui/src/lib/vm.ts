@@ -1,6 +1,7 @@
 import vm from 'astratch-vm?sharedworker';
 import * as Comlink from 'comlink';
 import type { VM } from 'astratch-vm';
+import { isChildWindow } from '../utils/window';
 
 /**
  * @author AI
@@ -20,24 +21,29 @@ const asyncVM = <T>(remote: Comlink.Remote<T>): AsyncRemote<T> =>
 
 const vmProxy = asyncVM(Comlink.wrap<VM>(new vm().port));
 
-/* Test */
-await vmProxy.createProject({
-    name: 'test',
-    id: '0',
-    author: [],
-});
-let path: string | null = null;
-for (let i = 0; i <= 20; i++) {
-    path = await vmProxy.getProject!.getTargets.getPath.entities.addPath({
-        name: crypto.randomUUID(),
-        parent: path,
+if (!isChildWindow) {
+    /* Test */
+    await vmProxy.createProject({
+        name: 'test',
+        id: '0',
+        author: [],
     });
-    for (let j = 0; j <= 5; j++) {
-        const target = await vmProxy.getProject!.getTargets.createTarget('entity', {
+    let path: string | null = null;
+    for (let i = 0; i <= 20; i++) {
+        path = await vmProxy.getProject!.getTargets.getPath.entities.addPath({
+            name: crypto.randomUUID(),
             parent: path,
         });
-        await vmProxy.getProject!.getTargets.renameTarget('entity', target, crypto.randomUUID());
+        for (let j = 0; j <= 5; j++) {
+            const target = await vmProxy.getProject!.getTargets.createTarget('entity', {
+                parent: path,
+            });
+            await vmProxy.getProject!.getTargets.renameTarget(
+                'entity',
+                target,
+                crypto.randomUUID(),
+            );
+        }
     }
 }
-
 export { asyncVM as proxyVM, type AsyncRemote, vmProxy as vm };

@@ -8,6 +8,7 @@ import {
 } from 'react';
 import styles from './index.module.scss';
 import classNames from 'classnames';
+import { Menu } from '../menus/renderer';
 
 export interface ISplitPanelHandle {
     setSizePercent: (value: number) => void;
@@ -28,6 +29,8 @@ export const SplitPanel = ({
     hideElement = 'none',
     /** 用于在外部影响这个面板 */
     ref,
+    /** 右键手柄打开的右键菜单 */
+    contextMenu,
 }: {
     FirstElement: ReactNode;
     SecondElement: ReactNode;
@@ -36,6 +39,7 @@ export const SplitPanel = ({
     minSecondElementSize?: number;
     defaultSize?: number;
     hideElement?: 'first' | 'second' | 'both' | 'none';
+    contextMenu?: () => ReactNode;
     ref?: Ref<ISplitPanelHandle>;
 }) => {
     const isMoving = useRef(false);
@@ -79,6 +83,8 @@ export const SplitPanel = ({
         [sizePercent],
     );
 
+    const ContextMenu = contextMenu?.();
+
     return (
         <div
             className={styles.main}
@@ -103,21 +109,52 @@ export const SplitPanel = ({
             >
                 {FirstElement}
             </div>
-            <div
-                className={classNames(styles.sizeHandle, {
-                    [styles.vertical]: direction === 'vertical',
-                })}
-                onPointerDown={() => {
-                    isMoving.current = true;
-                }}
-                onLostPointerCapture={() => {
-                    isMoving.current = false;
-                }}
-                onDoubleClick={() => {
-                    setSizePercent(defaultSize);
-                    checkHide(defaultSize);
-                }}
-            />
+            {contextMenu ? (
+                <Menu
+                    keyMode='right'
+                    classname={classNames(styles.sizeHandle, {
+                        [styles.vertical]: direction === 'vertical',
+                    })}
+                    Button={
+                        <div
+                            onPointerDown={() => {
+                                isMoving.current = true;
+                            }}
+                            onLostPointerCapture={() => {
+                                isMoving.current = false;
+                            }}
+                            onDoubleClick={() => {
+                                setSizePercent(defaultSize);
+                                checkHide(defaultSize);
+                            }}
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                            }}
+                        />
+                    }
+                    positioningByPointer={true}
+                >
+                    {ContextMenu}
+                </Menu>
+            ) : (
+                <div
+                    className={classNames(styles.sizeHandle, {
+                        [styles.vertical]: direction === 'vertical',
+                    })}
+                    onPointerDown={() => {
+                        isMoving.current = true;
+                    }}
+                    onLostPointerCapture={() => {
+                        isMoving.current = false;
+                    }}
+                    onDoubleClick={() => {
+                        setSizePercent(defaultSize);
+                        checkHide(defaultSize);
+                    }}
+                />
+            )}
+
             <div
                 style={{
                     [direction === 'horizontal' ? 'width' : 'height']:

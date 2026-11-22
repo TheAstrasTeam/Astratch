@@ -81,4 +81,101 @@
     flex-direction: column;
     height: 100%;
     flex: 1;
+    & .watching-group {
+        position: relative;
+        display: flex;
+        flex: 1;
+        /* 嵌套 flex 下必须允许收缩，否则内容会撑破面板 */
+        min-width: 0;
+        min-height: 0;
+        overflow: hidden;
+        border-radius: 5px;
+        border: 1px solid color-mix(in srgb, $ui-quaternary 50%, transparent 50%);
+        &:hover {
+            border-color: $ui-quaternary;
+        }
+        &.is-focusing {
+            border-color: $accent-primary;
+        }
+        & .group-element-name {
+            position: absolute;
+            margin: 15px;
+            padding: 5px;
+            border-radius: 5px;
+            border: transparent 1px solid;
+            background-color: $ui-secondary;
+            transition: opacity 0.2s ease;
+            display: flex;
+            gap: 5px;
+            & button {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                & svg {
+                    width: 15px;
+                    height: auto;
+                }
+            }
+        }
+        .cover-layout {
+            pointer-events: none;
+            position: absolute;
+            background-color: $ui-transparent-dark;
+            border: 1px solid $ui-quaternary;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bolder;
+            font-size: larger;
+
+            transition: inset 0.1s ease;
+
+            animation: cover-layout-out 0.2s ease forwards;
+
+            &.left {
+                inset: 0 50% 0 0;
+            }
+            &.right {
+                inset: 0 0 0 50%;
+            }
+            &.top {
+                inset: 0 0 50% 0;
+            }
+            &.bottom {
+                inset: 50% 0 0 0;
+            }
+            &.center {
+                inset: 0;
+            }
+            & span {
+                background-color: $ui-secondary;
+                border-radius: 5px;
+                padding: 5px;
+            }
+        }
+    }
+    & .empty-page {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        flex: 1;
+        gap: 15px;
+        & .empty-icon {
+            filter: $ui-svg-filter;
+        }
+        & .empty-tip {
+            font-weight: bolder;
+            font-size: x-large;
+        }
+    }
+}
+
+@keyframes cover-layout-out {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
