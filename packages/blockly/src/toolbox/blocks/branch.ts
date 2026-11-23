@@ -41,7 +41,7 @@ export const initBranchBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:branch.if'),
+                message0: t('blocks:branch.if.label'),
                 args0: [booleanInput('CONDITION')],
                 message1: '%1',
                 args1: [statementInput('DO')],
@@ -106,7 +106,7 @@ export const initBranchBlocks = () => {
                         });
                     }),
                 )
-                .appendField(t('blocks:branch.elseIf'));
+                .appendField(t('blocks:branch.elseIf.label'));
             input.connection!.setShadowState({
                 type: OPCODES.boolean,
                 extraState: { isEnable: false },
@@ -148,7 +148,7 @@ export const initBranchBlocks = () => {
                         });
                     }),
                 )
-                .appendField(t('blocks:branch.else'));
+                .appendField(t('blocks:branch.else.label'));
             this.appendStatementInput('ELSE');
             this.updateTail_();
         },
@@ -173,7 +173,7 @@ export const initBranchBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:branch.match'),
+                message0: t('blocks:branch.match.label'),
                 args0: [
                     {
                         type: 'input_value',
@@ -196,7 +196,7 @@ export const initBranchBlocks = () => {
 
             this.jsonInit({
                 ...matchBranchConnections,
-                message0: t('blocks:branch.matchCase'),
+                message0: t('blocks:branch.matchCase.label'),
                 args0: [unknownInput('VALUE')],
                 message1: '%1',
                 args1: [statementInput('DO')],
@@ -319,7 +319,7 @@ export const initBranchBlocks = () => {
         init() {
             this.jsonInit({
                 ...matchBranchEndConnections,
-                message0: t('blocks:branch.matchDefault'),
+                message0: t('blocks:branch.matchDefault.label'),
                 message1: '%1',
                 args1: [statementInput('DO')],
                 colour: TOOLBOX_COLOR.branch,

@@ -5,8 +5,8 @@ import { QuickOpen_BuiltIn_TargetRenderer } from './Renderer';
 
 export default {
     translate: true,
-    nameID: 'quickOpen_target',
-    descriptionID: 'quickOpen_target_description',
+    nameID: 'quickOpen.target.name',
+    descriptionID: 'quickOpen.target.description',
     icon: TargetIcon,
     id: 'target',
     shortcut: [],

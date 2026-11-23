@@ -97,7 +97,7 @@ export const initMathBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:math.power'),
+                message0: t('blocks:math.power.label'),
                 args0: [numberInput('BASE'), numberInput('EXPONENT')],
                 output: TYPES.NUMBER,
                 colour: TOOLBOX_COLOR.math,
@@ -109,7 +109,7 @@ export const initMathBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:math.mod'),
+                message0: t('blocks:math.mod.label'),
                 args0: [numberInput('DIVIDEND'), numberInput('DIVISOR')],
                 output: TYPES.NUMBER,
                 colour: TOOLBOX_COLOR.math,
@@ -121,14 +121,14 @@ export const initMathBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:math.round'),
+                message0: t('blocks:math.round.label'),
                 args0: [
                     numberInput('NUM'),
                     dropdown('MODE', [
-                        [t('blocks:option.round.abs'), 'abs'],
-                        [t('blocks:option.round.ceil'), 'ceil'],
-                        [t('blocks:option.round.floor'), 'floor'],
-                        [t('blocks:option.round.round'), 'round'],
+                        [t('blocks:option_round.abs.label'), 'abs'],
+                        [t('blocks:option_round.ceil.label'), 'ceil'],
+                        [t('blocks:option_round.floor.label'), 'floor'],
+                        [t('blocks:option_round.round.label'), 'round'],
                     ]),
                 ],
                 output: TYPES.NUMBER,
@@ -141,19 +141,19 @@ export const initMathBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:math.unary'),
+                message0: t('blocks:math.unary.label'),
                 args0: [
                     dropdown('FN', [
-                        [t('blocks:option.unary.sqrt'), 'sqrt'],
-                        [t('blocks:option.unary.cbrt'), 'cbrt'],
-                        [t('blocks:option.unary.sin'), 'sin'],
-                        [t('blocks:option.unary.cos'), 'cos'],
-                        [t('blocks:option.unary.tan'), 'tan'],
-                        [t('blocks:option.unary.asin'), 'asin'],
-                        [t('blocks:option.unary.acos'), 'acos'],
-                        [t('blocks:option.unary.atan'), 'atan'],
-                        [t('blocks:option.unary.ln'), 'ln'],
-                        [t('blocks:option.unary.log'), 'log'],
+                        [t('blocks:option_unary.sqrt.label'), 'sqrt'],
+                        [t('blocks:option_unary.cbrt.label'), 'cbrt'],
+                        [t('blocks:option_unary.sin.label'), 'sin'],
+                        [t('blocks:option_unary.cos.label'), 'cos'],
+                        [t('blocks:option_unary.tan.label'), 'tan'],
+                        [t('blocks:option_unary.asin.label'), 'asin'],
+                        [t('blocks:option_unary.acos.label'), 'acos'],
+                        [t('blocks:option_unary.atan.label'), 'atan'],
+                        [t('blocks:option_unary.ln.label'), 'ln'],
+                        [t('blocks:option_unary.log.label'), 'log'],
                     ]),
                     numberInput('NUM'),
                 ],
@@ -167,11 +167,11 @@ export const initMathBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:math.constant'),
+                message0: t('blocks:math.constant.label'),
                 args0: [
                     dropdown('CONSTANT', [
-                        [t('blocks:option.constant.pi'), 'pi'],
-                        [t('blocks:option.constant.e'), 'e'],
+                        [t('blocks:option_constant.pi.label'), 'pi'],
+                        [t('blocks:option_constant.e.label'), 'e'],
                     ]),
                 ],
                 output: TYPES.NUMBER,
@@ -184,7 +184,7 @@ export const initMathBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:math.random'),
+                message0: t('blocks:math.random.label'),
                 args0: [numberInput('FROM'), numberInput('TO')],
                 output: TYPES.NUMBER,
                 colour: TOOLBOX_COLOR.math,
@@ -395,15 +395,15 @@ export const initMathBlocks = () => {
             state_boolean: boolean[];
             updateShape(): void;
         };
-    blocklyAdapter.Blockly.Blocks[OPCODES.and] = _spawnBooleanBlocks(t('blocks:logic.and'));
+    blocklyAdapter.Blockly.Blocks[OPCODES.and] = _spawnBooleanBlocks(t('blocks:logic.and.label'));
 
-    blocklyAdapter.Blockly.Blocks[OPCODES.or] = _spawnBooleanBlocks(t('blocks:logic.or'));
+    blocklyAdapter.Blockly.Blocks[OPCODES.or] = _spawnBooleanBlocks(t('blocks:logic.or.label'));
 
     blocklyAdapter.Blockly.Blocks[OPCODES.not] = {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:logic.not'),
+                message0: t('blocks:logic.not.label'),
                 args0: [booleanInput('VALUE')],
                 output: TYPES.BOOLEAN,
                 colour: TOOLBOX_COLOR.math,
@@ -438,7 +438,7 @@ export const initMathBlocks = () => {
                 output: TYPES.STRING,
                 colour: TOOLBOX_COLOR.math,
             });
-            this.appendDummyInput('JOIN_TEXT').appendField(t('blocks:string.join'));
+            this.appendDummyInput('JOIN_TEXT').appendField(t('blocks:string.join.label'));
             this.updateShape();
         },
         onchange(event) {
@@ -477,7 +477,7 @@ export const initMathBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:string.letterOf'),
+                message0: t('blocks:string.letterOf.label'),
                 args0: [stringInput('STRING'), numberInput('INDEX')],
                 output: TYPES.STRING,
                 colour: TOOLBOX_COLOR.math,
@@ -489,7 +489,7 @@ export const initMathBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:string.substring'),
+                message0: t('blocks:string.substring.label'),
                 args0: [stringInput('STRING'), numberInput('FROM'), numberInput('TO')],
                 output: TYPES.STRING,
                 colour: TOOLBOX_COLOR.math,
@@ -501,7 +501,7 @@ export const initMathBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:string.split'),
+                message0: t('blocks:string.split.label'),
                 args0: [stringInput('SEPARATOR'), stringInput('STRING')],
                 output: TYPES.ARRAY,
                 colour: TOOLBOX_COLOR.math,
@@ -513,11 +513,11 @@ export const initMathBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:string.char'),
+                message0: t('blocks:string.char.label'),
                 args0: [
                     dropdown('CHAR', [
-                        [t('blocks:option.char.enter'), 'enter'],
-                        [t('blocks:option.char.tab'), 'tab'],
+                        [t('blocks:option_char.enter.label'), 'enter'],
+                        [t('blocks:option_char.tab.label'), 'tab'],
                     ]),
                 ],
                 output: TYPES.STRING,
@@ -530,7 +530,7 @@ export const initMathBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:string.contains'),
+                message0: t('blocks:string.contains.label'),
                 args0: [stringInput('STRING'), stringInput('SUBSTRING')],
                 output: TYPES.BOOLEAN,
                 colour: TOOLBOX_COLOR.math,
@@ -542,7 +542,7 @@ export const initMathBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:string.length'),
+                message0: t('blocks:string.length.label'),
                 args0: [stringInput('STRING')],
                 output: TYPES.NUMBER,
                 colour: TOOLBOX_COLOR.math,

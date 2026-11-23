@@ -19,7 +19,7 @@ export const Menubar = () => {
                             key={pos}
                             Button={
                                 <div className={styles.menu}>
-                                    <button>{t(`gui:menu_${pos}`)}</button>
+                                    <button>{t(`gui:menu.${pos}.name`)}</button>
                                 </div>
                             }
                             pos={pos}
@@ -30,7 +30,7 @@ export const Menubar = () => {
             <div className={styles.center}>
                 {!isOpenQuickOpen && (
                     <div className={styles.quickOpenInput} onClick={openQuickOpen}>
-                        <span>{t('gui:quickOpen_tip')}</span>
+                        <span>{t('gui:quickOpen.input.placeholder')}</span>
                     </div>
                 )}
             </div>

@@ -5,16 +5,16 @@ export default () => {
     const projectID = menubarManager.addCategory('project', {
         id: 'astratch_menu_project_project',
         translate: true,
-        nameID: 'astratch_menu_project_project',
+        nameID: 'menu.project.name',
     });
     // 新项目
     menubarManager.addValue('project', projectID, {
         translate: true,
-        nameID: 'project_createProject',
+        nameID: 'command_project.createProject.name',
         commandID: commandManager.addCommand({
             translate: true,
-            nameID: 'project_createProject',
-            descriptionID: 'project_createProject_description',
+            nameID: 'command_project.createProject.name',
+            descriptionID: 'command_project.createProject.description',
             author: 'The Astras Team',
             callback: () => {
                 alert('CREATE_PROJECT');
@@ -24,11 +24,11 @@ export default () => {
     // 打开项目
     menubarManager.addValue('project', projectID, {
         translate: true,
-        nameID: 'project_openProject',
+        nameID: 'command_project.openProject.name',
         commandID: commandManager.addCommand({
             translate: true,
-            nameID: 'project_openProject',
-            descriptionID: 'project_openProject_description',
+            nameID: 'command_project.openProject.name',
+            descriptionID: 'command_project.openProject.description',
             author: 'The Astras Team',
             callback: () => {
                 alert('OPEN_PROJECT');
@@ -38,11 +38,11 @@ export default () => {
     // 关闭项目
     menubarManager.addValue('project', projectID, {
         translate: true,
-        nameID: 'project_closeProject',
+        nameID: 'command_project.closeProject.name',
         commandID: commandManager.addCommand({
             translate: true,
-            nameID: 'project_closeProject',
-            descriptionID: 'project_closeProject_description',
+            nameID: 'command_project.closeProject.name',
+            descriptionID: 'command_project.closeProject.description',
             author: 'The Astras Team',
             callback: () => {
                 alert('CLOSE_PROJECT');
@@ -55,11 +55,11 @@ export default () => {
     // 保存项目
     menubarManager.addValue('project', projectID, {
         translate: true,
-        nameID: 'project_saveProject',
+        nameID: 'command_project.saveProject.name',
         commandID: commandManager.addCommand({
             translate: true,
-            nameID: 'project_saveProject',
-            descriptionID: 'project_saveProject_description',
+            nameID: 'command_project.saveProject.name',
+            descriptionID: 'command_project.saveProject.description',
             author: 'The Astras Team',
             callback: () => {
                 alert('SAVE_PROJECT');
@@ -70,21 +70,21 @@ export default () => {
     menubarManager.addCategory('project', {
         id: editorID,
         translate: true,
-        nameID: 'astratch_menu_project_editor',
+        nameID: 'menu_project.editor.name',
     });
 
     // 设置
     menubarManager.addValue('project', editorID, {
         translate: true,
-        nameID: 'editor_settings',
+        nameID: 'command_project.settings.name',
         children: [
             {
                 translate: true,
-                nameID: 'editor_settings_theme',
+                nameID: 'command_project.themeSettings.name',
                 commandID: commandManager.addCommand({
                     translate: true,
-                    nameID: 'editor_settings_theme',
-                    descriptionID: 'editor_settings_theme_description',
+                    nameID: 'command_project.themeSettings.name',
+                    descriptionID: 'command_project.themeSettings.description',
                     author: 'The Astras Team',
                     callback: () => {
                         alert('OPEN_THEME_SETTINGS');
@@ -93,11 +93,11 @@ export default () => {
             },
             {
                 translate: true,
-                nameID: 'editor_settings_shortcuts',
+                nameID: 'command_project.shortcutSettings.name',
                 commandID: commandManager.addCommand({
                     translate: true,
-                    nameID: 'editor_settings_shortcuts',
-                    descriptionID: 'editor_settings_shortcuts_description',
+                    nameID: 'command_project.shortcutSettings.name',
+                    descriptionID: 'command_project.shortcutSettings.description',
                     author: 'The Astras Team',
                     callback: () => {
                         alert('OPEN_SHORTCUTS_SETTINGS');
@@ -109,11 +109,11 @@ export default () => {
             },
             {
                 translate: true,
-                nameID: 'editor_settings',
+                nameID: 'command_project.settings.name',
                 commandID: commandManager.addCommand({
                     translate: true,
-                    nameID: 'editor_settings',
-                    descriptionID: 'editor_settings_description',
+                    nameID: 'command_project.settings.name',
+                    descriptionID: 'command_project.settings.description',
                     author: 'The Astras Team',
                     callback: () => {
                         alert('OPEN_SETTINGS');
@@ -125,11 +125,11 @@ export default () => {
     // 退出编辑器
     menubarManager.addValue('project', editorID, {
         translate: true,
-        nameID: 'editor_exit',
+        nameID: 'command_project.exit.name',
         commandID: commandManager.addCommand({
             translate: true,
-            nameID: 'editor_exit',
-            descriptionID: 'editor_exit_description',
+            nameID: 'command_project.exit.name',
+            descriptionID: 'command_project.exit.description',
             author: 'The Astras Team',
             callback: () => {
                 alert('EXIT_EDITOR');

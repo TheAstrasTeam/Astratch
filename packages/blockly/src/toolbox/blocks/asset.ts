@@ -53,7 +53,7 @@ export const initAssetBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:asset.allAssetsName'),
+                message0: t('blocks:asset.allAssetsName.label'),
                 colour: TOOLBOX_COLOR.asset,
                 output: 'String',
             });
@@ -64,7 +64,7 @@ export const initAssetBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:asset.getAssetHandle'),
+                message0: t('blocks:asset.getAssetHandle.label'),
                 args0: [objectInput('HANDLE')],
                 colour: TOOLBOX_COLOR.asset,
                 output: 'Object',
@@ -76,7 +76,7 @@ export const initAssetBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:asset.getTempAssetLength'),
+                message0: t('blocks:asset.getTempAssetLength.label'),
                 args0: [objectInput('HANDLE')],
                 colour: TOOLBOX_COLOR.asset,
                 output: 'Length',
@@ -87,12 +87,12 @@ export const initAssetBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:asset.getImageTempAssetLH'),
+                message0: t('blocks:asset.getImageTempAssetLH.label'),
                 args0: [
                     objectInput('HANDLE'),
                     dropdown('LH', [
-                        [t('blocks:width'), 'width'],
-                        [t('blocks:height'), 'height'],
+                        [t('blocks:asset.width.label'), 'width'],
+                        [t('blocks:asset.height.label'), 'height'],
                     ]),
                 ],
                 colour: TOOLBOX_COLOR.asset,
@@ -105,7 +105,7 @@ export const initAssetBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:asset.getImageTempAssetMIME'),
+                message0: t('blocks:asset.getImageTempAssetMIME.label'),
                 args0: [objectInput('HANDLE')],
                 colour: TOOLBOX_COLOR.asset,
                 output: 'String',
@@ -116,7 +116,7 @@ export const initAssetBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:asset.getAudioTempAssetTotalTime'),
+                message0: t('blocks:asset.getAudioTempAssetTotalTime.label'),
                 args0: [objectInput('HANDLE')],
                 colour: TOOLBOX_COLOR.asset,
                 output: 'Number',

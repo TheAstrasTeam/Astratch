@@ -6,7 +6,7 @@ import { Renderer } from './Renderer';
 export default {
     Renderer,
     Icon,
-    name: t('gui:target'),
+    name: t('gui:sidebar.target.name'),
     enable: () => {
         return true;
     },

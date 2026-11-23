@@ -67,13 +67,13 @@ export const Sidebar = ({ hideSidebar }: { hideSidebar: (value: boolean) => void
                         </button>
                     }
                 >
-                    <MenuHeader>{t('gui:sidebar')}</MenuHeader>
+                    <MenuHeader>{t('gui:sidebar.panel.name')}</MenuHeader>
                     <MenuItem
                         onClick={() => {
                             hideSidebar(true);
                         }}
                     >
-                        {t('gui:sidebar.hide')}
+                        {t('gui:sidebar.hide.name')}
                     </MenuItem>
                 </Menu>
             </div>

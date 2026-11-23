@@ -5,8 +5,8 @@ import { QuickOpen_BuiltIn_BlockRenderer } from './Renderer';
 
 export default {
     translate: true,
-    nameID: 'quickOpen_block',
-    descriptionID: 'quickOpen_block_description',
+    nameID: 'quickOpen.block.name',
+    descriptionID: 'quickOpen.block.description',
     icon: BlockIcon,
     id: 'block',
     shortcut: [],

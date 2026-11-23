@@ -19,7 +19,7 @@ export const initFunctionBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:function.execute'),
+                message0: t('blocks:function.execute.label'),
                 args0: [functionInput('FUNCTION')],
                 colour: TOOLBOX_COLOR.function,
             });
@@ -30,7 +30,7 @@ export const initFunctionBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:function.executeReturn'),
+                message0: t('blocks:function.executeReturn.label'),
                 args0: [functionInput('FUNCTION')],
                 output: TYPES.UNKNOWN,
                 colour: TOOLBOX_COLOR.function,
@@ -42,7 +42,7 @@ export const initFunctionBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:function.inline'),
+                message0: t('blocks:function.inline.label'),
                 message1: '%1',
                 args1: [statementInput('DO')],
                 output: TYPES.FUNCTION,

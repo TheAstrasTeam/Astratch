@@ -23,9 +23,13 @@ export const initEventBlocks = () => {
                 ...hatConnections,
                 colour: TOOLBOX_COLOR.event,
             });
-            this.appendDummyInput('text1').appendField(t('blocks:event.whenStartClicked_1'));
+            this.appendDummyInput('text1').appendField(
+                t('blocks:event_whenStartClicked.prefix.label'),
+            );
             this.appendDummyInput('icon').appendField(new Blockly.FieldImage(Start, 25, 25));
-            this.appendDummyInput('text2').appendField(t('blocks:event.whenStartClicked_2'));
+            this.appendDummyInput('text2').appendField(
+                t('blocks:event_whenStartClicked.suffix.label'),
+            );
         },
     } as Blockly.Block;
 
@@ -33,7 +37,7 @@ export const initEventBlocks = () => {
         init() {
             this.jsonInit({
                 ...hatConnections,
-                message0: t('blocks:event.whenMouse'),
+                message0: t('blocks:event.whenMouse.label'),
                 args0: [
                     dropdown('BUTTON', MOUSE_BUTTON_OPTIONS),
                     dropdown('STATE', KEY_STATE_OPTIONS),
@@ -47,7 +51,7 @@ export const initEventBlocks = () => {
         init() {
             this.jsonInit({
                 ...hatConnections,
-                message0: t('blocks:event.whenKey'),
+                message0: t('blocks:event.whenKey.label'),
                 args0: [dropdown('KEY', KEY_OPTIONS), dropdown('STATE', KEY_STATE_OPTIONS)],
                 colour: TOOLBOX_COLOR.event,
             });
@@ -58,7 +62,7 @@ export const initEventBlocks = () => {
         init() {
             this.jsonInit({
                 ...hatConnections,
-                message0: t('blocks:event.whenTouched'),
+                message0: t('blocks:event.whenTouched.label'),
                 args0: [dropdown('STATE', KEY_STATE_OPTIONS)],
                 colour: TOOLBOX_COLOR.event,
             });
@@ -69,7 +73,7 @@ export const initEventBlocks = () => {
         init() {
             this.jsonInit({
                 ...hatConnections,
-                message0: t('blocks:event.whenAfter'),
+                message0: t('blocks:event.whenAfter.label'),
                 args0: [numberInput('SECONDS')],
                 colour: TOOLBOX_COLOR.event,
             });

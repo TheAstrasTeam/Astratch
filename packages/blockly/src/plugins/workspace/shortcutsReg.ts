@@ -324,7 +324,7 @@ export const registerMultiSelectShortcuts = () => {
                     Blockly.utils.KeyCodes.CTRL_CMD,
                 ]),
             ],
-            displayText: () => t('gui:selectAll'),
+            displayText: () => t('gui:command.selectAll.name'),
         },
         true,
     );

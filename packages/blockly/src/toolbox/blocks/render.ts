@@ -30,44 +30,44 @@ import X from './assets/x.svg';
 import Y from './assets/y.svg';
 
 const EFFECT_OPTIONS = [
-    [t('blocks:option.effect.color'), 'color'],
-    [t('blocks:option.effect.whirl'), 'whirl'],
-    [t('blocks:option.effect.fisheye'), 'fisheye'],
-    [t('blocks:option.effect.pixelate'), 'pixelate'],
-    [t('blocks:option.effect.mosaic'), 'mosaic'],
-    [t('blocks:option.effect.ghost'), 'ghost'],
-    [t('blocks:option.effect.blur'), 'blur'],
+    [t('blocks:option_effect.color.label'), 'color'],
+    [t('blocks:option_effect.whirl.label'), 'whirl'],
+    [t('blocks:option_effect.fisheye.label'), 'fisheye'],
+    [t('blocks:option_effect.pixelate.label'), 'pixelate'],
+    [t('blocks:option_effect.mosaic.label'), 'mosaic'],
+    [t('blocks:option_effect.ghost.label'), 'ghost'],
+    [t('blocks:option_effect.blur.label'), 'blur'],
 ];
 
 const BLEND_OPTIONS = [
-    [t('blocks:option.blend.default'), 'default'],
-    [t('blocks:option.blend.dissolve'), 'dissolve'],
-    [t('blocks:option.blend.darken'), 'darken'],
-    [t('blocks:option.blend.lighten'), 'lighten'],
-    [t('blocks:option.blend.screen'), 'screen'],
-    [t('blocks:option.blend.multiply'), 'multiply'],
-    [t('blocks:option.blend.colorBurn'), 'colorBurn'],
-    [t('blocks:option.blend.colorDodge'), 'colorDodge'],
-    [t('blocks:option.blend.overlay'), 'overlay'],
-    [t('blocks:option.blend.difference'), 'difference'],
-    [t('blocks:option.blend.pinLight'), 'pinLight'],
-    [t('blocks:option.blend.softLight'), 'softLight'],
-    [t('blocks:option.blend.hardLight'), 'hardLight'],
+    [t('blocks:option_blend.default.label'), 'default'],
+    [t('blocks:option_blend.dissolve.label'), 'dissolve'],
+    [t('blocks:option_blend.darken.label'), 'darken'],
+    [t('blocks:option_blend.lighten.label'), 'lighten'],
+    [t('blocks:option_blend.screen.label'), 'screen'],
+    [t('blocks:option_blend.multiply.label'), 'multiply'],
+    [t('blocks:option_blend.colorBurn.label'), 'colorBurn'],
+    [t('blocks:option_blend.colorDodge.label'), 'colorDodge'],
+    [t('blocks:option_blend.overlay.label'), 'overlay'],
+    [t('blocks:option_blend.difference.label'), 'difference'],
+    [t('blocks:option_blend.pinLight.label'), 'pinLight'],
+    [t('blocks:option_blend.softLight.label'), 'softLight'],
+    [t('blocks:option_blend.hardLight.label'), 'hardLight'],
 ];
 
 const LAYER_OPTIONS = [
-    [t('blocks:option.layer.up'), 'up'],
-    [t('blocks:option.layer.down'), 'down'],
+    [t('blocks:option_layer.up.label'), 'up'],
+    [t('blocks:option_layer.down.label'), 'down'],
 ];
 
 const TEXT_METRIC_OPTIONS = [
-    [t('blocks:option.textMetric.borderWidth'), 'borderWidth'],
-    [t('blocks:option.textMetric.pixelLength'), 'pixelLength'],
+    [t('blocks:option_textMetric.borderWidth.label'), 'borderWidth'],
+    [t('blocks:option_textMetric.pixelLength.label'), 'pixelLength'],
 ];
 
 const TEXT_COLOR_OPTIONS = [
-    [t('blocks:option.textColor.color'), 'color'],
-    [t('blocks:option.textColor.borderColor'), 'borderColor'],
+    [t('blocks:option_textColor.color.label'), 'color'],
+    [t('blocks:option_textColor.borderColor.label'), 'borderColor'],
 ];
 
 export const initRenderBlocks = () => {
@@ -104,7 +104,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:motion.forward'),
+                message0: t('blocks:motion.forward.label'),
                 args0: [numberInput('STEPS')],
                 colour: TOOLBOX_COLOR.render,
             });
@@ -115,7 +115,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:motion.moveTo'),
+                message0: t('blocks:motion.moveTo.label'),
                 args0: [stringInput('TARGET')],
                 colour: TOOLBOX_COLOR.render,
             });
@@ -126,7 +126,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:motion.setX'),
+                message0: t('blocks:motion.setX.label'),
                 args0: [numberInput('X')],
                 colour: TOOLBOX_COLOR.render,
             });
@@ -137,7 +137,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:motion.setY'),
+                message0: t('blocks:motion.setY.label'),
                 args0: [numberInput('Y')],
                 colour: TOOLBOX_COLOR.render,
             });
@@ -148,7 +148,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:motion.changeX'),
+                message0: t('blocks:motion.changeX.label'),
                 args0: [numberInput('X')],
                 colour: TOOLBOX_COLOR.render,
             });
@@ -159,7 +159,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:motion.changeY'),
+                message0: t('blocks:motion.changeY.label'),
                 args0: [numberInput('Y')],
                 colour: TOOLBOX_COLOR.render,
             });
@@ -170,7 +170,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:motion.setXY'),
+                message0: t('blocks:motion.setXY.label'),
                 args0: [arrayInput('XY')],
                 colour: TOOLBOX_COLOR.render,
             });
@@ -206,7 +206,7 @@ export const initRenderBlocks = () => {
                         this.removeInput(inputID, true);
                     });
                     this.appendDummyInput('moveText_array').appendField(
-                        t(isSet ? 'blocks:motion.setXY' : 'blocks:motion.changeXY'),
+                        t(isSet ? 'blocks:motion.setXY.label' : 'blocks:motion.changeXY.label'),
                     );
                     this.appendDummyInput('moveSwitcher').appendField(
                         new Blockly.FieldImage(SwitchToNumber, 24, 24, undefined, () => {
@@ -224,7 +224,7 @@ export const initRenderBlocks = () => {
                     this.removeInput(inputID, true);
                 });
                 this.appendDummyInput('moveText_number').appendField(
-                    t(isSet ? 'blocks:motion.setXY' : 'blocks:motion.changeXY'),
+                    t(isSet ? 'blocks:motion.setXY.label' : 'blocks:motion.changeXY.label'),
                 );
                 this.appendDummyInput('moveSwitcher').appendField(
                     new Blockly.FieldImage(SwitchToArray, 24, 24, undefined, () => {
@@ -295,7 +295,7 @@ export const initRenderBlocks = () => {
             this.jsonInit({
                 ...returnConnections,
                 output: 'Number',
-                message0: t('blocks:motion.getX'),
+                message0: t('blocks:motion.getX.label'),
                 colour: TOOLBOX_COLOR.render,
             });
         },
@@ -305,7 +305,7 @@ export const initRenderBlocks = () => {
             this.jsonInit({
                 ...returnConnections,
                 output: 'Number',
-                message0: t('blocks:motion.getY'),
+                message0: t('blocks:motion.getY.label'),
                 colour: TOOLBOX_COLOR.render,
             });
         },
@@ -317,7 +317,7 @@ export const initRenderBlocks = () => {
             this.jsonInit({
                 ...returnConnections,
                 output: 'Number',
-                message0: t('blocks:motion.turnLeft'),
+                message0: t('blocks:motion.turnLeft.label'),
                 args0: [numberInput('DEGREES')],
                 colour: TOOLBOX_COLOR.render,
             });
@@ -329,7 +329,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:motion.turnRight'),
+                message0: t('blocks:motion.turnRight.label'),
                 args0: [numberInput('DEGREES')],
                 colour: TOOLBOX_COLOR.render,
             });
@@ -341,7 +341,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:motion.setHeading'),
+                message0: t('blocks:motion.setHeading.label'),
                 args0: [numberInput('DEGREES')],
                 colour: TOOLBOX_COLOR.render,
             });
@@ -352,7 +352,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:motion.faceTo'),
+                message0: t('blocks:motion.faceTo.label'),
                 args0: [stringInput('TARGET')],
                 colour: TOOLBOX_COLOR.render,
             });
@@ -363,7 +363,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:motion.heading'),
+                message0: t('blocks:motion.heading.label'),
                 output: TYPES.NUMBER,
                 colour: TOOLBOX_COLOR.render,
             });
@@ -375,7 +375,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:display.setSize'),
+                message0: t('blocks:display.setSize.label'),
                 args0: [numberInput('SIZE')],
                 colour: TOOLBOX_COLOR.motion_display,
             });
@@ -386,7 +386,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:display.changeSize'),
+                message0: t('blocks:display.changeSize.label'),
                 args0: [numberInput('SIZE')],
                 colour: TOOLBOX_COLOR.motion_display,
             });
@@ -397,7 +397,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:display.size'),
+                message0: t('blocks:display.size.label'),
                 output: TYPES.NUMBER,
                 colour: TOOLBOX_COLOR.motion_display,
             });
@@ -409,7 +409,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:display.show'),
+                message0: t('blocks:display.show.label'),
                 colour: TOOLBOX_COLOR.motion_display,
             });
         },
@@ -419,7 +419,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:display.hide'),
+                message0: t('blocks:display.hide.label'),
                 colour: TOOLBOX_COLOR.motion_display,
             });
         },
@@ -429,7 +429,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:display.visible'),
+                message0: t('blocks:display.visible.label'),
                 output: TYPES.BOOLEAN,
                 colour: TOOLBOX_COLOR.motion_display,
             });
@@ -441,7 +441,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:display.switchCostume'),
+                message0: t('blocks:display.switchCostume.label'),
                 args0: [objectInput('COSTUME')],
                 colour: TOOLBOX_COLOR.motion_display,
             });
@@ -452,7 +452,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:display.costume'),
+                message0: t('blocks:display.costume.label'),
                 output: TYPES.STRING,
                 colour: TOOLBOX_COLOR.motion_display,
             });
@@ -464,7 +464,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:display.changeEffect'),
+                message0: t('blocks:display.changeEffect.label'),
                 args0: [dropdown('EFFECT', EFFECT_OPTIONS), numberInput('VALUE')],
                 colour: TOOLBOX_COLOR.motion_display,
             });
@@ -475,7 +475,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:display.setEffect'),
+                message0: t('blocks:display.setEffect.label'),
                 args0: [dropdown('EFFECT', EFFECT_OPTIONS), numberInput('VALUE')],
                 colour: TOOLBOX_COLOR.motion_display,
             });
@@ -486,7 +486,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:display.effect'),
+                message0: t('blocks:display.effect.label'),
                 args0: [dropdown('EFFECT', EFFECT_OPTIONS)],
                 output: TYPES.NUMBER,
                 colour: TOOLBOX_COLOR.motion_display,
@@ -499,7 +499,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:display.setBlendMode'),
+                message0: t('blocks:display.setBlendMode.label'),
                 args0: [dropdown('BLEND', BLEND_OPTIONS)],
                 colour: TOOLBOX_COLOR.motion_display,
             });
@@ -510,7 +510,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:display.blendMode'),
+                message0: t('blocks:display.blendMode.label'),
                 output: TYPES.STRING,
                 colour: TOOLBOX_COLOR.motion_display,
             });
@@ -522,7 +522,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:display.setClip'),
+                message0: t('blocks:display.setClip.label'),
                 colour: TOOLBOX_COLOR.motion_display,
             });
         },
@@ -532,7 +532,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:display.resetClip'),
+                message0: t('blocks:display.resetClip.label'),
                 colour: TOOLBOX_COLOR.motion_display,
             });
         },
@@ -542,7 +542,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:display.clip'),
+                message0: t('blocks:display.clip.label'),
                 output: TYPES.ARRAY,
                 colour: TOOLBOX_COLOR.motion_display,
             });
@@ -554,7 +554,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:display.changeLayer'),
+                message0: t('blocks:display.changeLayer.label'),
                 args0: [dropdown('DIRECTION', LAYER_OPTIONS), numberInput('COUNT')],
                 colour: TOOLBOX_COLOR.motion_display,
             });
@@ -565,7 +565,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:display.setLayer'),
+                message0: t('blocks:display.setLayer.label'),
                 args0: [numberInput('LAYER')],
                 colour: TOOLBOX_COLOR.motion_display,
             });
@@ -576,7 +576,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:display.layer'),
+                message0: t('blocks:display.layer.label'),
                 output: TYPES.NUMBER,
                 colour: TOOLBOX_COLOR.motion_display,
             });
@@ -588,7 +588,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:text.show'),
+                message0: t('blocks:text.show.label'),
                 args0: [stringInput('TEXT')],
                 colour: TOOLBOX_COLOR.motion_display,
             });
@@ -599,7 +599,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:text.setFont'),
+                message0: t('blocks:text.setFont.label'),
                 args0: [objectInput('ASSET')],
                 colour: TOOLBOX_COLOR.motion_display,
             });
@@ -610,7 +610,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:text.setTextColor'),
+                message0: t('blocks:text.setTextColor.label'),
                 args0: [stringInput('COLOR')],
                 colour: TOOLBOX_COLOR.motion_display,
             });
@@ -621,7 +621,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:text.setTextBorderColor'),
+                message0: t('blocks:text.setTextBorderColor.label'),
                 args0: [stringInput('COLOR')],
                 colour: TOOLBOX_COLOR.motion_display,
             });
@@ -632,7 +632,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:text.setTextBorderWidth'),
+                message0: t('blocks:text.setTextBorderWidth.label'),
                 args0: [numberInput('WIDTH')],
                 colour: TOOLBOX_COLOR.motion_display,
             });
@@ -643,7 +643,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:text.metric'),
+                message0: t('blocks:text.metric.label'),
                 args0: [dropdown('METRIC', TEXT_METRIC_OPTIONS)],
                 output: TYPES.NUMBER,
                 colour: TOOLBOX_COLOR.motion_display,
@@ -655,7 +655,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:text.color'),
+                message0: t('blocks:text.color.label'),
                 args0: [dropdown('COLOR', TEXT_COLOR_OPTIONS)],
                 output: TYPES.STRING,
                 colour: TOOLBOX_COLOR.motion_display,
@@ -667,7 +667,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:text.stop'),
+                message0: t('blocks:text.stop.label'),
                 colour: TOOLBOX_COLOR.motion_display,
             });
         },
@@ -677,7 +677,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:text.showing'),
+                message0: t('blocks:text.showing.label'),
                 output: TYPES.BOOLEAN,
                 colour: TOOLBOX_COLOR.motion_display,
             });
@@ -688,7 +688,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:text.font'),
+                message0: t('blocks:text.font.label'),
                 output: TYPES.STRING,
                 colour: TOOLBOX_COLOR.motion_display,
             });
@@ -699,7 +699,7 @@ export const initRenderBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:text.content'),
+                message0: t('blocks:text.content.label'),
                 output: TYPES.STRING,
                 colour: TOOLBOX_COLOR.motion_display,
             });

@@ -5,8 +5,8 @@ import { QuickOpen_BuiltIn_Command } from './Renderer';
 
 export default {
     translate: true,
-    nameID: 'quickOpen_command',
-    descriptionID: 'quickOpen_command_description',
+    nameID: 'quickOpen.command.name',
+    descriptionID: 'quickOpen.command.description',
     icon: CommandIcon,
     id: 'command',
     shortcut: [],

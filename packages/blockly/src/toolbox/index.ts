@@ -14,7 +14,7 @@ export const num = (v: string | number) => ({
 export const str = (v?: string) => ({
     shadow: {
         type: OPCODES.string,
-        fields: { TEXT: v ?? t('blocks:text.example') },
+        fields: { TEXT: v ?? t('blocks:text.example.value') },
     },
 });
 
@@ -75,13 +75,13 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
             {
                 kind: 'category',
                 id: 'render',
-                name: t('blocks:category.render'),
+                name: t('blocks:category.render.name'),
                 colour: TOOLBOX_COLOR.render,
                 contents: [
                     {
                         kind: 'category',
                         id: 'motion',
-                        name: t('blocks:category.motion'),
+                        name: t('blocks:category.motion.name'),
                         colour: TOOLBOX_COLOR.motion,
                         contents: [
                             block(OPCODES.forward, { STEPS: num(10) }),
@@ -104,7 +104,7 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                     {
                         kind: 'category',
                         id: 'direction',
-                        name: t('blocks:category.direction'),
+                        name: t('blocks:category.direction.name'),
                         colour: TOOLBOX_COLOR.render,
                         contents: [
                             block(OPCODES.turnLeft, { DEGREES: angle(15) }),
@@ -120,7 +120,7 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                     {
                         kind: 'category',
                         id: 'display',
-                        name: t('blocks:category.display'),
+                        name: t('blocks:category.display.name'),
                         colour: TOOLBOX_COLOR.motion_display,
                         contents: [
                             block(OPCODES.setSize, { SIZE: num(100) }),
@@ -155,7 +155,7 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                     {
                         kind: 'category',
                         id: 'text',
-                        name: t('blocks:category.text'),
+                        name: t('blocks:category.text.name'),
                         colour: TOOLBOX_COLOR.motion_display,
                         contents: [
                             block(OPCODES.showText, { TEXT: str() }),
@@ -179,7 +179,7 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
             {
                 kind: 'category',
                 id: 'audio',
-                name: t('blocks:category.audio'),
+                name: t('blocks:category.audio.name'),
                 colour: TOOLBOX_COLOR.audio,
                 contents: [
                     block(OPCODES.playAllAudio),
@@ -192,30 +192,30 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                     sep(),
                     block(OPCODES.playAudio),
                     block(OPCODES.stopOrPlayAudio, {
-                        AUDIO_NAME: str(t('blocks:audio.example')),
+                        AUDIO_NAME: str(t('blocks:audio.example.value')),
                     }),
                     block(OPCODES.stopAndDeleteAudio, {
-                        AUDIO_NAME: str(t('blocks:audio.example')),
+                        AUDIO_NAME: str(t('blocks:audio.example.value')),
                     }),
                     block(OPCODES.setAudioEffect, {
-                        AUDIO_NAME: str(t('blocks:audio.example')),
+                        AUDIO_NAME: str(t('blocks:audio.example.value')),
                         VALUE: num(100),
                     }),
                     block(OPCODES.isExistingAudio, {
-                        AUDIO_NAME: str(t('blocks:audio.example')),
+                        AUDIO_NAME: str(t('blocks:audio.example.value')),
                     }),
                     block(OPCODES.isPlayingAudio, {
-                        AUDIO_NAME: str(t('blocks:audio.example')),
+                        AUDIO_NAME: str(t('blocks:audio.example.value')),
                     }),
                     block(OPCODES.getAudioEffect, {
-                        AUDIO_NAME: str(t('blocks:audio.example')),
+                        AUDIO_NAME: str(t('blocks:audio.example.value')),
                     }),
                 ],
             },
             {
                 kind: 'category',
                 id: 'asset',
-                name: t('blocks:category.asset'),
+                name: t('blocks:category.asset.name'),
                 colour: TOOLBOX_COLOR.asset,
                 contents: [
                     block(OPCODES.assetSelector),
@@ -234,13 +234,13 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
             {
                 kind: 'category',
                 id: 'entity',
-                name: t('blocks:category.entity'),
+                name: t('blocks:category.entity.name'),
                 colour: TOOLBOX_COLOR.entity,
                 contents: [
                     {
                         kind: 'category',
                         id: 'entity_tempEntity',
-                        name: t('blocks:category.entity.tempEntity'),
+                        name: t('blocks:category.entity.tempEntity.name'),
                         colour: TOOLBOX_COLOR.entity,
                         contents: [
                             block(OPCODES.getTemplate),
@@ -266,7 +266,7 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                     {
                         kind: 'category',
                         id: 'entity_data',
-                        name: t('blocks:category.entity.data'),
+                        name: t('blocks:category.entity.data.name'),
                         colour: TOOLBOX_COLOR.entity,
                         contents: [
                             block(OPCODES.thisInstance),
@@ -283,7 +283,7 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
             {
                 kind: 'category',
                 id: 'event',
-                name: t('blocks:category.event'),
+                name: t('blocks:category.event.name'),
                 colour: TOOLBOX_COLOR.event,
                 contents: [
                     block(OPCODES.whenStartClicked),
@@ -296,7 +296,7 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
             {
                 kind: 'category',
                 id: 'flow',
-                name: t('blocks:category.flow'),
+                name: t('blocks:category.flow.name'),
                 colour: TOOLBOX_COLOR.flow,
                 contents: [
                     block(OPCODES.wait, { SECONDS: num(1) }),
@@ -314,7 +314,7 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
             {
                 kind: 'category',
                 id: 'branch',
-                name: t('blocks:category.branch'),
+                name: t('blocks:category.branch.name'),
                 colour: TOOLBOX_COLOR.branch,
                 contents: [
                     block(OPCODES.if, { CONDITION: bool(false) }),
@@ -327,13 +327,13 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
             {
                 kind: 'category',
                 id: 'sensing',
-                name: t('blocks:category.sensing'),
+                name: t('blocks:category.sensing.name'),
                 colour: TOOLBOX_COLOR.sensing,
                 contents: [
                     {
                         kind: 'category',
                         id: 'sensingInput',
-                        name: t('blocks:category.sensingInput'),
+                        name: t('blocks:category.sensingInput.name'),
                         colour: TOOLBOX_COLOR.sensing,
                         contents: [
                             block(OPCODES.mouseX),
@@ -351,16 +351,24 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                             block(OPCODES.daysSince2000),
                             block(OPCODES.currentTime, undefined),
                             sep(),
-                            block(OPCODES.timer, { NAME: str(t('blocks:timer.example')) }),
-                            block(OPCODES.startTimer, { NAME: str(t('blocks:timer.example')) }),
-                            block(OPCODES.resetTimer, { NAME: str(t('blocks:timer.example')) }),
-                            block(OPCODES.stopTimer, { NAME: str(t('blocks:timer.example')) }),
+                            block(OPCODES.timer, {
+                                NAME: str(t('blocks:sensing_timer.example.value')),
+                            }),
+                            block(OPCODES.startTimer, {
+                                NAME: str(t('blocks:sensing_timer.example.value')),
+                            }),
+                            block(OPCODES.resetTimer, {
+                                NAME: str(t('blocks:sensing_timer.example.value')),
+                            }),
+                            block(OPCODES.stopTimer, {
+                                NAME: str(t('blocks:sensing_timer.example.value')),
+                            }),
                         ],
                     },
                     {
                         kind: 'category',
                         id: 'detect',
-                        name: t('blocks:category.detect'),
+                        name: t('blocks:category.detect.name'),
                         colour: TOOLBOX_COLOR.sensing,
                         contents: [block(OPCODES.touching), block(OPCODES.distanceTo, undefined)],
                     },
@@ -369,13 +377,13 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
             {
                 kind: 'category',
                 id: 'calc',
-                name: t('blocks:category.calc'),
+                name: t('blocks:category.calc.name'),
                 colour: TOOLBOX_COLOR.math,
                 contents: [
                     {
                         kind: 'category',
                         id: 'math',
-                        name: t('blocks:category.math'),
+                        name: t('blocks:category.math.name'),
                         colour: TOOLBOX_COLOR.math,
                         contents: [
                             block(OPCODES.add),
@@ -394,14 +402,14 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                     {
                         kind: 'category',
                         id: 'compare',
-                        name: t('blocks:category.compare'),
+                        name: t('blocks:category.compare.name'),
                         colour: TOOLBOX_COLOR.math,
                         contents: [block(OPCODES.compare)],
                     },
                     {
                         kind: 'category',
                         id: 'logic',
-                        name: t('blocks:category.logic'),
+                        name: t('blocks:category.logic.name'),
                         colour: TOOLBOX_COLOR.math,
                         contents: [
                             block(OPCODES.and),
@@ -412,7 +420,7 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                     {
                         kind: 'category',
                         id: 'string',
-                        name: t('blocks:category.string'),
+                        name: t('blocks:category.string.name'),
                         colour: TOOLBOX_COLOR.math,
                         contents: [
                             block(OPCODES.join),
@@ -423,13 +431,13 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                                 TO: num('2'),
                             }),
                             block(OPCODES.split, {
-                                SEPARATOR: str(t('blocks:split.example')),
+                                SEPARATOR: str(t('blocks:string_split.example.value')),
                                 STRING: str(),
                             }),
                             block(OPCODES.char, undefined),
                             block(OPCODES.contains, {
                                 STRING: str(),
-                                SUBSTRING: str(t('blocks:contains.example')),
+                                SUBSTRING: str(t('blocks:string_contains.example.value')),
                             }),
                             block(OPCODES.stringLength, { STRING: str() }),
                         ],
@@ -439,13 +447,13 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
             {
                 kind: 'category',
                 id: 'data',
-                name: t('blocks:category.data'),
+                name: t('blocks:category.data.name'),
                 colour: TOOLBOX_COLOR.data,
                 contents: [
                     {
                         kind: 'category',
                         id: 'temp',
-                        name: t('blocks:category.temp'),
+                        name: t('blocks:category.temp.name'),
                         colour: TOOLBOX_COLOR.data,
                         contents: [
                             block(OPCODES.getTemp, { NAME: str('') }),
@@ -457,7 +465,7 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                     {
                         kind: 'category',
                         id: 'inputBox',
-                        name: t('blocks:category.inputBox'),
+                        name: t('blocks:category.inputBox.name'),
                         colour: TOOLBOX_COLOR.data,
                         contents: [
                             block(OPCODES.string),
@@ -476,7 +484,7 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                     {
                         kind: 'category',
                         id: 'object',
-                        name: t('blocks:category.object'),
+                        name: t('blocks:category.object.name'),
                         colour: TOOLBOX_COLOR.data,
                         contents: [
                             block(OPCODES.emptyObject, undefined),
@@ -492,7 +500,7 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
                     {
                         kind: 'category',
                         id: 'array',
-                        name: t('blocks:category.array'),
+                        name: t('blocks:category.array.name'),
                         colour: TOOLBOX_COLOR.data,
                         contents: [
                             block(OPCODES.emptyArray, undefined),
@@ -510,7 +518,7 @@ export const getToolbox = (): Blockly.utils.toolbox.ToolboxInfo => {
             // {
             //     kind: 'category',
             //     id: 'function',
-            //     name: t('blocks:category.function'),
+            //     name: t('blocks:category.function.name'),
             //     colour: TOOLBOX_COLOR.function,
             //     contents: [
             //         block(OPCODES.execute, undefined),

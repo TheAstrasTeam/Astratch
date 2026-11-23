@@ -5,7 +5,7 @@ import Icon from '@as/targets/target.svg?react';
 export default {
     Renderer: () => ({ Node: () => <div>Testing</div>, storage: () => ({}) }),
     Icon,
-    name: t('gui:addon'),
+    name: t('gui:sidebar.addon.name'),
     enable: () => {
         return true;
     },

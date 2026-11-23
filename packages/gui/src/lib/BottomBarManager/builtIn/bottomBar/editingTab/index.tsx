@@ -4,7 +4,7 @@ import { EditingTabHint } from './Renderer.tsx';
 
 export default {
     translate: true,
-    descriptionID: 'bottomBar_focusingTab',
+    descriptionID: 'bottomBar.focusingTab.name',
     Renderer: EditingTabHint,
     commandID: commandManager.addCommand({
         translate: true,
@@ -12,8 +12,8 @@ export default {
             alert('CHANGE_FOCUSING_TAB');
         },
         author: 'The Astras Team',
-        nameID: 'notice_name',
-        descriptionID: 'notice_description',
+        nameID: 'command.focusingTab.name',
+        descriptionID: 'command.focusingTab.description',
     }).id,
     pos: 'left',
 } satisfies BottomBarSubmitItem;

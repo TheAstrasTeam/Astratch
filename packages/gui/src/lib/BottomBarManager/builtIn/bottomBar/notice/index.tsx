@@ -4,7 +4,7 @@ import { NoticeButton } from './Renderer';
 
 export default {
     translate: true,
-    descriptionID: 'bottomBar_notice',
+    descriptionID: 'bottomBar.notice.description',
     Renderer: NoticeButton,
     commandID: commandManager.addCommand({
         translate: true,
@@ -12,8 +12,8 @@ export default {
             alert('OPEN_NOTICE');
         },
         author: 'The Astras Team',
-        nameID: 'notice_name',
-        descriptionID: 'notice_description',
+        nameID: 'command.notice.name',
+        descriptionID: 'command.notice.description',
     }).id,
     pos: 'right',
 } satisfies BottomBarSubmitItem;

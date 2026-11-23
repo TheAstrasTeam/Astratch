@@ -15,20 +15,20 @@ import MinusIcon from './assets/minus.svg';
 
 export const initAudioBlocks = () => {
     const EFFECT_OPTIONS = [
-        [t('blocks:voice'), 'voice'],
-        [t('blocks:tone'), 'tone'],
-        [t('blocks:balance'), 'balance'],
-        [t('blocks:speed'), 'speed'],
+        [t('blocks:audio_effect.voice.label'), 'voice'],
+        [t('blocks:audio_effect.tone.label'), 'tone'],
+        [t('blocks:audio_effect.balance.label'), 'balance'],
+        [t('blocks:audio_effect.speed.label'), 'speed'],
     ];
     blocklyAdapter.Blockly.Blocks[OPCODES.playAllAudio] = {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:audio.playAll'),
+                message0: t('blocks:audio.playAll.label'),
                 args0: [
                     dropdown('OPERATION', [
-                        [t('blocks:audio_play'), 'play'],
-                        [t('blocks:pause'), 'pause'],
+                        [t('blocks:audio.play.label'), 'play'],
+                        [t('blocks:audio.pause.label'), 'pause'],
                     ]),
                 ],
                 colour: TOOLBOX_COLOR.audio,
@@ -39,7 +39,7 @@ export const initAudioBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:audio.stopAll'),
+                message0: t('blocks:audio.stopAll.label'),
                 colour: TOOLBOX_COLOR.audio,
             });
         },
@@ -48,7 +48,7 @@ export const initAudioBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:audio.setAllEffect'),
+                message0: t('blocks:audio.setAllEffect.label'),
                 args0: [dropdown('OPERATION', EFFECT_OPTIONS), numberInput('VALUE')],
                 colour: TOOLBOX_COLOR.audio,
             });
@@ -60,7 +60,7 @@ export const initAudioBlocks = () => {
             this.jsonInit({
                 ...returnConnections,
                 output: 'Array',
-                message0: t('blocks:audio.getAllAudio'),
+                message0: t('blocks:audio.getAllAudio.label'),
                 colour: TOOLBOX_COLOR.audio,
             });
         },
@@ -80,7 +80,7 @@ export const initAudioBlocks = () => {
         updateShape() {
             if (!this.getInput('PLAY_AUDIO'))
                 this.appendValueInput('PLAY_AUDIO')
-                    .appendField(t('blocks:audio.playAudio'))
+                    .appendField(t('blocks:audio.playAudio.label'))
                     .setCheck('Object')
                     .connection?.setShadowState({
                         type: OPCODES.assetSelector,
@@ -90,7 +90,7 @@ export const initAudioBlocks = () => {
 
             if (this.isExpand) {
                 const input = this.appendValueInput('SET_NAME')
-                    .appendField(t('blocks:audio.playAudio_setName'))
+                    .appendField(t('blocks:audio.playAudioSetName.label'))
                     .setCheck('String');
                 input.connection?.setShadowState({
                     type: OPCODES.string,
@@ -155,11 +155,11 @@ export const initAudioBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:audio.stopOrPlayAudio'),
+                message0: t('blocks:audio.stopOrPlayAudio.label'),
                 args0: [
                     dropdown('OPERATION', [
-                        [t('blocks:audio_play'), 'play'],
-                        [t('blocks:pause'), 'pause'],
+                        [t('blocks:audio.play.label'), 'play'],
+                        [t('blocks:audio.pause.label'), 'pause'],
                     ]),
                     stringInput('AUDIO_NAME'),
                 ],
@@ -171,7 +171,7 @@ export const initAudioBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:audio.stopAndDeleteAudio'),
+                message0: t('blocks:audio.stopAndDeleteAudio.label'),
                 args0: [stringInput('AUDIO_NAME')],
                 colour: TOOLBOX_COLOR.audio,
             });
@@ -181,7 +181,7 @@ export const initAudioBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:audio.setAudioEffect'),
+                message0: t('blocks:audio.setAudioEffect.label'),
                 args0: [
                     stringInput('AUDIO_NAME'),
                     dropdown('OPERATION', EFFECT_OPTIONS),
@@ -196,7 +196,7 @@ export const initAudioBlocks = () => {
             this.jsonInit({
                 ...returnConnections,
                 output: 'Boolean',
-                message0: t('blocks:audio.isExistingAudio'),
+                message0: t('blocks:audio.isExistingAudio.label'),
                 args0: [stringInput('AUDIO_NAME')],
                 colour: TOOLBOX_COLOR.audio,
             });
@@ -207,7 +207,7 @@ export const initAudioBlocks = () => {
             this.jsonInit({
                 ...returnConnections,
                 output: 'Boolean',
-                message0: t('blocks:audio.isPlayingAudio'),
+                message0: t('blocks:audio.isPlayingAudio.label'),
                 args0: [stringInput('AUDIO_NAME')],
                 colour: TOOLBOX_COLOR.audio,
             });
@@ -218,7 +218,7 @@ export const initAudioBlocks = () => {
             this.jsonInit({
                 ...returnConnections,
                 output: 'Object',
-                message0: t('blocks:audio.getAudioUsingAsset'),
+                message0: t('blocks:audio.getAudioUsingAsset.label'),
                 args0: [stringInput('AUDIO_NAME')],
                 colour: TOOLBOX_COLOR.audio,
             });
@@ -229,7 +229,7 @@ export const initAudioBlocks = () => {
             this.jsonInit({
                 ...returnConnections,
                 output: 'Number',
-                message0: t('blocks:audio.getAudioEffect'),
+                message0: t('blocks:audio.getAudioEffect.label'),
                 args0: [stringInput('AUDIO_NAME'), dropdown('OPERATION', EFFECT_OPTIONS)],
                 colour: TOOLBOX_COLOR.audio,
             });

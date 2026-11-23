@@ -57,7 +57,7 @@ export const initEntityBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:entity.createInstanceByTemplate'),
+                message0: t('blocks:entity.createInstanceByTemplate.label'),
                 args0: [objectInput('TEMPLATE')],
                 output: TYPES.OBJECT,
                 colour: TOOLBOX_COLOR.entity,
@@ -77,7 +77,7 @@ export const initEntityBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:entity.activeInstance'),
+                message0: t('blocks:entity.activeInstance.label'),
                 args0: [objectInput('HANDLE')],
                 colour: TOOLBOX_COLOR.entity,
             });
@@ -88,7 +88,7 @@ export const initEntityBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:entity.pauseInstance'),
+                message0: t('blocks:entity.pauseInstance.label'),
                 args0: [objectInput('HANDLE')],
                 colour: TOOLBOX_COLOR.entity,
             });
@@ -99,7 +99,7 @@ export const initEntityBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:entity.removeInstance'),
+                message0: t('blocks:entity.removeInstance.label'),
                 args0: [objectInput('HANDLE')],
                 colour: TOOLBOX_COLOR.entity,
             });
@@ -110,7 +110,7 @@ export const initEntityBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:entity.applyParentEntityAttr'),
+                message0: t('blocks:entity.applyParentEntityAttr.label'),
                 colour: TOOLBOX_COLOR.entity,
             });
         },
@@ -120,7 +120,7 @@ export const initEntityBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:entity.thisInstance'),
+                message0: t('blocks:entity.thisInstance.label'),
                 output: 'Object',
                 colour: TOOLBOX_COLOR.entity,
             });
@@ -131,7 +131,7 @@ export const initEntityBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:entity.getInstanceBasedTemplate'),
+                message0: t('blocks:entity.getInstanceBasedTemplate.label'),
                 args0: [objectInput('TEMPLATE')],
                 output: 'Array',
                 colour: TOOLBOX_COLOR.entity,
@@ -143,7 +143,7 @@ export const initEntityBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:entity.getAllInstance'),
+                message0: t('blocks:entity.getAllInstance.label'),
                 output: 'Array',
                 colour: TOOLBOX_COLOR.entity,
             });
@@ -154,7 +154,7 @@ export const initEntityBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:entity.getInstanceAttr'),
+                message0: t('blocks:entity.getInstanceAttr.label'),
                 args0: [
                     objectInput('HANDLE'),
                     {

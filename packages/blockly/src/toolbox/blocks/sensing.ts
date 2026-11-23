@@ -15,13 +15,13 @@ import { blocklyAdapter } from '../../blockly';
 import type { Blockly } from '../..';
 
 const DATE_PART_OPTIONS = [
-    [t('blocks:option.date.year'), 'year'],
-    [t('blocks:option.date.month'), 'month'],
-    [t('blocks:option.date.day'), 'day'],
-    [t('blocks:option.date.weekday'), 'weekday'],
-    [t('blocks:option.date.hour'), 'hour'],
-    [t('blocks:option.date.minute'), 'minute'],
-    [t('blocks:option.date.second'), 'second'],
+    [t('blocks:option_date.year.label'), 'year'],
+    [t('blocks:option_date.month.label'), 'month'],
+    [t('blocks:option_date.day.label'), 'day'],
+    [t('blocks:option_date.weekday.label'), 'weekday'],
+    [t('blocks:option_date.hour.label'), 'hour'],
+    [t('blocks:option_date.minute.label'), 'minute'],
+    [t('blocks:option_date.second.label'), 'second'],
 ];
 
 export const initSensingBlocks = () => {
@@ -30,7 +30,7 @@ export const initSensingBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:sensing.mouseX'),
+                message0: t('blocks:sensing.mouseX.label'),
                 output: TYPES.NUMBER,
                 colour: TOOLBOX_COLOR.sensing,
             });
@@ -41,7 +41,7 @@ export const initSensingBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:sensing.mouseY'),
+                message0: t('blocks:sensing.mouseY.label'),
                 output: TYPES.NUMBER,
                 colour: TOOLBOX_COLOR.sensing,
             });
@@ -52,7 +52,7 @@ export const initSensingBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:sensing.mousePressed'),
+                message0: t('blocks:sensing.mousePressed.label'),
                 args0: [
                     dropdown('BUTTON', MOUSE_BUTTON_OPTIONS),
                     dropdown('STATE', KEY_STATE_OPTIONS),
@@ -67,7 +67,7 @@ export const initSensingBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:sensing.keyPressed'),
+                message0: t('blocks:sensing.keyPressed.label'),
                 args0: [dropdown('KEY', KEY_OPTIONS), dropdown('STATE', KEY_STATE_OPTIONS)],
                 output: TYPES.BOOLEAN,
                 colour: TOOLBOX_COLOR.sensing,
@@ -79,7 +79,7 @@ export const initSensingBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:sensing.lastKey'),
+                message0: t('blocks:sensing.lastKey.label'),
                 output: TYPES.STRING,
                 colour: TOOLBOX_COLOR.sensing,
             });
@@ -90,7 +90,7 @@ export const initSensingBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:sensing.pressedKeys'),
+                message0: t('blocks:sensing.pressedKeys.label'),
                 output: TYPES.ARRAY,
                 colour: TOOLBOX_COLOR.sensing,
             });
@@ -101,7 +101,7 @@ export const initSensingBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:sensing.micData'),
+                message0: t('blocks:sensing.micData.label'),
                 output: TYPES.ARRAY,
                 colour: TOOLBOX_COLOR.sensing,
             });
@@ -112,7 +112,7 @@ export const initSensingBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:sensing.ask'),
+                message0: t('blocks:sensing.ask.label'),
                 output: TYPES.STRING,
                 colour: TOOLBOX_COLOR.sensing,
             });
@@ -123,7 +123,7 @@ export const initSensingBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:sensing.username'),
+                message0: t('blocks:sensing.username.label'),
                 output: TYPES.STRING,
                 colour: TOOLBOX_COLOR.sensing,
             });
@@ -134,7 +134,7 @@ export const initSensingBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:sensing.daysSince2000'),
+                message0: t('blocks:sensing.daysSince2000.label'),
                 output: TYPES.NUMBER,
                 colour: TOOLBOX_COLOR.sensing,
             });
@@ -145,7 +145,7 @@ export const initSensingBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:sensing.currentTime'),
+                message0: t('blocks:sensing.currentTime.label'),
                 args0: [dropdown('PART', DATE_PART_OPTIONS)],
                 output: TYPES.NUMBER,
                 colour: TOOLBOX_COLOR.sensing,
@@ -158,7 +158,7 @@ export const initSensingBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:sensing.timer'),
+                message0: t('blocks:sensing.timer.label'),
                 args0: [stringInput('NAME')],
                 output: TYPES.NUMBER,
                 colour: TOOLBOX_COLOR.sensing,
@@ -170,7 +170,7 @@ export const initSensingBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:sensing.startTimer'),
+                message0: t('blocks:sensing.startTimer.label'),
                 args0: [stringInput('NAME')],
                 colour: TOOLBOX_COLOR.sensing,
             });
@@ -181,7 +181,7 @@ export const initSensingBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:sensing.resetTimer'),
+                message0: t('blocks:sensing.resetTimer.label'),
                 args0: [stringInput('NAME')],
                 colour: TOOLBOX_COLOR.sensing,
             });
@@ -192,7 +192,7 @@ export const initSensingBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:sensing.stopTimer'),
+                message0: t('blocks:sensing.stopTimer.label'),
                 args0: [stringInput('NAME')],
                 colour: TOOLBOX_COLOR.sensing,
             });
@@ -204,7 +204,7 @@ export const initSensingBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:sensing.touching'),
+                message0: t('blocks:sensing.touching.label'),
                 args0: [dropdown('TARGET', [['', '']])],
                 output: TYPES.BOOLEAN,
                 colour: TOOLBOX_COLOR.sensing,
@@ -224,7 +224,7 @@ export const initSensingBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:sensing.distanceTo'),
+                message0: t('blocks:sensing.distanceTo.label'),
                 args0: [dropdown('TARGET', [['', '']])],
                 output: TYPES.NUMBER,
                 colour: TOOLBOX_COLOR.sensing,

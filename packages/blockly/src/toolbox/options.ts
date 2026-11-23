@@ -6,15 +6,15 @@
 import { t } from 'astratch-i18n';
 
 export const MOUSE_BUTTON_OPTIONS = [
-    [t('blocks:option.mouseButton.left'), 'left'],
-    [t('blocks:option.mouseButton.middle'), 'middle'],
-    [t('blocks:option.mouseButton.right'), 'right'],
-    [t('blocks:option.mouseButton.any'), 'ANY'],
+    [t('blocks:option_mouseButton.left.label'), 'left'],
+    [t('blocks:option_mouseButton.middle.label'), 'middle'],
+    [t('blocks:option_mouseButton.right.label'), 'right'],
+    [t('blocks:option_mouseButton.any.label'), 'ANY'],
 ];
 
 export const KEY_STATE_OPTIONS = [
-    [t('blocks:option.keyState.down'), 'down'],
-    [t('blocks:option.keyState.up'), 'up'],
+    [t('blocks:option_keyState.down.label'), 'down'],
+    [t('blocks:option_keyState.up.label'), 'up'],
 ];
 
 const KEY_NAMES = [
@@ -80,5 +80,5 @@ export const KEY_OPTIONS = [
     ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(key => [key, key]),
     ...KEY_CHARS.map(key => [key, key]),
     ...KEY_NAMES.map(key => [key, key]),
-    [t('blocks:option.key.any'), 'ANY'],
+    [t('blocks:option_key.any.label'), 'ANY'],
 ];

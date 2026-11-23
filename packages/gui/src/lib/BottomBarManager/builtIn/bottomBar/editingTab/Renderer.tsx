@@ -29,7 +29,7 @@ export const EditingTabHint = () => {
         <>
             {focusingName && (
                 <span>
-                    {t('gui:bottomBar.editingTabHint')}
+                    {t('gui:bottomBar.focusingTab.hint')}
                     {focusingName}
                 </span>
             )}

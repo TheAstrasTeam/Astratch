@@ -231,7 +231,7 @@ export const EditingWorkspace = () => {
                             >
                                 <span>{slot.name}</span>
                                 <Box
-                                    tip={t('gui:workspace.closeElement', { title: slot.name })}
+                                    tip={t('gui:workspace.closeElement.tip', { title: slot.name })}
                                     tipPosition='dom'
                                 >
                                     <button
@@ -271,7 +271,7 @@ export const EditingWorkspace = () => {
 
         const buildContextMenu = () => (
             <>
-                <MenuHeader>{t('gui:workspace')}</MenuHeader>
+                <MenuHeader>{t('gui:workspace.panel.name')}</MenuHeader>
                 <MenuItem
                     onClick={() => {
                         tabsManager.addAndReplaceGroup(id, {
@@ -281,7 +281,7 @@ export const EditingWorkspace = () => {
                         });
                     }}
                 >
-                    {t('gui:workspace.swapPanel')}
+                    {t('gui:workspace.swapPanel.name')}
                 </MenuItem>
                 <MenuItem
                     onClick={() => {
@@ -289,8 +289,8 @@ export const EditingWorkspace = () => {
                     }}
                 >
                     {group.direction === 'horizontal'
-                        ? t('gui:workspace.closeLeftPanel')
-                        : t('gui:workspace.closeTopPanel')}
+                        ? t('gui:workspace.closeLeftPanel.name')
+                        : t('gui:workspace.closeTopPanel.name')}
                 </MenuItem>
                 <MenuItem
                     onClick={() => {
@@ -298,8 +298,8 @@ export const EditingWorkspace = () => {
                     }}
                 >
                     {group.direction === 'horizontal'
-                        ? t('gui:workspace.closeRightPanel')
-                        : t('gui:workspace.closeBottomPanel')}
+                        ? t('gui:workspace.closeRightPanel.name')
+                        : t('gui:workspace.closeBottomPanel.name')}
                 </MenuItem>
                 <MenuItem
                     onClick={() => {
@@ -309,7 +309,7 @@ export const EditingWorkspace = () => {
                         });
                     }}
                 >
-                    {t('gui:workspace.switchDirection')}(
+                    {t('gui:workspace.switchDirection.name')}(
                     {group.direction === 'horizontal' ? '↕' : '↔'})
                 </MenuItem>
             </>

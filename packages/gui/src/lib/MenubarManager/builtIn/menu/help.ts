@@ -8,31 +8,31 @@ export default () => {
     const helpID = menubarManager.addCategory('help', {
         id: 'astratch_menu_help_help',
         translate: true,
-        nameID: 'astratch_menu_help_help',
+        nameID: 'menu.help.name',
     });
     menubarManager.addValue('help', helpID, {
         translate: true,
-        nameID: 'command.openStartPanel',
+        nameID: 'command_help.openStartPanel.name',
         commandID: commandManager.addCommand({
             translate: true,
-            nameID: 'command.openStartPanel',
-            descriptionID: 'command.openStartPanel.description',
+            nameID: 'command_help.openStartPanel.name',
+            descriptionID: 'command_help.openStartPanel.description',
             author: 'The Astras Team',
             callback: () => {
                 tabsManager.insertElementToFocusingGroup({
                     Renderer: StartPanel,
-                    name: t('gui:tab.start'),
+                    name: t('gui:tab.start.name'),
                 });
             },
         }).id,
     });
     menubarManager.addValue('help', helpID, {
         translate: true,
-        nameID: 'help_about',
+        nameID: 'command_help.about.name',
         commandID: commandManager.addCommand({
             translate: true,
-            nameID: 'help_about',
-            descriptionID: 'help_about_description',
+            nameID: 'command_help.about.name',
+            descriptionID: 'command_help.about.description',
             author: 'The Astras Team',
             callback: () => {
                 alert('OPEN_ABOUT');
@@ -41,11 +41,11 @@ export default () => {
     });
     menubarManager.addValue('help', helpID, {
         translate: true,
-        nameID: 'help_document',
+        nameID: 'command_help.document.name',
         commandID: commandManager.addCommand({
             translate: true,
-            nameID: 'help_document',
-            descriptionID: 'help_document_description',
+            nameID: 'command_help.document.name',
+            descriptionID: 'command_help.document.description',
             author: 'The Astras Team',
             callback: () => {
                 alert('OPEN_DOCUMENT');
@@ -57,11 +57,11 @@ export default () => {
     });
     menubarManager.addValue('help', helpID, {
         translate: true,
-        nameID: 'help_contributors',
+        nameID: 'command_help.contributors.name',
         commandID: commandManager.addCommand({
             translate: true,
-            nameID: 'help_contributors',
-            descriptionID: 'help_contributors_description',
+            nameID: 'command_help.contributors.name',
+            descriptionID: 'command_help.contributors.description',
             author: 'The Astras Team',
             callback: () => {
                 alert('OPEN_CONTRIBUTORS');
@@ -70,11 +70,11 @@ export default () => {
     });
     menubarManager.addValue('help', helpID, {
         translate: true,
-        nameID: 'help_source',
+        nameID: 'command_help.source.name',
         commandID: commandManager.addCommand({
             translate: true,
-            nameID: 'help_source',
-            descriptionID: 'help_source_description',
+            nameID: 'command_help.source.name',
+            descriptionID: 'command_help.source.description',
             author: 'The Astras Team',
             callback: () => {
                 window.open('https://github.com/TheAstrasTeam/Astratch');

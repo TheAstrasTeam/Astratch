@@ -36,7 +36,7 @@ export const initFlowBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:flow.wait'),
+                message0: t('blocks:flow.wait.label'),
                 args0: [numberInput('SECONDS')],
                 colour: TOOLBOX_COLOR.flow,
             });
@@ -47,7 +47,7 @@ export const initFlowBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:flow.waitUntil'),
+                message0: t('blocks:flow.waitUntil.label'),
                 args0: [booleanInput('CONDITION')],
                 colour: TOOLBOX_COLOR.flow,
             });
@@ -58,7 +58,7 @@ export const initFlowBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:flow.repeatWhile'),
+                message0: t('blocks:flow.repeatWhile.label'),
                 args0: [booleanInput('CONDITION')],
                 message1: '%1',
                 args1: [statementInput('DO')],
@@ -69,13 +69,13 @@ export const initFlowBlocks = () => {
 
     blocklyAdapter.Blockly.Blocks[OPCODES.repeatTimeCount] = RenamingParamBlock(
         OPCODES.repeatTimeCount,
-        t('blocks:flow.repeatTimeCount'),
+        t('blocks:flow.repeatTimeCount.label'),
         TOOLBOX_COLOR.flow,
     );
 
     blocklyAdapter.Blockly.Blocks[OPCODES.repeatTimeValue] = RenamingParamBlock(
         OPCODES.repeatTimeValue,
-        t('blocks:flow.repeatTimeValue'),
+        t('blocks:flow.repeatTimeValue.label'),
         TOOLBOX_COLOR.flow,
     );
 
@@ -83,7 +83,7 @@ export const initFlowBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:flow.repeatTimes'),
+                message0: t('blocks:flow.repeatTimes.label'),
                 args0: [numberInput('TIMES'), numberInput('INDEX')],
                 message1: '%1',
                 args1: [statementInput('DO')],
@@ -116,7 +116,7 @@ export const initFlowBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:flow.forEach'),
+                message0: t('blocks:flow.forEach.label'),
                 args0: [arrayInput('ARRAY'), unknownInput('ITEM'), numberInput('INDEX')],
                 message1: '%1',
                 args1: [statementInput('DO')],
@@ -153,7 +153,7 @@ export const initFlowBlocks = () => {
         init() {
             this.jsonInit({
                 ...endConnections,
-                message0: t('blocks:flow.break'),
+                message0: t('blocks:flow.break.label'),
                 colour: TOOLBOX_COLOR.flow,
             });
             this.addIcon(new BlockIcon(this, Break));
@@ -164,7 +164,7 @@ export const initFlowBlocks = () => {
         init() {
             this.jsonInit({
                 ...endConnections,
-                message0: t('blocks:flow.continue'),
+                message0: t('blocks:flow.continue.label'),
                 colour: TOOLBOX_COLOR.flow,
             });
             this.addIcon(new BlockIcon(this, Continue));
@@ -175,7 +175,7 @@ export const initFlowBlocks = () => {
         init() {
             this.jsonInit({
                 ...endConnections,
-                message0: t('blocks:flow.exitScript'),
+                message0: t('blocks:flow.exitScript.label'),
                 colour: TOOLBOX_COLOR.flow,
             });
             this.addIcon(new BlockIcon(this, ExitScript));
@@ -186,7 +186,7 @@ export const initFlowBlocks = () => {
         init() {
             this.jsonInit({
                 ...endConnections,
-                message0: t('blocks:flow.stopProject'),
+                message0: t('blocks:flow.stopProject.label'),
                 colour: TOOLBOX_COLOR.flow,
             });
             this.addIcon(new BlockIcon(this, StopProject));

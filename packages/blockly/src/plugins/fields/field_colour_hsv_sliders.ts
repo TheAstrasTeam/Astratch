@@ -377,7 +377,7 @@ export class FieldColourHsvSliders extends FieldColour {
         }
 
         this.hueReadout = FieldColourHsvSliders.createLabelInContainer(
-            t('blocks:colorPicker.hue'),
+            t('blocks:colorPicker.hue.label'),
             container,
         );
         this.hueSlider = FieldColourHsvSliders.createSliderInContainer(
@@ -386,7 +386,7 @@ export class FieldColourHsvSliders extends FieldColour {
             container,
         );
         this.saturationReadout = FieldColourHsvSliders.createLabelInContainer(
-            t('blocks:colorPicker.saturation'),
+            t('blocks:colorPicker.saturation.label'),
             container,
         );
         this.saturationSlider = FieldColourHsvSliders.createSliderInContainer(
@@ -395,7 +395,7 @@ export class FieldColourHsvSliders extends FieldColour {
             container,
         );
         this.brightnessReadout = FieldColourHsvSliders.createLabelInContainer(
-            t('blocks:colorPicker.brightness'),
+            t('blocks:colorPicker.brightness.label'),
             container,
         );
         this.brightnessSlider = FieldColourHsvSliders.createSliderInContainer(
@@ -454,7 +454,7 @@ export class FieldColourHsvSliders extends FieldColour {
             // If the browser supports the eyedropper API, create a button for it.
             const button: HTMLButtonElement = document.createElement('button');
             button.classList.add('fieldColourEyedropper');
-            button.textContent = t('blocks:colorPicker.eyedropper');
+            button.textContent = t('blocks:colorPicker.eyedropper.label');
             button.style.color = 'var(--ui-text)';
             container.appendChild(document.createElement('hr'));
             container.appendChild(button);

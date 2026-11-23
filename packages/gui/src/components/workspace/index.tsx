@@ -12,7 +12,7 @@ if (await vm.isCreatedProject())
     tabsManager.addGroup(
         {
             direction: 'horizontal',
-            firstElement: { Renderer: StartPanel, name: t('gui:tab.start') },
+            firstElement: { Renderer: StartPanel, name: t('gui:tab.start.name') },
             parent: undefined,
         },
         true,

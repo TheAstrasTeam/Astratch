@@ -77,7 +77,7 @@ export class ContinuousToolbox extends Blockly.Toolbox {
         // 选中积木
         const selectionBox = _createInfoBox(
             Selection,
-            t('blocks:toolbox.selectInfo', {
+            t('blocks:toolbox.selectInfo.label', {
                 blockLength: 0,
             }),
         );
@@ -90,7 +90,7 @@ export class ContinuousToolbox extends Blockly.Toolbox {
                 positionBox.text.textContent = `${viewPort_Event.viewLeft?.toFixed(0)},${viewPort_Event.viewTop?.toFixed(0)}`;
             } else if (event.type === 'selected') {
                 const workspaceMSM = ashMultiSelectorManager.getWorkspace(this.getWorkspace().id);
-                selectionBox.text.textContent = t('blocks:toolbox.selectInfo', {
+                selectionBox.text.textContent = t('blocks:toolbox.selectInfo.label', {
                     blockLength: workspaceMSM?.getSelectedBlocks().length ?? 0,
                 });
             }
@@ -112,7 +112,7 @@ export class ContinuousToolbox extends Blockly.Toolbox {
         const collapseOtherCategoriesIcon = document.createElement('img');
         collapseOtherCategoriesIcon.src = collapseIcon;
         collapseOtherCategoriesButton.appendChild(collapseOtherCategoriesIcon);
-        const collapseOtherCategoriesLabel = t('blocks:utils_collapseOther');
+        const collapseOtherCategoriesLabel = t('blocks:toolbox.collapseOther.label');
         collapseOtherCategoriesButton.type = 'button';
         collapseOtherCategoriesButton.classList.add('ash-toolbox-tools-collapseAll');
         collapseOtherCategoriesButton.title = collapseOtherCategoriesLabel;

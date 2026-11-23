@@ -12,7 +12,7 @@ export const StartPanel = ({ id }: { id: string }) => {
     const createProject = () => {
         const data = {
             ...tabsManager.getGroup(id)!,
-            firstElement: { Renderer: CreateProjectPanel, name: t('gui:createProject') },
+            firstElement: { Renderer: CreateProjectPanel, name: t('gui:start.createProject.name') },
             secondElement: tabsManager.getGroup(id)?.firstElement,
         };
         tabsManager.addAndReplaceGroup(id, data);
@@ -24,19 +24,19 @@ export const StartPanel = ({ id }: { id: string }) => {
             </div>
 
             <span className={styles.randomTitle}>准备好把白纸变成绚烂的画了吗？</span>
-            <span className={styles.title}>{t('gui:start.fromWhere')}</span>
+            <span className={styles.title}>{t('gui:start.fromWhere.name')}</span>
 
             <button className={styles.button} onClick={createProject}>
                 <CreateProjectIcon />
-                {t('gui:createProject')}
+                {t('gui:start.createProject.name')}
             </button>
             <button className={styles.button}>
                 <OpenProjectIcon />
-                {t('gui:openProject')}
+                {t('gui:start.openProject.name')}
             </button>
             <button className={styles.button}>
                 <RecentProjectIcon />
-                {t('gui:recentProject')}
+                {t('gui:start.recentProject.name')}
             </button>
         </div>
     );

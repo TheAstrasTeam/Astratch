@@ -24,7 +24,7 @@ export const initDataBlocks = () => {
     blocklyAdapter.Blockly.Blocks[OPCODES.number] = {
         init() {
             this.jsonInit({
-                message0: t('blocks:math.number'),
+                message0: t('blocks:math.number.label'),
                 args0: [{ type: 'field_number', name: 'NUM', value: 0, check: 'Number' }],
                 output: TYPES.NUMBER,
                 colour: TOOLBOX_COLOR.textField,
@@ -139,7 +139,7 @@ export const initDataBlocks = () => {
     blocklyAdapter.Blockly.Blocks[OPCODES.null] = {
         init() {
             this.jsonInit({
-                message0: t('blocks:math.null'),
+                message0: t('blocks:math.null.label'),
                 output: TYPES.UNKNOWN,
                 colour: TOOLBOX_COLOR.data,
             });
@@ -151,7 +151,7 @@ export const initDataBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:object.empty'),
+                message0: t('blocks:object.empty.label'),
                 output: TYPES.OBJECT,
                 colour: TOOLBOX_COLOR.data,
             });
@@ -162,7 +162,7 @@ export const initDataBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:object.keys'),
+                message0: t('blocks:object.keys.label'),
                 args0: [objectInput('OBJECT')],
                 output: TYPES.ARRAY,
                 colour: TOOLBOX_COLOR.data,
@@ -174,7 +174,7 @@ export const initDataBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:object.values'),
+                message0: t('blocks:object.values.label'),
                 args0: [objectInput('OBJECT')],
                 output: TYPES.ARRAY,
                 colour: TOOLBOX_COLOR.data,
@@ -186,7 +186,7 @@ export const initDataBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:object.get'),
+                message0: t('blocks:object.get.label'),
                 args0: [objectInput('OBJECT'), stringInput('KEY')],
                 output: TYPES.UNKNOWN,
                 colour: TOOLBOX_COLOR.data,
@@ -198,7 +198,7 @@ export const initDataBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:object.has'),
+                message0: t('blocks:object.has.label'),
                 args0: [objectInput('OBJECT'), stringInput('KEY')],
                 output: TYPES.BOOLEAN,
                 colour: TOOLBOX_COLOR.data,
@@ -210,7 +210,7 @@ export const initDataBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:object.size'),
+                message0: t('blocks:object.size.label'),
                 args0: [objectInput('OBJECT')],
                 output: TYPES.NUMBER,
                 colour: TOOLBOX_COLOR.data,
@@ -222,7 +222,7 @@ export const initDataBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:object.delete'),
+                message0: t('blocks:object.delete.label'),
                 args0: [objectInput('OBJECT'), stringInput('KEY')],
                 output: TYPES.OBJECT,
                 colour: TOOLBOX_COLOR.data,
@@ -234,7 +234,7 @@ export const initDataBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:object.set'),
+                message0: t('blocks:object.set.label'),
                 args0: [objectInput('OBJECT'), stringInput('KEY'), unknownInput('VALUE')],
                 output: TYPES.OBJECT,
                 colour: TOOLBOX_COLOR.data,
@@ -247,7 +247,7 @@ export const initDataBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:array.empty'),
+                message0: t('blocks:array.empty.label'),
                 output: TYPES.ARRAY,
                 colour: TOOLBOX_COLOR.data,
             });
@@ -258,7 +258,7 @@ export const initDataBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:array.getItem'),
+                message0: t('blocks:array.getItem.label'),
                 args0: [arrayInput('ARRAY'), numberInput('INDEX')],
                 output: TYPES.UNKNOWN,
                 colour: TOOLBOX_COLOR.data,
@@ -270,7 +270,7 @@ export const initDataBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:array.length'),
+                message0: t('blocks:array.length.label'),
                 args0: [arrayInput('ARRAY')],
                 output: TYPES.NUMBER,
                 colour: TOOLBOX_COLOR.data,
@@ -282,7 +282,7 @@ export const initDataBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:array.indexOf'),
+                message0: t('blocks:array.indexOf.label'),
                 args0: [arrayInput('ARRAY'), unknownInput('VALUE')],
                 output: TYPES.NUMBER,
                 colour: TOOLBOX_COLOR.data,
@@ -294,7 +294,7 @@ export const initDataBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:array.push'),
+                message0: t('blocks:array.push.label'),
                 args0: [arrayInput('ARRAY'), unknownInput('VALUE')],
                 output: TYPES.ARRAY,
                 colour: TOOLBOX_COLOR.data,
@@ -306,7 +306,7 @@ export const initDataBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:array.insert'),
+                message0: t('blocks:array.insert.label'),
                 args0: [arrayInput('ARRAY'), numberInput('INDEX'), unknownInput('VALUE')],
                 output: TYPES.ARRAY,
                 colour: TOOLBOX_COLOR.data,
@@ -318,7 +318,7 @@ export const initDataBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:array.remove'),
+                message0: t('blocks:array.remove.label'),
                 args0: [arrayInput('ARRAY'), numberInput('INDEX')],
                 output: TYPES.ARRAY,
                 colour: TOOLBOX_COLOR.data,
@@ -331,7 +331,7 @@ export const initDataBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:temp.get'),
+                message0: t('blocks:temp.get.label'),
                 args0: [stringInput('NAME')],
                 output: TYPES.UNKNOWN,
                 colour: TOOLBOX_COLOR.data,
@@ -343,7 +343,7 @@ export const initDataBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:temp.define'),
+                message0: t('blocks:temp.define.label'),
                 args0: [stringInput('NAME'), unknownInput('VALUE')],
                 colour: TOOLBOX_COLOR.data,
             });
@@ -354,7 +354,7 @@ export const initDataBlocks = () => {
         init() {
             this.jsonInit({
                 ...connections,
-                message0: t('blocks:temp.delete'),
+                message0: t('blocks:temp.delete.label'),
                 args0: [stringInput('NAME')],
                 colour: TOOLBOX_COLOR.data,
             });
@@ -365,7 +365,7 @@ export const initDataBlocks = () => {
         init() {
             this.jsonInit({
                 ...returnConnections,
-                message0: t('blocks:temp.has'),
+                message0: t('blocks:temp.has.label'),
                 args0: [stringInput('NAME')],
                 output: TYPES.BOOLEAN,
                 colour: TOOLBOX_COLOR.data,

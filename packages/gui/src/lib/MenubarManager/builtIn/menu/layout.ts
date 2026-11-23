@@ -6,16 +6,16 @@ import { windowManager } from '../../../WindowManager';
 export default () => {
     const layoutID = menubarManager.addCategory('layout', {
         translate: true,
-        nameID: 'astratch_menu_layout_layout',
+        nameID: 'menu.layout.name',
     });
     // 打开目标
     menubarManager.addValue('layout', layoutID, {
         translate: true,
-        nameID: 'layout_openTarget',
+        nameID: 'command_layout.openTarget.name',
         commandID: commandManager.addCommand({
             translate: true,
-            nameID: 'layout_openTarget',
-            descriptionID: 'layout_openTarget_description',
+            nameID: 'command_layout.openTarget.name',
+            descriptionID: 'command_layout.openTarget.description',
             author: 'The Astras Team',
             callback: () => {
                 alert('OPEN_TARGET');
@@ -25,12 +25,12 @@ export default () => {
     // 打开新窗口
     menubarManager.addValue('layout', layoutID, {
         translate: true,
-        nameID: 'layout_openNewWindow',
+        nameID: 'command_layout.openNewWindow.name',
         isEnable: () => !isChildWindow,
         commandID: commandManager.addCommand({
             translate: true,
-            nameID: 'layout_openNewWindow',
-            descriptionID: 'layout_openNewWindow_description',
+            nameID: 'command_layout.openNewWindow.name',
+            descriptionID: 'command_layout.openNewWindow.description',
             author: 'The Astras Team',
             isEnable: () => !isChildWindow,
             callback: () => {
@@ -43,11 +43,11 @@ export default () => {
     // 打开目标到新窗口
     menubarManager.addValue('layout', layoutID, {
         translate: true,
-        nameID: 'layout_openTarget_newWindow',
+        nameID: 'command_layout.openTargetInNewWindow.name',
         commandID: commandManager.addCommand({
             translate: true,
-            nameID: 'layout_openTarget_newWindow',
-            descriptionID: 'layout_openTarget_newWindow_description',
+            nameID: 'command_layout.openTargetInNewWindow.name',
+            descriptionID: 'command_layout.openTargetInNewWindow.description',
             author: 'The Astras Team',
             callback: () => {
                 alert('OPEN_TARGET_TO_NEW_WINDOW');
@@ -57,11 +57,11 @@ export default () => {
     // 移动正在选择的目标到新窗口
     menubarManager.addValue('layout', layoutID, {
         translate: true,
-        nameID: 'layout_moveSelectedTarget_newWindow',
+        nameID: 'command_layout.moveSelectedTargetToNewWindow.name',
         commandID: commandManager.addCommand({
             translate: true,
-            nameID: 'layout_moveSelectedTarget_newWindow',
-            descriptionID: 'layout_moveSelectedTarget_newWindow_description',
+            nameID: 'command_layout.moveSelectedTargetToNewWindow.name',
+            descriptionID: 'command_layout.moveSelectedTargetToNewWindow.description',
             author: 'The Astras Team',
             callback: () => {
                 alert('MOVE_SELECTED_TARGET_TO_NEW_WINDOW');
@@ -71,17 +71,17 @@ export default () => {
 
     const uiID = menubarManager.addCategory('layout', {
         translate: true,
-        nameID: 'astratch_menu_layout_ui',
+        nameID: 'menu_layout.ui.name',
     });
     // 显示/隐藏侧边栏
     // TODO: 显示/隐藏
     menubarManager.addValue('layout', uiID, {
         translate: true,
-        nameID: 'layout_showSidebar',
+        nameID: 'command_layout.showSidebar.name',
         commandID: commandManager.addCommand({
             translate: true,
-            nameID: 'layout_showSidebar',
-            descriptionID: 'layout_showSidebar_newWindow_description',
+            nameID: 'command_layout.showSidebar.name',
+            descriptionID: 'command_layout.showSidebar.description',
             author: 'The Astras Team',
             callback: () => {
                 alert('SHOW_SIDEBAR');
@@ -91,11 +91,11 @@ export default () => {
     // 切换侧边栏到
     menubarManager.addValue('layout', uiID, {
         translate: true,
-        nameID: 'layout_switchSidebarTo',
+        nameID: 'command_layout.switchSidebarTo.name',
         commandID: commandManager.addCommand({
             translate: true,
-            nameID: 'layout_switchSidebarTo',
-            descriptionID: 'layout_switchSidebarTo_newWindow_description',
+            nameID: 'command_layout.switchSidebarTo.name',
+            descriptionID: 'command_layout.switchSidebarTo.description',
             author: 'The Astras Team',
             callback: () => {
                 alert('SWITCH_SIDEBAR');
@@ -109,11 +109,11 @@ export default () => {
     // TODO: 展开/收起
     menubarManager.addValue('layout', uiID, {
         translate: true,
-        nameID: 'layout_showTargetsTree',
+        nameID: 'command_layout.showTargetsTree.name',
         commandID: commandManager.addCommand({
             translate: true,
-            nameID: 'layout_showTargetsTree',
-            descriptionID: 'layout_showTargetsTree_newWindow_description',
+            nameID: 'command_layout.showTargetsTree.name',
+            descriptionID: 'command_layout.showTargetsTree.description',
             author: 'The Astras Team',
             callback: () => {
                 alert('SHOW_TARGETS_TREE');
@@ -127,11 +127,11 @@ export default () => {
     // 移动工作区的镜头位置
     menubarManager.addValue('layout', uiID, {
         translate: true,
-        nameID: 'layout_moveWorkspaceCameraPos',
+        nameID: 'command_layout.moveWorkspaceCameraPos.name',
         commandID: commandManager.addCommand({
             translate: true,
-            nameID: 'layout_moveWorkspaceCameraPos',
-            descriptionID: 'layout_moveWorkspaceCameraPos_newWindow_description',
+            nameID: 'command_layout.moveWorkspaceCameraPos.name',
+            descriptionID: 'command_layout.moveWorkspaceCameraPos.description',
             author: 'The Astras Team',
             callback: () => {
                 alert('MOVE_WORKSPACE_CAMERA');
