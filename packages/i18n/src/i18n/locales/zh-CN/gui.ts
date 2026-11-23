@@ -155,5 +155,8 @@ export default {
     'workspace.closeRightPanel': '关闭右侧面板',
     'workspace.switchDirection': '切换面板方向',
     'workspace.empty.tip': '啥也没有...',
-    'workspace.closeElement': '关闭"{{title}}"',
+    'workspace.closeElement': '关闭“{{title}}”',
+
+    'command.openStartPanel': '打开“开始”',
+    'command.openStartPanel.description': '从聚焦处打开“开始”面板',
 };

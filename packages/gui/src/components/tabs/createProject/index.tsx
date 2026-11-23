@@ -1,3 +1,3 @@
-export const CreateProject = () => {
+export const CreateProjectPanel = () => {
     return <div>test</div>;
 };

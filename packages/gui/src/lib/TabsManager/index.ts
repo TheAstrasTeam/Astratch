@@ -95,7 +95,7 @@ class TabsManager extends EventBus<ITabsManagerEventsType> {
         });
     }
 
-    addGroup(meta: ITabGroupSubmit, asWatching = false) {
+    addGroup(meta: ITabGroupSubmit, asWatching = false, asFocusing = true) {
         const id = meta.id ?? crypto.randomUUID();
         const result = {
             ...meta,
@@ -111,7 +111,7 @@ class TabsManager extends EventBus<ITabsManagerEventsType> {
             group: result,
         });
         if (asWatching) this.setWatchingGroup(id);
-        this.setFocusingGroup(id, 'first');
+        if (asFocusing) this.setFocusingGroup(id, 'first');
         return {
             id,
             group: result,
@@ -147,6 +147,7 @@ class TabsManager extends EventBus<ITabsManagerEventsType> {
     }
 
     deleteGroup(id: string) {
+        const parent = this.groupStorage.get(id)?.parent;
         const isSuccess = this.groupStorage.delete(id);
         if (!isSuccess) return isSuccess;
         // 删除父层为它的组
@@ -168,6 +169,7 @@ class TabsManager extends EventBus<ITabsManagerEventsType> {
                 });
             }
         }
+        if (this.watchingGroup === id) this.setWatchingGroup(parent);
         this.emit('DELETE_GROUP', {
             id,
         });
@@ -227,6 +229,76 @@ class TabsManager extends EventBus<ITabsManagerEventsType> {
 
             this.groupStorage.delete(groupID);
             this.emit('DELETE_GROUP', { id: groupID });
+        }
+    }
+
+    /** 在聚焦处插入新的元素，它会自动处理不同情况的连接关系 */
+    insertElementToFocusingGroup(element: ITabGroup['firstElement']) {
+        // 如果已有在看的组且拥有聚焦的组，则添加到聚焦的组
+        // 如果已有在看的组且没有聚焦的组，则对在看的组分开
+        // 如果没有在看的组，直接替换
+        if (tabsManager.watchingGroup === undefined)
+            tabsManager.setWatchingGroup(
+                tabsManager.addGroup({
+                    direction: 'horizontal',
+                    firstElement: element,
+                    parent: tabsManager.watchingGroup,
+                }).id,
+            );
+        else {
+            if (tabsManager.focusingGroup) {
+                const group = tabsManager.getGroup(tabsManager.focusingGroup)!;
+                if (!group.secondElement) {
+                    // 若没有第二元素，直接在第二元素加
+                    tabsManager.addAndReplaceGroup(tabsManager.focusingGroup, {
+                        ...group,
+                        secondElement: element,
+                    });
+                } else {
+                    // 若有第二元素，则将聚焦位置元素原本的元素移动到新的组
+                    const currentID = tabsManager.addGroup(
+                        {
+                            ...group,
+                            firstElement:
+                                group[
+                                    tabsManager.focusingPos === 'first'
+                                        ? 'firstElement'
+                                        : 'secondElement'
+                                ]!,
+                            secondElement: element,
+                            parent: group.id,
+                            id: undefined,
+                        },
+                        false,
+                        false,
+                    ).id;
+                    tabsManager.addAndReplaceGroup(tabsManager.focusingGroup, {
+                        ...group,
+                        [tabsManager.focusingPos === 'first' ? 'firstElement' : 'secondElement']:
+                            currentID,
+                    });
+                }
+            } else {
+                const group = tabsManager.getGroup(tabsManager.watchingGroup)!;
+                if (!group.secondElement) {
+                    // 若没有第二元素，直接在第二元素加
+                    tabsManager.addAndReplaceGroup(tabsManager.watchingGroup, {
+                        ...group,
+                        secondElement: element,
+                    });
+                } else {
+                    // 若有第二元素，则将第二元素原本的元素移动到新的组
+                    const currentID = tabsManager.addGroup({
+                        ...group,
+                        firstElement: group.secondElement,
+                        secondElement: element,
+                    }).id;
+                    tabsManager.addAndReplaceGroup(tabsManager.watchingGroup, {
+                        ...group,
+                        secondElement: currentID,
+                    });
+                }
+            }
         }
     }
 }

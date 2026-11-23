@@ -69,10 +69,6 @@ class VM extends EventBus<IVMEventsType> {
     get getProject(): Project | undefined {
         return this.project ? Comlink.proxy(this.project) : undefined;
     }
-
-    test() {
-        console.log('Hello World!');
-    }
 }
 const vm = new VM();
 export { vm, type IVMEventsType, type VM };

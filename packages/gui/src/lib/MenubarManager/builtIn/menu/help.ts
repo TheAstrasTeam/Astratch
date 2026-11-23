@@ -1,11 +1,30 @@
+import { t } from 'astratch-i18n';
 import { menubarManager } from '../..';
+import { StartPanel } from '../../../../components/tabs/start';
 import { commandManager } from '../../../CommandManager';
+import { tabsManager } from '../../../TabsManager';
 
 export default () => {
     const helpID = menubarManager.addCategory('help', {
         id: 'astratch_menu_help_help',
         translate: true,
         nameID: 'astratch_menu_help_help',
+    });
+    menubarManager.addValue('help', helpID, {
+        translate: true,
+        nameID: 'command.openStartPanel',
+        commandID: commandManager.addCommand({
+            translate: true,
+            nameID: 'command.openStartPanel',
+            descriptionID: 'command.openStartPanel.description',
+            author: 'The Astras Team',
+            callback: () => {
+                tabsManager.insertElementToFocusingGroup({
+                    Renderer: StartPanel,
+                    name: t('gui:tab.start'),
+                });
+            },
+        }).id,
     });
     menubarManager.addValue('help', helpID, {
         translate: true,

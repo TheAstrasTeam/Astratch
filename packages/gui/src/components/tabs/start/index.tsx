@@ -6,13 +6,13 @@ import CreateProjectIcon from '@as/createProject.svg?react';
 import OpenProjectIcon from '@as/openProject.svg?react';
 import RecentProjectIcon from '@as/recentProject.svg?react';
 import { tabsManager } from '../../../lib/TabsManager';
-import { CreateProject } from '../createProject';
+import { CreateProjectPanel } from '../createProject';
 
-export const StartTab = ({ id }: { id: string }) => {
+export const StartPanel = ({ id }: { id: string }) => {
     const createProject = () => {
         const data = {
             ...tabsManager.getGroup(id)!,
-            firstElement: { Renderer: CreateProject, name: t('gui:createProject') },
+            firstElement: { Renderer: CreateProjectPanel, name: t('gui:createProject') },
             secondElement: tabsManager.getGroup(id)?.firstElement,
         };
         tabsManager.addAndReplaceGroup(id, data);

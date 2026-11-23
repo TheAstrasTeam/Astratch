@@ -4,7 +4,7 @@ import { EditingWorkspace } from './editingWorkspace';
 import styles from './index.module.scss';
 import { Sidebar } from './sidebar';
 import { tabsManager } from '../../lib/TabsManager';
-import { StartTab } from '../tabs/start';
+import { StartPanel } from '../tabs/start';
 import { t } from 'astratch-i18n';
 import { vm } from '../../lib/vm';
 
@@ -12,7 +12,7 @@ if (await vm.isCreatedProject())
     tabsManager.addGroup(
         {
             direction: 'horizontal',
-            firstElement: { Renderer: StartTab, name: t('gui:tab.start') },
+            firstElement: { Renderer: StartPanel, name: t('gui:tab.start') },
             parent: undefined,
         },
         true,
