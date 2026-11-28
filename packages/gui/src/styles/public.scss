@@ -36,6 +36,9 @@ span {
     display: block;
     min-width: max-content;
 }
+[class*='box_tip'] * {
+    display: initial;
+}
 p {
     min-width: max-content;
 }

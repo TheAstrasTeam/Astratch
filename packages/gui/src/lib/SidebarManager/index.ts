@@ -25,7 +25,7 @@ export interface ISidebarItem {
     latestStorage: Record<string, unknown>;
     Icon: FunctionComponent<SVGProps<SVGSVGElement>>;
     name: string;
-    enable: () => boolean;
+    enable: () => boolean | Promise<boolean>;
 }
 
 export interface ISidebarSubmitItem {
@@ -41,7 +41,7 @@ export interface ISidebarSubmitItem {
     };
     Icon: FunctionComponent<SVGProps<SVGSVGElement>>;
     name: string;
-    enable: () => boolean;
+    enable: () => boolean | Promise<boolean>;
 }
 
 class Sidebar extends EventBus<ISideBarEventTypes> {
