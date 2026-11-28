@@ -5,7 +5,7 @@ import type { menubarManager } from './lib/MenubarManager';
 import type { quickOpenManager } from './lib/QuickOpenManager';
 import type { tabsManager } from './lib/TabsManager';
 import type { themeManager } from './lib/ThemeManager';
-import type { AsyncRemote } from './lib/vm';
+import type { AsyncRemote } from './lib/vm/vm';
 import type { windowManager } from './lib/WindowManager';
 
 declare global {
@@ -20,5 +20,7 @@ declare global {
             tabsManager: typeof tabsManager;
             vm: AsyncRemote<VM>;
         };
+        // 用于消错，它的注解实际不正确，但无所谓
+        showDirectoryPicker?: () => Promise<FileSystemDirectoryHandle | undefined>;
     }
 }

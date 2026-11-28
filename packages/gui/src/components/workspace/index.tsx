@@ -4,15 +4,15 @@ import { EditingWorkspace } from './editingWorkspace';
 import styles from './index.module.scss';
 import { Sidebar } from './sidebar';
 import { tabsManager } from '../../lib/TabsManager';
-import { StartPanel } from '../tabs/start';
+import { CreateStartPanel } from '../tabs/start';
 import { t } from 'astratch-i18n';
-import { vm } from '../../lib/vm';
+import { vm } from '../../lib/vm/vm';
 
-if (await vm.isCreatedProject())
+if (!(await vm.isCreatedProject()))
     tabsManager.addGroup(
         {
             direction: 'horizontal',
-            firstElement: { Renderer: StartPanel, name: t('gui:tab.start.name') },
+            firstElement: { Renderer: CreateStartPanel, name: t('gui:tab.start.name') },
             parent: undefined,
         },
         true,

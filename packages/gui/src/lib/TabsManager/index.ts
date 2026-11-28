@@ -292,6 +292,8 @@ class TabsManager extends EventBus<ITabsManagerEventsType> {
                         ...group,
                         firstElement: group.secondElement,
                         secondElement: element,
+                        parent: group.id,
+                        id: undefined,
                     }).id;
                     tabsManager.addAndReplaceGroup(tabsManager.watchingGroup, {
                         ...group,
@@ -300,6 +302,24 @@ class TabsManager extends EventBus<ITabsManagerEventsType> {
                 }
             }
         }
+    }
+
+    /** 切换组中的一个元素 */
+    changeElement(
+        groupID: string,
+        pos: 'first' | 'second',
+        Renderer: ComponentType<{ id: string; pos: 'first' | 'second' }>,
+        RendererName: string,
+    ) {
+        const group = this.getGroup(groupID);
+        if (!group) return;
+        this.addAndReplaceGroup(groupID, {
+            ...group,
+            [pos === 'first' ? 'firstElement' : 'secondElement']: {
+                Renderer,
+                name: RendererName,
+            },
+        });
     }
 }
 

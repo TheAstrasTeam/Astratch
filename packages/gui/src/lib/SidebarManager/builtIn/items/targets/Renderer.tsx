@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import * as Comlink from 'comlink';
-import { vm } from '../../../../vm';
+import { vm } from '../../../../vm/vm';
 import type { TINFO_TREE } from 'astratch-vm';
 
 import styles from './index.module.scss';

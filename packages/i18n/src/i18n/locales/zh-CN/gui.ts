@@ -1,18 +1,4 @@
-export default {
-    'quickOpen.input.placeholder': '打开快速访问...',
-    'quickOpen.target.name': '目标',
-    'quickOpen.target.description': '搜索、打开项目中的目标',
-    'quickOpen.block.name': '积木',
-    'quickOpen.block.description': '搜索所选工作区中的积木',
-    'quickOpen.command.name': '指令',
-    'quickOpen.command.description': '更多可用的实用命令',
-
-    'menu.project.name': '项目',
-    'menu.edit.name': '编辑',
-    'menu.run.name': '运行',
-    'menu.layout.name': '布局',
-    'menu.help.name': '帮助',
-
+const commands = {
     'command_run.runProject.name': '运行项目',
     'command_run.runProject.description': '触发"当▷点击时"积木',
 
@@ -26,8 +12,6 @@ export default {
     'command_run.stopProject.name': '停止项目',
     'command_run.stopProject.description':
         '停止项目中所有内容的运行\n（"一次完成积木"依然会执行到当前完成）',
-
-    'menu_runMenu.debug.name': '调试',
 
     'command_run.addBreakpointToSelectedBlock.name': '在选择的积木处加入断点',
     'command_run.addBreakpointToSelectedBlock.description':
@@ -49,8 +33,6 @@ export default {
     'command_project.saveProject.name': '保存项目',
     'command_project.saveProject.description': '保存正在编辑的项目到 存储的文件夹 / .aen文件并导出',
 
-    'menu_project.editor.name': '编辑器',
-
     'command_project.settings.name': '设置',
     'command_project.settings.description': '编辑 Astratch 的配置',
 
@@ -68,8 +50,6 @@ export default {
 
     'command_edit.redo.name': '重做',
     'command_edit.redo.description': '重做刚刚的更改\n"撤回刚刚的撤回"',
-
-    'menu_edit.createTarget.name': '创建目标',
 
     'command_edit.createTargetEntity.name': '创建实体',
     'command_edit.createTargetEntity.description': '在选择的实体边创建一个实体',
@@ -96,8 +76,6 @@ export default {
     'command_layout.moveSelectedTargetToNewWindow.description':
         '只限主窗口，其它窗口的目标即使在编辑也不会移动它',
 
-    'menu_layout.ui.name': '界面',
-
     'command_layout.showSidebar.name': '展开侧边栏',
     'command_layout.showSidebar.description': '展开左侧的侧边栏',
 
@@ -110,10 +88,8 @@ export default {
     'command_layout.moveWorkspaceCameraPos.name': '移动工作区的镜头位置...',
     'command_layout.moveWorkspaceCameraPos.description': '移动所选工作区的镜头位置',
 
-    'menu_runMenu.run.name': '运行',
-
-    'command_help.openStartPanel.name': '打开“开始”',
-    'command_help.openStartPanel.description': '从聚焦处打开“开始”面板',
+    'command_help.openCreateStartPanel.name': '打开“开始”',
+    'command_help.openCreateStartPanel.description': '从聚焦处打开“开始”面板',
 
     'command_help.about.name': '关于 Astratch',
     'command_help.about.description': '关于 Astratch 的一些信息...为什么不看看呢？',
@@ -132,24 +108,106 @@ export default {
 
     'command.focusingTab.name': '修改聚焦的标签卡',
     'command.focusingTab.description': '修改正在聚焦的标签卡',
+} as const;
 
+const menu = {
+    'menu.project.name': '项目',
+    'menu.edit.name': '编辑',
+    'menu.run.name': '运行',
+    'menu.layout.name': '布局',
+    'menu.help.name': '帮助',
+    'menu_runMenu.debug.name': '调试',
+    'menu_project.editor.name': '编辑器',
+    'menu_edit.createTarget.name': '创建目标',
+    'menu_layout.ui.name': '界面',
+    'menu_runMenu.run.name': '运行',
+} as const;
+
+const quickOpen = {
+    'quickOpen.input.placeholder': '打开快速访问...',
+    'quickOpen.target.name': '目标',
+    'quickOpen.target.description': '搜索、打开项目中的目标',
+    'quickOpen.block.name': '积木',
+    'quickOpen.block.description': '搜索所选工作区中的积木',
+    'quickOpen.command.name': '指令',
+    'quickOpen.command.description': '更多可用的实用命令',
+} as const;
+
+const project = {
+    'project.defaultName': '我的项目',
+    'project.defaultID': 'my.project',
+
+    'project.frameSync': '帧同步',
+    'project.frameSync.description':
+        '同步逻辑帧和渲染帧。\n若启用，每次逻辑帧都会等待渲染帧完成再执行。',
+
+    'project.allowChangeImportedVar': '允许修改导入的变量',
+    'project.allowChangeImportedVar.description':
+        '允许修改从模块导入的变量。\n若启用，则可修改所有来自导入的变量。',
+} as const;
+
+const tabs = {
+    createProject: {
+        'tab.createProject.title': '创建项目',
+        'tab.createProject.name.title': '项目名称',
+        'tab.createProject.name.introduce': `
+这个项目的名称，它将会在各个地方作为展示使用。
+
+除此之外，它还会在以下地方使用：
+
+- 项目标识的自动生成
+- 关于项目的交互文本
+
+您随时可以修改项目名称。
+    `,
+        'tab.createProject.name.isThatYouWant': '是这样吗：{{name}}',
+
+        'tab.createProject.path.title': '保存目录',
+        'tab.createProject.path.chooseSaveMethod': '选择一个保存方式',
+
+        'tab.createProject.path.useFolder': '使用目录保存',
+        'tab.createProject.path.useFolder.introduce': `Astratch 会使用一个目录来存储您的项目，
+这会带来更快的打开效率和更小的内存占用。`,
+        'tab.createProject.path.useFolder.unavailable':
+            '您使用的浏览器不支持"目录保存"，\n请尝试更新或切换（需基于Chromium构建）浏览器',
+
+        'tab.createProject.path.useFile': '使用单文件保存',
+        'tab.createProject.path.useFile.introduce': `Astratch 会修改/下载一个包含项目的单压缩包文件，
+这会更利于共享项目，但同时会升高内存占用。`,
+        'tab.createProject.path.selectFolder': '选择一个文件夹',
+
+        'tab.createProject.settings.title': '项目设置',
+
+        'tab.createProject.validate.title': '验证项目',
+    },
+    start: {
+        'tab.start.name': '开始',
+        'tab.start.createProject.name': '创建项目',
+        'tab.start.createProjectFaster.name': '进入空项目',
+        'tab.start.createProjectFaster.tip': `这会自动创建一个空项目并应用以下属性：
+- 命名为"${project['project.defaultName']}"
+- 使用单文件保存`,
+        'tab.start.openProject.name': '打开项目',
+        'tab.start.recentProject.name': '最近的项目',
+        'tab.start.fromWhere.name': '从哪开始？',
+    },
+} as const;
+
+const sidebar = {
     'sidebar.target.name': '目标',
     'sidebar.targets.name': '目标',
 
     'sidebar.panel.name': '侧边栏',
     'sidebar.hide.name': '隐藏侧边栏',
+} as const;
 
-    'start.createProject.name': '创建项目',
-    'start.openProject.name': '打开项目',
-    'start.recentProject.name': '最近的项目',
-    'start.fromWhere.name': '从哪开始？',
-
+const bottomBar = {
     'bottomBar.focusingTab.hint': '正在聚焦：',
     'bottomBar.focusingTab.name': '正在聚焦的标签卡',
     'bottomBar.notice.description': '通知',
+} as const;
 
-    'tab.start.name': '开始',
-
+const workspace = {
     'workspace.panel.name': '工作区',
     'workspace.drag.tip': '松开鼠标以放置',
     'workspace.swapPanel.name': '互换面板',
@@ -160,4 +218,24 @@ export default {
     'workspace.switchDirection.name': '切换面板方向',
     'workspace.empty.tip': '啥也没有...',
     'workspace.closeElement.tip': '关闭“{{title}}”',
-};
+} as const;
+
+export default {
+    ...Object.assign({}, ...Object.values(tabs)),
+    ...quickOpen,
+    ...menu,
+    ...commands,
+    ...sidebar,
+    ...bottomBar,
+    ...workspace,
+    ...project,
+    'button.cancel': '取消',
+    'button.next': '下一步',
+    'button.back': '上一步',
+    'button.done': '完成',
+
+    enabled: '已启用',
+    enable: '启用',
+    disable: '禁用',
+    disabled: '已禁用',
+} as Record<string, string>;

@@ -1,0 +1,111 @@
+@use '../../../styles/styles.scss' as *;
+
+.main {
+    display: flex;
+    padding: 125px;
+    flex: 1;
+    align-items: flex-start;
+    background-color: var(--ui-primary);
+    flex-direction: column;
+    border-radius: 5px;
+    justify-content: center;
+    gap: 10px;
+    & .create-panel {
+        width: 100%;
+        height: 100%;
+        display: flex;
+
+        & .left,
+        & .right {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            height: 100%;
+        }
+        & .left .content {
+            flex: 1;
+        }
+        & .button-panel {
+            display: flex;
+            gap: 25px;
+            & button {
+                padding: 5px;
+                min-width: 75px;
+            }
+        }
+    }
+}
+
+.name {
+    & .input {
+        margin: 15px 0;
+    }
+}
+
+.p {
+    white-space: break-spaces;
+    margin: 0;
+    text-align: left;
+}
+
+.path {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    & .save-method-button {
+        border: 1px solid transparent;
+        &.selected {
+            border: 1px solid $accent-primary;
+        }
+        min-width: max-content;
+        display: flex;
+        width: 100%;
+        padding: 10px;
+        gap: 10px;
+        align-items: center;
+        svg {
+            width: 75px;
+            height: auto;
+        }
+        & .introduce {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+    & .save-config {
+        display: flex;
+        padding-left: 25px;
+        gap: 10px;
+        align-items: center;
+    }
+}
+
+.settings {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    & ul {
+        overflow: auto;
+        gap: 10px;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+
+        & li {
+            display: flex;
+            gap: 10px;
+        }
+    }
+}
+
+.validate {
+    & ul {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        & li span {
+            padding-left: 15px;
+        }
+    }
+}

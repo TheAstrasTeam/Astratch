@@ -5,7 +5,7 @@ import { quickOpenManager } from './QuickOpenManager';
 import { themeManager } from './ThemeManager';
 import { windowManager } from './WindowManager';
 import { childID, isChildWindow, parentWindow } from '../utils/window';
-import { vm } from './vm';
+import { vm } from './vm/vm';
 import { tabsManager } from './TabsManager';
 
 const Astratch = {

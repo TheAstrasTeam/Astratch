@@ -9,8 +9,11 @@ button {
     border: none;
     padding: 2px;
     border-radius: 4px;
-    &:hover {
+    &:hover:not(&:disabled) {
         background-color: $ui-quaternary;
+    }
+    &:disabled {
+        filter: brightness(0.8);
     }
 }
 
@@ -30,6 +33,11 @@ span {
     user-select: none;
     // 让换行可用
     white-space: break-spaces;
+    display: block;
+    min-width: max-content;
+}
+p {
+    min-width: max-content;
 }
 
 body {
@@ -77,4 +85,18 @@ ul {
 li {
     min-width: max-content;
     display: block;
+}
+
+h1 {
+    font-size: x-large;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0;
+    display: block;
+    min-width: max-content;
 }

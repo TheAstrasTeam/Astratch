@@ -42,8 +42,8 @@ describe('command Manager', () => {
         const event_deleted = () => {
             success.event_deleted = true;
         };
-        commandManager.on('ADDED_COMMAND', event_added);
-        commandManager.on('DELETED_COMMAND', event_deleted);
+        commandManager.on('ADD_COMMAND', event_added);
+        commandManager.on('DELETE_COMMAND', event_deleted);
         commandManager.addCommand(testMeta);
         commandManager.deleteCommand(id);
         expect(success).toEqual({

@@ -76,6 +76,7 @@
 }
 
 .workspace {
+    outline: none;
     display: flex;
     padding: 5px;
     flex-direction: column;
@@ -107,6 +108,7 @@
             transition: opacity 0.2s ease;
             display: flex;
             gap: 5px;
+            overflow: auto;
             & button {
                 display: flex;
                 justify-content: center;

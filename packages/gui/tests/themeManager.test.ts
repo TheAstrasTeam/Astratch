@@ -75,8 +75,8 @@ describe('ThemeManager', () => {
         const event_applied = () => {
             success.event_applied = true;
         };
-        themeManager.on('ADDED_THEME', event_added);
-        themeManager.on('APPLIED_THEME', event_applied);
+        themeManager.on('ADD_THEME', event_added);
+        themeManager.on('APPLY_THEME', event_applied);
         expect(await themeManager.addNewTheme(themeUI, true)).toEqual('HELLO!');
         expect(success).toEqual({
             event_added: true,
